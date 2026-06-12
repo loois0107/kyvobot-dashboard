@@ -64,3 +64,6 @@ client.on('messageCreate', async (message) => {
 
 // 5. 봇 구동 시동 걸기
 client.login(process.env.DISCORD_TOKEN);
+// Render 무료 서버 유지를 위한 야매 포트 열기
+const http = require('http');
+http.createServer((req, res) => res.end('Bot is running')).listen(process.env.PORT || 3000);
