@@ -89,7 +89,9 @@ export default function Dashboard() {
       .eq('guild_id', TARGET_GUILD_ID);
 
     if (error) alert(`저장 실패: ${error.message}`);
-    else alert('👋 환영 메시지 설정이 성공적으로 저장되었습니다!');
+
+else alert('👋 Welcome settings have been successfully saved!');
+
     setLoading(false);
   };
 
