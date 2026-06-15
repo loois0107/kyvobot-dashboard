@@ -5,7 +5,8 @@ import { useSession, signIn, signOut } from 'next-auth/react';
 import { supabase } from '@/lib/supabase';
 
 export default function Dashboard() {
-  const { data: session, status } = useSession();
+  // 빌드 시 useSession()이 undefined를 반환하더라도 대시보드가 터지지 않도록 안전장치(|| {})를 추가했습니다.
+  const { data: session, status } = useSession() || {};
   const [bannedWords, setBannedWords] = useState<string[]>([]);
   const [newWord, setNewWord] = useState('');
   const [loading, setLoading] = useState(false);
@@ -39,7 +40,6 @@ export default function Dashboard() {
     const updatedWords = [...bannedWords, newWord.trim().toLowerCase()];
     setLoading(true);
 
-    // guild_id가 기본키가 되었기 때문에 이제 단 한 줄로 깔끔하게 저장 및 수정이 끝납니다!
     const { error } = await supabase
       .from('server_settings')
       .upsert({ guild_id: TARGET_GUILD_ID, banned_words: updatedWords });
