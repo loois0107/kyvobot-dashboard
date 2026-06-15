@@ -5,8 +5,11 @@ import { useSession, signIn, signOut } from 'next-auth/react';
 import { supabase } from '@/lib/supabase';
 
 export default function Dashboard() {
-  // 빌드 시 useSession()이 undefined를 반환하더라도 대시보드가 터지지 않도록 안전장치(|| {})를 추가했습니다.
-  const { data: session, status } = useSession() || {};
+  // 🛡️ 에러 원천 차단: 구조분해 할당({...})을 완전히 제거하고 안전하게 객체로 직접 받습니다.
+  const sessionResult = useSession();
+  const session = sessionResult ? sessionResult.data : null;
+  const status = sessionResult ? sessionResult.status : "loading";
+
   const [bannedWords, setBannedWords] = useState<string[]>([]);
   const [newWord, setNewWord] = useState('');
   const [loading, setLoading] = useState(false);
