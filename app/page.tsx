@@ -41,7 +41,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false);
   const TARGET_GUILD_ID = "1507639384453939381";
 
-  const OPERATOR_USER_ID = (session as any)?.user?.id || "";
+  const 1049299755643179039 = (session as any)?.user?.id || "";
 
   useEffect(() => {
     if (session) {
