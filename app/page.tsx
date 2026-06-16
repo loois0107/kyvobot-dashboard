@@ -5,7 +5,7 @@ import { useSession, signIn, signOut } from 'next-auth/react';
 import { supabase } from '@/lib/supabase';
 
 // 🌐 [CRITICAL CONFIG] Replace with your actual Render Python Bot app URL
-const RENDER_BOT_URL = "https://kyvobot-dashboard.onrender.com"; 
+const RENDER_BOT_URL = "https://your-bot-app.onrender.com"; 
 
 export default function Dashboard() {
   const sessionResult = useSession();
@@ -35,36 +35,27 @@ export default function Dashboard() {
 
   // --- Live Automation Analytics State ---
   const [botStats, setBotStats] = useState({
-    status: 'loading',
-    bot_name: 'KyvoBot Core',
-    version: '1.0.4',
-    guilds_count: 0,
-    cached_users: 0,
-    ping_ms: 0
+    status: 'loading', bot_name: 'KyvoBot Core', version: '1.0.4', guilds_count: 0, cached_users: 0, ping_ms: 0
   });
 
   const [loading, setLoading] = useState(false);
   const TARGET_GUILD_ID = "1507639384453939381";
 
+  // Safely extract discord provider user account unique identifier string from Next-Auth session context
+  const OPERATOR_USER_ID = (session as any)?.user?.id || "";
+
   useEffect(() => {
     if (session) {
       fetchSettings();
       fetchLiveBotStats();
-      // Set interval loop to update telemetry every 30 seconds
       const timer = setInterval(fetchLiveBotStats, 30000);
       return () => clearInterval(timer);
     }
   }, [session]);
 
-  // Fetch configs from Supabase
   const fetchSettings = async () => {
     setLoading(true);
-    const { data } = await supabase
-      .from('server_settings')
-      .select('*')
-      .eq('guild_id', TARGET_GUILD_ID)
-      .single();
-
+    const { data } = await supabase.from('server_settings').select('*').eq('guild_id', TARGET_GUILD_ID).single();
     if (data) {
       setBannedWords(data.banned_words || []);
       setWelcomeEnabled(data.welcome_enabled || false);
@@ -72,7 +63,6 @@ export default function Dashboard() {
       setWelcomeMessage(data.welcome_message || '');
       setAutoRoleId(data.auto_role_id || '');
       setCustomCommands(data.custom_commands || {});
-      
       setAntiSpamEnabled(data.anti_spam_enabled || false);
       setLinkBlockEnabled(data.link_block_enabled || false);
       setXpEnabled(data.xp_enabled || false);
@@ -82,52 +72,64 @@ export default function Dashboard() {
     setLoading(false);
   };
 
-  // Telemetry Pipeline Link: Fetch live metric analytics from Python Backend Route
   const fetchLiveBotStats = async () => {
     try {
       const res = await fetch(`${RENDER_BOT_URL}/api/stats`);
-      if (res.ok) {
-        const data = await res.json();
-        setBotStats(data);
-      } else {
-        setBotStats(prev => ({ ...prev, status: 'interrupted' }));
-      }
+      if (res.ok) setBotStats(await res.json());
+      else setBotStats(prev => ({ ...prev, status: 'interrupted' }));
     } catch (e) {
       setBotStats(prev => ({ ...prev, status: 'offline' }));
     }
   };
 
-  // --- Operations Mutation Handlers ---
+  // 🌟 CENTRALIZED SECURE ROUTER: Transmits saving frames directly through the Python firewall checkpoint
+  const commitSecureUpdate = async (updatedPayload: dict) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${RENDER_BOT_URL}/api/settings/update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          guild_id: TARGET_GUILD_ID,
+          user_id: OPERATOR_USER_ID,
+          payload: updatedPayload
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Transmission anomaly.");
+      return true;
+    } catch (e: any) {
+      alert(`🔒 Security Intercept: ${e.message}`);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const addWord = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newWord.trim() || bannedWords.includes(newWord.trim().toLowerCase())) return;
     const updatedWords = [...bannedWords, newWord.trim().toLowerCase()];
-    setLoading(true);
-    const { error } = await supabase.from('server_settings').update({ banned_words: updatedWords }).eq('guild_id', TARGET_GUILD_ID);
-    if (!error) { setBannedWords(updatedWords); setNewWord(''); }
-    setLoading(false);
+    if (await commitSecureUpdate({ banned_words: updatedWords })) {
+      setBannedWords(updatedWords);
+      setNewWord('');
+    }
   };
 
   const removeWord = async (wordToRemove: string) => {
     const updatedWords = bannedWords.filter(w => w !== wordToRemove);
-    setLoading(true);
-    const { error } = await supabase.from('server_settings').update({ banned_words: updatedWords }).eq('guild_id', TARGET_GUILD_ID);
-    if (!error) setBannedWords(updatedWords);
-    setLoading(false);
+    if (await commitSecureUpdate({ banned_words: updatedWords })) setBannedWords(updatedWords);
   };
 
   const saveWelcomeSettings = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    const { error } = await supabase.from('server_settings').update({
+    const isSuccess = await commitSecureUpdate({
       welcome_enabled: welcomeEnabled,
       welcome_channel_id: welcomeChannelId || null,
       welcome_message: welcomeMessage || null,
       auto_role_id: autoRoleId || null
-    }).eq('guild_id', TARGET_GUILD_ID);
-    if (error) alert(`Failed to save: ${error.message}`);
-    else alert('👋 Welcome settings synchronized!');
-    setLoading(false);
+    });
+    if (isSuccess) alert('👋 Welcome settings synchronized securely via Core Bot Guard!');
   };
 
   const addCommand = async (e: React.FormEvent) => {
@@ -136,56 +138,38 @@ export default function Dashboard() {
     let name = cmdName.trim();
     if (!name.startsWith('!')) name = '!' + name;
     const updatedCommands = { ...customCommands, [name]: cmdResponse.trim() };
-    setLoading(true);
-    const { error } = await supabase.from('server_settings').update({ custom_commands: updatedCommands }).eq('guild_id', TARGET_GUILD_ID);
-    if (error) alert(`Error: ${error.message}`);
-    else { setCustomCommands(updatedCommands); setCmdName(''); setCmdResponse(''); }
-    setLoading(false);
+    if (await commitSecureUpdate({ custom_commands: updatedCommands })) {
+      setCustomCommands(updatedCommands);
+      setCmdName('');
+      setCmdResponse('');
+    }
   };
 
   const removeCommand = async (nameToRemove: string) => {
     const updatedCommands = { ...customCommands };
     delete updatedCommands[nameToRemove];
-    setLoading(true);
-    const { error } = await supabase.from('server_settings').update({ custom_commands: updatedCommands }).eq('guild_id', TARGET_GUILD_ID);
-    if (error) alert(`Error: ${error.message}`);
-    else setCustomCommands(updatedCommands);
-    setLoading(false);
+    if (await commitSecureUpdate({ custom_commands: updatedCommands })) setCustomCommands(updatedCommands);
   };
 
   const saveAutoModSettings = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    const { error } = await supabase.from('server_settings').update({
-      anti_spam_enabled: antiSpamEnabled,
-      link_block_enabled: linkBlockEnabled
-    }).eq('guild_id', TARGET_GUILD_ID);
-    if (error) alert(`Error: ${error.message}`);
-    else alert('🛡️ Advanced security controls updated!');
-    setLoading(false);
+    if (await commitSecureUpdate({ anti_spam_enabled: antiSpamEnabled, link_block_enabled: linkBlockEnabled })) {
+      alert('🛡️ Advanced security controls updated securely!');
+    }
   };
 
   const saveEconomySettings = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    const { error } = await supabase.from('server_settings').update({
-      xp_enabled: xpEnabled,
-      xp_rate: xpRate
-    }).eq('guild_id', TARGET_GUILD_ID);
-    if (error) alert(`Error: ${error.message}`);
-    else alert('💰 Progression economy system config updated!');
-    setLoading(false);
+    if (await commitSecureUpdate({ xp_enabled: xpEnabled, xp_rate: xpRate })) {
+      alert('💰 Progression economy system config updated securely!');
+    }
   };
 
   const saveInteractiveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    const { error } = await supabase.from('server_settings').update({
-      ticket_category_id: ticketCategoryId || null
-    }).eq('guild_id', TARGET_GUILD_ID);
-    if (error) alert(`Error: ${error.message}`);
-    else alert('🎟️ Interactive component layout saved!');
-    setLoading(false);
+    if (await commitSecureUpdate({ ticket_category_id: ticketCategoryId || null })) {
+      alert('🎟️ Interactive view configurations saved securely!');
+    }
   };
 
   if (status === "loading") {
@@ -250,7 +234,6 @@ export default function Dashboard() {
         {/* ---- TAB 1: OVERVIEW & TELEMETRY CHARTS ---- */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
-            {/* Live Core Telemetry Cluster Status Banner */}
             <div className="bg-gray-950 border border-gray-800 p-6 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
                 <h2 className="text-lg font-black tracking-tight text-white flex items-center gap-2">
@@ -267,7 +250,6 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Micro Metrics Analytics Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="bg-gray-800 p-5 rounded-xl border border-gray-700">
                 <span className="text-[10px] font-bold tracking-wider text-gray-400 uppercase">Network API Ping Latency</span>
@@ -283,7 +265,6 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Custom Interactive SVG Line Chart: Traffic Optimization Analytics Mapping */}
             <div className="bg-gray-800 p-6 rounded-2xl border border-gray-700">
               <div className="flex justify-between items-center mb-4">
                 <div>
@@ -293,7 +274,6 @@ export default function Dashboard() {
                 <span className="text-[10px] bg-blue-500/10 text-blue-400 font-bold border border-blue-500/20 px-2 py-0.5 rounded-md font-mono">LIVE MATRIX</span>
               </div>
 
-              {/* Native Vector Canvas Layout Area */}
               <div className="relative w-full h-48 bg-gray-950 rounded-xl p-2 border border-gray-900 overflow-hidden">
                 <svg className="w-full h-full" viewBox="0 0 500 100" preserveAspectRatio="none">
                   <defs>
@@ -302,25 +282,16 @@ export default function Dashboard() {
                       <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.0" />
                     </linearGradient>
                   </defs>
-                  {/* Grid Lines helper nodes */}
                   <line x1="0" y1="25" x2="500" y2="25" stroke="#1f2937" strokeWidth="0.5" strokeDasharray="5,5" />
                   <line x1="0" y1="50" x2="500" y2="50" stroke="#1f2937" strokeWidth="0.5" strokeDasharray="5,5" />
                   <line x1="0" y1="75" x2="500" y2="75" stroke="#1f2937" strokeWidth="0.5" strokeDasharray="5,5" />
-                  
-                  {/* Visual Chart Shading Area Vector */}
                   <path d="M 0 100 L 0 70 Q 100 20 200 60 T 400 30 L 500 10 L 500 100 Z" fill="url(#chartGradient)" />
-                  {/* Primary Analytic Data Line Routing path */}
                   <path d="M 0 70 Q 100 20 200 60 T 400 30 L 500 10" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" />
-                  
-                  {/* Pulsing Target Tracker Dot Node */}
                   <circle cx="500" cy="10" r="4" fill="#60a5fa" className="animate-ping origin-center" />
                   <circle cx="500" cy="10" r="3" fill="#3b82f6" />
                 </svg>
                 <div className="absolute bottom-2 left-3 right-3 flex justify-between text-[9px] text-gray-600 font-mono">
-                  <span>-50m ago</span>
-                  <span>-30m ago</span>
-                  <span>-10m ago</span>
-                  <span>LIVE TIME</span>
+                  <span>-50m ago</span><span>-30m ago</span><span>-10m ago</span><span>LIVE TIME</span>
                 </div>
               </div>
             </div>
