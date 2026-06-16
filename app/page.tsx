@@ -5,7 +5,7 @@ import { useSession, signIn, signOut } from 'next-auth/react';
 import { supabase } from '@/lib/supabase';
 
 // 🌐 [CRITICAL CONFIG] Replace with your actual Render Python Bot app URL (Must start with https://)
-const RENDER_BOT_URL = "https://kyvobot-dashboard.onrender.com"; 
+const RENDER_BOT_URL = "https://kyvobot.onrender.com"; 
 
 export default function Dashboard() {
   const sessionResult = useSession();
