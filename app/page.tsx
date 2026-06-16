@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { supabase } from '@/lib/supabase';
 
-// 🌐 [CRITICAL CONFIG] Replace with your actual Render Python Bot app URL
+// 🌐 [CRITICAL CONFIG] Replace with your actual Render Python Bot app URL (Must start with https://)
 const RENDER_BOT_URL = "https://kyvobot-dashboard.onrender.com"; 
 
 export default function Dashboard() {
@@ -41,7 +41,6 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false);
   const TARGET_GUILD_ID = "1507639384453939381";
 
-  // Safely extract discord provider user account unique identifier string from Next-Auth session context
   const OPERATOR_USER_ID = (session as any)?.user?.id || "";
 
   useEffect(() => {
@@ -82,8 +81,8 @@ export default function Dashboard() {
     }
   };
 
-  // 🌟 CENTRALIZED SECURE ROUTER: Transmits saving frames directly through the Python firewall checkpoint
-  const commitSecureUpdate = async (updatedPayload: dict) => {
+  // 🌟 FIXED TYPE: Changed 'updatedPayload: dict' to 'updatedPayload: any' to fix Vercel compilation error
+  const commitSecureUpdate = async (updatedPayload: any) => {
     setLoading(true);
     try {
       const res = await fetch(`${RENDER_BOT_URL}/api/settings/update`, {
@@ -196,14 +195,11 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-900 text-white font-sans">
-      
-      {/* 📱 Navigation Matrix Component */}
       <div className="w-full md:w-64 bg-gray-950 p-4 flex flex-row md:flex-col gap-1.5 overflow-x-auto md:overflow-x-visible border-b md:border-b-0 md:border-r border-gray-800 shrink-0 sticky top-0 z-50 backdrop-blur-md bg-opacity-90">
         <div className="hidden md:block mb-4 p-2">
           <h1 className="text-2xl font-black text-blue-500 tracking-wide">KyvoBot</h1>
           <p className="text-xs text-gray-400 mt-1">Operator: {session.user?.name}</p>
         </div>
-        
         {[
           { id: 'overview', label: '📊 Dashboard Overview' },
           { id: 'automod', label: '🛡️ AutoMod Filters' },
@@ -222,16 +218,12 @@ export default function Dashboard() {
             {tab.label}
           </button>
         ))}
-        
         <button onClick={() => signOut()} className="md:mt-auto px-4 py-2.5 text-xs font-bold text-left text-rose-400 hover:bg-rose-500/10 rounded-xl whitespace-nowrap">
           🚪 Disconnect Terminal
         </button>
       </div>
 
-      {/* 💻 Main Settings Panel Node */}
       <main className="flex-1 p-5 sm:p-10 max-w-4xl mx-auto w-full transition-all duration-200">
-        
-        {/* ---- TAB 1: OVERVIEW & TELEMETRY CHARTS ---- */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
             <div className="bg-gray-950 border border-gray-800 p-6 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -273,7 +265,6 @@ export default function Dashboard() {
                 </div>
                 <span className="text-[10px] bg-blue-500/10 text-blue-400 font-bold border border-blue-500/20 px-2 py-0.5 rounded-md font-mono">LIVE MATRIX</span>
               </div>
-
               <div className="relative w-full h-48 bg-gray-950 rounded-xl p-2 border border-gray-900 overflow-hidden">
                 <svg className="w-full h-full" viewBox="0 0 500 100" preserveAspectRatio="none">
                   <defs>
@@ -447,7 +438,6 @@ export default function Dashboard() {
             <button type="submit" disabled={loading} className="w-full bg-emerald-600 hover:bg-emerald-700 text-xs font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-600/10">{loading ? "Synchronizing..." : "Commit Component Layouts"}</button>
           </form>
         )}
-
       </main>
     </div>
   );
