@@ -9,10 +9,10 @@ export default function Dashboard() {
   const session = sessionResult ? sessionResult.data : null;
   const status = sessionResult ? sessionResult.status : "loading";
 
-  // Dashboard Tab Control State
+  // Navigation Control
   const [activeTab, setActiveTab] = useState('overview');
 
-  // --- Existing State Variables ---
+  // --- Core State Variables ---
   const [bannedWords, setBannedWords] = useState<string[]>([]);
   const [newWord, setNewWord] = useState('');
   const [welcomeEnabled, setWelcomeEnabled] = useState(false);
@@ -23,16 +23,11 @@ export default function Dashboard() {
   const [cmdName, setCmdName] = useState('');
   const [cmdResponse, setCmdResponse] = useState('');
   
-  // --- Extended Feature State Variables ---
-  # 1. AutoMod Extension (cogs/automod)
+  // --- Extended Modules State Variables ---
   const [antiSpamEnabled, setAntiSpamEnabled] = useState(false);
   const [linkBlockEnabled, setLinkBlockEnabled] = useState(false);
-  
-  # 2. Economy & Leveling System (cogs/economy)
   const [xpEnabled, setXpEnabled] = useState(false);
   const [xpRate, setXpRate] = useState(1.0);
-  
-  # 3. Interactive Components (cogs/interactive)
   const [ticketCategoryId, setTicketCategoryId] = useState('');
 
   const [loading, setLoading] = useState(false);
@@ -44,7 +39,7 @@ export default function Dashboard() {
     }
   }, [session]);
 
-  // Load configuration from Supabase
+  // Data Pipeline Link: Fetch configurations from Supabase
   const fetchSettings = async () => {
     setLoading(true);
     const { data } = await supabase
@@ -70,7 +65,7 @@ export default function Dashboard() {
     setLoading(false);
   };
 
-  // --- Handlers ---
+  // --- Operations Mutation Handlers ---
   const addWord = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newWord.trim() || bannedWords.includes(newWord.trim().toLowerCase())) return;
@@ -100,7 +95,7 @@ export default function Dashboard() {
     }).eq('guild_id', TARGET_GUILD_ID);
 
     if (error) alert(`Failed to save: ${error.message}`);
-    else alert('👋 Welcome settings have been successfully saved!');
+    else alert('👋 Welcome settings have been successfully synchronized!');
     setLoading(false);
   };
 
@@ -112,7 +107,7 @@ export default function Dashboard() {
     const updatedCommands = { ...customCommands, [name]: cmdResponse.trim() };
     setLoading(true);
     const { error } = await supabase.from('server_settings').update({ custom_commands: updatedCommands }).eq('guild_id', TARGET_GUILD_ID);
-    if (error) alert(`Failed to add command: ${error.message}`);
+    if (error) alert(`Failed to register command: ${error.message}`);
     else { setCustomCommands(updatedCommands); setCmdName(''); setCmdResponse(''); }
     setLoading(false);
   };
@@ -122,7 +117,7 @@ export default function Dashboard() {
     delete updatedCommands[nameToRemove];
     setLoading(true);
     const { error } = await supabase.from('server_settings').update({ custom_commands: updatedCommands }).eq('guild_id', TARGET_GUILD_ID);
-    if (error) alert(`Failed to delete command: ${error.message}`);
+    if (error) alert(`Failed to drop command: ${error.message}`);
     else setCustomCommands(updatedCommands);
     setLoading(false);
   };
@@ -135,7 +130,7 @@ export default function Dashboard() {
       link_block_enabled: linkBlockEnabled
     }).eq('guild_id', TARGET_GUILD_ID);
     if (error) alert(`Error: ${error.message}`);
-    else alert('🛡️ Advanced AutoMod settings have been successfully saved!');
+    else alert('🛡️ Advanced security controls updated successfully!');
     setLoading(false);
   };
 
@@ -147,7 +142,7 @@ export default function Dashboard() {
       xp_rate: xpRate
     }).eq('guild_id', TARGET_GUILD_ID);
     if (error) alert(`Error: ${error.message}`);
-    else alert('💰 Economy and leveling settings have been synchronized!');
+    else alert('💰 Gamification economy system config updated!');
     setLoading(false);
   };
 
@@ -158,15 +153,15 @@ export default function Dashboard() {
       ticket_category_id: ticketCategoryId || null
     }).eq('guild_id', TARGET_GUILD_ID);
     if (error) alert(`Error: ${error.message}`);
-    else alert('🎟️ Interactive component settings have been saved!');
+    else alert('🎟️ Interactive view configurations saved!');
     setLoading(false);
   };
 
-  // Auth Status Rendering
+  // Auth Status Rendering Guards
   if (status === "loading") {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center font-sans">
-        <p className="text-xl animate-pulse text-gray-400">Authenticating with Discord...</p>
+        <p className="text-xl animate-pulse text-gray-400">Authenticating session via Discord...</p>
       </div>
     );
   }
@@ -174,10 +169,10 @@ export default function Dashboard() {
   if (!session) {
     return (
       <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center font-sans p-6">
-        <div className="max-w-md text-center bg-gray-800 p-10 rounded-2xl border border-gray-700 shadow-2xl">
-          <h1 className="text-4xl font-extrabold text-blue-400 mb-4">KyvoBot</h1>
-          <p className="text-gray-400 mb-8">Login with Discord to manage your server dashboard.</p>
-          <button onClick={() => signIn('discord')} className="w-full bg-[#5865F2] text-white font-bold py-4 px-6 rounded-xl shadow-lg">
+        <div className="max-w-md w-full text-center bg-gray-800 p-10 rounded-2xl border border-gray-700 shadow-2xl">
+          <h1 className="text-4xl font-black text-blue-500 mb-4 tracking-wide">KyvoBot</h1>
+          <p className="text-gray-400 mb-8 text-sm">Secure enterprise panel connection. Connect your Discord account to proceed.</p>
+          <button onClick={() => signIn('discord')} className="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-4 px-6 rounded-xl shadow-lg transition duration-150">
             Connect with Discord
           </button>
         </div>
@@ -188,25 +183,25 @@ export default function Dashboard() {
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-900 text-white font-sans">
       
-      {/* 📱 Mobile Horizontal Scroll / Desktop Sidebar Navigation */}
+      {/* 📱 Navigation Matrix Terminal Component */}
       <div className="w-full md:w-64 bg-gray-950 p-4 flex flex-row md:flex-col gap-1.5 overflow-x-auto md:overflow-x-visible border-b md:border-b-0 md:border-r border-gray-800 shrink-0 sticky top-0 z-50 backdrop-blur-md bg-opacity-90">
         <div className="hidden md:block mb-4 p-2">
-          <h1 className="text-2xl font-black text-blue-400 tracking-wide">KyvoBot</h1>
-          <p className="text-xs text-gray-400 mt-1">Logged in as {session.user?.name}</p>
+          <h1 className="text-2xl font-black text-blue-500 tracking-wide">KyvoBot</h1>
+          <p className="text-xs text-gray-400 mt-1">Operator: {session.user?.name}</p>
         </div>
         
         {[
-          { id: 'overview', label: '📊 Overview' },
-          { id: 'automod', label: '🛡️ AutoMod Security' },
-          { id: 'welcome', label: '👋 Welcome & Roles' },
-          { id: 'economy', label: '💰 XP & Leveling' },
-          { id: 'commands', label: '⚙️ Custom Commands' },
-          { id: 'interactive', label: '🎟️ Interactive System' },
+          { id: 'overview', label: '📊 Dashboard Overview' },
+          { id: 'automod', label: '🛡️ AutoMod Filters' },
+          { id: 'welcome', label: '👋 Welcome & Auto-Roles' },
+          { id: 'economy', label: '💰 XP & Progression' },
+          { id: 'commands', label: '⚙️ Custom Core Commands' },
+          { id: 'interactive', label: '🎟️ Interactive View Modules' },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2.5 rounded-xl text-sm font-semibold text-left whitespace-nowrap transition-all duration-150 ${
+            className={`px-4 py-2.5 rounded-xl text-xs font-bold text-left whitespace-nowrap transition-all duration-150 ${
               activeTab === tab.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
             }`}
           >
@@ -214,29 +209,29 @@ export default function Dashboard() {
           </button>
         ))}
         
-        <button onClick={() => signOut()} className="md:mt-auto px-4 py-2.5 text-sm font-semibold text-left text-rose-400 hover:bg-rose-500/10 rounded-xl whitespace-nowrap">
-          🚪 Logout
+        <button onClick={() => signOut()} className="md:mt-auto px-4 py-2.5 text-xs font-bold text-left text-rose-400 hover:bg-rose-500/10 rounded-xl whitespace-nowrap">
+          🚪 Disconnect Terminal
         </button>
       </div>
 
-      {/* 💻 Main Dashboard Content */}
-      <main className="flex-1 p-6 sm:p-10 max-w-4xl mx-auto w-full transition-all duration-200">
+      {/* 💻 Main Settings Panel Node */}
+      <main className="flex-1 p-5 sm:p-10 max-w-4xl mx-auto w-full transition-all duration-200">
         
         {/* ---- TAB 1: OVERVIEW ---- */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
-            <div className="bg-gradient-to-r from-blue-600/20 to-indigo-600/20 border border-blue-500/30 p-6 rounded-2xl">
-              <h2 className="text-2xl font-bold text-blue-300">Welcome back, {session.user?.name}!</h2>
-              <p className="text-gray-400 text-sm mt-1">KyvoBot is actively syncing real-time configurations for Target Guild (ID: {TARGET_GUILD_ID}).</p>
+            <div className="bg-gradient-to-r from-blue-600/10 to-indigo-600/10 border border-blue-500/20 p-6 rounded-2xl">
+              <h2 className="text-xl font-bold text-blue-400">System Connected: {session.user?.name}</h2>
+              <p className="text-gray-400 text-xs mt-1">Asynchronous engine actively syncing cluster configurations for Target Guild: <code className="bg-gray-800 text-blue-300 px-1 py-0.5 rounded text-xs">{TARGET_GUILD_ID}</code></p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-gray-800 p-5 rounded-xl border border-gray-700">
-                <span className="text-xs font-bold tracking-wider text-gray-400 uppercase">Banned Words Filter</span>
-                <p className="text-2xl font-black text-red-400 mt-1">{bannedWords.length} Filters Active</p>
+                <span className="text-[10px] font-bold tracking-wider text-gray-400 uppercase">Active Word Filters</span>
+                <p className="text-2xl font-black text-rose-400 mt-1">{bannedWords.length} Filters Engaged</p>
               </div>
               <div className="bg-gray-800 p-5 rounded-xl border border-gray-700">
-                <span className="text-xs font-bold tracking-wider text-gray-400 uppercase">Custom Commands</span>
-                <p className="text-2xl font-black text-blue-400 mt-1">{Object.keys(customCommands).length} Commands Enabled</p>
+                <span className="text-[10px] font-bold tracking-wider text-gray-400 uppercase">Custom Server Command Clusters</span>
+                <p className="text-2xl font-black text-blue-400 mt-1">{Object.keys(customCommands).length} Stored Entries</p>
               </div>
             </div>
           </div>
@@ -245,43 +240,42 @@ export default function Dashboard() {
         {/* ---- TAB 2: AUTOMOD ---- */}
         {activeTab === 'automod' && (
           <div className="space-y-6">
-            {/* Word Filters */}
             <section className="bg-gray-800 p-6 rounded-2xl border border-gray-700">
-              <h2 className="text-xl font-semibold mb-4 text-red-400">🤬 Banned Words Filter</h2>
+              <h2 className="text-lg font-bold mb-1 text-rose-400">🤬 Banned Words Dictionary</h2>
+              <p className="text-xs text-gray-400 mb-4">Messages containing these strict sub-strings will be purged immediately.</p>
               <form onSubmit={addWord} className="flex gap-2 mb-4">
-                <input type="text" value={newWord} onChange={(e) => setNewWord(e.target.value)} placeholder="Enter a new word to filter..." className="flex-1 bg-gray-900 border border-gray-600 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-blue-500" />
-                <button type="submit" className="bg-blue-600 px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">Add Filter</button>
+                <input type="text" value={newWord} onChange={(e) => setNewWord(e.target.value)} placeholder="Type restricted word..." className="flex-1 bg-gray-950 border border-gray-700 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-blue-500 text-white placeholder-gray-600" />
+                <button type="submit" className="bg-blue-600 hover:bg-blue-700 px-5 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition">Add Token</button>
               </form>
-              <div className="bg-gray-900 rounded-xl p-4 border border-gray-700 max-h-40 overflow-y-auto flex flex-wrap gap-2">
-                {bannedWords.length === 0 ? <p className="text-gray-500 text-sm m-auto">No filtered words configured yet.</p> : 
+              <div className="bg-gray-950 rounded-xl p-4 border border-gray-800 max-h-40 overflow-y-auto flex flex-wrap gap-2">
+                {bannedWords.length === 0 ? <p className="text-gray-600 text-xs m-auto">Dictionary configuration vacant.</p> : 
                   bannedWords.map((word, i) => (
-                    <div key={i} className="bg-red-500/10 text-red-400 border border-red-500/20 px-2.5 py-1 rounded-md text-xs flex items-center gap-2">
+                    <div key={i} className="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-2">
                       <span>{word}</span>
-                      <button type="button" onClick={() => removeWord(word)} className="font-bold hover:text-red-300">✕</button>
+                      <button type="button" onClick={() => removeWord(word)} className="font-bold hover:text-rose-300">✕</button>
                     </div>
                   ))
                 }
               </div>
             </section>
 
-            {# Advanced Filters }
             <form onSubmit={saveAutoModSettings} className="bg-gray-800 p-6 rounded-2xl border border-gray-700 space-y-4">
-              <h2 className="text-xl font-semibold text-blue-400">🛡️ Advanced Anti-Abuse</h2>
-              <div className="flex items-center justify-between p-3 bg-gray-900 rounded-xl border border-gray-700">
+              <h2 className="text-lg font-bold text-blue-400">🛡️ Advanced Infrastructure Security</h2>
+              <div className="flex items-center justify-between p-4 bg-gray-950 rounded-xl border border-gray-800">
                 <div>
-                  <p className="text-sm font-medium">Anti-Spam System</p>
-                  <p className="text-xs text-gray-400">Rate-limits and warns users spamming consecutive messages</p>
+                  <p className="text-xs font-bold">Anti-Spam System Rate-Limiter</p>
+                  <p className="text-[11px] text-gray-500 mt-0.5">Intercepts and flags users processing more than 5 messages per 3 seconds.</p>
                 </div>
-                <input type="checkbox" checked={antiSpamEnabled} onChange={(e) => setAntiSpamEnabled(e.target.checked)} className="w-5 h-5 accent-blue-600" />
+                <input type="checkbox" checked={antiSpamEnabled} onChange={(e) => setAntiSpamEnabled(e.target.checked)} className="w-4 h-4 accent-blue-500" />
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-900 rounded-xl border border-gray-700">
+              <div className="flex items-center justify-between p-4 bg-gray-950 rounded-xl border border-gray-800">
                 <div>
-                  <p className="text-sm font-medium">Invite Link Blocker</p>
-                  <p className="text-xs text-gray-400">Automatically intercepts and deletes external discord server invites</p>
+                  <p className="text-xs font-bold">External Server Invite Interceptor</p>
+                  <p className="text-[11px] text-gray-500 mt-0.5">Deletes messages indexing cross-server advertisement links.</p>
                 </div>
-                <input type="checkbox" checked={linkBlockEnabled} onChange={(e) => setLinkBlockEnabled(e.target.checked)} className="w-5 h-5 accent-blue-600" />
+                <input type="checkbox" checked={linkBlockEnabled} onChange={(e) => setLinkBlockEnabled(e.target.checked)} className="w-4 h-4 accent-blue-500" />
               </div>
-              <button type="submit" disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700 text-sm font-bold py-2.5 rounded-lg transition">{loading ? "Saving..." : "Apply Security Settings"}</button>
+              <button type="submit" disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700 text-xs font-bold py-3 rounded-xl transition shadow-lg shadow-blue-600/10">{loading ? "Synchronizing..." : "Commit Security Settings"}</button>
             </form>
           </div>
         )}
@@ -290,25 +284,35 @@ export default function Dashboard() {
         {activeTab === 'welcome' && (
           <form onSubmit={saveWelcomeSettings} className="bg-gray-800 p-6 rounded-2xl border border-gray-700 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-blue-400">👋 Welcome Message & Auto-Role</h2>
-              <input type="checkbox" checked={welcomeEnabled} onChange={(e) => setWelcomeEnabled(e.target.checked)} className="w-5 h-5 accent-blue-600" />
+              <div>
+                <h2 className="text-lg font-bold text-blue-400">👋 Join Inbound Welcome Matrix</h2>
+                <p className="text-xs text-gray-400 mt-0.5">Automates greetings and grants base tier access level roles.</p>
+              </div>
+              <input type="checkbox" checked={welcomeEnabled} onChange={(e) => setWelcomeEnabled(e.target.checked)} className="w-4 h-4 accent-blue-500" />
             </div>
+            
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1">Welcome Channel ID</label>
-                <input type="text" value={welcomeChannelId} onChange={(e) => setWelcomeChannelId(e.target.value)} placeholder="e.g., 123456789012345678" className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none" />
+                <label className="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-wider">Welcome Target Channel ID</label>
+                <input type="text" value={welcomeChannelId} onChange={(e) => setWelcomeChannelId(e.target.value)} placeholder="e.g., 1507639384453939381" className="w-full bg-gray-950 border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 placeholder-gray-700" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-400 mb-1">Auto-Role ID (Give on Join)</label>
-                <input type="text" value={autoRoleId} onChange={(e) => setAutoRoleId(e.target.value)} placeholder="e.g., 987654321098765432" className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none" />
+                <label className="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-wider">Inbound Auto-Role ID Assignment</label>
+                <input type="text" value={autoRoleId} onChange={(e) => setAutoRoleId(e.target.value)} placeholder="e.g., 987654321098765432" className="w-full bg-gray-950 border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 placeholder-gray-700" />
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-400 mb-1">Custom Welcome Message</label>
-              <textarea value={welcomeMessage} onChange={(e) => setWelcomeMessage(e.target.value)} rows={3} placeholder="Hello {user}, welcome to {server}!" className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none resize-none" />
-              <p className="text-[10px] text-gray-500 mt-1">Available placeholders: <span className="text-blue-400">{'{user}, {username}, {server}, {member_count}'}</span></p>
+              <label className="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-wider">Custom Structural String Response</label>
+              <textarea value={welcomeMessage} onChange={(e) => setWelcomeMessage(e.target.value)} rows={3} placeholder="Hello {user}, welcome to the server node cluster {server}!" className="w-full bg-gray-950 border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 resize-none placeholder-gray-700" />
+              <div className="p-3 bg-gray-950 rounded-xl border border-gray-800 mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-gray-500">
+                <span>Variables:</span>
+                <span className="text-blue-400 font-mono">{"{user}"} = Mention</span>
+                <span className="text-blue-400 font-mono">{"{username}"} = Plain text</span>
+                <span className="text-blue-400 font-mono">{"{server}"} = Server name</span>
+                <span className="text-blue-400 font-mono">{"{member_count}"} = Scaling integer</span>
+              </div>
             </div>
-            <button type="submit" disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700 text-sm font-bold py-2.5 rounded-lg transition">{loading ? "Saving..." : "Save Welcome Settings"}</button>
+            <button type="submit" disabled={loading} className="w-full bg-blue-600 hover:bg-blue-700 text-xs font-bold py-3 rounded-xl transition shadow-lg shadow-blue-600/10">{loading ? "Synchronizing..." : "Save Incoming Protocol"}</button>
           </form>
         )}
 
@@ -316,19 +320,23 @@ export default function Dashboard() {
         {activeTab === 'economy' && (
           <form onSubmit={saveEconomySettings} className="bg-gray-800 p-6 rounded-2xl border border-gray-700 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-amber-400">💰 Economy & Leveling System</h2>
-              <input type="checkbox" checked={xpEnabled} onChange={(e) => setXpEnabled(e.target.checked)} className="w-5 h-5 accent-amber-500" />
+              <div>
+                <h2 className="text-lg font-bold text-amber-500">💰 Gamification Economy Tracker</h2>
+                <p className="text-xs text-gray-400 mt-0.5">Enables XP scaling node architectures based on texting velocity profiles.</p>
+              </div>
+              <input type="checkbox" checked={xpEnabled} onChange={(e) => setXpEnabled(e.target.checked)} className="w-4 h-4 accent-amber-500" />
             </div>
-            <p className="text-xs text-gray-400">Enables server tracking where members gain custom XP allocations and complete level milestones by active chatting.</p>
             
             {xpEnabled && (
-              <div className="p-4 bg-gray-900 rounded-xl border border-gray-700">
-                <label className="block text-xs font-medium text-gray-400 mb-1">XP Progression Rate Multiplier</label>
-                <input type="number" step="0.1" min="0.1" max="5.0" value={xpRate} onChange={(e) => setXpRate(parseFloat(e.target.value) || 1.0)} className="bg-gray-800 border border-gray-600 rounded-md px-3 py-1.5 text-sm text-white w-28 focus:outline-none" />
-                <span className="text-xs text-gray-500 ml-2">Default 1.0 (Higher integers accelerate progression velocity)</span>
+              <div className="p-4 bg-gray-950 rounded-xl border border-gray-800 space-y-2">
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider">XP Allocation Multiplier Coefficient</label>
+                <div className="flex items-center gap-3">
+                  <input type="number" step="0.1" min="0.1" max="5.0" value={xpRate} onChange={(e) => setXpRate(parseFloat(e.target.value) || 1.0)} className="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white w-24 focus:outline-none focus:border-amber-500 font-mono" />
+                  <p className="text-[11px] text-gray-500">Scale factor 1.0 baseline. Incremental rates accelerate level configuration checkpoints.</p>
+                </div>
               </div>
             )}
-            <button type="submit" disabled={loading} className="w-full bg-amber-600 hover:bg-amber-700 text-sm font-bold py-2.5 rounded-lg transition">{loading ? "Saving..." : "Sync Leveling System"}</button>
+            <button type="submit" disabled={loading} className="w-full bg-amber-600 hover:bg-amber-700 text-xs font-bold py-3 rounded-xl transition shadow-lg shadow-amber-600/10">{loading ? "Synchronizing..." : "Synchronize Progression Economy"}</button>
           </form>
         )}
 
@@ -336,23 +344,24 @@ export default function Dashboard() {
         {activeTab === 'commands' && (
           <div className="space-y-6">
             <form onSubmit={addCommand} className="bg-gray-800 p-6 rounded-2xl border border-gray-700 space-y-3">
-              <h2 className="text-xl font-semibold text-blue-400">⚙️ Custom Commands (Unlimited Storage)</h2>
+              <h2 className="text-lg font-bold text-blue-400">⚙️ Unlimited Inline Custom Routing Map</h2>
+              <p className="text-xs text-gray-400 mb-2">Maps matching prefixes directly to specific payload asset string responses.</p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                <input type="text" value={cmdName} onChange={(e) => setCmdName(e.target.value)} placeholder="Command (e.g., !rules)" className="bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none" />
-                <input type="text" value={cmdResponse} onChange={(e) => setCmdResponse(e.target.value)} placeholder="Bot static string return text..." className="sm:col-span-2 bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none" />
+                <input type="text" value={cmdName} onChange={(e) => setCmdName(e.target.value)} placeholder="Trigger key (e.g., !rules)" className="bg-gray-950 border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 placeholder-gray-700" />
+                <input type="text" value={cmdResponse} onChange={(e) => setCmdResponse(e.target.value)} placeholder="Static output response..." className="sm:col-span-2 bg-gray-950 border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500 placeholder-gray-700" />
               </div>
-              <button type="submit" className="w-full bg-blue-600 text-sm font-bold py-2 rounded-lg">Create Custom Command & Sync to DB</button>
+              <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-xs font-bold py-2.5 rounded-xl transition">Deploy Pipeline Entry</button>
             </form>
 
-            <div className="bg-gray-900 rounded-2xl p-4 border border-gray-700 max-h-80 overflow-y-auto space-y-2">
-              {Object.keys(customCommands).length === 0 ? <p className="text-gray-500 text-center text-sm py-4">No custom commands registered yet.</p> : 
+            <div className="bg-gray-950 rounded-2xl p-4 border border-gray-800 max-h-80 overflow-y-auto space-y-2">
+              {Object.keys(customCommands).length === 0 ? <p className="text-gray-600 text-center text-xs py-4">Custom dictionary database index empty.</p> : 
                 Object.entries(customCommands).map(([name, response]) => (
-                  <div key={name} className="bg-gray-800 border border-gray-700 p-3 rounded-xl flex items-center justify-between gap-4">
+                  <div key={name} className="bg-gray-900 border border-gray-800 p-3 rounded-xl flex items-center justify-between gap-4">
                     <div className="min-w-0 flex-1">
-                      <span className="inline-block bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded text-xs font-mono font-bold">{name}</span>
-                      <p className="text-gray-300 text-xs mt-1 truncate">{response}</p>
+                      <span className="inline-block bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded text-[10px] font-mono font-bold">{name}</span>
+                      <p className="text-gray-400 text-xs mt-1 truncate">{response}</p>
                     </div>
-                    <button type="button" onClick={() => removeCommand(name)} className="text-red-400 font-bold px-2 hover:text-red-300">✕</button>
+                    <button type="button" onClick={() => removeCommand(name)} className="text-rose-400 font-bold px-2 hover:text-rose-300 transition text-sm">✕</button>
                   </div>
                 ))
               }
@@ -363,17 +372,18 @@ export default function Dashboard() {
         {/* ---- TAB 6: INTERACTIVE VIEW COMPONENTS ---- */}
         {activeTab === 'interactive' && (
           <form onSubmit={saveInteractiveSettings} className="bg-gray-800 p-6 rounded-2xl border border-gray-700 space-y-4">
-            <h2 className="text-xl font-semibold text-emerald-400">🎟️ Interactive Component System</h2>
-            <p className="text-xs text-gray-400">Deploys rich discord interactive node structures including specialized text buttons and select menus.</p>
+            <h2 className="text-lg font-bold text-emerald-400">🎟️ Discord Interactive DOM Components</h2>
+            <p className="text-xs text-gray-400">Manages persistent UI button bindings and selection menu routers inside target frames.</p>
             
-            <div className="p-4 bg-gray-900 rounded-xl border border-gray-700 space-y-3">
-              <h3 className="text-sm font-medium text-emerald-300">Support System (Ticket System)</h3>
+            <div className="p-4 bg-gray-950 rounded-xl border border-gray-800 space-y-3">
+              <h3 className="text-xs font-bold text-emerald-400">1:1 Customer Support Isolation Node (Ticket System)</h3>
               <div>
-                <label className="block text-[11px] text-gray-400 mb-1">Ticket Target Category ID (Category ID)</label>
-                <input type="text" value={ticketCategoryId} onChange={(e) => setTicketCategoryId(e.target.value)} placeholder="Target category where temporary dynamic support private channels scale" className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none" />
+                <label className="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-wider">Target Room Scaling Category ID</label>
+                <input type="text" value={ticketCategoryId} onChange={(e) => setTicketCategoryId(e.target.value)} placeholder="e.g., 987654321098765432" className="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500 placeholder-gray-700" />
+                <p className="text-[10px] text-gray-500 mt-1">Isolates single support channels under this specified categorization block dynamically on interaction click.</p>
               </div>
             </div>
-            <button type="submit" disabled={loading} className="w-full bg-emerald-600 hover:bg-emerald-700 text-sm font-bold py-2.5 rounded-lg transition">{loading ? "Saving..." : "Save Interactive Settings"}</button>
+            <button type="submit" disabled={loading} className="w-full bg-emerald-600 hover:bg-emerald-700 text-xs font-bold py-3 rounded-xl transition shadow-lg shadow-emerald-600/10">{loading ? "Synchronizing..." : "Commit Component Layouts"}</button>
           </form>
         )}
 
