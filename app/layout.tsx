@@ -1,11 +1,14 @@
-'use client';
-
 import { Inter } from 'next/font/google';
 import { Providers } from './providers';
 import Link from 'next/link';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
+
+export const metadata = {
+  title: 'KyvoBot Dashboard',
+  description: 'Manage your KyvoBot server',
+};
 
 export default function RootLayout({
   children,
@@ -24,14 +27,11 @@ export default function RootLayout({
                   KYVO DASHBOARD
                 </h2>
                 <nav className="flex flex-col gap-4 text-sm text-[#57576F]">
-                  <Link href="/dashboard" className="hover:text-white transition-colors">
+                  <Link href="/" className="hover:text-white transition-colors">
                     🏠 Home Terminal
                   </Link>
                   <Link href="/leaderboard" className="hover:text-[#FFD700] text-gray-300 font-bold transition-colors">
                     🏆 Capital Leaderboard
-                  </Link>
-                  <Link href="/logs" className="hover:text-white transition-colors">
-                    📜 Security Logs
                   </Link>
                 </nav>
               </div>
