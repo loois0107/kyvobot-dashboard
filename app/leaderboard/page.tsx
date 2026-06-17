@@ -12,27 +12,50 @@ interface LeaderboardUser {
 export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const BACKEND_URL = 'https://kyvobot.onrender.com';
     
     fetch(`${BACKEND_URL}/api/leaderboard`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP Error: Status ${res.status}`);
+        }
+        return res.json();
+      })
       .then((data) => {
-        setLeaderboard(data);
+        if (Array.isArray(data)) {
+          setLeaderboard(data);
+        } else {
+          throw new Error('Data package payload is not a valid array structure.');
+        }
         setLoading(false);
       })
       .catch((err) => {
         console.error('Failed to capture financial ledger:', err);
+        setError(err.message);
         setLoading(false);
       });
   }, []);
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0F0F1A] text-[#FFD700]">
+      <div className="flex min-h-screen items-center justify-center bg-[#0F0F1A] text-[#FFD700] font-mono">
         <div className="text-xl font-bold tracking-widest animate-pulse">
           SYNCHRONIZING NETWORK LEDGER...
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0F0F1A] p-6 font-mono text-red-500">
+        <div className="max-w-md w-full border border-red-900 bg-[#161626] p-6 rounded-xl text-center shadow-lg">
+          <h2 className="text-xl font-bold mb-2 tracking-wider">NETWORK TERMINAL FAILURE</h2>
+          <p className="text-sm text-gray-400 mb-4">{error}</p>
+          <p className="text-xs text-[#57576F]">Verify backend runtime connection parameters or CORS configurations.</p>
         </div>
       </div>
     );
