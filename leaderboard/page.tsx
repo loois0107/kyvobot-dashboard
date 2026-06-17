@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 
 interface LeaderboardUser {
   user_id: string;
@@ -11,7 +11,7 @@ interface LeaderboardUser {
   xp: number;
 }
 
-export default function LeaderboardPage() {
+function LeaderboardContent() {
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -107,5 +107,13 @@ export default function LeaderboardPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function LeaderboardPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-12 text-zinc-500 text-sm">Loading ranking shell...</div>}>
+      <LeaderboardContent />
+    </Suspense>
   );
 }
