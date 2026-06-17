@@ -1,9 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  typescript: {
-    ignoreBuildErrors: true,
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'https://kyvobot.onrender.com/api/:path*',
+      },
+    ];
   },
-  // 에러를 내던 eslint 블록을 깔끔하게 제거했습니다!
 };
 
-export default nextConfig;
+module.exports = nextConfig;
