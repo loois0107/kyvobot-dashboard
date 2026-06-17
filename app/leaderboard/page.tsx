@@ -14,7 +14,7 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const BACKEND_URL = 'https://kyvobot-core.onrender.com'; // 👈 여기에 아까 확인한 파이썬 백엔드 주소를 넣으세요.
+    const BACKEND_URL = 'https://kyvobot.onrender.com';
     
     fetch(`${BACKEND_URL}/api/leaderboard`)
       .then((res) => res.json())
