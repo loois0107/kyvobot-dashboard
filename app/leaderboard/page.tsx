@@ -27,8 +27,10 @@ export default function LeaderboardPage() {
       .then((data) => {
         if (Array.isArray(data)) {
           setLeaderboard(data);
+        } else if (data && Array.isArray(data.data)) {
+          setLeaderboard(data.data);
         } else {
-          throw new Error('Data package payload is not a valid array structure.');
+          throw new Error(`Invalid structure. Received: ${JSON.stringify(data)}`);
         }
         setLoading(false);
       })
