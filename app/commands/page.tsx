@@ -177,7 +177,7 @@ function CommandsContent() {
 export default function CustomCommandsPage() {
   return (
     <Suspense fallback={<div className="text-center py-12 text-zinc-500 text-sm">Loading config shell...</div>}>
-      <LogsContent />
+      <CommandsContent />
     </Suspense>
   );
 }
