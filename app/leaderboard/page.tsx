@@ -1,119 +1,110 @@
-"use client";
+'use client';
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState } from 'react';
 
 interface LeaderboardUser {
   user_id: string;
-  username: string;
-  avatar_url: string;
+  username?: string;
   points: number;
   level: number;
-  xp: number;
-}
-
-function LeaderboardContent() {
-  const [users, setUsers] = useState<LeaderboardUser[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchLeaderboard = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch("https://kyvobot.onrender.com/api/leaderboard");
-      const result = await res.json();
-      if (result.status === "success") {
-        setUsers(result.data);
-      } else {
-        setError(result.message || "Failed to load ranking metrics.");
-      }
-    } catch (err: any) {
-      setError(err.message || "Network compilation fault.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchLeaderboard();
-  }, []);
-
-  const getRankBadge = (index: number) => {
-    switch (index) {
-      case 0: return "bg-yellow-500/20 text-yellow-400 border-yellow-500/40 text-base font-bold";
-      case 1: return "bg-zinc-300/20 text-zinc-300 border-zinc-300/40 text-sm font-semibold";
-      case 2: return "bg-amber-700/20 text-amber-500 border-amber-700/40 text-sm font-semibold";
-      default: return "bg-zinc-900 border-zinc-800 text-zinc-500 text-xs";
-    }
-  };
-
-  return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6 text-zinc-200">
-      <div className="flex justify-between items-center border-b border-zinc-800 pb-4">
-        <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Global Net-Worth Standings</h1>
-          <p className="text-sm text-zinc-400 mt-1">Real-time leaderboard indexing top active capital holders across the network.</p>
-        </div>
-        <button 
-          onClick={fetchLeaderboard}
-          className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-sm font-medium rounded-lg border border-zinc-800 transition-colors"
-        >
-          Refresh Matrix
-        </button>
-      </div>
-
-      {loading ? (
-        <div className="text-center py-12 text-zinc-600 text-sm font-mono">Fetching economy node registry...</div>
-      ) : error ? (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm font-mono">{error}</div>
-      ) : users.length === 0 ? (
-        <div className="text-center py-12 text-zinc-600 text-sm">No recorded fiscal footprints active within database.</div>
-      ) : (
-        <div className="border border-zinc-800 rounded-xl bg-zinc-950/40 overflow-hidden shadow-2xl">
-          <div className="divide-y divide-zinc-900">
-            {users.map((user, index) => (
-              <div key={user.user_id} className="p-4 flex items-center justify-between hover:bg-zinc-900/10 transition-colors">
-                <div className="flex items-center space-x-4">
-                  <div className={`w-8 h-8 rounded-lg border flex items-center justify-center font-mono ${getRankBadge(index)}`}>
-                    {index + 1}
-                  </div>
-                  {user.avatar_url ? (
-                    <img src={user.avatar_url} alt="" className="w-10 h-10 rounded-full border border-zinc-800" />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs font-bold text-zinc-500">
-                      N/A
-                    </div>
-                  )}
-                  <div>
-                    <div className="text-sm font-bold text-zinc-200">{user.username}</div>
-                    <div className="text-xs text-zinc-600 font-mono tracking-tighter">ID: {user.user_id}</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-8 text-right">
-                  <div className="hidden sm:block">
-                    <div className="text-xs text-zinc-500">Progression</div>
-                    <div className="text-xs font-semibold text-zinc-400 font-mono">LV. {user.level} ({user.xp} XP)</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-zinc-500">Accumulated Points</div>
-                    <div className="text-sm font-bold text-emerald-400 font-mono">
-                      {user.points.toLocaleString()} <span className="text-xs text-emerald-600 font-normal">P</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
 }
 
 export default function LeaderboardPage() {
+  const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const BACKEND_URL = 'https://kyvobot-core.onrender.com'; // 👈 여기에 아까 확인한 파이썬 백엔드 주소를 넣으세요.
+    
+    fetch(`${BACKEND_URL}/api/leaderboard`)
+      .then((res) => res.json())
+      .then((data) => {
+        setLeaderboard(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Failed to capture financial ledger:', err);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#0F0F1A] text-[#FFD700]">
+        <div className="text-xl font-bold tracking-widest animate-pulse">
+          SYNCHRONIZING NETWORK LEDGER...
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <Suspense fallback={<div className="text-center py-12 text-zinc-500 text-sm">Loading ranking shell...</div>}>
-      <LeaderboardContent />
-    </Suspense>
+    <div className="min-h-screen bg-[#0F0F1A] text-white p-6 font-mono selection:bg-[#2A1F40]">
+      <div className="max-w-4xl mx-auto">
+        <header className="mb-10 border-b border-[#2A1F40] pb-6">
+          <h1 className="text-3xl font-extrabold tracking-tight text-[#FFD700]">
+            KYVO NETWORKS // CAPITAL LEADERBOARD
+          </h1>
+          <p className="text-sm text-[#57576F] mt-2">
+            Real-time financial status tracking node across active servers.
+          </p>
+        </header>
+
+        <div className="overflow-hidden rounded-xl border border-[#2A1F40] bg-[#161626]">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-[#2A1F40] bg-[#0A0A14] text-sm text-[#B8860B] tracking-wider uppercase">
+                <th className="py-4 px-6 text-center w-20">Rank</th>
+                <th className="py-4 px-6">Operator Node ID</th>
+                <th className="py-4 px-6 text-center w-32">Level</th>
+                <th className="py-4 px-6 text-right w-44">Asset Balance</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#2A1F40]">
+              {leaderboard.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="py-10 text-center text-[#57576F] text-sm">
+                    No active assets registered in the database segment.
+                  </td>
+                </tr>
+              ) : (
+                leaderboard.map((user, index) => {
+                  const rank = index + 1;
+                  const isTopThree = rank <= 3;
+                  const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉';
+
+                  return (
+                    <tr 
+                      key={user.user_id} 
+                      className="hover:bg-[#1E1E30] transition-colors duration-150"
+                    >
+                      <td className="py-4 px-6 text-center font-bold text-lg">
+                        {isTopThree ? (
+                          <span className="inline-block scale-110">{medal}</span>
+                        ) : (
+                          <span className="text-[#57576F]">{rank}</span>
+                        )}
+                      </td>
+                      <td className="py-4 px-6 font-semibold tracking-wide text-gray-200">
+                        {user.username || `NODE_${user.user_id.slice(0, 6)}`}
+                        <span className="text-[10px] text-[#57576F] block font-normal mt-0.5">
+                          UID: {user.user_id}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 text-center font-bold text-[#CBA6F7]">
+                        LV.{user.level}
+                      </td>
+                      <td className="py-4 px-6 text-right font-bold text-[#89B4FA] tracking-wide">
+                        {user.points.toLocaleString()} <span className="text-xs text-[#57576F] font-normal">P</span>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   );
 }
