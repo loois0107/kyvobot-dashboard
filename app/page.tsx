@@ -1,131 +1,113 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
-interface AuditLog {
-  id: string;
-  action_type: string;
-  user_name: string;
-  user_id: string;
-  moderator_name: string;
-  reason: string;
-  created_at: string;
+interface BotStats {
+  status: string;
+  bot_name: string;
+  version: string;
+  guilds_count: number;
+  shards_count: number;
+  ping_ms: number;
 }
 
-export default function LogsPage() {
-  const [logs, setLogs] = useState<AuditLog[]>([]);
+export default function HomeTerminal() {
+  const [stats, setStats] = useState<BotStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/logs')
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP Error: Status ${res.status}`);
-        }
-        return res.json();
-      })
+    fetch('/api/stats')
+      .then((res) => res.json())
       .then((data) => {
-        if (Array.isArray(data)) {
-          setLogs(data);
-        } else if (data && Array.isArray(data.data)) {
-          setLogs(data.data);
-        } else {
-          throw new Error('Data package payload is not a valid array structure.');
+        if (data.status === 'online') {
+          setStats(data);
         }
-        setLoading(false);
+        setLoading(false)
       })
       .catch((err) => {
-        console.error('Failed to capture audit logs:', err);
-        setError(err.message);
+        console.error('Failed to load bot stats:', err);
         setLoading(false);
       });
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0F0F1A] text-[#FFD700] font-mono">
-        <div className="text-xl font-bold tracking-widest animate-pulse">
-          INTERCEPTING SECURE LOG FEEDS...
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0F0F1A] p-6 font-mono text-red-500">
-        <div className="max-w-md w-full border border-red-900 bg-[#161626] p-6 rounded-xl text-center shadow-lg">
-          <h2 className="text-xl font-bold mb-2 tracking-wider">LOG RECOVERY FAILURE</h2>
-          <p className="text-sm text-gray-400 mb-4">{error}</p>
-          <p className="text-xs text-[#57576F]">Verify backend runtime connection parameters or CORS configurations.</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-[#0F0F1A] text-white p-6 font-mono selection:bg-[#2A1F40]">
-      <div className="max-w-5xl mx-auto">
-        <header className="mb-10 border-b border-[#2A1F40] pb-6">
-          <h1 className="text-3xl font-extrabold tracking-tight text-[#FFD700]">
-            KYVO NETWORKS // SECURITY AUDIT LOGS
+    <div className="min-h-screen bg-[#0F0F1A] text-white font-mono p-6 selection:bg-[#2A1F40]">
+      <div className="max-w-4xl mx-auto mt-10">
+        
+        {/* 대시보드 타이틀 헤더 */}
+        <header className="mb-12 border-b border-[#2A1F40] pb-6 text-center md:text-left">
+          <h1 className="text-4xl font-extrabold tracking-wider text-[#FFD700] animate-pulse">
+            KYVO NETWORKS // CORE TERMINAL
           </h1>
-          <p className="text-sm text-[#57576F] mt-2">
-            Real-time tracking of server moderation actions and automated systems.
+          <p className="text-xs text-[#57576F] mt-2 tracking-widest">
+            SECURE INTERACTION MATRIX & DISCORD COMMAND CENTER
           </p>
         </header>
 
-        <div className="flex flex-col gap-4">
-          {logs.length === 0 ? (
-            <div className="border border-[#2A1F40] bg-[#161626] p-10 rounded-xl text-center text-[#57576F] text-sm">
-              No security infractions or logs registered in this matrix.
+        {/* 메인 콘텐츠 그리드 레이아웃 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          
+          {/* 왼쪽 사령탑: 봇 실시간 상태판 */}
+          <div className="md:col-span-2 border border-[#2A1F40] bg-[#161626] p-6 rounded-xl shadow-2xl">
+            <h2 className="text-lg font-bold text-gray-200 mb-4 flex items-center gap-2 border-b border-[#2A1F40] pb-2">
+              <span className="h-2 w-2 rounded-full bg-green-500 animate-ping"></span>
+              SYSTEM OPERATIONAL STATUS
+            </h2>
+            
+            {loading ? (
+              <p className="text-sm text-[#FFD700] animate-pulse">PINGING BACKEND CORE INFRAS...</p>
+            ) : stats ? (
+              <div className="grid grid-cols-2 gap-4 text-sm text-gray-400">
+                <div>CORE ALIAS: <span className="text-white font-bold">{stats.bot_name}</span></div>
+                <div>MATRIX VER: <span className="text-[#FFD700]">{stats.version}</span></div>
+                <div>CONNECTED SERVERS: <span className="text-blue-400 font-bold">{stats.guilds_count} Guilds</span></div>
+                <div>LATENCY TICK: <span className="text-green-400">{stats.ping_ms}ms</span></div>
+              </div>
+            ) : (
+              <p className="text-sm text-red-400">BACKEND MATRIX OFFLINE. VERIFY RUNTIME.</p>
+            )}
+          </div>
+
+          {/* 오른쪽 사령탑: 디스코드 통합 계정 동기화 섹션 */}
+          <div className="border border-[#2A1F40] bg-[#161626] p-6 rounded-xl flex flex-col justify-between shadow-2xl">
+            <div>
+              <h2 className="text-base font-bold text-gray-200 mb-2 border-b border-[#2A1F40] pb-2">DISCORD ACCOUNT</h2>
+              <p className="text-xs text-[#57576F] leading-relaxed">Matrix sync requires authentication bypass via official Discord gateway protocols.</p>
             </div>
-          ) : (
-            logs.map((log) => {
-              const isAutomod = log.action_type === 'AUTOMOD';
-              const isSevere = ['BAN', 'KICK'].includes(log.action_type);
-              
-              let badgeColor = 'border-blue-500 text-blue-400 bg-blue-950/30';
-              if (isAutomod) badgeColor = 'border-purple-500 text-purple-400 bg-purple-950/30';
-              if (isSevere) badgeColor = 'border-red-500 text-red-400 bg-red-950/30';
-              if (log.action_type === 'WARN') badgeColor = 'border-orange-500 text-orange-400 bg-orange-950/30';
+            <button 
+              onClick={() => alert('Discord login integration pipeline active.')} 
+              className="w-full mt-4 bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-bold py-3 px-4 rounded-lg transition-all shadow-md tracking-wider"
+            >
+              CONNECT DISCORD
+            </button>
+          </div>
 
-              return (
-                <div 
-                  key={log.id} 
-                  className="border border-[#2A1F40] bg-[#161626] p-5 rounded-xl flex flex-col gap-3 hover:border-[#57576F] transition-all"
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex items-center gap-3">
-                      <span className={`text-xs font-bold px-2.5 py-1 rounded border ${badgeColor}`}>
-                        {log.action_type}
-                      </span>
-                      <span className="text-sm font-bold text-gray-200">
-                        Target: {log.user_name}
-                      </span>
-                      <span className="text-[11px] text-[#57576F]">
-                        (ID: {log.user_id})
-                      </span>
-                    </div>
-                    <span className="text-xs text-[#57576F]">
-                      {log.created_at ? new Date(log.created_at).toLocaleString() : 'UNKNOWN_TIME'}
-                    </span>
-                  </div>
-                  
-                  <div className="text-sm text-gray-400 border-l-2 border-[#2A1F40] pl-3 py-1 bg-[#0A0A14]/50 rounded-r">
-                    {log.reason}
-                  </div>
-
-                  <div className="text-[11px] text-[#57576F] flex items-center gap-1">
-                    <span>Authorized By:</span>
-                    <span className="text-gray-400 font-semibold">{log.moderator_name}</span>
-                  </div>
-                </div>
-              );
-            })
-          )}
         </div>
+
+        {/* 아래쪽 사령탑: 중앙 허브 제어 메뉴 (네비게이션 라우팅) */}
+        <div className="border border-[#2A1F40] bg-[#161626] p-6 rounded-xl shadow-2xl">
+          <h2 className="text-lg font-bold text-gray-200 mb-4 border-b border-[#2A1F40] pb-2">SYSTEM ARCHITECTURE DIRECTORY</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            
+            <Link href="/logs" className="border border-[#2A1F40] bg-[#0F0F1A] p-4 rounded-lg hover:border-[#FFD700] transition-all group">
+              <div className="text-sm font-bold text-[#FFD700] group-hover:underline">// AUDIT LOGS</div>
+              <p className="text-[11px] text-[#57576F] mt-1">Real-time automation actions feed.</p>
+            </Link>
+
+            <Link href="/leaderboard" className="border border-[#2A1F40] bg-[#0F0F1A] p-4 rounded-lg hover:border-blue-400 transition-all group">
+              <div className="text-sm font-bold text-blue-400 group-hover:underline">// LEADERBOARD</div>
+              <p className="text-[11px] text-[#57576F] mt-1">User Matrix XP/Point standings.</p>
+            </Link>
+
+            <Link href="/settings" className="border border-[#2A1F40] bg-[#0F0F1A] p-4 rounded-lg hover:border-purple-400 transition-all group">
+              <div className="text-sm font-bold text-purple-400 group-hover:underline">// MANAGEMENT</div>
+              <p className="text-[11px] text-[#57576F] mt-1">Server configurations matrix.</p>
+            </Link>
+
+          </div>
+        </div>
+
       </div>
     </div>
   );
