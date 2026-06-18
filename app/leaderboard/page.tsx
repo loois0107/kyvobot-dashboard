@@ -49,12 +49,12 @@ export default function LeaderboardPage() {
         {/* 랭킹 보드 판넬 */}
         <div className="bg-[#161626] border border-[#2A1F40] rounded-xl shadow-2xl overflow-hidden">
           
-          {/* ★ 레이아웃 지분 조정 (2 / 5 / 2 / 3 구조로 변경하여 포인트 공간 확보) */}
-          <div className="grid grid-cols-12 gap-1 bg-[#0F0F1A] p-4 text-[10px] sm:text-xs font-bold text-[#57576F] border-b border-[#2A1F40]">
-            <div className="col-span-2 text-center">RANK</div>
-            <div className="col-span-5">IDENTITY MATRIX</div>
-            <div className="col-span-2 text-center">LVL</div>
-            <div className="col-span-3 text-right">POINTS</div>
+          {/* ★ 퍼센트 분할 레이아웃 적용 (순위 15% / 이름 40% / 레벨 15% / 포인트 30%) */}
+          <div className="flex items-center bg-[#0F0F1A] p-4 text-[10px] sm:text-xs font-bold text-[#57576F] border-b border-[#2A1F40]">
+            <div className="w-[15%] text-center">RANK</div>
+            <div className="w-[40%] text-left pl-2">IDENTITY</div>
+            <div className="w-[15%] text-center">LVL</div>
+            <div className="w-[30%] text-right">POINTS</div>
           </div>
 
           {loading ? (
@@ -75,16 +75,16 @@ export default function LeaderboardPage() {
                   rank === 3 ? 'text-[#CD7F32]' : 'text-[#57576F]';
 
                 return (
-                  // ★ 글자 크기를 모바일에서 살짝 줄여 겹침 원천 차단 (text-xs sm:text-sm)
-                  <div key={user.user_id} className="grid grid-cols-12 gap-1 p-4 items-center text-xs sm:text-sm hover:bg-[#202036]/30 transition-all">
+                  // ★ w-[%] 독점 가로 구역을 지정하여 글자 겹침을 원천 차단
+                  <div key={user.user_id} className="flex items-center p-4 text-xs sm:text-sm hover:bg-[#202036]/30 transition-all">
                     
-                    {/* 순위 마크 */}
-                    <div className={`col-span-2 text-center font-extrabold ${rankColor}`}>
+                    {/* 순위 (15% 구역) */}
+                    <div className={`w-[15%] text-center font-extrabold ${rankColor}`}>
                       {rank === 1 ? '👑' : rank < 10 ? `0${rank}` : rank}
                     </div>
 
-                    {/* 유저 프로필 (닉네임이 너무 길면 말줄임표 처리하는 min-w-0 및 truncate 추가) */}
-                    <div className="col-span-5 flex items-center gap-2 min-w-0">
+                    {/* 유저 이름 및 아바타 (40% 구역) */}
+                    <div className="w-[40%] flex items-center gap-2 min-w-0 pl-2">
                       {user.avatar_url ? (
                         <img 
                           src={user.avatar_url} 
@@ -99,13 +99,13 @@ export default function LeaderboardPage() {
                       <span className="font-bold text-gray-300 truncate">{user.username}</span>
                     </div>
 
-                    {/* 레벨 */}
-                    <div className="col-span-2 text-center text-blue-400 font-bold">
+                    {/* 레벨 (15% 구역) */}
+                    <div className="w-[15%] text-center text-blue-400 font-bold">
                       {user.level}
                     </div>
 
-                    {/* 포인트 (공간을 3칸으로 늘려 겹침 해결) */}
-                    <div className="col-span-3 text-right text-green-400 font-bold tracking-wide truncate">
+                    {/* 포인트 (30% 구역 - 오른쪽 정렬로 마감처리) */}
+                    <div className="w-[30%] text-right text-green-400 font-bold tracking-tight truncate">
                       {user.points.toLocaleString()}
                     </div>
 
