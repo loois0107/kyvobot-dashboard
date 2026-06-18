@@ -31,11 +31,23 @@ export default function HomeTerminal() {
       });
   }, []);
 
+  // ★ 디스코드 OAuth2 로그인 창으로 이동시키는 함수
+  const handleDiscordLogin = () => {
+    // ⚠️ 아래 URL은 2단계에서 디스코드 개발자 포털에서 생성한 주소로 교체해야 합니다!
+    const DISCORD_AUTH_URL = "https://discord.com/api/oauth2/authorize?..."; 
+    
+    if (DISCORD_AUTH_URL.includes("...")) {
+      alert("⚠️ Discord OAuth2 URL 설정을 먼저 완료해야 합니다! (2단계를 확인하세요)");
+      return;
+    }
+    
+    window.location.href = DISCORD_AUTH_URL;
+  };
+
   return (
     <div className="min-h-screen bg-[#0F0F1A] text-white font-mono p-6 selection:bg-[#2A1F40]">
       <div className="max-w-4xl mx-auto mt-10">
         
-        {/* 대시보드 타이틀 헤더 */}
         <header className="mb-12 border-b border-[#2A1F40] pb-6 text-center md:text-left">
           <h1 className="text-4xl font-extrabold tracking-wider text-[#FFD700] animate-pulse">
             KYVO NETWORKS // CORE TERMINAL
@@ -45,10 +57,8 @@ export default function HomeTerminal() {
           </p>
         </header>
 
-        {/* 메인 콘텐츠 그리드 레이아웃 */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           
-          {/* 왼쪽 사령탑: 봇 실시간 상태판 */}
           <div className="md:col-span-2 border border-[#2A1F40] bg-[#161626] p-6 rounded-xl shadow-2xl">
             <h2 className="text-lg font-bold text-gray-200 mb-4 flex items-center gap-2 border-b border-[#2A1F40] pb-2">
               <span className="h-2 w-2 rounded-full bg-green-500 animate-ping"></span>
@@ -69,14 +79,14 @@ export default function HomeTerminal() {
             )}
           </div>
 
-          {/* 오른쪽 사령탑: 디스코드 통합 계정 동기화 섹션 */}
           <div className="border border-[#2A1F40] bg-[#161626] p-6 rounded-xl flex flex-col justify-between shadow-2xl">
             <div>
               <h2 className="text-base font-bold text-gray-200 mb-2 border-b border-[#2A1F40] pb-2">DISCORD ACCOUNT</h2>
               <p className="text-xs text-[#57576F] leading-relaxed">Matrix sync requires authentication bypass via official Discord gateway protocols.</p>
             </div>
+            {/* ★ 진짜 로그인 연동 함수 바인딩 */}
             <button 
-              onClick={() => alert('Discord login integration pipeline active.')} 
+              onClick={handleDiscordLogin} 
               className="w-full mt-4 bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-bold py-3 px-4 rounded-lg transition-all shadow-md tracking-wider"
             >
               CONNECT DISCORD
@@ -85,7 +95,6 @@ export default function HomeTerminal() {
 
         </div>
 
-        {/* 아래쪽 사령탑: 중앙 허브 제어 메뉴 (네비게이션 라우팅) */}
         <div className="border border-[#2A1F40] bg-[#161626] p-6 rounded-xl shadow-2xl">
           <h2 className="text-lg font-bold text-gray-200 mb-4 border-b border-[#2A1F40] pb-2">SYSTEM ARCHITECTURE DIRECTORY</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
