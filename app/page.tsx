@@ -34,7 +34,7 @@ export default function HomeTerminal() {
   // ★ 디스코드 OAuth2 로그인 창으로 이동시키는 함수
   const handleDiscordLogin = () => {
     // ⚠️ 아래 URL은 2단계에서 디스코드 개발자 포털에서 생성한 주소로 교체해야 합니다!
-    const DISCORD_AUTH_URL = "https://discord.com/api/oauth2/authorize?..."; 
+    const DISCORD_AUTH_URL = "https://discord.com/oauth2/authorize?client_id=1508034647152398436&response_type=code&redirect_uri=https%3A%2F%2Fkyvobot-dashboard-2bu4.vercel.app%2Fapi%2Fauth%2Fcallback%2Fdiscord&scope=identify+guilds"; 
     
     if (DISCORD_AUTH_URL.includes("...")) {
       alert("⚠️ Discord OAuth2 URL 설정을 먼저 완료해야 합니다! (2단계를 확인하세요)");
