@@ -18,9 +18,7 @@ export default function LogsPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const BACKEND_URL = 'https://kyvobot.onrender.com';
-    
-    fetch(`${BACKEND_URL}/api/logs`)
+    fetch('/api/logs')
       .then((res) => {
         if (!res.ok) {
           throw new Error(`HTTP Error: Status ${res.status}`);
