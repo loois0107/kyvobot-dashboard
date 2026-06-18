@@ -33,7 +33,7 @@ export default function SettingsPage() {
       });
   };
 
-  // 2. 서버 설정 저장하기
+  // 2. 서버 설정 저장하기 (★자백제 레이어 업그레이드)
   const saveSettings = () => {
     if (!guildId || !userId) return alert('Guild ID and User ID are mandatory.');
     setLoading(true);
@@ -48,7 +48,14 @@ export default function SettingsPage() {
         payload: { custom_commands: commands }
       })
     })
-      .then((res) => res.json())
+      .then(async (res) => {
+        if (!res.ok) {
+          // 서버가 에러 코드를 뱉으면 텍스트를 그대로 긁어옵니다.
+          const errText = await res.text().catch(() => 'Unknown Raw Body');
+          throw new Error(`HTTP ${res.status} // ${errText}`);
+        }
+        return res.json();
+      })
       .then((resData) => {
         if (resData.status === 'success') {
           setMessage('Configuration matrix successfully deployed!');
@@ -59,7 +66,8 @@ export default function SettingsPage() {
       })
       .catch((err) => {
         console.error(err);
-        setMessage('Network handshake failed.');
+        // 에러 원인을 화면에 날것 그대로 고발합니다.
+        setMessage(`Handshake Blocked: ${err.message}`);
         setLoading(false);
       });
   };
@@ -82,7 +90,7 @@ export default function SettingsPage() {
         </header>
 
         <div className="flex flex-col gap-6 bg-[#161626] border border-[#2A1F40] p-6 rounded-xl shadow-xl">
-          {/* 인증 매개변수 입력창 */}
+          {/* ID 입력창 */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="text-xs text-gray-400 block mb-1">TARGET GUILD ID</label>
@@ -114,7 +122,7 @@ export default function SettingsPage() {
           </button>
 
           {message && (
-            <div className="bg-[#0F0F1A] border border-[#2A1F40] text-xs text-center p-2 rounded text-gray-300">
+            <div className="bg-[#0F0F1A] border border-purple-900/50 text-xs text-center p-3 rounded text-gray-300 break-all whitespace-pre-wrap">
               {message}
             </div>
           )}
