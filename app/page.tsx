@@ -112,7 +112,7 @@ export default function LogsPage() {
                     </div>
                     <span className="text-xs text-[#57576F]">
                       {log.created_at ? new Date(log.created_at).toLocaleString() : 'UNKNOWN_TIME'}
-                    </tspan>
+                    </span>
                   </div>
                   
                   <div className="text-sm text-gray-400 border-l-2 border-[#2A1F40] pl-3 py-1 bg-[#0A0A14]/50 rounded-r">
