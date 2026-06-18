@@ -1,4 +1,3 @@
-// ✨ FORCE NEXT.JS TO BYPASS ALL WEB-APP CACHES SYSTEM
 export const dynamic = 'force-dynamic';
 
 'use client';
@@ -20,7 +19,6 @@ export default function LeaderboardTerminal() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Add timestamp multiplier token to force clean raw fetch node query bypass
     fetch(`/api/leaderboard?t=${Date.now()}`)
       .then((res) => res.json())
       .then((data) => {
@@ -39,29 +37,30 @@ export default function LeaderboardTerminal() {
     return val.toString();
   };
 
+  // Dynamic Aura Style Router Assignment Engine
   const getRankStyle = (index: number) => {
     switch (index) {
-      case 0:
+      case 0: // 1st Place: Shimmering Gold Aura
         return {
-          bg: 'bg-[#FFD700]/10 border-[#FFD700]/40 hover:shadow-[0_0_25px_rgba(255,215,0,0.2)]',
+          bg: 'bg-[#FFD700]/5 border-[#FFD700]/30 animate-gold-aura',
           badge: '🥇',
-          text: 'text-[#FFD700] font-black',
+          text: 'text-[#FFD700] font-black scale-110 drop-shadow-[0_0_8px_rgba(255,215,0,0.6)]',
         };
-      case 1:
+      case 1: // 2nd Place: Shimmering Silver Aura
         return {
-          bg: 'bg-[#C0C0C0]/10 border-[#C0C0C0]/30 hover:shadow-[0_0_25px_rgba(192,192,192,0.15)]',
+          bg: 'bg-[#C0C0C0]/5 border-[#C0C0C0]/20 animate-silver-aura',
           badge: '🥈',
-          text: 'text-[#C0C0C0] font-bold',
+          text: 'text-[#C0C0C0] font-bold drop-shadow-[0_0_8px_rgba(192,192,192,0.5)]',
         };
-      case 2:
+      case 2: // 3rd Place: Shimmering Bronze Aura
         return {
-          bg: 'bg-[#CD7F32]/10 border-[#CD7F32]/30 hover:shadow-[0_0_25px_rgba(205,127,50,0.15)]',
+          bg: 'bg-[#CD7F32]/5 border-[#CD7F32]/20 animate-bronze-aura',
           badge: '🥉',
-          text: 'text-[#CD7F32] font-bold',
+          text: 'text-[#CD7F32] font-bold drop-shadow-[0_0_8px_rgba(205,127,50,0.5)]',
         };
-      default:
+      default: // Standard Nodes
         return {
-          bg: 'bg-[#161626] border-[#2A1F40] hover:border-[#5865F2]/40 hover:shadow-[0_0_20px_rgba(88,101,242,0.1)]',
+          bg: 'bg-[#161626] border-[#2A1F40] hover:border-[#5865F2]/40 hover:shadow-[0_0_20px_rgba(88,101,242,0.15)]',
           badge: `#${index + 1}`,
           text: 'text-[#57576F] font-mono',
         };
@@ -70,8 +69,29 @@ export default function LeaderboardTerminal() {
 
   return (
     <div className="min-h-screen bg-[#0F0F1A] text-white font-mono p-4 md:p-6 selection:bg-[#2A1F40]">
+      
+      {/* 🔮 INLINE CYBERSPACE NEON AURA ANIMATION SHADER */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes goldGlow {
+          0%, 100% { box-shadow: 0 0 15px rgba(255,215,0,0.15), inset 0 0 8px rgba(255,215,0,0.02); border-color: rgba(255,215,0,0.25); }
+          50% { box-shadow: 0 0 35px rgba(255,215,0,0.45), inset 0 0 20px rgba(255,215,0,0.1); border-color: rgba(255,215,0,0.7); }
+        }
+        @keyframes silverGlow {
+          0%, 100% { box-shadow: 0 0 15px rgba(192,192,192,0.1), inset 0 0 8px rgba(192,192,192,0.02); border-color: rgba(192,192,192,0.2); }
+          50% { box-shadow: 0 0 30px rgba(192,192,192,0.35), inset 0 0 15px rgba(192,192,192,0.08); border-color: rgba(192,192,192,0.55); }
+        }
+        @keyframes bronzeGlow {
+          0%, 100% { box-shadow: 0 0 15px rgba(205,127,50,0.1), inset 0 0 8px rgba(205,127,50,0.02); border-color: rgba(205,127,50,0.2); }
+          50% { box-shadow: 0 0 30px rgba(205,127,50,0.35), inset 0 0 15px rgba(205,127,50,0.08); border-color: rgba(205,127,50,0.55); }
+        }
+        .animate-gold-aura { animation: goldGlow 3.5s infinite ease-in-out; }
+        .animate-silver-aura { animation: silverGlow 3.5s infinite ease-in-out; }
+        .animate-bronze-aura { animation: bronzeGlow 3.5s infinite ease-in-out; }
+      `}} />
+
       <div className="max-w-4xl mx-auto mt-4 md:mt-10 space-y-6">
         
+        {/* Navigation Layer */}
         <div className="flex justify-between items-center border-b border-[#2A1F40] pb-4">
           <Link 
             href="/" 
@@ -84,6 +104,7 @@ export default function LeaderboardTerminal() {
           </span>
         </div>
 
+        {/* Title Block */}
         <div>
           <h1 className="text-2xl md:text-3xl font-black tracking-wider text-white">
             GLOBAL STANDINGS MATRIX
@@ -93,6 +114,7 @@ export default function LeaderboardTerminal() {
           </p>
         </div>
 
+        {/* Leaderboard Array Map */}
         <div className="space-y-3">
           {loading ? (
             <div className="text-center py-20 border border-[#2A1F40] bg-[#161626] rounded-xl animate-pulse">
@@ -114,12 +136,13 @@ export default function LeaderboardTerminal() {
                   className={`
                     border p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4
                     transform transition-all duration-300 ease-out cursor-pointer
-                    hover:scale-[1.01] active:scale-[0.99]
+                    hover:scale-[1.015] active:scale-[0.985]
                     ${style.bg}
                   `}
                 >
+                  {/* Left Identity Segment */}
                   <div className="flex items-center gap-4 w-full sm:w-auto">
-                    <span className={`text-sm md:text-base w-10 text-center ${style.text}`}>
+                    <span className={`text-base md:text-lg w-10 text-center ${style.text}`}>
                       {style.badge}
                     </span>
                     
@@ -137,14 +160,16 @@ export default function LeaderboardTerminal() {
                       <h3 className="text-sm md:text-base font-bold text-white truncate">
                         {user.username}
                       </h3>
-                      <p className="text-[11px] text-[#57576F] font-mono mt-0.5">
-                        ID // {user.user_id}
+                      <p className="text-[10px] text-[#57576F] font-mono mt-0.5">
+                        NODE_ID // {user.user_id}
                       </p>
                     </div>
                   </div>
 
+                  {/* Right Metrics Segment */}
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-8 w-full sm:w-auto justify-end">
                     
+                    {/* Progress Monitor */}
                     <div className="flex flex-col gap-1 w-full sm:w-44">
                       <div className="flex justify-between text-[10px] font-bold text-gray-400 tracking-tighter">
                         <span>{formatMetric(user.xp)} / {formatMetric(maxXp)} XP</span>
@@ -158,7 +183,8 @@ export default function LeaderboardTerminal() {
                       </div>
                     </div>
 
-                    <div className="flex justify-between sm:justify-end gap-6 text-right font-mono">
+                    {/* Numerical Data Outputs */}
+                    <div className="flex justify-between sm:justify-end gap-6 text-right font-mono min-w-[120px]">
                       <div>
                         <div className="text-[10px] text-[#57576F] tracking-wider">LEVEL</div>
                         <div className="text-sm md:text-base font-black text-white">{user.level}</div>
