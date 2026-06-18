@@ -15,8 +15,12 @@ interface BotStats {
 export default function HomeTerminal() {
   const [stats, setStats] = useState<BotStats | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  // ★ 로그인 상태를 기억할 감지 스위치 상태 지정
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
+    // 1. 백엔드 로봇 상태 가져오기
     fetch('/api/stats')
       .then((res) => res.json())
       .then((data) => {
@@ -29,13 +33,23 @@ export default function HomeTerminal() {
         console.error('Failed to load bot stats:', err);
         setLoading(false);
       });
+
+    // 2. ★ 대기실(callback)이 브라우저 주머니에 넣어둔 합격 도장이 있는지 실시간 검사
+    const authStatus = localStorage.getItem('discord_authenticated');
+    if (authStatus === 'true') {
+      setIsAuthenticated(true);
+    }
   }, []);
 
-  // ★ 올바른 리디렉션 경로로 수정된 진짜 디스코드 로그인 스위치
   const handleDiscordLogin = () => {
     const DISCORD_AUTH_URL = "https://discord.com/oauth2/authorize?client_id=1508034647152398436&response_type=code&redirect_uri=https%3A%2F%2Fkyvobot-dashboard-2bu4.vercel.app%2Fcallback&scope=identify+guilds"; 
-    
     window.location.href = DISCORD_AUTH_URL;
+  };
+
+  // 테스트용 로그아웃 함수 (필요 시 주머니 비우기)
+  const handleDiscordLogout = () => {
+    localStorage.removeItem('discord_authenticated');
+    setIsAuthenticated(false);
   };
 
   return (
@@ -73,17 +87,38 @@ export default function HomeTerminal() {
             )}
           </div>
 
+          {/* ★ 디스코드 계정 상태 제어 연동 섹션 변경 */}
           <div className="border border-[#2A1F40] bg-[#161626] p-6 rounded-xl flex flex-col justify-between shadow-2xl">
             <div>
               <h2 className="text-base font-bold text-gray-200 mb-2 border-b border-[#2A1F40] pb-2">DISCORD ACCOUNT</h2>
-              <p className="text-xs text-[#57576F] leading-relaxed">Matrix sync requires authentication bypass via official Discord gateway protocols.</p>
+              <p className="text-xs text-[#57576F] leading-relaxed">
+                {isAuthenticated 
+                  ? "Bypass verification successful. Handshake protocol holding secure link." 
+                  : "Matrix sync requires authentication bypass via official Discord gateway protocols."}
+              </p>
             </div>
-            <button 
-              onClick={handleDiscordLogin} 
-              className="w-full mt-4 bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-bold py-3 px-4 rounded-lg transition-all shadow-md tracking-wider"
-            >
-              CONNECT DISCORD
-            </button>
+            
+            {/* ★ 로그인 상태에 따라 버튼을 다르게 보여주는 조건부 스위칭 레이어 */}
+            {isAuthenticated ? (
+              <div className="flex flex-col gap-2 mt-4">
+                <div className="w-full text-center border border-green-500 bg-green-950/20 text-green-400 text-xs font-bold py-3 px-4 rounded-lg tracking-widest">
+                  ● MATRIX SYNC ACTIVE
+                </div>
+                <button 
+                  onClick={handleDiscordLogout}
+                  className="text-[10px] text-red-400 hover:underline text-right"
+                >
+                  [DISCONNECT LINK]
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={handleDiscordLogin} 
+                className="w-full mt-4 bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-bold py-3 px-4 rounded-lg transition-all shadow-md tracking-wider"
+              >
+                CONNECT DISCORD
+              </button>
+            )}
           </div>
 
         </div>
