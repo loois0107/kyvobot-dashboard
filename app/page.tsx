@@ -31,15 +31,9 @@ export default function HomeTerminal() {
       });
   }, []);
 
-  // ★ 디스코드 OAuth2 로그인 창으로 이동시키는 함수
+  // ★ 올바른 리디렉션 경로로 수정된 진짜 디스코드 로그인 스위치
   const handleDiscordLogin = () => {
-    // ⚠️ 아래 URL은 2단계에서 디스코드 개발자 포털에서 생성한 주소로 교체해야 합니다!
-    const DISCORD_AUTH_URL = "https://discord.com/oauth2/authorize?client_id=1508034647152398436&response_type=code&redirect_uri=https%3A%2F%2Fkyvobot-dashboard-2bu4.vercel.app%2Fapi%2Fauth%2Fcallback%2Fdiscord&scope=identify+guilds"; 
-    
-    if (DISCORD_AUTH_URL.includes("...")) {
-      alert("⚠️ Discord OAuth2 URL 설정을 먼저 완료해야 합니다! (2단계를 확인하세요)");
-      return;
-    }
+    const DISCORD_AUTH_URL = "https://discord.com/oauth2/authorize?client_id=1508034647152398436&response_type=code&redirect_uri=https%3A%2F%2Fkyvobot-dashboard-2bu4.vercel.app%2Fcallback&scope=identify+guilds"; 
     
     window.location.href = DISCORD_AUTH_URL;
   };
@@ -84,7 +78,6 @@ export default function HomeTerminal() {
               <h2 className="text-base font-bold text-gray-200 mb-2 border-b border-[#2A1F40] pb-2">DISCORD ACCOUNT</h2>
               <p className="text-xs text-[#57576F] leading-relaxed">Matrix sync requires authentication bypass via official Discord gateway protocols.</p>
             </div>
-            {/* ★ 진짜 로그인 연동 함수 바인딩 */}
             <button 
               onClick={handleDiscordLogin} 
               className="w-full mt-4 bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-bold py-3 px-4 rounded-lg transition-all shadow-md tracking-wider"
