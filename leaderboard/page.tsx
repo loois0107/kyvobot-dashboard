@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic';
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -19,6 +17,7 @@ export default function LeaderboardTerminal() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // ?t=${Date.now()} 파라미터로 브라우저 캐시를 무조건 우회해서 최신 데이터를 가져옴
     fetch(`/api/leaderboard?t=${Date.now()}`)
       .then((res) => res.json())
       .then((data) => {
@@ -37,28 +36,27 @@ export default function LeaderboardTerminal() {
     return val.toString();
   };
 
-  // Dynamic Aura Style Router Assignment Engine
   const getRankStyle = (index: number) => {
     switch (index) {
-      case 0: // 1st Place: Shimmering Gold Aura
+      case 0:
         return {
           bg: 'bg-[#FFD700]/5 border-[#FFD700]/30 animate-gold-aura',
           badge: '🥇',
           text: 'text-[#FFD700] font-black scale-110 drop-shadow-[0_0_8px_rgba(255,215,0,0.6)]',
         };
-      case 1: // 2nd Place: Shimmering Silver Aura
+      case 1:
         return {
           bg: 'bg-[#C0C0C0]/5 border-[#C0C0C0]/20 animate-silver-aura',
           badge: '🥈',
           text: 'text-[#C0C0C0] font-bold drop-shadow-[0_0_8px_rgba(192,192,192,0.5)]',
         };
-      case 2: // 3rd Place: Shimmering Bronze Aura
+      case 2:
         return {
           bg: 'bg-[#CD7F32]/5 border-[#CD7F32]/20 animate-bronze-aura',
           badge: '🥉',
           text: 'text-[#CD7F32] font-bold drop-shadow-[0_0_8px_rgba(205,127,50,0.5)]',
         };
-      default: // Standard Nodes
+      default:
         return {
           bg: 'bg-[#161626] border-[#2A1F40] hover:border-[#5865F2]/40 hover:shadow-[0_0_20px_rgba(88,101,242,0.15)]',
           badge: `#${index + 1}`,
@@ -91,7 +89,6 @@ export default function LeaderboardTerminal() {
 
       <div className="max-w-4xl mx-auto mt-4 md:mt-10 space-y-6">
         
-        {/* Navigation Layer */}
         <div className="flex justify-between items-center border-b border-[#2A1F40] pb-4">
           <Link 
             href="/" 
@@ -104,7 +101,6 @@ export default function LeaderboardTerminal() {
           </span>
         </div>
 
-        {/* Title Block */}
         <div>
           <h1 className="text-2xl md:text-3xl font-black tracking-wider text-white">
             GLOBAL STANDINGS MATRIX
@@ -114,7 +110,6 @@ export default function LeaderboardTerminal() {
           </p>
         </div>
 
-        {/* Leaderboard Array Map */}
         <div className="space-y-3">
           {loading ? (
             <div className="text-center py-20 border border-[#2A1F40] bg-[#161626] rounded-xl animate-pulse">
@@ -140,7 +135,6 @@ export default function LeaderboardTerminal() {
                     ${style.bg}
                   `}
                 >
-                  {/* Left Identity Segment */}
                   <div className="flex items-center gap-4 w-full sm:w-auto">
                     <span className={`text-base md:text-lg w-10 text-center ${style.text}`}>
                       {style.badge}
@@ -166,10 +160,8 @@ export default function LeaderboardTerminal() {
                     </div>
                   </div>
 
-                  {/* Right Metrics Segment */}
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-8 w-full sm:w-auto justify-end">
                     
-                    {/* Progress Monitor */}
                     <div className="flex flex-col gap-1 w-full sm:w-44">
                       <div className="flex justify-between text-[10px] font-bold text-gray-400 tracking-tighter">
                         <span>{formatMetric(user.xp)} / {formatMetric(maxXp)} XP</span>
@@ -183,7 +175,6 @@ export default function LeaderboardTerminal() {
                       </div>
                     </div>
 
-                    {/* Numerical Data Outputs */}
                     <div className="flex justify-between sm:justify-end gap-6 text-right font-mono min-w-[120px]">
                       <div>
                         <div className="text-[10px] text-[#57576F] tracking-wider">LEVEL</div>
