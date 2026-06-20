@@ -1,15 +1,24 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-// Forces Next.js to bypass static pre-rendering and build this route dynamically at runtime
 export const dynamic = "force-dynamic";
 
-const supabaseUrl = process.env.SUPABASE_URL || "";
-const supabaseKey = process.env.SUPABASE_KEY || "";
-const supabase = createClient(supabaseUrl, supabaseKey);
-
 export async function GET() {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_KEY;
+
+  // 1. Guard check to prevent crash during build crawling if env vars are temporarily missing
+  if (!supabaseUrl || !supabaseKey) {
+    return NextResponse.json(
+      { status: "error", message: "Environment variables are missing" },
+      { status: 500 }
+    );
+  }
+
   try {
+    // 2. Initialize client inside request scope to bypass global import-time exceptions
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
     const { count: guildsCount, error: guildsError } = await supabase
       .from("guild_settings")
       .select("*", { count: "exact", head: true });
