@@ -18,9 +18,8 @@ export default function LogsPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const BACKEND_URL = 'https://kyvobot.onrender.com';
-    
-    fetch(`${BACKEND_URL}/api/logs`)
+    // Render 외부 주소 직호출 시 발생하는 CORS 차단을 피하기 위해 내부 API 라우트 사용
+    fetch(`/api/logs?t=${Date.now()}`)
       .then((res) => {
         if (!res.ok) {
           throw new Error(`HTTP Error: Status ${res.status}`);
