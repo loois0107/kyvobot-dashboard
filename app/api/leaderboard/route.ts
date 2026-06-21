@@ -4,15 +4,20 @@ import { createClient } from "@supabase/supabase-js";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  // Ensure strict exact match with system environment variables
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
-    return NextResponse.json({ status: "error", message: "Environment variables missing" }, { status: 500 });
+    return NextResponse.json(
+      { status: "error", message: "Environment variables missing inside runtime context" },
+      { status: 500 }
+    );
   }
 
   try {
     const supabase = createClient(supabaseUrl, supabaseKey);
+
     const { data, error } = await supabase
       .from("users")
       .select("user_id, xp, level, points")
@@ -30,9 +35,15 @@ export async function GET() {
       xp: user.xp || 0,
     }));
 
-    return NextResponse.json({ status: "success", data: formattedData });
+    return NextResponse.json({
+      status: "success",
+      data: formattedData,
+    });
   } catch (error) {
     console.error("[LEADERBOARD API ERROR]", error);
-    return NextResponse.json({ status: "error" }, { status: 500 });
+    return NextResponse.json(
+      { status: "error", message: "Database query execution failure" },
+      { status: 500 }
+    );
   }
 }
