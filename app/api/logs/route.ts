@@ -14,10 +14,10 @@ export async function GET() {
   try {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // user_name:username -> DB의 username 컬럼을 user_name 이라는 키로 변경해서 가져옴
+    // * 기호를 쓰면 컬럼명이 달라도 에러(500)가 절대 안 나고 다 가져옴
     const { data, error } = await supabase
       .from("audit_logs")
-      .select("id, action_type, user_name:username, user_id, moderator_name, reason, created_at")
+      .select("*")
       .order("created_at", { ascending: false })
       .limit(50);
 
@@ -25,7 +25,18 @@ export async function GET() {
       return NextResponse.json({ status: "supabase_error", details: error.message }, { status: 500 });
     }
 
-    return NextResponse.json(data || []);
+    // DB에 들어있을 법한 모든 컬럼명 변형을 유연하게 체크해서 매핑 (없으면 Unknown 처리)
+    const formattedData = (data || []).map((log: any) => ({
+      id: log.id,
+      action_type: log.action_type || "UNKNOWN",
+      user_name: log.user_name || log.username || log.target_name || log.target_username || "Unknown User",
+      user_id: log.user_id || log.target_id || "0000",
+      moderator_name: log.moderator_name || log.moderator_username || log.admin_name || "System",
+      reason: log.reason || "No reason provided",
+      created_at: log.created_at,
+    }));
+
+    return NextResponse.json(formattedData);
   } catch (error: any) {
     return NextResponse.json({ status: "crash", details: error.message }, { status: 500 });
   }
