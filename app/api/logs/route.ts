@@ -14,26 +14,48 @@ export async function GET() {
   try {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 1차 시도: 복수형 테이블 호출
-    let { data, error } = await supabase.from("audit_logs").select("*").limit(50);
-
-    // 만약 주소 에러가 나면 2차 시도: 단수형 테이블 호출
-    if (error && error.message.includes("Invalid path")) {
-      const retry = await supabase.from("audit_log").select("*").limit(50);
-      data = retry.data;
-      error = retry.error;
-    }
-
-    // 여전히 에러가 있다면 화면에 에러 카드 출력
-    if (error) {
+    // [검증] 리더보드에서 성공했던 users 테이블이 여기서도 연결되는지 확인
+    const testUsers = await supabase.from("users").select("count", { count: 'exact', head: true });
+    if (testUsers.error) {
       return NextResponse.json([
         {
-          id: "debug-err",
+          id: "debug-err-1",
           action_type: "BAN",
-          user_name: "수파베이스 연결 실패",
+          user_name: "연결망 확인 실패",
+          user_id: "CONNECTION",
+          moderator_name: "Supabase",
+          reason: `기본 users 테이블도 접속 불가: ${testUsers.error.message}`,
+          created_at: new Date().toISOString()
+        }
+      ]);
+    }
+
+    // [탐색] 가능한 모든 테이블 이름 후보 순회 테스트
+    const candidates = ["audit_logs", "audit_log", "logs", "Audit_logs"];
+    let data = null;
+    let error = null;
+    let successTable = "";
+
+    for (const table of candidates) {
+      const res = await supabase.from(table).select("*").limit(50);
+      if (!res.error) {
+        data = res.data;
+        successTable = table;
+        break;
+      }
+      error = res.error;
+    }
+
+    // 모든 후보가 실패했을 때
+    if (!successTable && error) {
+      return NextResponse.json([
+        {
+          id: "debug-err-2",
+          action_type: "BAN",
+          user_name: "이름 매핑 실패",
           user_id: "DATABASE",
           moderator_name: "Supabase",
-          reason: `진짜 원인 👉 ${error.message}`,
+          reason: `모든 후보 이름 주소 인식 실패. 마지막 에러: ${error.message}`,
           created_at: new Date().toISOString()
         }
       ]);
