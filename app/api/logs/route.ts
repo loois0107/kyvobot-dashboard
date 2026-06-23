@@ -8,38 +8,32 @@ export async function GET() {
   const supabaseKey = process.env.SUPABASE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
-    return NextResponse.json([
-      {
-        id: "debug-err-1",
-        action_type: "FAIL",
-        user_name: "환경 변수 누락",
-        user_id: "SYSTEM",
-        moderator_name: "시스템",
-        reason: "대시보드 서버에 Supabase 연결 키가 설정되지 않았습니다.",
-        created_at: new Date().toISOString()
-      }
-    ]);
+    return NextResponse.json([{ id: "err", action_type: "FAIL", user_name: "키 누락", user_id: "SYSTEM", moderator_name: "시스템", reason: "환경 변수가 없습니다.", created_at: new Date().toISOString() }]);
   }
 
   try {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 에러 유발 가능성을 줄이기 위해 전체 선택 후 정렬 없이 50개만 호출 시도
-    const { data, error } = await supabase
-      .from("audit_logs")
-      .select("*")
-      .limit(50);
+    // 1차 시도: 복수형 테이블 호출
+    let { data, error } = await supabase.from("audit_logs").select("*").limit(50);
 
-    // 💡 핵심 치트키: DB 에러가 나면 500을 뱉지 않고, 에러 내용을 로그 카드 형태로 위장해서 전달
+    // 만약 주소 에러가 나면 2차 시도: 단수형 테이블 호출
+    if (error && error.message.includes("Invalid path")) {
+      const retry = await supabase.from("audit_log").select("*").limit(50);
+      data = retry.data;
+      error = retry.error;
+    }
+
+    // 여전히 에러가 있다면 화면에 에러 카드 출력
     if (error) {
       return NextResponse.json([
         {
-          id: "debug-err-2",
-          action_type: "BAN", // 빨간색 배지 유도
-          user_name: "수파베이스 쿼리 실패",
+          id: "debug-err",
+          action_type: "BAN",
+          user_name: "수파베이스 연결 실패",
           user_id: "DATABASE",
           moderator_name: "Supabase",
-          reason: `진짜 에러 원인 👉 ${error.message}`,
+          reason: `진짜 원인 👉 ${error.message}`,
           created_at: new Date().toISOString()
         }
       ]);
@@ -57,16 +51,6 @@ export async function GET() {
 
     return NextResponse.json(formattedData);
   } catch (error: any) {
-    return NextResponse.json([
-      {
-        id: "debug-err-3",
-        action_type: "FAIL",
-        user_name: "런타임 크래시",
-        user_id: "SERVER",
-        moderator_name: "NodeJS",
-        reason: `코드 실행 중 예외 발생: ${error.message}`,
-        created_at: new Date().toISOString()
-      }
-    ]);
+    return NextResponse.json([{ id: "err", action_type: "FAIL", user_name: "크래시", user_id: "SERVER", moderator_name: "NodeJS", reason: error.message, created_at: new Date().toISOString() }]);
   }
 }
