@@ -14,24 +14,20 @@ export async function GET() {
   try {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // [검증] 리더보드에서 성공했던 users 테이블이 여기서도 연결되는지 확인
-    const testUsers = await supabase.from("users").select("count", { count: 'exact', head: true });
-    if (testUsers.error) {
-      return NextResponse.json([
-        {
-          id: "debug-err-1",
-          action_type: "BAN",
-          user_name: "연결망 확인 실패",
-          user_id: "CONNECTION",
-          moderator_name: "Supabase",
-          reason: `기본 users 테이블도 접속 불가: ${testUsers.error.message}`,
-          created_at: new Date().toISOString()
-        }
-      ]);
-    }
-
-    // [탐색] 가능한 모든 테이블 이름 후보 순회 테스트
-    const candidates = ["audit_logs", "audit_log", "logs", "Audit_logs"];
+    // 디스코드 봇 라이브러리들이 사용하는 거의 모든 로그 테이블 이름 후보군
+    const candidates = [
+      "audit_logs", 
+      "audit_log", 
+      "logs", 
+      "Audit_logs", 
+      "mod_logs", 
+      "moderation_logs", 
+      "bot_logs", 
+      "action_logs", 
+      "server_logs",
+      "sanctions"
+    ];
+    
     let data = null;
     let error = null;
     let successTable = "";
@@ -46,16 +42,16 @@ export async function GET() {
       error = res.error;
     }
 
-    // 모든 후보가 실패했을 때
+    // 모든 후보 이름이 실패했을 때 화면에 시도한 이름들을 리포트
     if (!successTable && error) {
       return NextResponse.json([
         {
-          id: "debug-err-2",
+          id: "debug-err-3",
           action_type: "BAN",
-          user_name: "이름 매핑 실패",
-          user_id: "DATABASE",
+          user_name: "테이블 탐색 실패",
+          user_id: "NOT_FOUND",
           moderator_name: "Supabase",
-          reason: `모든 후보 이름 주소 인식 실패. 마지막 에러: ${error.message}`,
+          reason: `시도한 이름들: [${candidates.join(", ")}]. 이 중에 일치하는 테이블이 DB에 없습니다.`,
           created_at: new Date().toISOString()
         }
       ]);
@@ -63,12 +59,12 @@ export async function GET() {
 
     const formattedData = (data || []).map((log: any) => ({
       id: log.id || Math.random().toString(),
-      action_type: log.action_type || "LOG",
+      action_type: log.action_type || log.action || "LOG",
       user_name: log.user_name || log.username || log.target_name || log.target_username || "Unknown User",
       user_id: log.user_id || log.target_id || "0000",
       moderator_name: log.moderator_name || log.moderator_username || log.admin_name || "System",
       reason: log.reason || "No reason provided",
-      created_at: log.created_at || new Date().toISOString(),
+      created_at: log.created_at || log.timestamp || new Date().toISOString(),
     }));
 
     return NextResponse.json(formattedData);
