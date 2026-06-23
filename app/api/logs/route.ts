@@ -14,18 +14,18 @@ export async function GET() {
   try {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 디스코드 봇 라이브러리들이 사용하는 거의 모든 로그 테이블 이름 후보군
+    // 대소문자 혼용(CamelCase) 및 봇 기능별 자주 쓰이는 2차 후보군 10개
     const candidates = [
-      "audit_logs", 
-      "audit_log", 
-      "logs", 
-      "Audit_logs", 
-      "mod_logs", 
-      "moderation_logs", 
-      "bot_logs", 
-      "action_logs", 
-      "server_logs",
-      "sanctions"
+      "auditLogs", 
+      "AuditLogs", 
+      "auditlogs", 
+      "warns", 
+      "bans", 
+      "punishments", 
+      "cases", 
+      "records", 
+      "moderation", 
+      "discord_logs"
     ];
     
     let data = null;
@@ -42,16 +42,16 @@ export async function GET() {
       error = res.error;
     }
 
-    // 모든 후보 이름이 실패했을 때 화면에 시도한 이름들을 리포트
+    // 2차 후보마저 실패했을 때
     if (!successTable && error) {
       return NextResponse.json([
         {
-          id: "debug-err-3",
+          id: "debug-err-4",
           action_type: "BAN",
-          user_name: "테이블 탐색 실패",
+          user_name: "2차 탐색도 실패",
           user_id: "NOT_FOUND",
           moderator_name: "Supabase",
-          reason: `시도한 이름들: [${candidates.join(", ")}]. 이 중에 일치하는 테이블이 DB에 없습니다.`,
+          reason: `시도한 이름들: [${candidates.join(", ")}]. 진짜 이름을 알아내야 합니다.`,
           created_at: new Date().toISOString()
         }
       ]);
