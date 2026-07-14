@@ -21,7 +21,7 @@ export async function GET() {
     { auth: { persistSession: false } }
   );
 
-  const tables = ["guild_settings", "automod_logs"]; // 완장 프로젝트 실제 테이블명에 맞게 수정
+  const tables = ["guild_settings", "automod_logs","rag_vectors", "tickets", "users"]; // 완장 프로젝트 실제 테이블명에 맞게 수정
   const dbReport: Record<string, any> = {};
 
   for (const table of tables) {
