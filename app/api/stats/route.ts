@@ -30,11 +30,11 @@ export async function GET(request: Request) {
     );
   }
 
-  // 🛡️ 보안 격리: 관리자 권한 검증 (타협 불가능한 1순위 방어벽)
+  // 🛡️ Security Isolation: Verify Administrator Permission (Non-negotiable primary defense line)
   const isAdmin = await verifyGuildAdmin(guildId);
   if (!isAdmin) {
     return NextResponse.json(
-      { status: "error", message: "해당 서버의 관리 권한이 없습니다." },
+      { status: "error", message: "Unauthorized. You do not have permission to manage this server." },
       { status: 403 }
     );
   }
@@ -50,7 +50,7 @@ export async function GET(request: Request) {
   try {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 1. 길드 기본 설정 조회 (서버 존재 검증용)
+    // 1. Fetch basic guild settings (To verify server existence)
     const { data: guildData, error: guildError } = await supabase
       .from("guild_settings")
       .select("*")
@@ -58,11 +58,11 @@ export async function GET(request: Request) {
       .maybeSingle();
 
     if (guildError) {
-      console.error("[🔴 DB ERROR - guild_settings 테이블 조회 실패]:", guildError);
+      console.error("[🔴 DB ERROR - Failed to query guild_settings table]:", guildError);
       throw guildError;
     }
 
-    // 2. 🛡️ 서버별 automod 로그 총 건수 집계 (격리 완벽 보장)
+    // 2. 🛡️ Aggregate total automod logs per server (Guarantees absolute isolation)
     let automodLogCount = 0;
     const { count: logCount, error: logError } = await supabase
       .from("automod_logs")
@@ -71,16 +71,16 @@ export async function GET(request: Request) {
 
     if (logError) {
       console.warn(
-        `[⚠️ DB WARNING - automod_logs 조회 실패] ` +
+        `[⚠️ DB WARNING - Failed to query automod_logs] ` +
         `Code: ${logError.code} | Message: ${logError.message}. ` +
-        `로그 카운트를 0으로 우회합니다.`
+        `Falling back log count to 0.`
       );
       automodLogCount = 0;
     } else {
       automodLogCount = logCount || 0;
     }
 
-    // 3. 🛡️ [RAG Vectors 다이렉트 카운트] guild_knowledge 테이블 직접 집계!
+    // 3. 🛡️ [RAG Vectors Direct Count] Directly aggregate from guild_knowledge table!
     let ragVectorsCount = 0;
     const { count: ragCount, error: ragError } = await supabase
       .from("guild_knowledge")
@@ -89,16 +89,16 @@ export async function GET(request: Request) {
 
     if (ragError) {
       console.warn(
-        `[⚠️ DB WARNING - guild_knowledge 조회 실패] ` +
+        `[⚠️ DB WARNING - Failed to query guild_knowledge] ` +
         `Code: ${ragError.code} | Message: ${ragError.message}. ` +
-        `RAG 개수를 0으로 안전하게 우회합니다.`
+        `Safely falling back RAG count to 0.`
       );
       ragVectorsCount = 0;
     } else {
       ragVectorsCount = ragCount || 0;
     }
 
-    // 4. 🛡️ [Active Tickets 다이렉트 카운트] guild_ticket_settings 테이블 직접 집계! (거짓 양성 완전 제거)
+    // 4. 🛡️ [Active Tickets Direct Count] Directly aggregate from guild_ticket_settings table! (Eliminates false positives)
     let activeTicketsCount = 0;
     const { count: ticketCount, error: ticketError } = await supabase
       .from("guild_ticket_settings")
@@ -107,16 +107,16 @@ export async function GET(request: Request) {
 
     if (ticketError) {
       console.warn(
-        `[⚠️ DB WARNING - guild_ticket_settings 조회 실패] ` +
+        `[⚠️ DB WARNING - Failed to query guild_ticket_settings] ` +
         `Code: ${ticketError.code} | Message: ${ticketError.message}. ` +
-        `티켓 개수를 0으로 안전하게 우회합니다.`
+        `Safely falling back ticket count to 0.`
       );
       activeTicketsCount = 0;
     } else {
       activeTicketsCount = ticketCount || 0;
     }
 
-    // 5. 🛡️ [Custom Commands 직접 집계] Database Rows 카드 대체 지표!
+    // 5. 🛡️ [Custom Commands Direct Count] Database Rows Card Alternative Metric!
     let customCommandCount = 0;
     const { count: cmdCount, error: cmdError } = await supabase
       .from("custom_commands")
@@ -125,16 +125,16 @@ export async function GET(request: Request) {
 
     if (cmdError) {
       console.warn(
-        `[⚠️ DB WARNING - custom_commands 조회 실패] ` +
+        `[⚠️ DB WARNING - Failed to query custom_commands] ` +
         `Code: ${cmdError.code} | Message: ${cmdError.message}. ` +
-        `커맨드 수를 0으로 우회합니다.`
+        `Falling back custom command count to 0.`
       );
       customCommandCount = 0;
     } else {
       customCommandCount = cmdCount || 0;
     }
 
-    // 6. 페이로드 조립 - 각 지표가 서로 겹치지 않는 완전 독립형 카운트 (가짜 증감률 코드 완전 삭제!)
+    // 6. Assemble Payload - Fully independent counters per metric (Fake growth rate codes completely removed!)
     const guildTelemetryPayload = {
       custom_commands: customCommandCount,
       rag_synapses: ragVectorsCount,
