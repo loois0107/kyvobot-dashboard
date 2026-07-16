@@ -4,8 +4,9 @@ import { verifyGuildAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
+// 🏎️ MULTI-TENANT IN-MEMORY CACHE STORAGE: Segregates data snapshots per unique guild ID node
 const guildCacheMap = new Map<string, { data: any; timestamp: number }>();
-const CACHE_TTL_MS = 15 * 1000;
+const CACHE_TTL_MS = 15 * 1000; // Fast real-time calibration interval (15 Seconds)
 
 export async function GET(request: Request) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -18,6 +19,7 @@ export async function GET(request: Request) {
     );
   }
 
+  // 📡 TARGET EXTRACTION: Intercept the dynamic query parameter string token
   const { searchParams } = new URL(request.url);
   const guildId = searchParams.get("guild_id")?.trim();
 
@@ -28,7 +30,7 @@ export async function GET(request: Request) {
     );
   }
 
-  // 🛡️ 보안 격리: 관리자 권한 검증
+  // 🛡️ 보안 격리: 관리자 권한 검증 (타협 불가능한 1순위 방어벽)
   const isAdmin = await verifyGuildAdmin(guildId);
   if (!isAdmin) {
     return NextResponse.json(
@@ -40,6 +42,7 @@ export async function GET(request: Request) {
   const currentTime = Date.now();
   const cachedNode = guildCacheMap.get(guildId);
 
+  // 🛡️ ISOLATED TTL PROTECTION: Return isolated server memory instantly if cache hit persists
   if (cachedNode && currentTime - cachedNode.timestamp < CACHE_TTL_MS) {
     return NextResponse.json(cachedNode.data);
   }
@@ -47,7 +50,7 @@ export async function GET(request: Request) {
   try {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 1. 길드 설정 조회
+    // 1. Fetch data row targeting the exact dynamic Guild ID settings mapping
     const { data: guildData, error: guildError } = await supabase
       .from("guild_settings")
       .select("*")
@@ -59,26 +62,25 @@ export async function GET(request: Request) {
       throw guildError;
     }
 
-    // 2. 🛡️ 서버별 격리 필터 되살림! (클로드 피드백 반영)
-    let guildUsers = 0;
-    const { count: usersCount, error: usersError } = await supabase
-      .from("users")
+    // 2. 🛡️ 서버별 automod 로그 총 건수 집계 (users 글로벌 구조 안전 우회 및 격리 성공!)
+    let automodLogCount = 0;
+    const { count: logCount, error: logError } = await supabase
+      .from("automod_logs")
       .select("*", { count: "exact", head: true })
-      .eq("guild_id", guildId); // 👈 보안 필터 완벽 복구! 타협은 없다.
+      .eq("guild_id", guildId); // automod_logs는 guild_id 컬럼을 보유하므로 정상 격리
 
-    if (usersError) {
-      // 💡 여기서 에러 코드(usersError.code)를 명확하게 로그로 노출합니다.
+    if (logError) {
       console.warn(
-        `[⚠️ DB WARNING - users 테이블 조회 실패] ` +
-        `Code: ${usersError.code} | Message: ${usersError.message}. ` +
-        `유저 수 집계를 안전하게 0으로 우회합니다.`
+        `[⚠️ DB WARNING - automod_logs 조회 실패] ` +
+        `Code: ${logError.code} | Message: ${logError.message}. ` +
+        `로그 카운트를 0으로 우회합니다.`
       );
-      guildUsers = 0;
+      automodLogCount = 0;
     } else {
-      guildUsers = usersCount || 0;
+      automodLogCount = logCount || 0;
     }
-    
-    // 3. 텔레메트리 연산
+
+    // 3. Telemetry parameter extraction logic
     let ragVectorsCount = 0;
     let activeTicketsCount = 0;
     let totalShopItems = 0;
@@ -95,15 +97,17 @@ export async function GET(request: Request) {
       activeTicketsCount = guildData.active_tickets_count ?? (ragVectorsCount > 0 ? 1 : 0);
     }
 
-    // 4. 패이로드 조립
+    // 4. 페이로드 조립 (db_rows 합성 계산식 및 automod_logs 매핑 업데이트)
     const guildTelemetryPayload = {
-      db_rows: guildUsers + totalShopItems + (guildData ? 1 : 0),
+      // Guild Database Rows: 이 서버가 보유한 실제 데이터 행 (설정 + 상점 아이템 + 로그)
+      db_rows: automodLogCount + totalShopItems + (guildData ? 1 : 0),
       db_rows_change: "▲ 1.2%",
       rag_synapses: ragVectorsCount,
       active_tickets: activeTicketsCount,
-      global_users: guildUsers
+      automod_logs: automodLogCount, // 👈 global_users 자리를 automod_logs로 깔끔하게 대체!
     };
 
+    // 🏎️ CACHE COMPARTMENTALIZATION: Store snapshot inside isolation segment mapping
     guildCacheMap.set(guildId, {
       data: guildTelemetryPayload,
       timestamp: currentTime

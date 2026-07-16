@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation'; // 💡 useRouter 임포트 삭제 완료!
+import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 
@@ -11,38 +11,37 @@ interface LogLine {
   message: string;
 }
 
+// 🛡️ [인터페이스 수정] globalUsers를 제거하고 automodLogs로 교체 완료!
 interface TelemetryData {
   dbRows: number;
   dbRowsChange: string;
   ragSynapses: number;
   activeTickets: number;
-  globalUsers: number;
+  automodLogs: number;
 }
 
 export default function DashboardHome() {
   const params = useParams();
   const { data: session, status } = useSession();
   
-  // 🛡️ [문제 3 해결 - 초입 명확화] guildId를 엄격하게 문자열로 확정!
   const guildId = params?.guildId as string | undefined;
 
+  // 🛡️ [초기 State 수정] automodLogs: 0 설정 완료!
   const [telemetry, setTelemetry] = useState<TelemetryData>({
     dbRows: 0,
     dbRowsChange: '▲ 0%',
     ragSynapses: 0,
     activeTickets: 0,
-    globalUsers: 0
+    automodLogs: 0
   });
   
   const [isLoadingStats, setIsLoadingStats] = useState(true);
   const [isLoadingLogs, setIsLoadingLogs] = useState(true);
-  
-  // 🛡️ [문제 2 해결] 연결 실패 상태 명시화
   const [statsError, setStatsError] = useState(false);
 
-  // 배지 세분화 정의
+  // 🛡️ [isDataEmpty 판정 수정] automodLogs가 0일 때 비어있는 배지 처리 완료!
   const isConnectionFailed = statsError && !isLoadingStats;
-  const isDataEmpty = !statsError && telemetry.dbRows === 0 && telemetry.globalUsers === 0 && !isLoadingStats;
+  const isDataEmpty = !statsError && telemetry.dbRows === 0 && telemetry.automodLogs === 0 && !isLoadingStats;
 
   const [isPaused, setIsPaused] = useState(false);
   const [logFilter, setLogFilter] = useState<'ALL' | 'INFO' | 'SUCCESS' | 'WARN' | 'SYSTEM'>('ALL');
@@ -59,6 +58,7 @@ export default function DashboardHome() {
         return;
       }
       
+      // 🛡️ [fetchRealtimeStats 수정] API 응답 데이터를 automodLogs에 똑똑하게 매핑!
       setStatsError(false);
       const data = await res.json();
       setTelemetry({
@@ -66,7 +66,7 @@ export default function DashboardHome() {
         dbRowsChange: data.db_rows_change ?? '▲ 0%',
         ragSynapses: data.rag_synapses ?? 0,
         activeTickets: data.active_tickets ?? 0,
-        globalUsers: data.global_users ?? 0
+        automodLogs: data.automod_logs ?? 0
       });
     } catch (err) {
       setStatsError(true);
@@ -117,7 +117,6 @@ export default function DashboardHome() {
     return () => clearInterval(logsInterval);
   }, [guildId, isPaused]);
 
-  // 🛡️ [문제 3 대처 가드] guildId 세그먼트가 없는 비정상적 라우팅 시 원천 가드
   if (!guildId || guildId === '[guildId]') {
     return (
       <div className="flex min-h-[400px] items-center justify-center bg-[#111214] text-red-400 font-mono p-8 text-center border border-red-500/20 rounded-2xl">
@@ -215,11 +214,13 @@ export default function DashboardHome() {
             <span className="text-xs text-yellow-600 font-sans ml-1">Bridges</span>
           </span>
         </div>
+        
+        {/* 🛡️ [네 번째 카드 JSX 교체] Active Guild Users 대신 Automod Logs 카드로 전면 교체 완료! */}
         <div className="bg-[#111214] border border-[#232428] rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center">
-          <span className="text-xs font-black text-gray-500 uppercase tracking-wider block">Active Guild Users</span>
-          <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.globalUsers === 0 ? 'text-gray-600' : 'text-white'}`}>
-            {isLoadingStats ? '...' : telemetry.globalUsers.toLocaleString()}
-            <span className="text-xs text-gray-400 font-sans ml-1">Users</span>
+          <span className="text-xs font-black text-gray-500 uppercase tracking-wider block">Automod Logs</span>
+          <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.automodLogs === 0 ? 'text-gray-600' : 'text-white'}`}>
+            {isLoadingStats ? '...' : telemetry.automodLogs.toLocaleString()}
+            <span className="text-xs text-red-600 font-sans ml-1">Incidents</span>
           </span>
         </div>
       </div>
@@ -230,7 +231,6 @@ export default function DashboardHome() {
       <div className="space-y-4">
         <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase px-1">⚡ CORE MODULE QUICK DISPATCH</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* 🛡️ [문제 3 해결] `${guildId || ''}` 에서 지저분한 || '' 구문을 제거하고 확정 변수로 사용! */}
           <Link href={`/dashboard/${guildId}/leveling`} className="bg-[#1e1f22] hover:bg-[#232428] border border-[#2b2d31] hover:border-[#5865F2]/40 rounded-2xl p-8 shadow-md transition-all duration-200 group cursor-pointer text-left flex flex-col justify-between min-h-[210px]">
             <div><span className="text-3xl block mb-3">✨</span><h4 className="text-sm font-black text-white group-hover:text-[#5865F2] uppercase tracking-wider">Leveling & Eco</h4><p className="text-xs text-gray-400 mt-2 leading-relaxed">Configure user reward tiers, XP multipliers, and server market item registries.</p></div>
             <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase mt-4 block group-hover:text-white transition-colors">DISPATCH INTERFACE ➔</span>
