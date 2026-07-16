@@ -4,8 +4,9 @@ import { verifyGuildAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
+// 🏎️ MULTI-TENANT IN-MEMORY CACHE STORAGE: Segregates data snapshots per unique guild ID node
 const guildCacheMap = new Map<string, { data: any; timestamp: number }>();
-const CACHE_TTL_MS = 15 * 1000;
+const CACHE_TTL_MS = 15 * 1000; // Fast real-time calibration interval (15 Seconds)
 
 export async function GET(request: Request) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -18,6 +19,7 @@ export async function GET(request: Request) {
     );
   }
 
+  // 📡 TARGET EXTRACTION: Intercept the dynamic query parameter string token
   const { searchParams } = new URL(request.url);
   const guildId = searchParams.get("guild_id")?.trim();
 
@@ -28,7 +30,7 @@ export async function GET(request: Request) {
     );
   }
 
-  // 🛡️ 보안 격리 검증
+  // 🛡️ 보안 격리: 관리자 권한 검증 (타협 불가능한 1순위 방어벽)
   const isAdmin = await verifyGuildAdmin(guildId);
   if (!isAdmin) {
     return NextResponse.json(
@@ -40,6 +42,7 @@ export async function GET(request: Request) {
   const currentTime = Date.now();
   const cachedNode = guildCacheMap.get(guildId);
 
+  // 🛡️ ISOLATED TTL PROTECTION: Return isolated server memory instantly if cache hit persists
   if (cachedNode && currentTime - cachedNode.timestamp < CACHE_TTL_MS) {
     return NextResponse.json(cachedNode.data);
   }
@@ -47,7 +50,7 @@ export async function GET(request: Request) {
   try {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 1. 길드 기본 설정 조회
+    // 1. Fetch data row targeting the exact dynamic Guild ID settings mapping
     const { data: guildData, error: guildError } = await supabase
       .from("guild_settings")
       .select("*")
@@ -59,7 +62,7 @@ export async function GET(request: Request) {
       throw guildError;
     }
 
-    // 2. 서버별 automod 로그 총 건수 집계
+    // 2. 🛡️ 서버별 automod 로그 총 건수 집계
     let automodLogCount = 0;
     const { count: logCount, error: logError } = await supabase
       .from("automod_logs")
@@ -67,27 +70,35 @@ export async function GET(request: Request) {
       .eq("guild_id", guildId);
 
     if (logError) {
-      console.warn(`[⚠️ DB WARNING - automod_logs 조회 실패] Code: ${logError.code}. 로그를 0으로 우회합니다.`);
+      console.warn(
+        `[⚠️ DB WARNING - automod_logs 조회 실패] ` +
+        `Code: ${logError.code} | Message: ${logError.message}. ` +
+        `로그 카운트를 0으로 우회합니다.`
+      );
       automodLogCount = 0;
     } else {
       automodLogCount = logCount || 0;
     }
 
-    // 3. 🛡️ [RAG Vectors 직접 집계] guild_knowledge 테이블에서 이 서버의 진짜 벡터 개수 카운트!
+    // 3. 🛡️ [RAG Vectors 다이렉트 카운트] guild_knowledge 테이블 직접 집계!
     let ragVectorsCount = 0;
     const { count: ragCount, error: ragError } = await supabase
       .from("guild_knowledge")
       .select("*", { count: "exact", head: true })
-      .eq("guild_id", guildId);
+      .eq("guild_id", guildId); // guild_id 기준으로 정확하게 카운트
 
     if (ragError) {
-      console.warn(`[⚠️ DB WARNING - guild_knowledge 조회 실패] Code: ${ragError.code}. RAG 개수를 0으로 우회합니다.`);
+      console.warn(
+        `[⚠️ DB WARNING - guild_knowledge 조회 실패] ` +
+        `Code: ${ragError.code} | Message: ${ragError.message}. ` +
+        `RAG 개수를 0으로 안전하게 우회합니다.`
+      );
       ragVectorsCount = 0;
     } else {
       ragVectorsCount = ragCount || 0;
     }
 
-    // 4. Active Tickets 및 기타 설정 연산
+    // 4. Telemetry parameter extraction logic (티켓 설정/숍 아이템 등)
     let activeTicketsCount = 0;
     let totalShopItems = 0;
 
@@ -101,13 +112,15 @@ export async function GET(request: Request) {
 
     // 5. 페이로드 조립
     const guildTelemetryPayload = {
-      db_rows: automodLogCount + totalShopItems + (guildData ? 1 : 0),
+      // 이 서버가 보유한 실제 데이터 행 (설정 + 상점 아이템 + 로그 + RAG 지식 개수)
+      db_rows: automodLogCount + totalShopItems + ragVectorsCount + (guildData ? 1 : 0),
       db_rows_change: "▲ 1.2%",
       rag_synapses: ragVectorsCount,
       active_tickets: activeTicketsCount,
       automod_logs: automodLogCount,
     };
 
+    // 🏎️ CACHE COMPARTMENTALIZATION: Store snapshot inside isolation segment mapping
     guildCacheMap.set(guildId, {
       data: guildTelemetryPayload,
       timestamp: currentTime
