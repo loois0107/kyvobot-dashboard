@@ -1,11 +1,16 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, notFound } from 'next/navigation';
 import Link from 'next/link';
 
 export default function ServerControlHubHome() {
   const params = useParams();
-  const guildId = (params?.guildId || '1507639384453939381') as string;
+  
+  // 💡 하드코딩된 폴백 ID를 제거하고, 파라미터가 없으면 즉시 Next.js 404(notFound)로 보냅니다.
+  const guildId = params?.guildId as string | undefined;
+  if (!guildId) {
+    notFound();
+  }
 
   return (
     <div className="font-mono text-white space-y-6">
