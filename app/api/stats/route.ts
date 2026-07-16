@@ -50,7 +50,7 @@ export async function GET(request: Request) {
   try {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 1. Fetch data row targeting the exact dynamic Guild ID settings mapping
+    // 1. 길드 기본 설정 조회 (서버 존재 검증용)
     const { data: guildData, error: guildError } = await supabase
       .from("guild_settings")
       .select("*")
@@ -62,7 +62,7 @@ export async function GET(request: Request) {
       throw guildError;
     }
 
-    // 2. 🛡️ 서버별 automod 로그 총 건수 집계
+    // 2. 🛡️ 서버별 automod 로그 총 건수 집계 (격리 완벽 보장)
     let automodLogCount = 0;
     const { count: logCount, error: logError } = await supabase
       .from("automod_logs")
@@ -85,7 +85,7 @@ export async function GET(request: Request) {
     const { count: ragCount, error: ragError } = await supabase
       .from("guild_knowledge")
       .select("*", { count: "exact", head: true })
-      .eq("guild_id", guildId); // guild_id 기준으로 정확하게 카운트
+      .eq("guild_id", guildId);
 
     if (ragError) {
       console.warn(
@@ -98,23 +98,45 @@ export async function GET(request: Request) {
       ragVectorsCount = ragCount || 0;
     }
 
-    // 4. Telemetry parameter extraction logic (티켓 설정/숍 아이템 등)
+    // 4. 🛡️ [Active Tickets 다이렉트 카운트] guild_ticket_settings 테이블 직접 집계! (거짓 양성 완전 제거)
     let activeTicketsCount = 0;
-    let totalShopItems = 0;
+    const { count: ticketCount, error: ticketError } = await supabase
+      .from("guild_ticket_settings")
+      .select("*", { count: "exact", head: true })
+      .eq("guild_id", guildId);
 
-    if (guildData) {
-      const botSettings = guildData.settings || {};
-      if (botSettings.leveling_settings?.shop_items) {
-        totalShopItems = botSettings.leveling_settings.shop_items.length;
-      }
-      activeTicketsCount = guildData.active_tickets_count ?? (ragVectorsCount > 0 ? 1 : 0);
+    if (ticketError) {
+      console.warn(
+        `[⚠️ DB WARNING - guild_ticket_settings 조회 실패] ` +
+        `Code: ${ticketError.code} | Message: ${ticketError.message}. ` +
+        `티켓 개수를 0으로 안전하게 우회합니다.`
+      );
+      activeTicketsCount = 0;
+    } else {
+      activeTicketsCount = ticketCount || 0;
     }
 
-    // 5. 페이로드 조립
+    // 5. 🛡️ [Custom Commands 직접 집계] Database Rows 카드 대체 지표!
+    let customCommandCount = 0;
+    const { count: cmdCount, error: cmdError } = await supabase
+      .from("custom_commands")
+      .select("*", { count: "exact", head: true })
+      .eq("guild_id", guildId);
+
+    if (cmdError) {
+      console.warn(
+        `[⚠️ DB WARNING - custom_commands 조회 실패] ` +
+        `Code: ${cmdError.code} | Message: ${cmdError.message}. ` +
+        `커맨드 수를 0으로 우회합니다.`
+      );
+      customCommandCount = 0;
+    } else {
+      customCommandCount = cmdCount || 0;
+    }
+
+    // 6. 페이로드 조립 - 각 지표가 서로 겹치지 않는 완전 독립형 카운트 (가짜 증감률 코드 완전 삭제!)
     const guildTelemetryPayload = {
-      // 이 서버가 보유한 실제 데이터 행 (설정 + 상점 아이템 + 로그 + RAG 지식 개수)
-      db_rows: automodLogCount + totalShopItems + ragVectorsCount + (guildData ? 1 : 0),
-      db_rows_change: "▲ 1.2%",
+      custom_commands: customCommandCount,
       rag_synapses: ragVectorsCount,
       active_tickets: activeTicketsCount,
       automod_logs: automodLogCount,

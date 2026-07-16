@@ -11,10 +11,9 @@ interface LogLine {
   message: string;
 }
 
-// 🛡️ [인터페이스 수정] globalUsers를 제거하고 automodLogs로 교체 완료!
+// 🛡️ [인터페이스 수정] db 관련 필드를 제거하고 customCommands로 완전 대체 완료!
 interface TelemetryData {
-  dbRows: number;
-  dbRowsChange: string;
+  customCommands: number;
   ragSynapses: number;
   activeTickets: number;
   automodLogs: number;
@@ -26,10 +25,9 @@ export default function DashboardHome() {
   
   const guildId = params?.guildId as string | undefined;
 
-  // 🛡️ [초기 State 수정] automodLogs: 0 설정 완료!
+  // 🛡️ [초기 State 수정] dbRows 대신 customCommands: 0 매핑 완료!
   const [telemetry, setTelemetry] = useState<TelemetryData>({
-    dbRows: 0,
-    dbRowsChange: '▲ 0%',
+    customCommands: 0,
     ragSynapses: 0,
     activeTickets: 0,
     automodLogs: 0
@@ -39,13 +37,14 @@ export default function DashboardHome() {
   const [isLoadingLogs, setIsLoadingLogs] = useState(true);
   const [statsError, setStatsError] = useState(false);
 
-  // 🛡️ [isDataEmpty 판정 수정] automodLogs가 0일 때 비어있는 배지 처리 완료!
-  const isConnectionFailed = statsError && !isLoadingStats;
-  const isDataEmpty = !statsError && telemetry.dbRows === 0 && telemetry.automodLogs === 0 && !isLoadingStats;
-
   const [isPaused, setIsPaused] = useState(false);
   const [logFilter, setLogFilter] = useState<'ALL' | 'INFO' | 'SUCCESS' | 'WARN' | 'SYSTEM'>('ALL');
   const [logs, setLogs] = useState<LogLine[]>([]);
+
+  const isConnectionFailed = statsError && !isLoadingStats;
+  
+  // 🛡️ [isDataEmpty 판정 수정] dbRows 대신 automod와 RAG 지식이 둘 다 0이면 빈 서버 판정!
+  const isDataEmpty = !statsError && telemetry.automodLogs === 0 && telemetry.ragSynapses === 0 && !isLoadingStats;
 
   // 📡 REAL TIME STATISTICS SYNC PROTOCOL
   const fetchRealtimeStats = async (targetId: string) => {
@@ -58,12 +57,11 @@ export default function DashboardHome() {
         return;
       }
       
-      // 🛡️ [fetchRealtimeStats 수정] API 응답 데이터를 automodLogs에 똑똑하게 매핑!
+      // 🛡️ [fetchRealtimeStats 수정] 가짜 증감률 변수 및 db_rows 완전히 걷어내기!
       setStatsError(false);
       const data = await res.json();
       setTelemetry({
-        dbRows: data.db_rows ?? 0,
-        dbRowsChange: data.db_rows_change ?? '▲ 0%',
+        customCommands: data.custom_commands ?? 0,
         ragSynapses: data.rag_synapses ?? 0,
         activeTickets: data.active_tickets ?? 0,
         automodLogs: data.automod_logs ?? 0
@@ -193,13 +191,16 @@ export default function DashboardHome() {
           [SECTION 2: 📊 REALTIME TELEMETRY MATRIX]
          ========================================== */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        {/* 🛡️ [첫 번째 카드 JSX 교체] Custom Commands 카드로 대체 및 가짜 증감률(dbRowsChange) 전면 삭제 완료! */}
         <div className="bg-[#111214] border border-[#232428] rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center">
-          <span className="text-xs font-black text-gray-500 uppercase tracking-wider block">Guild Database Rows</span>
-          <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.dbRows === 0 ? 'text-gray-600' : 'text-white'}`}>
-            {isLoadingStats ? '...' : telemetry.dbRows.toLocaleString()}
-            <span className="text-sm text-[#23a55a] font-sans ml-1.5">{telemetry.dbRowsChange}</span>
+          <span className="text-xs font-black text-gray-500 uppercase tracking-wider block">Custom Commands</span>
+          <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.customCommands === 0 ? 'text-gray-600' : 'text-white'}`}>
+            {isLoadingStats ? '...' : telemetry.customCommands.toLocaleString()}
+            <span className="text-xs text-[#5865F2]/60 font-sans ml-1">Commands</span>
           </span>
         </div>
+
         <div className="bg-[#111214] border border-[#232428] rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center">
           <span className="text-xs font-black text-gray-500 uppercase tracking-wider block">Guild RAG Vectors</span>
           <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.ragSynapses === 0 ? 'text-gray-600' : 'text-purple-400'}`}>
@@ -214,8 +215,6 @@ export default function DashboardHome() {
             <span className="text-xs text-yellow-600 font-sans ml-1">Bridges</span>
           </span>
         </div>
-        
-        {/* 🛡️ [네 번째 카드 JSX 교체] Active Guild Users 대신 Automod Logs 카드로 전면 교체 완료! */}
         <div className="bg-[#111214] border border-[#232428] rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center">
           <span className="text-xs font-black text-gray-500 uppercase tracking-wider block">Automod Logs</span>
           <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.automodLogs === 0 ? 'text-gray-600' : 'text-white'}`}>
