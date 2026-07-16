@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { verifyGuildAdmin } from "@/lib/auth"; // 🛡️ [수정 2] 관리자 권한 검증 헬퍼 임포트
+import { verifyGuildAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-// 🏎️ MULTI-TENANT IN-MEMORY CACHE STORAGE: Segregates data snapshots per unique guild ID node
 const guildCacheMap = new Map<string, { data: any; timestamp: number }>();
-const CACHE_TTL_MS = 15 * 1000; // Fast real-time calibration interval (15 Seconds)
+const CACHE_TTL_MS = 15 * 1000;
 
 export async function GET(request: Request) {
-  // 🛡️ [수정 1] Vercel에 실제 등록된 정식 환경변수명으로 전면 교체 (500 에러 원천 차단!)
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -20,7 +18,6 @@ export async function GET(request: Request) {
     );
   }
 
-  // 📡 TARGET EXTRACTION: Intercept the dynamic query parameter string token
   const { searchParams } = new URL(request.url);
   const guildId = searchParams.get("guild_id")?.trim();
 
@@ -31,7 +28,7 @@ export async function GET(request: Request) {
     );
   }
 
-  // 🛡️ [수정 2] 보안 강화: 이 서버의 관리 권한이 있는 유저인지 검증 (해킹 위험 원천 차단)
+  // 🛡️ 보안 격리: 관리자 권한 검증
   const isAdmin = await verifyGuildAdmin(guildId);
   if (!isAdmin) {
     return NextResponse.json(
@@ -43,7 +40,6 @@ export async function GET(request: Request) {
   const currentTime = Date.now();
   const cachedNode = guildCacheMap.get(guildId);
 
-  // 🛡️ ISOLATED TTL PROTECTION: Return isolated server memory instantly if cache hit persists
   if (cachedNode && currentTime - cachedNode.timestamp < CACHE_TTL_MS) {
     return NextResponse.json(cachedNode.data);
   }
@@ -51,7 +47,7 @@ export async function GET(request: Request) {
   try {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 1. Fetch data row targeting the exact dynamic Guild ID settings mapping
+    // 1. 길드 설정 조회
     const { data: guildData, error: guildError } = await supabase
       .from("guild_settings")
       .select("*")
@@ -63,15 +59,15 @@ export async function GET(request: Request) {
       throw guildError;
     }
 
-    // 2. Query tracked active user population belonging exclusively to this specific server context
+    // 2. 🛡️ 서버별 격리 필터 되살림! (클로드 피드백 반영)
     let guildUsers = 0;
     const { count: usersCount, error: usersError } = await supabase
       .from("users")
       .select("*", { count: "exact", head: true })
-      .eq("guild_id", guildId);
+      .eq("guild_id", guildId); // 👈 보안 필터 완벽 복구! 타협은 없다.
 
     if (usersError) {
-      // 🛡️ [수정 3] 에러 감춤 문제 해결: 경고만 띄우고 원인을 모르는 참사 방지
+      // 💡 여기서 에러 코드(usersError.code)를 명확하게 로그로 노출합니다.
       console.warn(
         `[⚠️ DB WARNING - users 테이블 조회 실패] ` +
         `Code: ${usersError.code} | Message: ${usersError.message}. ` +
@@ -82,7 +78,7 @@ export async function GET(request: Request) {
       guildUsers = usersCount || 0;
     }
     
-    // 3. Telemetry parameter extraction logic
+    // 3. 텔레메트리 연산
     let ragVectorsCount = 0;
     let activeTicketsCount = 0;
     let totalShopItems = 0;
@@ -99,7 +95,7 @@ export async function GET(request: Request) {
       activeTicketsCount = guildData.active_tickets_count ?? (ragVectorsCount > 0 ? 1 : 0);
     }
 
-    // 4. Calibrate the multi-tenant payload profile
+    // 4. 패이로드 조립
     const guildTelemetryPayload = {
       db_rows: guildUsers + totalShopItems + (guildData ? 1 : 0),
       db_rows_change: "▲ 1.2%",
@@ -108,7 +104,6 @@ export async function GET(request: Request) {
       global_users: guildUsers
     };
 
-    // 🏎️ CACHE COMPARTMENTALIZATION: Store snapshot inside isolation segment mapping
     guildCacheMap.set(guildId, {
       data: guildTelemetryPayload,
       timestamp: currentTime
