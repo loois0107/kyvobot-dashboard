@@ -12,21 +12,22 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-  // 📡 1. 서버 통합 매트릭스 로드 (언어 + 명령어 한 번에 수신)
+  // 📡 1. 서버 통합 매트릭스 로드
   const fetchAllSettings = () => {
     if (!guildId || guildId === '[guildId]') return;
     setLoading(true);
     setMessage('');
     
     fetch(`/api/settings/${guildId}`)
-      .then((res) => res.json())
-      .then((resData) => {
-        if (resData.ok && resData.settings) {
+      .then(async (res) => {
+        const resData = await res.json();
+        if (res.ok && resData.ok && resData.settings) {
           setLanguage(resData.settings.language || 'en');
           setCommands(resData.settings.custom_commands || {});
           setMessage('Matrix settings successfully decrypted.');
         } else {
-          setMessage(resData.message || 'No settings found.');
+          // ⚡ [클로드 수정 제안 적용] 로드 실패 시 에러 필드 및 HTTP 상태 매핑
+          setMessage Luz(`Load failed [${res.status}]: ${resData.error || resData.message || 'Unknown configuration state.'}`);
         }
         setLoading(false);
       })
@@ -41,7 +42,7 @@ export default function SettingsPage() {
     fetchAllSettings();
   }, [guildId]);
 
-  // 🌐 2. 통합 백엔드 저장 처리 파이프라인 (단일 주소 POST 통신)
+  // 🌐 2. 통합 백엔드 저장 처리 파이프라인
   const saveUnifiedSettings = async (nextCommands?: Record<string, string>, nextLang?: string) => {
     if (!guildId || guildId === '[guildId]') return;
     setLoading(true);
@@ -60,12 +61,15 @@ export default function SettingsPage() {
       });
 
       const data = await res.json();
-      if (data.ok) {
+      
+      // ⚡ [클로드 핵심 제안] 성공과 실패 분기문을 분리하여 진짜 에러 파싱
+      if (res.ok && data.ok) {
         setMessage('Configuration matrix successfully deployed!');
         if (nextCommands !== undefined) setCommands(nextCommands);
         if (nextLang !== undefined) setLanguage(nextLang);
       } else {
-        setMessage(`Bypass failed: ${data.message}`);
+        // 백엔드 실패는 error 필드로 옴 + HTTP 상태도 같이 노출!
+        setMessage(`Save failed [${res.status}]: ${data.error || data.message || 'Unknown Layer Exception.'}`);
       }
     } catch (err) {
       console.error(err);
@@ -75,7 +79,6 @@ export default function SettingsPage() {
     }
   };
 
-  // 📋 3. 명령어 정규화 추가 핸들러
   const handleAddCommand = () => {
     const name = prompt('Enter command name (e.g., hello):')?.trim().toLowerCase();
     const response = prompt('Enter command response text:');
@@ -85,7 +88,6 @@ export default function SettingsPage() {
     saveUnifiedSettings(updated, language);
   };
 
-  // 📋 4. 명령어 정규화 삭제 핸들러
   const handleDeleteCommand = (name: string) => {
     if (!confirm(`Delete '${name}'?`)) return;
     
@@ -131,7 +133,6 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {/* 명령어 관리판 */}
           <div className="border border-[#2A1F40] bg-[#0F0F1A] p-4 rounded-lg">
             <div className="flex items-center justify-between mb-3 border-b border-[#2A1F40] pb-2">
               <span className="text-xs font-bold text-gray-400">CUSTOM MACRO COMMANDS</span>
