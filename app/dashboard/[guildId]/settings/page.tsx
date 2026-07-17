@@ -12,37 +12,44 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-  // 🌐 [클로드 최종 조언 설계도 이식] stats가 아닌 세로 개설한 전용 GET 라우트로 데이터 fetch
-  const fetchSettings = () => {
+  // 🌐 1. 언어 설정 전용 불러오기
+  const fetchLanguageSettings = () => {
     if (!guildId || guildId === '[guildId]') return;
     setLoading(true);
-    setMessage('');
-    
     fetch(`/api/settings/${guildId}`)
       .then((res) => res.json())
       .then((resData) => {
-        // 3단 폴백 및 안전 장치 탑재 연동
         if (resData.ok && resData.settings) {
           setLanguage(resData.settings.language || 'en');
-          setCommands(resData.settings.custom_commands || {});
-          setMessage('Matrix settings successfully decrypted.');
-        } else {
-          setMessage(resData.message || 'No settings found.');
         }
         setLoading(false);
       })
       .catch((err) => {
         console.error(err);
-        setMessage('Failed to fetch settings from network core.');
         setLoading(false);
       });
   };
 
+  // 📋 2. 커스텀 명령어 목록 전용 불러오기 (클로드 신규 라우트 격리)
+  const fetchCommands = () => {
+    if (!guildId || guildId === '[guildId]') return;
+    fetch(`/api/settings/${guildId}/commands`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.ok) setCommands(data.commands);
+      })
+      .catch((err) => console.error(err));
+  };
+
   useEffect(() => {
-    fetchSettings();
+    if (guildId && guildId !== '[guildId]') {
+      fetchLanguageSettings();
+      fetchCommands();
+    }
   }, [guildId]);
 
-  const saveSettings = () => {
+  // 🌐 3. 언어 설정 전용 저장하기
+  const saveLanguageSettings = () => {
     if (!guildId || guildId === '[guildId]') return alert('Invalid Active Guild Context.');
     setLoading(true);
     setMessage('');
@@ -50,21 +57,12 @@ export default function SettingsPage() {
     fetch(`/api/settings/${guildId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        custom_commands: commands,
-        language: language
-      })
+      body: JSON.stringify({ language: language })
     })
-      .then(async (res) => {
-        if (!res.ok) {
-          const errText = await res.text().catch(() => 'Unknown Raw Body');
-          throw new Error(`HTTP ${res.status} // ${errText}`);
-        }
-        return res.json();
-      })
+      .then((res) => res.json())
       .then((resData) => {
         if (resData.ok) {
-          setMessage('Configuration matrix successfully deployed!');
+          setMessage('Language configuration matrix successfully deployed!');
         } else {
           setMessage(`Bypass failed: ${resData.message || 'Unauthorized'}`);
         }
@@ -77,11 +75,53 @@ export default function SettingsPage() {
       });
   };
 
-  const handleAddCommand = () => {
-    const trigger = prompt('Enter command trigger (e.g., !hello):');
+  // 📋 4. 명령어 개별 추가 핸들러 (원자적 실시간 저장)
+  const handleAddCommand = async () => {
+    const name = prompt('Enter command trigger (e.g., !hello):')?.trim();
     const response = prompt('Enter command response text:');
-    if (trigger && response) {
-      setCommands({ ...commands, [trigger]: response });
+    if (!name || !response) return;
+
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/settings/${guildId}/commands`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command_name: name, response_text: response }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setMessage(`Command '${name}' successfully synced and deployed.`);
+        fetchCommands(); // 리스트 즉시 리로드
+      } else {
+        setMessage(`Fault: ${data.message}`);
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage('Failed to register macro to database layer.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 📋 5. 명령어 개별 삭제 핸들러 (원자적 실시간 제거)
+  const handleDeleteCommand = async (name: string) => {
+    if (!confirm(`Are you sure you want to permanently expunge '${name}'?`)) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/settings/${guildId}/commands`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command_name: name }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setMessage(`Command '${name}' permanently expunged from database.`);
+        fetchCommands(); // 리스트 즉시 리로드
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -115,6 +155,15 @@ export default function SettingsPage() {
             </div>
           </div>
 
+          {/* 일반 언어 설정 전용 저장 버튼 */}
+          <button 
+            onClick={saveLanguageSettings}
+            disabled={loading}
+            className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 text-white text-xs font-bold py-2 rounded transition-all"
+          >
+            SAVE LANGUAGE CONFIGURATION
+          </button>
+
           {message && (
             <div className="bg-[#0F0F1A] border border-purple-900/50 text-xs text-center p-3 rounded text-gray-300 break-all whitespace-pre-wrap">
               {message}
@@ -142,11 +191,7 @@ export default function SettingsPage() {
                     <span className="text-green-400 font-bold">{trigger}</span>
                     <span className="text-gray-400 truncate max-w-[200px]">{response}</span>
                     <button 
-                      onClick={() => {
-                        const next = { ...commands };
-                        delete next[trigger];
-                        setCommands(next);
-                      }}
+                      onClick={() => handleDeleteCommand(trigger)}
                       className="text-red-400 hover:text-red-500 font-bold"
                     >
                       [DELETE]
@@ -156,14 +201,6 @@ export default function SettingsPage() {
               </div>
             )}
           </div>
-
-          <button 
-            onClick={saveSettings}
-            disabled={loading}
-            className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 text-white text-xs font-bold py-3 rounded-lg transition-all"
-          >
-            {loading ? 'DEPLOYING MATRIX...' : 'COMMIT CHANGES TO SUPABASE'}
-          </button>
         </div>
       </div>
     </div>
