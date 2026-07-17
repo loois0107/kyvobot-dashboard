@@ -50,7 +50,7 @@ export async function GET(request: Request) {
   try {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 1. Fetch basic guild settings (To verify server existence)
+    // 1. Fetch basic guild settings (To verify server existence & Extract Unified JSON Object)
     const { data: guildData, error: guildError } = await supabase
       .from("guild_settings")
       .select("*")
@@ -116,25 +116,14 @@ export async function GET(request: Request) {
       activeTicketsCount = ticketCount || 0;
     }
 
-    // 5. 🛡️ [Custom Commands Direct Count] Database Rows Card Alternative Metric!
+    // 5. 🛡️ [클로드 아키텍처 스펙 수정 완료] 독립 테이블 조회를 완전히 걷어내고, 
+    //    Step 1에서 로드한 guild_settings 내부의 custom_commands JSON 객체의 키 개수를 실시간 연산!
     let customCommandCount = 0;
-    const { count: cmdCount, error: cmdError } = await supabase
-      .from("custom_commands")
-      .select("*", { count: "exact", head: true })
-      .eq("guild_id", guildId);
-
-    if (cmdError) {
-      console.warn(
-        `[⚠️ DB WARNING - Failed to query custom_commands] ` +
-        `Code: ${cmdError.code} | Message: ${cmdError.message}. ` +
-        `Falling back custom command count to 0.`
-      );
-      customCommandCount = 0;
-    } else {
-      customCommandCount = cmdCount || 0;
+    if (guildData?.custom_commands && typeof guildData.custom_commands === "object") {
+      customCommandCount = Object.keys(guildData.custom_commands as Record<string, unknown>).length;
     }
 
-    // 6. Assemble Payload - Fully independent counters per metric (Fake growth rate codes completely removed!)
+    // 6. Assemble Payload - Fully independent counters per metric 
     const guildTelemetryPayload = {
       custom_commands: customCommandCount,
       rag_synapses: ragVectorsCount,

@@ -23,6 +23,7 @@ const ALLOWED_FIELDS = [
   "log_channel_id",
   "banned_words",
   "language",
+  "custom_commands", // Redis 캐시 무임승차를 위해 커스텀 명령어 객체 필드 유지
 ] as const;
 
 /** Extracts only whitelisted fields from the request body to prevent Mass Assignment attacks. */
@@ -34,7 +35,9 @@ function sanitizeBody(body: Record<string, unknown>): Record<string, unknown> {
   return clean;
 }
 
-// 🌐 [클로드 제안 반영] 설정 데이터를 안전하게 읽어오는 GET 핸들러 엔진 장착
+// ══════════════════════════════════════════════════════════
+//  GET — 로딩 시 언어 및 커스텀 명령어 통합 패키지 다운로드
+// ══════════════════════════════════════════════════════════
 export async function GET(
   req: NextRequest,
   ctx: { params: Promise<{ guildId: string }> }
@@ -42,38 +45,38 @@ export async function GET(
   const { guildId } = await ctx.params;
 
   try {
-    // 0) 디스코드 스노우플레이크 포맷 검증
     if (!/^\d{17,20}$/.test(guildId)) {
       return NextResponse.json({ error: "Invalid server ID." }, { status: 400 });
     }
 
-    // 1) 🔐 Auth.js 세션 기반 최고 관리자 권한 검증
     if (!(await verifyGuildAdmin(guildId))) {
       return NextResponse.json({ error: "Unauthorized access blocked." }, { status: 403 });
     }
 
-    // 2) Supabase에서 원본 설정 데이터 추출
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from("guild_settings")
       .select("*")
       .eq("guild_id", guildId)
-      .maybe_single();
+      .maybeSingle(); // ⚡ [클로드 지적 반영] .maybe_single() 오타를 .maybeSingle()로 완벽 수정!
 
     if (error) {
       console.error("[SETTINGS][GET][ERROR] Supabase fetch failed:", error);
       return NextResponse.json({ error: "Failed to fetch settings matrix." }, { status: 500 });
     }
 
-    // 3) 규격에 맞게 매핑하여 프론트엔드로 반환 ({ ok: true, settings: data })
-    return NextResponse.json({ ok: true, settings: data || { language: 'en' } });
+    const safeData = data || { language: 'en', custom_commands: {} };
+
+    return NextResponse.json({ ok: true, settings: safeData });
   } catch (err) {
     console.error("[SETTINGS][GET][FATAL] Unexpected infrastructure crash:", err);
     return NextResponse.json({ error: "Internal server error." }, { status: 500 });
   }
 }
 
-// 💾 기존에 검증 완료된 POST 핸들러 (유지)
+// ══════════════════════════════════════════════════════════
+//  POST — 언어 설정 및 명령어 객체를 안전하게 Upsert 후 Redis 캐시 폭파
+// ══════════════════════════════════════════════════════════
 export async function POST(
   req: NextRequest,
   ctx: { params: Promise<{ guildId: string }> }
@@ -86,11 +89,7 @@ export async function POST(
     }
 
     if (!(await verifyGuildAdmin(guildId))) {
-      console.warn(`[SETTINGS][WARN] Unauthorized access blocked: guild=${guildId}`);
-      return NextResponse.json(
-        { error: "Unauthorized. You do not have permission to manage this server." },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Unauthorized. Permission denied." }, { status: 403 });
     }
 
     const settings = sanitizeBody(await req.json());
