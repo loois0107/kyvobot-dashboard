@@ -22,6 +22,7 @@ const ALLOWED_FIELDS = [
   "spam_interval",
   "log_channel_id",
   "banned_words",
+  "language", // ⚡ [중요] 대시보드에서 언어 설정을 저장할 수 있도록 화이트리스트에 추가
 ] as const;
 
 /** Extracts only whitelisted fields from the request body to prevent Mass Assignment attacks. */
