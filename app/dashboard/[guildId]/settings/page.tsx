@@ -26,8 +26,8 @@ export default function SettingsPage() {
           setCommands(resData.settings.custom_commands || {});
           setMessage('Matrix settings successfully decrypted.');
         } else {
-          // ⚡ [클로드 수정 제안 적용] 로드 실패 시 에러 필드 및 HTTP 상태 매핑
-          setMessage Luz(`Load failed [${res.status}]: ${resData.error || resData.message || 'Unknown configuration state.'}`);
+          // ⚡ [클로드 수정 제안 적용] 오타 'Luz' 완벽 삭제 및 정상화 완료!
+          setMessage(`Load failed [${res.status}]: ${resData.error || resData.message || 'Unknown configuration state.'}`);
         }
         setLoading(false);
       })
@@ -62,13 +62,11 @@ export default function SettingsPage() {
 
       const data = await res.json();
       
-      // ⚡ [클로드 핵심 제안] 성공과 실패 분기문을 분리하여 진짜 에러 파싱
       if (res.ok && data.ok) {
         setMessage('Configuration matrix successfully deployed!');
         if (nextCommands !== undefined) setCommands(nextCommands);
         if (nextLang !== undefined) setLanguage(nextLang);
       } else {
-        // 백엔드 실패는 error 필드로 옴 + HTTP 상태도 같이 노출!
         setMessage(`Save failed [${res.status}]: ${data.error || data.message || 'Unknown Layer Exception.'}`);
       }
     } catch (err) {
