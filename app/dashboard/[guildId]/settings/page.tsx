@@ -12,117 +12,86 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-  // 🌐 1. 언어 설정 전용 불러오기
-  const fetchLanguageSettings = () => {
+  // 📡 1. 서버 통합 매트릭스 로드 (언어 + 명령어 한 번에 수신)
+  const fetchAllSettings = () => {
     if (!guildId || guildId === '[guildId]') return;
     setLoading(true);
+    setMessage('');
+    
     fetch(`/api/settings/${guildId}`)
       .then((res) => res.json())
       .then((resData) => {
         if (resData.ok && resData.settings) {
           setLanguage(resData.settings.language || 'en');
+          setCommands(resData.settings.custom_commands || {});
+          setMessage('Matrix settings successfully decrypted.');
+        } else {
+          setMessage(resData.message || 'No settings found.');
         }
         setLoading(false);
       })
       .catch((err) => {
         console.error(err);
+        setMessage('Failed to fetch settings from network core.');
         setLoading(false);
       });
-  };
-
-  // 📋 2. 커스텀 명령어 목록 전용 불러오기 (클로드 신규 라우트 격리)
-  const fetchCommands = () => {
-    if (!guildId || guildId === '[guildId]') return;
-    fetch(`/api/settings/${guildId}/commands`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.ok) setCommands(data.commands);
-      })
-      .catch((err) => console.error(err));
   };
 
   useEffect(() => {
-    if (guildId && guildId !== '[guildId]') {
-      fetchLanguageSettings();
-      fetchCommands();
-    }
+    fetchAllSettings();
   }, [guildId]);
 
-  // 🌐 3. 언어 설정 전용 저장하기
-  const saveLanguageSettings = () => {
-    if (!guildId || guildId === '[guildId]') return alert('Invalid Active Guild Context.');
+  // 🌐 2. 통합 백엔드 저장 처리 파이프라인 (단일 주소 POST 통신)
+  const saveUnifiedSettings = async (nextCommands?: Record<string, string>, nextLang?: string) => {
+    if (!guildId || guildId === '[guildId]') return;
     setLoading(true);
-    setMessage('');
+    
+    const targetCommands = nextCommands !== undefined ? nextCommands : commands;
+    const targetLang = nextLang !== undefined ? nextLang : language;
 
-    fetch(`/api/settings/${guildId}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ language: language })
-    })
-      .then((res) => res.json())
-      .then((resData) => {
-        if (resData.ok) {
-          setMessage('Language configuration matrix successfully deployed!');
-        } else {
-          setMessage(`Bypass failed: ${resData.message || 'Unauthorized'}`);
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setMessage(`Handshake Blocked: ${err.message}`);
-        setLoading(false);
+    try {
+      const res = await fetch(`/api/settings/${guildId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          language: targetLang,
+          custom_commands: targetCommands
+        }),
       });
+
+      const data = await res.json();
+      if (data.ok) {
+        setMessage('Configuration matrix successfully deployed!');
+        if (nextCommands !== undefined) setCommands(nextCommands);
+        if (nextLang !== undefined) setLanguage(nextLang);
+      } else {
+        setMessage(`Bypass failed: ${data.message}`);
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage('Handshake Blocked: Core Pipeline Fault.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // 📋 4. 명령어 개별 추가 핸들러 (원자적 실시간 저장)
-  const handleAddCommand = async () => {
-    const name = prompt('Enter command trigger (e.g., !hello):')?.trim();
+  // 📋 3. 명령어 정규화 추가 핸들러
+  const handleAddCommand = () => {
+    const name = prompt('Enter command name (e.g., hello):')?.trim().toLowerCase();
     const response = prompt('Enter command response text:');
     if (!name || !response) return;
 
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/settings/${guildId}/commands`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ command_name: name, response_text: response }),
-      });
-      const data = await res.json();
-      if (data.ok) {
-        setMessage(`Command '${name}' successfully synced and deployed.`);
-        fetchCommands(); // 리스트 즉시 리로드
-      } else {
-        setMessage(`Fault: ${data.message}`);
-      }
-    } catch (err) {
-      console.error(err);
-      setMessage('Failed to register macro to database layer.');
-    } finally {
-      setLoading(false);
-    }
+    const updated = { ...commands, [name]: response };
+    saveUnifiedSettings(updated, language);
   };
 
-  // 📋 5. 명령어 개별 삭제 핸들러 (원자적 실시간 제거)
-  const handleDeleteCommand = async (name: string) => {
-    if (!confirm(`Are you sure you want to permanently expunge '${name}'?`)) return;
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/settings/${guildId}/commands`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ command_name: name }),
-      });
-      const data = await res.json();
-      if (data.ok) {
-        setMessage(`Command '${name}' permanently expunged from database.`);
-        fetchCommands(); // 리스트 즉시 리로드
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+  // 📋 4. 명령어 정규화 삭제 핸들러
+  const handleDeleteCommand = (name: string) => {
+    if (!confirm(`Delete '${name}'?`)) return;
+    
+    const updated = { ...commands };
+    delete updated[name];
+    saveUnifiedSettings(updated, language);
   };
 
   return (
@@ -146,23 +115,15 @@ export default function SettingsPage() {
               <label className="text-xs text-gray-400 block mb-1">SERVER LANGUAGE</label>
               <select
                 value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-white px-3 py-2 rounded focus:border-purple-500 outline-none cursor-pointer font-bold"
+                onChange={(e) => saveUnifiedSettings(commands, e.target.value)}
+                disabled={loading}
+                className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-white px-3 py-2 rounded focus:border-purple-500 outline-none cursor-pointer font-bold disabled:opacity-50"
               >
                 <option value="en">🇺🇸 English (EN)</option>
                 <option value="ko">🇰🇷 한국어 (KO)</option>
               </select>
             </div>
           </div>
-
-          {/* 일반 언어 설정 전용 저장 버튼 */}
-          <button 
-            onClick={saveLanguageSettings}
-            disabled={loading}
-            className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 text-white text-xs font-bold py-2 rounded transition-all"
-          >
-            SAVE LANGUAGE CONFIGURATION
-          </button>
 
           {message && (
             <div className="bg-[#0F0F1A] border border-purple-900/50 text-xs text-center p-3 rounded text-gray-300 break-all whitespace-pre-wrap">
@@ -176,7 +137,8 @@ export default function SettingsPage() {
               <span className="text-xs font-bold text-gray-400">CUSTOM MACRO COMMANDS</span>
               <button 
                 onClick={handleAddCommand}
-                className="text-[11px] bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded font-bold"
+                disabled={loading}
+                className="text-[11px] bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 text-white px-2 py-1 rounded font-bold"
               >
                 + ADD NEW
               </button>
@@ -188,11 +150,12 @@ export default function SettingsPage() {
               <div className="flex flex-col gap-2 max-h-40 overflow-y-auto">
                 {Object.entries(commands).map(([trigger, response]) => (
                   <div key={trigger} className="flex justify-between items-center text-xs bg-[#161626] p-2 rounded border border-[#2A1F40]">
-                    <span className="text-green-400 font-bold">{trigger}</span>
+                    <span className="text-green-400 font-bold">/{trigger}</span>
                     <span className="text-gray-400 truncate max-w-[200px]">{response}</span>
                     <button 
                       onClick={() => handleDeleteCommand(trigger)}
-                      className="text-red-400 hover:text-red-500 font-bold"
+                      disabled={loading}
+                      className="text-red-400 hover:text-red-500 font-bold disabled:opacity-50"
                     >
                       [DELETE]
                     </button>
