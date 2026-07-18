@@ -45,7 +45,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (!targetId || !pathname) return;
     const pathSegments = pathname.split('/');
     const currentMenu = pathSegments[pathSegments.length - 1] || '';
-    const destinationMenu = ['leveling', 'leaderboard', 'ticket-settings', 'welcome'].includes(currentMenu) ? currentMenu : '';
+    
+    // 🛡️ FIXED: 화이트리스트 배열에 'settings'를 추가하여 설정 창에서 서버 전환 시 홈으로 튕기는 버그 완벽 패치!
+    const destinationMenu = ['leveling', 'leaderboard', 'ticket-settings', 'welcome', 'settings'].includes(currentMenu) ? currentMenu : '';
     router.push(`/dashboard/${targetId}/${destinationMenu}`);
   };
 
@@ -117,7 +119,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             >
               📥 Welcome Settings
             </Link>
-            {/* 🛠️ FIXED: 유령 주소 제거하고 정상 변수 매핑 완료 */}
             <Link 
               href={`/dashboard/${currentGuildId}/ticket-settings`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/ticket-settings') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
@@ -129,6 +130,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/leaderboard') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
               🏆 Server Leaderboard
+            </Link>
+            
+            {/* ⚙️ FIXED: 사이드바 최하단에 'Custom Commands' 퀵 네비게이션 노드 추가 완료! 활성화 하이라이트 배경 완벽 연동 */}
+            <Link 
+              href={`/dashboard/${currentGuildId}/settings`}
+              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/settings') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+            >
+              ⚙️ Custom Commands
             </Link>
           </nav>
         </div>
@@ -162,6 +171,34 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {children}
         </main>
       </div>
+
+      {/* 🟢 GUILD MANAGER ADDITION MODAL TRACE */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200">
+          <form onSubmit={handleAddGuild} className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl w-full max-w-md p-6 space-y-4 shadow-2xl font-mono">
+            <h3 className="text-sm font-black tracking-wider text-white uppercase border-b border-[#2b2d31] pb-3">➕ REGISTER NEW CLUSTER NODE</h3>
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-gray-400 uppercase">Target Guild Identifier (ID)</label>
+              <input 
+                type="text" required value={newGuildId} onChange={(e) => setNewGuildId(e.target.value)} placeholder="e.g. 1507639384453939381"
+                className="w-full bg-[#313338] border border-[#232428] rounded p-2.5 text-sm text-white focus:outline-none focus:border-[#5865f2]"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-gray-400 uppercase">Custom Node Alias (Optional)</label>
+              <input 
+                type="text" value={newGuildName} onChange={(e) => setNewGuildName(e.target.value)} placeholder="e.g. Production Main Server"
+                className="w-full bg-[#313338] border border-[#232428] rounded p-2.5 text-sm text-white focus:outline-none focus:border-[#5865f2]"
+              />
+            </div>
+            <div className="flex justify-end gap-3 pt-2 text-xs font-bold font-sans">
+              <button type="button" onClick={() => setShowAddModal(false)} className="px-4 py-2 text-gray-400 hover:text-white transition">CANCEL</button>
+              <button type="submit" className="bg-[#5865f2] hover:bg-[#4752c4] text-white px-5 py-2 rounded transition shadow-md">INITIALIZE CONNECT</button>
+            </div>
+          </form>
+        </div>
+      )}
+
     </div>
   );
 }
