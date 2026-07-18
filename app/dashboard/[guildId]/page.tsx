@@ -11,7 +11,6 @@ interface LogLine {
   message: string;
 }
 
-// 🛡️ [인터페이스 수정] db 관련 필드를 제거하고 customCommands로 완전 대체 완료!
 interface TelemetryData {
   customCommands: number;
   ragSynapses: number;
@@ -25,7 +24,6 @@ export default function DashboardHome() {
   
   const guildId = params?.guildId as string | undefined;
 
-  // 🛡️ [초기 State 수정] dbRows 대신 customCommands: 0 매핑 완료!
   const [telemetry, setTelemetry] = useState<TelemetryData>({
     customCommands: 0,
     ragSynapses: 0,
@@ -42,11 +40,8 @@ export default function DashboardHome() {
   const [logs, setLogs] = useState<LogLine[]>([]);
 
   const isConnectionFailed = statsError && !isLoadingStats;
-  
-  // 🛡️ [isDataEmpty 판정 수정] dbRows 대신 automod와 RAG 지식이 둘 다 0이면 빈 서버 판정!
   const isDataEmpty = !statsError && telemetry.automodLogs === 0 && telemetry.ragSynapses === 0 && !isLoadingStats;
 
-  // 📡 REAL TIME STATISTICS SYNC PROTOCOL
   const fetchRealtimeStats = async (targetId: string) => {
     if (!targetId || targetId === '[guildId]') return;
     try {
@@ -57,7 +52,6 @@ export default function DashboardHome() {
         return;
       }
       
-      // 🛡️ [fetchRealtimeStats 수정] 가짜 증감률 변수 및 db_rows 완전히 걷어내기!
       setStatsError(false);
       const data = await res.json();
       setTelemetry({
@@ -74,7 +68,6 @@ export default function DashboardHome() {
     }
   };
 
-  // 📡 REAL TIME LOGS SYNC PROTOCOL
   const fetchRealtimeLogs = async (targetId: string) => {
     if (!targetId || targetId === '[guildId]' || isPaused) return;
     try {
@@ -92,7 +85,6 @@ export default function DashboardHome() {
     }
   };
 
-  // 📡 통계 데이터 수신 전용 인터벌 (isPaused 격리)
   useEffect(() => {
     if (!guildId || guildId === '[guildId]') return;
 
@@ -104,7 +96,6 @@ export default function DashboardHome() {
     return () => clearInterval(statsInterval);
   }, [guildId]);
 
-  // 📡 실시간 로그 수신 전용 인터벌
   useEffect(() => {
     if (!guildId || guildId === '[guildId]' || isPaused) return;
 
@@ -192,14 +183,20 @@ export default function DashboardHome() {
          ========================================== */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         
-        {/* 🛡️ [첫 번째 카드 JSX 교체] Custom Commands 카드로 대체 및 가짜 증감률(dbRowsChange) 전면 삭제 완료! */}
-        <div className="bg-[#111214] border border-[#232428] rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center">
+        {/* 🌐 [교체 완료] 단순 div에서 클릭 시 설정창(/settings)으로 바로 연동되는 Link 컴포넌트로 인터페이스 업그레이드! */}
+        <Link
+          href={`/dashboard/${guildId}/settings`}
+          className="bg-[#111214] border border-[#232428] hover:border-[#5865F2]/40 rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center transition-all duration-200 group"
+        >
           <span className="text-xs font-black text-gray-500 uppercase tracking-wider block">Custom Commands</span>
-          <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.customCommands === 0 ? 'text-gray-600' : 'text-white'}`}>
+          <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.customCommands === 0 ? 'text-gray-600' : 'text-[#5865F2]'}`}>
             {isLoadingStats ? '...' : telemetry.customCommands.toLocaleString()}
             <span className="text-xs text-[#5865F2]/60 font-sans ml-1">Commands</span>
           </span>
-        </div>
+          <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase pt-1 group-hover:text-[#5865F2] transition-colors text-left">
+            MANAGE ➔
+          </span>
+        </Link>
 
         <div className="bg-[#111214] border border-[#232428] rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center">
           <span className="text-xs font-black text-gray-500 uppercase tracking-wider block">Guild RAG Vectors</span>
