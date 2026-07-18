@@ -4,18 +4,21 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 
+type ManagedGuild = { id: string; name: string };
+
+function isValidGuildId(id: unknown): id is string {
+  return typeof id === 'string' && id.length > 0 && !id.includes('[') && !id.includes('%5B');
+}
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const params = useParams();
   const router = useRouter();
   const pathname = usePathname();
-  
-  // 🛡️ HYDRATION SANITY GUARD: 빌드 및 새로고침 시 [guildId] 문자열이 상태를 오염시키는 현상 원천 차단
-  const rawGuildId = params?.guildId as string;
-  const currentGuildId = (rawGuildId && rawGuildId !== '[guildId]' && !rawGuildId.includes('%5B'))
-    ? rawGuildId
-    : '1507639384453939381';
 
-  const [guilds, setGuilds] = useState<{ id: string; name: string }[]>([]);
+  const rawGuildId = params?.guildId as string | undefined;
+  const currentGuildId = isValidGuildId(rawGuildId) ? rawGuildId : undefined;
+
+  const [guilds, setGuilds] = useState<ManagedGuild[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newGuildId, setNewGuildId] = useState('');
   const [newGuildName, setNewGuildName] = useState('');
@@ -27,41 +30,61 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     setIsMobileMenuOpen(false);
   }, [pathname]);
 
+  // Invalid/missing guildId in the URL - bounce to the root page, which resolves a real guild via the Discord API,
+  // instead of guessing a hardcoded server.
   useEffect(() => {
-    const savedGuilds = localStorage.getItem('kyvo_managed_guilds');
-    if (savedGuilds) {
-      const parsed = JSON.parse(savedGuilds);
-      // 혹시 로컬스토리지에 유령 문자열이 박혀있다면 깔끔하게 필터링 청소
-      const filtered = parsed.filter((g: any) => g.id !== '[guildId]' && !g.id.includes('%5B'));
-      setGuilds(filtered);
-    } else {
-      const defaultGuilds = [{ id: currentGuildId, name: '🛡️ Test Server' }];
-      setGuilds(defaultGuilds);
-      localStorage.setItem('kyvo_managed_guilds', JSON.stringify(defaultGuilds));
+    if (!currentGuildId) {
+      router.replace('/');
     }
+  }, [currentGuildId, router]);
+
+  useEffect(() => {
+    let saved: ManagedGuild[] = [];
+    try {
+      const raw = localStorage.getItem('kyvo_managed_guilds');
+      const parsed = raw ? JSON.parse(raw) : [];
+      if (Array.isArray(parsed)) {
+        saved = parsed.filter(
+          (g: any): g is ManagedGuild => g && isValidGuildId(g.id) && typeof g.name === 'string'
+        );
+      }
+    } catch {
+      saved = [];
+    }
+
+    if (currentGuildId && !saved.some((g) => g.id === currentGuildId)) {
+      saved = [...saved, { id: currentGuildId, name: `Server (${currentGuildId.slice(0, 4)})` }];
+    }
+
+    setGuilds(saved);
+    localStorage.setItem('kyvo_managed_guilds', JSON.stringify(saved));
   }, [currentGuildId]);
 
   const handleGuildChange = (targetId: string) => {
     if (!targetId || !pathname) return;
-    const pathSegments = pathname.split('/');
-    const currentMenu = pathSegments[pathSegments.length - 1] || '';
-    
-    // 🛡️ FIXED: 화이트리스트 배열에 'settings'를 추가하여 설정 창에서 서버 전환 시 홈으로 튕기는 버그 완벽 패치!
-    const destinationMenu = ['leveling', 'leaderboard', 'ticket-settings', 'welcome', 'settings'].includes(currentMenu) ? currentMenu : '';
-    router.push(`/dashboard/${targetId}/${destinationMenu}`);
+    // Path shape is always /dashboard/{guildId}/{...rest} - carry over whatever follows the guildId
+    // instead of maintaining a manually-synced whitelist of known subpages.
+    const pathSegments = pathname.split('/').filter(Boolean);
+    const destinationMenu = pathSegments.slice(2).join('/');
+    router.push(`/dashboard/${targetId}${destinationMenu ? `/${destinationMenu}` : ''}`);
   };
 
   const handleAddGuild = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newGuildId.trim() || newGuildId.includes('[') || newGuildId.includes('%')) return;
-    const updated = [...guilds, { id: newGuildId.trim(), name: newGuildName.trim() || `Server (${newGuildId.slice(0,4)})` }];
+    const id = newGuildId.trim();
+    if (!isValidGuildId(id)) return;
+    const updated = [...guilds, { id, name: newGuildName.trim() || `Server (${id.slice(0, 4)})` }];
     setGuilds(updated);
     localStorage.setItem('kyvo_managed_guilds', JSON.stringify(updated));
     setNewGuildId('');
     setNewGuildName('');
     setShowAddModal(false);
-    router.push(`/dashboard/${newGuildId.trim()}`);
+    router.push(`/dashboard/${id}`);
   };
+
+  if (!currentGuildId) {
+    return null;
+  }
 
   return (
     <div className="flex min-h-screen bg-[#111214] text-[#dbdee1] font-sans relative overflow-x-hidden">

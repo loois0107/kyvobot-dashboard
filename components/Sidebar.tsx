@@ -1,17 +1,39 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { usePathname, useParams } from 'next/navigation';
 
 export default function Sidebar() {
   const pathname = usePathname();
   const params = useParams();
-  
-  const guildId = (params?.guildId || '1507639384453939381') as string;
+
+  const [lastGuildId, setLastGuildId] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('kyvo_managed_guilds');
+      const parsed = raw ? JSON.parse(raw) : [];
+      if (Array.isArray(parsed) && typeof parsed[0]?.id === 'string') {
+        setLastGuildId(parsed[0].id);
+      }
+    } catch {
+      setLastGuildId(null);
+    }
+  }, []);
+
+  // The dashboard section renders its own full sidebar/navigation - don't stack a second one next to it.
+  if (pathname?.startsWith('/dashboard/')) {
+    return null;
+  }
+
+  const guildId = (params?.guildId as string | undefined) || lastGuildId;
+  // No known guild yet - send to '/', which resolves a real one via the Discord API rather than guessing.
+  const controlHubHref = guildId ? `/dashboard/${guildId}` : '/';
 
   const menuItems = [
     { href: '/', label: '🏠 Home', activeColor: 'text-white border-white' },
-    { href: `/dashboard/${guildId}`, label: '🎛️ Control Hub', activeColor: 'text-[#5865F2] border-[#5865F2]' },
+    { href: controlHubHref, label: '🎛️ Control Hub', activeColor: 'text-[#5865F2] border-[#5865F2]' },
     { href: '/logs', label: '🛡️ Audit Logs', activeColor: 'text-red-500 border-red-500' },
   ];
 
