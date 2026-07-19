@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 interface LeaderboardUser {
   user_id: string;
@@ -16,49 +17,40 @@ interface LeaderboardUser {
 export default function GuildLeaderboardTerminal() {
   const router = useRouter();
   const params = useParams();
-  
+  const { status } = useSession();
+
   // 💡 NEXT.JS MAGIC: 주소창에 박혀있는 현재 서버 ID를 유저의 입력 없이 자동 추출!
   const guildId = params?.guildId as string;
 
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
-  
-    const authStatus = localStorage.getItem('discord_authenticated');
-    console.log('[KyvoAuth Debug] 현재 로컬 스토리지의 authStatus 값:', authStatus);
-    
-    if (authStatus !== 'true') {
-      console.log('[KyvoAuth Debug] 인증 실패! 메인 화면으로 리다이렉트 시도 및 fetch 차단');
-      setIsAuthenticated(false);
-      router.push('/'); 
-      return;
+    if (status === 'unauthenticated') {
+      router.push('/');
     }
-    
-    console.log('[KyvoAuth Debug] 인증 성공! Supabase 데이터 로딩 시작');
-    setIsAuthenticated(true);
+  }, [status, router]);
 
-    if (!guildId) {
-      console.log('[KyvoAuth Debug] 주소창에 guildId 파라미터가 없어서 데이터 요청을 대기합니다.');
-      return;
-    }
+  useEffect(() => {
+    if (status !== 'authenticated' || !guildId) return;
 
     setLoading(true);
-    console.log(`📡 [API MATRIX] Fetching leaderboard metrics securely for server node: ${guildId}`);
 
-    // 2. 🛡️ CORE UPGRADE: 백엔드 API 엔드포인트에 실시간 서버 ID(guild_id) 탑재 
+    // 2. 🛡️ CORE UPGRADE: 백엔드 API 엔드포인트에 실시간 서버 ID(guild_id) 탑재
     fetch(`/api/leaderboard?guild_id=${guildId}&t=${Date.now()}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`leaderboard fetch failed: ${res.status}`);
+        return res.json();
+      })
       .then((data) => {
         setUsers(data.users || []);
         setLoading(false);
       })
       .catch((err) => {
-        console.error('Failed to pull localized server rank matrix:', err);
+        console.error('Failed to pull global rank matrix:', err);
         setLoading(false);
       });
-  }, [router, guildId]); // 🌟 드롭다운에서 완장이 서버를 스위칭하면 guildId가 바뀌면서 실시간 자동 리페칭!
+  }, [status, guildId]); // 🌟 드롭다운에서 완장이 서버를 스위칭하면 guildId가 바뀌면서 실시간 자동 리페칭!
 
   const formatMetric = (val: number) => {
     if (val >= 1000000) return `${(val / 1000000).toFixed(1)}M`;
@@ -95,7 +87,7 @@ export default function GuildLeaderboardTerminal() {
     }
   };
 
-  if (isAuthenticated === null || isAuthenticated === false) {
+  if (status === 'loading' || status === 'unauthenticated') {
     return (
       <div className="text-center space-y-3 border border-red-500/30 bg-[#161626] p-8 rounded-xl max-w-md mx-auto shadow-2xl mt-20">
         <p className="text-sm text-red-400 font-bold tracking-widest animate-pulse">
@@ -131,9 +123,9 @@ export default function GuildLeaderboardTerminal() {
       <div className="space-y-6">
         <div className="flex justify-between items-center border-b border-[#2A1F40] pb-4">
           <div>
-            <h1 className="text-xl md:text-2xl font-black tracking-wider text-white">🏆 SERVER STANDINGS MATRIX</h1>
+            <h1 className="text-xl md:text-2xl font-black tracking-wider text-white">🏆 GLOBAL LEADERBOARD</h1>
             <p className="text-xs text-[#57576F] mt-1 tracking-wide">
-              Showing rankings directly linked to node: <code className="text-[#5865F2]">{guildId}</code>
+              Cross-server rankings — not scoped to this guild alone.
             </p>
           </div>
           <span className="text-[10px] bg-[#2A1F40] text-[#FFD700] px-3 py-1 rounded font-black tracking-widest hidden sm:inline">
