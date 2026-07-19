@@ -19,9 +19,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const currentGuildId = isValidGuildId(rawGuildId) ? rawGuildId : undefined;
 
   const [guilds, setGuilds] = useState<ManagedGuild[]>([]);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [newGuildId, setNewGuildId] = useState('');
-  const [newGuildName, setNewGuildName] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const isSubPage = pathname ? pathname !== `/dashboard/${currentGuildId}` : false;
@@ -38,27 +35,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   }, [currentGuildId, router]);
 
+  // Live-loads the caller's actually-managed guilds from Discord (via /api/guilds) instead of a
+  // client-cached list, so servers the user has left or renamed never linger in the dropdown.
   useEffect(() => {
-    let saved: ManagedGuild[] = [];
-    try {
-      const raw = localStorage.getItem('kyvo_managed_guilds');
-      const parsed = raw ? JSON.parse(raw) : [];
-      if (Array.isArray(parsed)) {
-        saved = parsed.filter(
-          (g: any): g is ManagedGuild => g && isValidGuildId(g.id) && typeof g.name === 'string'
-        );
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/guilds');
+        if (!res.ok) throw new Error(`guilds fetch failed: ${res.status}`);
+        const data = await res.json();
+        if (!cancelled && Array.isArray(data)) {
+          setGuilds(data.filter((g: any): g is ManagedGuild => g && isValidGuildId(g.id) && typeof g.name === 'string'));
+        }
+      } catch (err) {
+        console.error('[GUILD LIST SYNC FAULT]', err);
       }
-    } catch {
-      saved = [];
-    }
-
-    if (currentGuildId && !saved.some((g) => g.id === currentGuildId)) {
-      saved = [...saved, { id: currentGuildId, name: `Server (${currentGuildId.slice(0, 4)})` }];
-    }
-
-    setGuilds(saved);
-    localStorage.setItem('kyvo_managed_guilds', JSON.stringify(saved));
-  }, [currentGuildId]);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleGuildChange = (targetId: string) => {
     if (!targetId || !pathname) return;
@@ -67,19 +63,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const pathSegments = pathname.split('/').filter(Boolean);
     const destinationMenu = pathSegments.slice(2).join('/');
     router.push(`/dashboard/${targetId}${destinationMenu ? `/${destinationMenu}` : ''}`);
-  };
-
-  const handleAddGuild = (e: React.FormEvent) => {
-    e.preventDefault();
-    const id = newGuildId.trim();
-    if (!isValidGuildId(id)) return;
-    const updated = [...guilds, { id, name: newGuildName.trim() || `Server (${id.slice(0, 4)})` }];
-    setGuilds(updated);
-    localStorage.setItem('kyvo_managed_guilds', JSON.stringify(updated));
-    setNewGuildId('');
-    setNewGuildName('');
-    setShowAddModal(false);
-    router.push(`/dashboard/${id}`);
   };
 
   if (!currentGuildId) {
@@ -101,23 +84,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="mb-6 flex justify-between items-center">
             <div>
               <label className="block text-xs font-bold text-[#949ba4] uppercase tracking-wider mb-2">Select Server</label>
-              <div className="flex gap-2">
-                <select
-                  value={currentGuildId || ''}
-                  onChange={(e) => handleGuildChange(e.target.value)}
-                  className="w-44 bg-[#313338] text-white rounded px-3 py-2 border border-[#232428] focus:outline-none focus:border-[#5865f2] cursor-pointer font-medium text-xs"
-                >
-                  {guilds.map((g) => (
-                    <option key={g.id} value={g.id}>{g.name}</option>
-                  ))}
-                </select>
-                <button 
-                  type="button" onClick={() => setShowAddModal(true)}
-                  className="bg-[#2b2d31] hover:bg-[#35373c] text-white font-bold px-3 rounded text-sm transition"
-                >
-                  +
-                </button>
-              </div>
+              <select
+                value={currentGuildId || ''}
+                onChange={(e) => handleGuildChange(e.target.value)}
+                className="w-44 bg-[#313338] text-white rounded px-3 py-2 border border-[#232428] focus:outline-none focus:border-[#5865f2] cursor-pointer font-medium text-xs"
+              >
+                {guilds.map((g) => (
+                  <option key={g.id} value={g.id}>{g.name}</option>
+                ))}
+              </select>
             </div>
             <button type="button" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-400 hover:text-white md:hidden text-lg p-1 mt-5">✕</button>
           </div>
@@ -194,33 +169,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {children}
         </main>
       </div>
-
-      {/* 🟢 GUILD MANAGER ADDITION MODAL TRACE */}
-      {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200">
-          <form onSubmit={handleAddGuild} className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl w-full max-w-md p-6 space-y-4 shadow-2xl font-mono">
-            <h3 className="text-sm font-black tracking-wider text-white uppercase border-b border-[#2b2d31] pb-3">➕ REGISTER NEW CLUSTER NODE</h3>
-            <div className="space-y-1">
-              <label className="text-[10px] font-bold text-gray-400 uppercase">Target Guild Identifier (ID)</label>
-              <input 
-                type="text" required value={newGuildId} onChange={(e) => setNewGuildId(e.target.value)} placeholder="e.g. 1507639384453939381"
-                className="w-full bg-[#313338] border border-[#232428] rounded p-2.5 text-sm text-white focus:outline-none focus:border-[#5865f2]"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-[10px] font-bold text-gray-400 uppercase">Custom Node Alias (Optional)</label>
-              <input 
-                type="text" value={newGuildName} onChange={(e) => setNewGuildName(e.target.value)} placeholder="e.g. Production Main Server"
-                className="w-full bg-[#313338] border border-[#232428] rounded p-2.5 text-sm text-white focus:outline-none focus:border-[#5865f2]"
-              />
-            </div>
-            <div className="flex justify-end gap-3 pt-2 text-xs font-bold font-sans">
-              <button type="button" onClick={() => setShowAddModal(false)} className="px-4 py-2 text-gray-400 hover:text-white transition">CANCEL</button>
-              <button type="submit" className="bg-[#5865f2] hover:bg-[#4752c4] text-white px-5 py-2 rounded transition shadow-md">INITIALIZE CONNECT</button>
-            </div>
-          </form>
-        </div>
-      )}
 
     </div>
   );

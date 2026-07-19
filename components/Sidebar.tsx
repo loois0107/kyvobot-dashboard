@@ -1,33 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 import { usePathname, useParams } from 'next/navigation';
 
 export default function Sidebar() {
   const pathname = usePathname();
   const params = useParams();
 
-  const [lastGuildId, setLastGuildId] = useState<string | null>(null);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem('kyvo_managed_guilds');
-      const parsed = raw ? JSON.parse(raw) : [];
-      if (Array.isArray(parsed) && typeof parsed[0]?.id === 'string') {
-        setLastGuildId(parsed[0].id);
-      }
-    } catch {
-      setLastGuildId(null);
-    }
-  }, []);
-
   // The dashboard section renders its own full sidebar/navigation - don't stack a second one next to it.
   if (pathname?.startsWith('/dashboard/')) {
     return null;
   }
 
-  const guildId = (params?.guildId as string | undefined) || lastGuildId;
+  const guildId = params?.guildId as string | undefined;
   // No known guild yet - send to '/', which resolves a real one via the Discord API rather than guessing.
   const controlHubHref = guildId ? `/dashboard/${guildId}` : '/';
 
