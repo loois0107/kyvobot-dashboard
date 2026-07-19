@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireGuildAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 function connectSupabase() {
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_KEY || process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseKey) return null;
   return createClient(supabaseUrl, supabaseKey);
@@ -15,7 +16,8 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const guild_id = searchParams.get('guild_id');
 
-  if (!guild_id) return NextResponse.json({ error: 'GUILD_ID_REQUIRED' }, { status: 400 });
+  const blocked = await requireGuildAdmin(guild_id);
+  if (blocked) return blocked;
 
   const supabase = connectSupabase();
   if (!supabase) return NextResponse.json({ error: 'ENV_KEY_MISSING' }, { status: 500 });
@@ -40,14 +42,15 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const supabase = connectSupabase();
-  if (!supabase) return NextResponse.json({ error: 'ENV_KEY_MISSING' }, { status: 500 });
-
   try {
     const body = await request.json();
     const { guild_id, setup_title, setup_desc, welcome_title, welcome_desc, system_prompt } = body;
 
-    if (!guild_id) return NextResponse.json({ error: 'GUILD_ID_REQUIRED' }, { status: 400 });
+    const blocked = await requireGuildAdmin(guild_id);
+    if (blocked) return blocked;
+
+    const supabase = connectSupabase();
+    if (!supabase) return NextResponse.json({ error: 'ENV_KEY_MISSING' }, { status: 500 });
 
     const { data, error } = await supabase
       .from('guild_ticket_settings')

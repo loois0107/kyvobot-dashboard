@@ -1,16 +1,15 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { requireGuildAdmin } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 function getSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  
-  if (!url || !key) {
-    return createClient('https://placeholder.supabase.co', 'placeholder-service-role-key-bypass');
-  }
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!url || !key) return null;
   return createClient(url, key);
 }
 
@@ -19,12 +18,13 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const guildId = searchParams.get('guild_id');
 
-  if (!guildId) {
-    return NextResponse.json({ error: 'Missing target guild_id selection.' }, { status: 400 });
-  }
+  const blocked = await requireGuildAdmin(guildId);
+  if (blocked) return blocked;
+
+  const supabase = getSupabaseClient();
+  if (!supabase) return NextResponse.json({ error: 'ENV_KEY_MISSING' }, { status: 500 });
 
   try {
-    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('guild_knowledge')
       .select('id, content')
@@ -43,16 +43,19 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { guild_id, content } = body;
 
-    if (!guild_id || !content) {
+    if (!content) {
       return NextResponse.json({ error: 'Missing required operational matrix parameters.' }, { status: 400 });
     }
 
+    const blocked = await requireGuildAdmin(guild_id);
+    if (blocked) return blocked;
+
     // 🔑 안전하게 환경변수 방식으로 원상복구 (하드코딩된 진짜 sk- 키 삭제 완료)
-    const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || process.env.OPENAI_API_KEY || ''; 
+    const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || process.env.OPENAI_API_KEY || '';
 
     if (!apiKey || apiKey.trim() === '') {
-      return NextResponse.json({ 
-        error: `Missing OPENAI_API_KEY configuration on host environment.` 
+      return NextResponse.json({
+        error: `Missing OPENAI_API_KEY configuration on host environment.`
       }, { status: 500 });
     }
 
@@ -81,6 +84,8 @@ export async function POST(request: Request) {
     }
 
     const supabase = getSupabaseClient();
+    if (!supabase) return NextResponse.json({ error: 'ENV_KEY_MISSING' }, { status: 500 });
+
     const { data, error } = await supabase
       .from('guild_knowledge')
       .insert([{ guild_id, content, embedding }])
@@ -98,17 +103,26 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
+  const guildId = searchParams.get('guild_id');
 
   if (!id) {
     return NextResponse.json({ error: 'Missing targeted unique database node identifier.' }, { status: 400 });
   }
 
+  const blocked = await requireGuildAdmin(guildId);
+  if (blocked) return blocked;
+
+  const supabase = getSupabaseClient();
+  if (!supabase) return NextResponse.json({ error: 'ENV_KEY_MISSING' }, { status: 500 });
+
   try {
-    const supabase = getSupabaseClient();
+    // 🛡️ id만으로 지우면 guild_id가 달라도 삭제가 통과되어 버리므로, 두 조건을 함께 걸어
+    // 이 길드가 소유한 행이 아닌 경우 매치 자체가 안 되게 막는다.
     const { error } = await supabase
       .from('guild_knowledge')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .eq('guild_id', guildId);
 
     if (error) throw error;
     return NextResponse.json({ success: true });

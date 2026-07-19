@@ -1,11 +1,18 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { requireGuildAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-  const supabaseKey = process.env.SUPABASE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_KEY || "";
+  const { searchParams } = new URL(request.url);
+  const guildId = searchParams.get("guild_id");
+
+  const blocked = await requireGuildAdmin(guildId);
+  if (blocked) return blocked;
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 
   let projectRef = "URL_NOT_FOUND";
   try {
@@ -21,10 +28,12 @@ export async function GET(request: Request) {
 
   try {
     const supabase = createClient(supabaseUrl, supabaseKey);
-    
+
+    // 🛡️ guild_id로 격리 - 이전엔 이 필터가 없어서 모든 길드의 automod 로그가 뒤섞여 노출됐음.
     const { data, error } = await supabase
       .from("automod_logs")
       .select("*")
+      .eq("guild_id", guildId)
       .order("created_at", { ascending: false })
       .limit(25);
 
@@ -60,9 +69,9 @@ export async function GET(request: Request) {
       let logType = "INFO";
       const upperAction = action.toUpperCase();
       if (
-        upperAction.includes("BAN") || 
-        upperAction.includes("TIMEOUT") || 
-        upperAction.includes("KICK") || 
+        upperAction.includes("BAN") ||
+        upperAction.includes("TIMEOUT") ||
+        upperAction.includes("KICK") ||
         upperAction.includes("DELETE")
       ) {
         logType = "WARN";

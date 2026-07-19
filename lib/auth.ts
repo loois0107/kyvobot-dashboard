@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 import { auth } from "@/auth"; // Auth.js v5의 루트 auth.ts에서 export한 헬퍼
 
 const MANAGE_GUILD = BigInt(0x20); // 디스코드 "서버 관리" 권한 비트
@@ -30,4 +31,31 @@ export async function verifyGuildAdmin(guildId: string): Promise<boolean> {
     console.error("[AUTH][ERROR] 권한 검증 중 예외:", err);
     return false;
   }
+}
+
+/**
+ * 길드 스코프 API 라우트용 공통 가드. guild_id 존재 여부와 verifyGuildAdmin 결과를
+ * 한 번에 검증해서, 통과 못 하면 그대로 반환할 수 있는 NextResponse를 돌려준다.
+ * 통과하면 null이므로 `if (blocked) return blocked;` 한 줄로 라우트 앞단에 꽂으면 된다.
+ *
+ * 이 가드가 빠진 라우트가 하나씩 나오는 문제(레벨/이코노미, 티켓 설정, 티켓 지식베이스 등에서
+ * 실제로 발생) 때문에 만들어졌다 - 길드 데이터를 다루는 라우트는 예외 없이 이걸 거쳐야 한다.
+ */
+export async function requireGuildAdmin(guildId: string | null | undefined): Promise<NextResponse | null> {
+  if (!guildId) {
+    return NextResponse.json(
+      { status: "error", message: "Missing required guild_id parameter" },
+      { status: 400 }
+    );
+  }
+
+  const isAdmin = await verifyGuildAdmin(guildId);
+  if (!isAdmin) {
+    return NextResponse.json(
+      { status: "error", message: "Unauthorized. You do not have permission to manage this server." },
+      { status: 403 }
+    );
+  }
+
+  return null;
 }
