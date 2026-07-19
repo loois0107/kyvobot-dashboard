@@ -40,18 +40,22 @@ export default function DashboardHome() {
   const [logs, setLogs] = useState<LogLine[]>([]);
 
   const isConnectionFailed = statsError && !isLoadingStats;
-  const isDataEmpty = !statsError && telemetry.automodLogs === 0 && telemetry.ragSynapses === 0 && !isLoadingStats;
+  const isDataEmpty = !statsError && !isLoadingStats &&
+    telemetry.customCommands === 0 &&
+    telemetry.ragSynapses === 0 &&
+    telemetry.activeTickets === 0 &&
+    telemetry.automodLogs === 0;
 
-  const fetchRealtimeStats = async (targetId: string) => {
+  const fetchRealtimeStats = async (targetId: string, signal?: AbortSignal) => {
     if (!targetId || targetId === '[guildId]') return;
     try {
-      const res = await fetch(`/api/stats?guild_id=${targetId}`);
+      const res = await fetch(`/api/stats?guild_id=${targetId}`, { signal });
       if (!res.ok) {
         setStatsError(true);
         console.error('[TELEMETRY stats 응답 실패]:', res.status);
         return;
       }
-      
+
       setStatsError(false);
       const data = await res.json();
       setTelemetry({
@@ -60,50 +64,64 @@ export default function DashboardHome() {
         activeTickets: data.active_tickets ?? 0,
         automodLogs: data.automod_logs ?? 0
       });
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.name === 'AbortError') return;
       setStatsError(true);
       console.error('[TELEMETRY SYNC FAULT]', err);
     } finally {
-      setIsLoadingStats(false);
+      if (!signal?.aborted) {
+        setIsLoadingStats(false);
+      }
     }
   };
 
-  const fetchRealtimeLogs = async (targetId: string) => {
-    if (!targetId || targetId === '[guildId]' || isPaused) return;
+  const fetchRealtimeLogs = async (targetId: string, signal?: AbortSignal) => {
+    if (!targetId || targetId === '[guildId]') return;
     try {
-      const res = await fetch(`/api/logs?guild_id=${targetId}`);
+      const res = await fetch(`/api/logs?guild_id=${targetId}`, { signal });
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data)) {
           setLogs(data);
         }
       }
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.name === 'AbortError') return;
       console.error('[LOGS SYNC FAULT]', err);
     } finally {
-      setIsLoadingLogs(false);
+      if (!signal?.aborted) {
+        setIsLoadingLogs(false);
+      }
     }
   };
 
   useEffect(() => {
     if (!guildId || guildId === '[guildId]') return;
 
+    const controller = new AbortController();
     setIsLoadingStats(true);
     setStatsError(false);
-    fetchRealtimeStats(guildId);
+    fetchRealtimeStats(guildId, controller.signal);
 
-    const statsInterval = setInterval(() => fetchRealtimeStats(guildId), 10000);
-    return () => clearInterval(statsInterval);
+    const statsInterval = setInterval(() => fetchRealtimeStats(guildId, controller.signal), 10000);
+    return () => {
+      controller.abort();
+      clearInterval(statsInterval);
+    };
   }, [guildId]);
 
   useEffect(() => {
     if (!guildId || guildId === '[guildId]' || isPaused) return;
 
+    const controller = new AbortController();
     setIsLoadingLogs(true);
-    fetchRealtimeLogs(guildId);
+    fetchRealtimeLogs(guildId, controller.signal);
 
-    const logsInterval = setInterval(() => fetchRealtimeLogs(guildId), 4000);
-    return () => clearInterval(logsInterval);
+    const logsInterval = setInterval(() => fetchRealtimeLogs(guildId, controller.signal), 4000);
+    return () => {
+      controller.abort();
+      clearInterval(logsInterval);
+    };
   }, [guildId, isPaused]);
 
   if (!guildId || guildId === '[guildId]') {
@@ -288,7 +306,7 @@ export default function DashboardHome() {
             <div className="text-center py-20 text-gray-600 text-xs font-semibold">No synchronized log blocks match the active telemetry filter matrix.</div>
           ) : (
             filteredLogs.map((log, i) => (
-              <div key={i} className="flex gap-4 items-start leading-relaxed animate-in fade-in slide-in-from-left-1 duration-150">
+              <div key={`${log.timestamp}-${log.type}-${log.message}-${i}`} className="flex gap-4 items-start leading-relaxed animate-in fade-in slide-in-from-left-1 duration-150">
                 <span className="text-gray-600">[{log.timestamp}]</span>
                 <span className={`font-black tracking-wider text-center w-16 flex-shrink-0 text-xs ${
                   log.type === 'SYSTEM' ? 'text-purple-400' :
