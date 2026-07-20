@@ -122,6 +122,8 @@ export default function WelcomeSettings() {
         showToast('Welcome & Goodbye matrix protocols successfully synchronized!', 'success');
         setIsDirty(false);
       } else {
+        const errorBody = await res.json().catch(() => null);
+        console.error('[WELCOME SAVE ERROR] status:', res.status, 'body:', errorBody);
         showToast('Failed to save welcome protocol configs.', 'error');
       }
     } catch (err: any) { showToast(`Network Drop: ${err.message}`, 'error'); }

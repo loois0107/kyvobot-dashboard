@@ -27,10 +27,11 @@ export async function GET(request: Request) {
   if (!supabase) return NextResponse.json({ error: 'ENV_KEY_MISSING' }, { status: 500 });
 
   try {
-    // ✨ [구조 교정] 존재하지 않는 단독 컬럼 대신 'settings' JSON 주머니 + 최상위 welcome_settings 컬럼을 함께 조회합니다.
+    // ✨ [구조 교정] 'guild_settings'엔 welcome_settings라는 단독 컬럼이 실존하지 않는다(42703로 확인됨).
+    // leveling/economy/goodbye와 마찬가지로 'settings' JSON 주머니 안에 함께 들어있다.
     const { data, error } = await supabase
       .from('guild_settings')
-      .select('settings, welcome_settings')
+      .select('settings')
       .eq('guild_id', guild_id)
       .maybeSingle();
 
@@ -44,11 +45,9 @@ export async function GET(request: Request) {
     const payload = {
       leveling_settings: botSettings.leveling_settings || { xp_rate: 1.0, blacklisted_channels: [], role_rewards: {} },
       economy_settings: botSettings.economy_settings || { currency_name: 'Points', min_bet: 10, shop_items: [] },
-      // 🛡️ goodbye_*는 봇(welcome.py)이 settings JSON 내부에서 읽으므로 여기서도 같은 위치에서 꺼낸다.
       goodbye_enabled: botSettings.goodbye_enabled ?? false,
       goodbye_channel_id: botSettings.goodbye_channel_id ?? null,
-      // 🛡️ welcome_settings는 봇이 최상위 컬럼으로 직접 select하는 값이라 settings JSON과 분리해서 그대로 내려준다.
-      welcome_settings: data?.welcome_settings || {},
+      welcome_settings: botSettings.welcome_settings || {},
     };
 
     return NextResponse.json(payload);
@@ -76,34 +75,32 @@ export async function POST(request: Request) {
     const supabase = connectSupabase();
     if (!supabase) return NextResponse.json({ error: 'ENV_KEY_MISSING' }, { status: 500 });
 
-    // ✨ [데이터 파괴 방지] 다른 모듈(안티누크, 티켓 등)의 설정을 지우지 않기 위해 기존 settings + welcome_settings를 먼저 긁어옵니다.
+    // ✨ [데이터 파괴 방지] 다른 모듈(안티누크, 티켓 등)의 설정을 지우지 않기 위해 기존 settings를 먼저 긁어옵니다.
     const { data: currentData } = await supabase
       .from('guild_settings')
-      .select('settings, welcome_settings')
+      .select('settings')
       .eq('guild_id', guild_id)
       .maybeSingle();
 
     const currentSettings = currentData?.settings || {};
 
-    // 🛡️ settings JSON 내부 병합 - leveling/economy/goodbye가 서로의 값을 안 지우도록 기존 값을 spread한 뒤
+    // 🛡️ settings JSON 내부 병합 - leveling/economy/goodbye/welcome이 서로의 값을 안 지우도록 기존 값을 spread한 뒤
     // 이번 요청에 실제로 실려온 필드만 덮어쓴다. goodbye_enabled는 boolean이라 `||`로 하면 false를 못 보내므로
-    // undefined 여부로 판별한다 (leveling/economy_settings는 객체라 `||`로도 안전).
+    // undefined 여부로 판별한다 (welcome/leveling/economy_settings는 객체라 `||`로도 안전 - 페이지가 저장할 때
+    // 항상 완전한 객체 하나를 통째로 보내지, 일부 필드만 undefined로 비워 보내지 않는다).
     const updatedSettings = {
       ...currentSettings,
       leveling_settings: leveling_settings || currentSettings.leveling_settings || { xp_rate: 1.0, blacklisted_channels: [], role_rewards: {} },
       economy_settings: economy_settings || currentSettings.economy_settings || { currency_name: 'Points', min_bet: 10, shop_items: [] },
       goodbye_enabled: goodbye_enabled !== undefined ? Boolean(goodbye_enabled) : (currentSettings.goodbye_enabled ?? false),
       goodbye_channel_id: goodbye_channel_id !== undefined ? goodbye_channel_id : (currentSettings.goodbye_channel_id ?? null),
+      welcome_settings: welcome_settings || currentSettings.welcome_settings || {},
     };
 
-    // 🛡️ welcome_settings는 settings JSON과 별개인 최상위 컬럼 (봇의 welcome.py가 select("welcome_settings")로 직접 읽음).
-    // 이번 요청이 안 보냈으면 기존 값을 그대로 유지해서, 레벨/이코노미 페이지가 저장할 때 웰컴 카드 설정을 안 날린다.
-    const updatedWelcomeSettings = welcome_settings !== undefined ? welcome_settings : (currentData?.welcome_settings ?? {});
-
-    // ✨ [구조 교정] 올바른 컬럼 매트릭스 명칭인 'settings'와 'welcome_settings' 각각에 병합된 데이터를 안전하게 인젝션합니다.
+    // ✨ [구조 교정] 존재하는 유일한 컬럼인 'settings' 하나에만 병합된 데이터를 안전하게 인젝션합니다.
     const { data, error } = await supabase
       .from('guild_settings')
-      .upsert({ guild_id, settings: updatedSettings, welcome_settings: updatedWelcomeSettings })
+      .upsert({ guild_id, settings: updatedSettings })
       .select();
 
     if (error) {
