@@ -51,16 +51,15 @@ export default function TicketAiSettings() {
 
   const loadTicketSettings = async (id: string) => {
     try {
-      const res = await fetch(`/api/ticket-setting?guild_id=${id}`);
+      const res = await fetch(`/api/ticket-settings?guild_id=${id}`);
       if (res.ok) {
         const data = await res.json();
         if (data) {
-          setPanelTitle(data.panel_title || '');
-          setPanelDesc(data.panel_desc || '');
+          setPanelTitle(data.setup_title || '');
+          setPanelDesc(data.setup_desc || '');
           setWelcomeTitle(data.welcome_title || '');
           setWelcomeDesc(data.welcome_desc || '');
           setSystemPrompt(data.system_prompt || '');
-          setVectorNodes(data.vector_nodes || []);
         }
         setIsDirty(false);
       }
@@ -80,18 +79,17 @@ export default function TicketAiSettings() {
     setIsSaving(true);
     try {
       const sessionWithToken = session as any;
-      const res = await fetch('/api/ticket-setting', {
+      const res = await fetch('/api/ticket-settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           guild_id: guildId.trim(),
           accessToken: sessionWithToken?.accessToken || null,
-          panel_title: panelTitle,
-          panel_desc: panelDesc,
+          setup_title: panelTitle,
+          setup_desc: panelDesc,
           welcome_title: welcomeTitle,
           welcome_desc: welcomeDesc,
-          system_prompt: systemPrompt,
-          vector_nodes: vectorNodes
+          system_prompt: systemPrompt
         }),
       });
 
