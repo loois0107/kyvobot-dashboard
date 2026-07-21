@@ -31,16 +31,15 @@ export default function TicketAiSettings() {
 
   // 🧬 RAG Knowledge Base States
   const [knowledgeInput, setKnowledgeInput] = useState('');
-  const [vectorNodes, setVectorNodes] = useState<VectorNode[]>([
-    { id: '1', content: '이 서버엔 kyvorn 이 있습니다' },
-    { id: '2', content: '강아지 이름은 방울이야' }
-  ]);
+  const [isInjecting, setIsInjecting] = useState(false);
+  const [vectorNodes, setVectorNodes] = useState<VectorNode[]>([]);
 
   useEffect(() => {
     const rawId = params?.guildId as string;
     if (rawId && rawId !== '[guildId]' && !rawId.includes('%5B')) {
       setGuildId(rawId);
       loadTicketSettings(rawId);
+      loadKnowledgeNodes(rawId);
     }
   }, [params?.guildId]);
 
@@ -62,6 +61,18 @@ export default function TicketAiSettings() {
           setSystemPrompt(data.system_prompt || '');
         }
         setIsDirty(false);
+      }
+    } catch (err) { console.error(err); }
+  };
+
+  const loadKnowledgeNodes = async (id: string) => {
+    try {
+      const res = await fetch(`/api/ticket-knowledge?guild_id=${id}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setVectorNodes(data.map((node: any) => ({ id: String(node.id), content: node.content })));
+        }
       }
     } catch (err) { console.error(err); }
   };
@@ -103,25 +114,54 @@ export default function TicketAiSettings() {
     finally { setIsSaving(false); }
   };
 
-  const injectKnowledgeNode = () => {
+  const injectKnowledgeNode = async () => {
     if (!knowledgeInput.trim()) {
       showToast('Error: Cannot ingest an empty knowledge block.', 'error');
       return;
     }
-    const newNode: VectorNode = {
-      id: String(Date.now()),
-      content: knowledgeInput.trim()
-    };
-    setVectorNodes(prev => [...prev, newNode]);
-    setKnowledgeInput('');
-    setIsDirty(true);
-    showToast('Knowledge context injected into staging queue.', 'success');
+    if (!guildId || guildId === '[guildId]') return;
+
+    setIsInjecting(true);
+    try {
+      const res = await fetch('/api/ticket-knowledge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ guild_id: guildId.trim(), content: knowledgeInput.trim() }),
+      });
+
+      if (res.ok) {
+        const result = await res.json();
+        const inserted = result.data?.[0];
+        if (inserted) {
+          setVectorNodes(prev => [...prev, { id: String(inserted.id), content: inserted.content }]);
+        }
+        setKnowledgeInput('');
+        showToast('Knowledge context injected into the vector database.', 'success');
+      } else {
+        showToast('Failed to inject knowledge block.', 'error');
+      }
+    } catch (err: any) {
+      showToast(`Network Drop: ${err.message}`, 'error');
+    } finally {
+      setIsInjecting(false);
+    }
   };
 
-  const purgeKnowledgeNode = (id: string) => {
-    setVectorNodes(prev => prev.filter(node => node.id !== id));
-    setIsDirty(true);
-    showToast('Vector grid synapse disconnected.', 'info');
+  const purgeKnowledgeNode = async (id: string) => {
+    if (!guildId || guildId === '[guildId]') return;
+    try {
+      const res = await fetch(`/api/ticket-knowledge?id=${id}&guild_id=${guildId.trim()}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        setVectorNodes(prev => prev.filter(node => node.id !== id));
+        showToast('Vector grid synapse disconnected.', 'info');
+      } else {
+        showToast('Failed to delete knowledge block.', 'error');
+      }
+    } catch (err: any) {
+      showToast(`Network Drop: ${err.message}`, 'error');
+    }
   };
 
   if (status === 'loading') return null;
@@ -198,8 +238,8 @@ export default function TicketAiSettings() {
             className="w-full bg-[#111214] border border-[#232428] rounded-xl p-4 text-xs text-white focus:outline-none focus:border-yellow-500" 
           />
           
-          <button type="button" onClick={injectKnowledgeNode} className="w-full bg-yellow-600/10 hover:bg-yellow-600 border border-yellow-500/20 text-yellow-400 hover:text-white text-xs font-black py-3 rounded-xl tracking-widest transition-all cursor-pointer">
-            + INJECT KNOWLEDGE DATA CONTEXT INTO NEURAL NETWORK
+          <button type="button" onClick={injectKnowledgeNode} disabled={isInjecting} className="w-full bg-yellow-600/10 hover:bg-yellow-600 border border-yellow-500/20 text-yellow-400 hover:text-white text-xs font-black py-3 rounded-xl tracking-widest transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+            {isInjecting ? 'INJECTING...' : '+ INJECT KNOWLEDGE DATA CONTEXT INTO NEURAL NETWORK'}
           </button>
 
           <div className="space-y-2 pt-2">
