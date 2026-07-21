@@ -123,9 +123,9 @@ export default function GuildLeaderboardTerminal() {
       <div className="space-y-6">
         <div className="flex justify-between items-center border-b border-[#2A1F40] pb-4">
           <div>
-            <h1 className="text-xl md:text-2xl font-black tracking-wider text-white">🏆 GLOBAL LEADERBOARD</h1>
+            <h1 className="text-xl md:text-2xl font-black tracking-wider text-white">🏆 SERVER STANDINGS MATRIX</h1>
             <p className="text-xs text-[#57576F] mt-1 tracking-wide">
-              Cross-server rankings — not scoped to this guild alone.
+              Showing rankings directly linked to node: <code className="text-[#5865F2]">{guildId}</code>
             </p>
           </div>
           <span className="text-[10px] bg-[#2A1F40] text-[#FFD700] px-3 py-1 rounded font-black tracking-widest hidden sm:inline">

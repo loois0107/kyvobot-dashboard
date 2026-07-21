@@ -37,12 +37,13 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // NOTE: the `users` table has no guild_id column, so this is one global leaderboard
-    // shared across every guild - it cannot be scoped per-server. Surfaced to the user
-    // as "Global Leaderboard" rather than pretending it's tied to the current guild.
+    // 🛡️ users가 (user_id, guild_id) 복합키 구조로 마이그레이션되면서 서버별 필터가 가능해졌다.
+    // username/avatar_url은 실제 컬럼이 아니어서(42703로 확인됨) select에서 제거 - 아래 매핑의
+    // Operator-XXXX 폴백이 이제 유일한 경로다.
     const { data, error } = await supabase
       .from("users")
-      .select("user_id, username, avatar_url, xp, level, points")
+      .select("user_id, xp, level, points")
+      .eq("guild_id", guildId)
       .order("xp", { ascending: false })
       .limit(100);
 
@@ -50,8 +51,8 @@ export async function GET(request: NextRequest) {
 
     const users = (data || []).map((user: any) => ({
       user_id: user.user_id,
-      username: user.username || `Operator-${user.user_id.slice(-4)}`,
-      avatar_url: user.avatar_url || "",
+      username: `Operator-${user.user_id.slice(-4)}`,
+      avatar_url: "",
       points: user.points || 0,
       level: user.level || 1,
       xp: user.xp || 0,
