@@ -15,13 +15,14 @@ const getSupabaseClient = () => {
   });
 };
 
-/** Whitelist of columns allowed to be updated in the database. */
+/**
+ * Whitelist of columns allowed to be updated in the database.
+ * 🛡️ automod_enabled/spam_limit/spam_interval/log_channel_id/banned_words는 이전에 guild_settings의
+ * 실제 컬럼으로 존재하는 줄 알고 여기 올라와 있었지만, 직접 조회로 그런 컬럼이 없는 걸 확인했다
+ * (welcome_settings/moderator_id 때와 같은 패턴). 이 필드들을 보내는 UI가 아직 없어서 지금까지는
+ * 조용히 무해했지만, 실제 컬럼이 생기기 전까지는 화이트리스트에 다시 올리지 말 것.
+ */
 const ALLOWED_FIELDS = [
-  "automod_enabled",
-  "spam_limit",
-  "spam_interval",
-  "log_channel_id",
-  "banned_words",
   "language",
   "custom_commands", // Redis 캐시 무임승차를 위해 커스텀 명령어 객체 필드 유지
 ] as const;
