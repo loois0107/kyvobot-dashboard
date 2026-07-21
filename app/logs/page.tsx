@@ -171,6 +171,7 @@ export default function LogsPage() {
                       {/* 🔑 FIXED: Forced standard en-US locale configuration to wipe out localized text strings */}
                       <span className="text-xs text-[#57576F]">
                         {log.created_at ? new Date(log.created_at).toLocaleString('en-US', {
+                          timeZone: 'Asia/Seoul',
                           year: 'numeric',
                           month: 'short',
                           day: 'numeric',

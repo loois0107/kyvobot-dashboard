@@ -59,8 +59,9 @@ export async function GET(request: Request) {
       const modName = log.moderator_name || "Kyvo AutoMod";
       const createdAt = log.created_at || new Date().toISOString();
 
-      // 시간 예쁘게 포맷팅 (HH:MM:SS)
-      const timeString = new Date(createdAt).toLocaleTimeString('ko-KR', { hour12: false });
+      // 시간 예쁘게 포맷팅 (HH:MM:SS) - timeZone을 안 박으면 서버 프로세스의 시스템 타임존(보통 UTC)을
+      // 그대로 쓰기 때문에, 'ko-KR' 로케일이어도 실제로는 KST가 아닌 시각이 찍히고 있었다.
+      const timeString = new Date(createdAt).toLocaleTimeString('ko-KR', { timeZone: 'Asia/Seoul', hour12: false });
 
       // 터미널 화면에 출력될 메시지 조립
       const terminalMessage = `[${modName}] ${userName}(${userId}) ➔ 명령 실행: ${action} // 사유: ${reason}`;
