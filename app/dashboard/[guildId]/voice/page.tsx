@@ -10,6 +10,9 @@ export default function VoiceSettingsPage() {
   const [triggerChannelId, setTriggerChannelId] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [hasLoaded, setHasLoaded] = useState(false);
+
+  const isConfigured = Boolean(triggerChannelId.trim());
 
   const fetchSettings = () => {
     if (!guildId || guildId === '[guildId]') return;
@@ -25,11 +28,13 @@ export default function VoiceSettingsPage() {
           setMessage(`Load failed [${res.status}]: ${data.error || 'Unknown error.'}`);
         }
         setLoading(false);
+        setHasLoaded(true);
       })
       .catch((err) => {
         console.error(err);
         setMessage('Failed to fetch voice settings.');
         setLoading(false);
+        setHasLoaded(true);
       });
   };
 
@@ -66,11 +71,24 @@ export default function VoiceSettingsPage() {
   return (
     <div className="min-h-screen bg-[#0F0F1A] text-white p-6 font-mono selection:bg-[#2A1F40]">
       <div className="max-w-2xl mx-auto">
-        <header className="mb-8 border-b border-[#2A1F40] pb-4">
-          <h1 className="text-2xl font-extrabold text-purple-400">🎙️ JOIN TO CREATE</h1>
-          <p className="text-xs text-[#57576F] mt-1">
-            Configure the trigger voice channel. Joining it spawns a personal temp channel and moves the member in automatically.
-          </p>
+        <header className="mb-8 border-b border-[#2A1F40] pb-4 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-extrabold text-purple-400">🎙️ JOIN TO CREATE</h1>
+            <p className="text-xs text-[#57576F] mt-1">
+              Configure the trigger voice channel. Joining it spawns a personal temp channel and moves the member in automatically.
+            </p>
+          </div>
+          {hasLoaded && (
+            <span
+              className={`shrink-0 text-[10px] font-bold px-3 py-1.5 rounded-full whitespace-nowrap ${
+                isConfigured
+                  ? 'bg-green-950/40 text-green-400 border border-green-500/30'
+                  : 'bg-amber-950/40 text-amber-400 border border-amber-500/30'
+              }`}
+            >
+              {isConfigured ? '✅ ACTIVE' : '⚠️ NOT CONFIGURED'}
+            </span>
+          )}
         </header>
 
         <div className="flex flex-col gap-6 bg-[#161626] border border-[#2A1F40] p-6 rounded-xl shadow-xl">
@@ -79,6 +97,12 @@ export default function VoiceSettingsPage() {
             <div className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-purple-400 px-3 py-2 rounded font-bold select-none">
               Guild {guildId ? guildId : 'Loading...'}
             </div>
+          </div>
+
+          <div className="bg-[#0F0F1A] border border-[#2A1F40] rounded-lg p-3 text-[11px] text-gray-300 leading-relaxed">
+            First, create a voice channel on your server (e.g. <span className="text-purple-300">"➕ Create a Room"</span>).
+            Once you enter its channel ID below, a personal voice channel will be created automatically
+            whenever a member joins it.
           </div>
 
           <div>
@@ -92,7 +116,8 @@ export default function VoiceSettingsPage() {
               className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-white px-3 py-2 rounded focus:outline-none focus:border-[#5865f2] disabled:opacity-50"
             />
             <p className="text-[10px] text-[#57576F] mt-2">
-              Enable Developer Mode in Discord, then right-click the voice channel and "Copy Channel ID". Leave empty to disable Join to Create.
+              How to find a channel ID: Discord Settings → Advanced → enable Developer Mode → right-click the channel → Copy Channel ID.
+              Leave empty to disable Join to Create.
             </p>
           </div>
 
