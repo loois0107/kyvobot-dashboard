@@ -111,11 +111,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             >
               ✨ Leveling & Economy
             </Link>
-            <Link 
+            <Link
               href={`/dashboard/${currentGuildId}/welcome`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/welcome') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
               📥 Welcome Settings
+            </Link>
+            <Link
+              href={`/dashboard/${currentGuildId}/voice`}
+              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/voice') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+            >
+              🎙️ Join to Create
             </Link>
             <Link 
               href={`/dashboard/${currentGuildId}/ticket-settings`}
