@@ -208,12 +208,15 @@ export default function LevelingEconomySettings() {
                 <input type="range" min="0.0" max="1.0" step="0.05" value={overlayOpacity} onChange={(e) => { setOverlayOpacity(parseFloat(e.target.value)); setIsDirty(true); }} className="w-full h-1 bg-[#232428] rounded-lg cursor-pointer accent-[#5865F2]" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#b5bac1]">Typography Font Layout</label>
-                <select value={fontPreference} onChange={(e) => { setFontPreference(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white cursor-pointer focus:outline-none">
+                <label className="text-xs font-bold text-[#b5bac1]">
+                  Typography Font Layout <span className="text-amber-400 font-normal">(Coming Soon)</span>
+                </label>
+                <select value={fontPreference} disabled className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-gray-500 cursor-not-allowed opacity-50 focus:outline-none">
                   <option value="font-mono">👾 Cyber Monospace (Default)</option>
                   <option value="font-sans">📱 Clean Sans-Serif</option>
                   <option value="font-serif">🏛️ Elegant Serif</option>
                 </select>
+                <p className="text-[10px] text-[#57576F]">Only one font is currently bundled with the bot - alternate fonts aren't wired up to the actual rank card yet.</p>
               </div>
             </div>
             <div className="space-y-2 pt-2">
