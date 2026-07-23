@@ -123,6 +123,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             >
               🎙️ Join to Create
             </Link>
+            <Link
+              href={`/dashboard/${currentGuildId}/anonymous-reports`}
+              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/anonymous-reports') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+            >
+              🌳 Anonymous Reports
+            </Link>
             <Link 
               href={`/dashboard/${currentGuildId}/ticket-settings`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/ticket-settings') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
