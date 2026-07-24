@@ -13,7 +13,12 @@ export default function PersonalCardSettings() {
   const { status } = useSession();
   const { showToast } = useToast();
 
-  const guildId = (params?.guildId as string) || '';
+  const rawGuildId = params?.guildId as string | undefined;
+  // 🛡️ Next.js가 하이드레이션 완료 전 잠깐 리터럴 "[guildId]" 플레이스홀더를 그대로 넘길 때가
+  // 있다 (leveling/welcome/ticket-settings 페이지에도 있는 동일한 방어 - dashboard/[guildId]는
+  // layout.tsx가 이걸 중앙에서 막아주지만, /profile/[guildId]는 그 레이아웃 밖이라 각자 막아야
+  // 한다). 이걸 막지 않으면 "%5BguildId%5D"가 그대로 API에 실려가 정크 행을 만든다.
+  const guildId = rawGuildId && rawGuildId !== '[guildId]' && !rawGuildId.includes('%5B') ? rawGuildId : '';
 
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -69,6 +74,7 @@ export default function PersonalCardSettings() {
   };
 
   const handleSave = async () => {
+    if (!guildId) return;
     setIsSaving(true);
     try {
       const res = await fetch(`/api/profile/${guildId}/card`, {
@@ -97,6 +103,7 @@ export default function PersonalCardSettings() {
   };
 
   const handleReset = async () => {
+    if (!guildId) return;
     setIsSaving(true);
     try {
       const res = await fetch(`/api/profile/${guildId}/card`, {
