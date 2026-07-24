@@ -59,3 +59,64 @@ export async function requireGuildAdmin(guildId: string | null | undefined): Pro
 
   return null;
 }
+
+/**
+ * 개인 대시보드용 가드. verifyGuildAdmin과 달리 "관리자인가"가 아니라 "로그인한 사람이
+ * 누구인가"만 묻는다. 세션의 유저 ID를 반환하고, 이 ID 외의 다른 user_id는 라우트 어디서도
+ * 절대 요청 바디/쿼리에서 받지 않는 것이 핵심 - IDOR을 검사가 아니라 구조적으로 차단한다.
+ */
+export async function requireLogin(): Promise<{ userId: string } | NextResponse> {
+  const session = await auth();
+  const userId = (session?.user as any)?.id;
+  if (!userId) {
+    return NextResponse.json({ status: "error", message: "Login required." }, { status: 401 });
+  }
+  return { userId };
+}
+
+/**
+ * 세션 유저가 해당 길드의 "멤버"인지만 검증한다 (관리자 권한 불필요) - verifyGuildAdmin과
+ * 같은 디스코드 API를 재사용하되 권한 비트 체크를 뺀 버전. 개인 대시보드에서 URL의 guildId를
+ * 임의로 바꿔서 무관한 서버에 접근/오버라이드 행을 만드는 걸 막는 용도.
+ */
+export async function verifyGuildMembership(guildId: string): Promise<boolean> {
+  try {
+    const session = await auth();
+    const accessToken = (session as any)?.accessToken;
+    if (!accessToken) return false;
+
+    const res = await fetch("https://discord.com/api/v10/users/@me/guilds", {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      next: { revalidate: 60 },
+    });
+    if (!res.ok) {
+      console.error("[AUTH][ERROR] 디스코드 길드 조회 실패:", res.status);
+      return false;
+    }
+
+    const guilds: Array<{ id: string }> = await res.json();
+    return guilds.some((g) => g.id === guildId);
+  } catch (err) {
+    console.error("[AUTH][ERROR] 멤버십 검증 중 예외:", err);
+    return false;
+  }
+}
+
+export async function requireGuildMembership(guildId: string | null | undefined): Promise<NextResponse | null> {
+  if (!guildId) {
+    return NextResponse.json(
+      { status: "error", message: "Missing required guild_id parameter" },
+      { status: 400 }
+    );
+  }
+
+  const isMember = await verifyGuildMembership(guildId);
+  if (!isMember) {
+    return NextResponse.json(
+      { status: "error", message: "You are not a member of this server." },
+      { status: 403 }
+    );
+  }
+
+  return null;
+}
