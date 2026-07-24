@@ -135,11 +135,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             >
               🎫 AI Support Ticket
             </Link>
-            <Link 
+            <Link
               href={`/dashboard/${currentGuildId}/leaderboard`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/leaderboard') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
               🏆 Server Leaderboard
+            </Link>
+            <Link
+              href={`/dashboard/${currentGuildId}/tier-roles`}
+              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/tier-roles') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+            >
+              🏅 Tier Role Mapping
             </Link>
             
             {/* ⚙️ FIXED: 사이드바 최하단에 'Custom Commands' 퀵 네비게이션 노드 추가 완료! 활성화 하이라이트 배경 완벽 연동 */}

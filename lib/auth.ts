@@ -120,3 +120,56 @@ export async function requireGuildMembership(guildId: string | null | undefined)
 
   return null;
 }
+
+const ADMINISTRATOR = BigInt(0x8); // 디스코드 "관리자" 권한 비트 - MANAGE_GUILD(0x20)보다 엄격하다
+
+/**
+ * verifyGuildAdmin은 MANAGE_GUILD(서버 관리) 권한만 보는데, /tier_role_set 슬래시 커맨드는
+ * `has_permissions(administrator=True)`로 더 엄격한 ADMINISTRATOR 권한을 요구한다. 이 라우트를
+ * 그대로 requireGuildAdmin으로 가드하면 "서버 관리는 있지만 관리자는 아닌" 유저가 커맨드로는
+ * 막히는 걸 대시보드로는 통과하는 구멍이 생긴다 - 커맨드와 동일한 기준을 강제하기 위해 별도로 둔다.
+ */
+export async function verifyGuildAdministrator(guildId: string): Promise<boolean> {
+  try {
+    const session = await auth();
+    const accessToken = (session as any)?.accessToken;
+    if (!accessToken) return false;
+
+    const res = await fetch("https://discord.com/api/v10/users/@me/guilds", {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      next: { revalidate: 60 },
+    });
+    if (!res.ok) {
+      console.error("[AUTH][ERROR] 디스코드 길드 조회 실패:", res.status);
+      return false;
+    }
+
+    const guilds: Array<{ id: string; owner: boolean; permissions: string }> = await res.json();
+    const target = guilds.find((g) => g.id === guildId);
+    if (!target) return false;
+
+    return target.owner || (BigInt(target.permissions) & ADMINISTRATOR) === ADMINISTRATOR;
+  } catch (err) {
+    console.error("[AUTH][ERROR] administrator 권한 검증 중 예외:", err);
+    return false;
+  }
+}
+
+export async function requireGuildAdministrator(guildId: string | null | undefined): Promise<NextResponse | null> {
+  if (!guildId) {
+    return NextResponse.json(
+      { status: "error", message: "Missing required guild_id parameter" },
+      { status: 400 }
+    );
+  }
+
+  const isAdministrator = await verifyGuildAdministrator(guildId);
+  if (!isAdministrator) {
+    return NextResponse.json(
+      { status: "error", message: "This action requires the Administrator permission (Manage Server alone isn't enough)." },
+      { status: 403 }
+    );
+  }
+
+  return null;
+}
