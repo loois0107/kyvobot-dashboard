@@ -23,12 +23,12 @@ const DEFAULT_CARD = {
  * (user_card_overrides)를 둘 다 돌려준다 - 프론트는 "무엇이 서버 기본값이고 무엇을 내가
  * 바꿨는지" 구분해서 보여줄 수 있다.
  */
-export async function GET(request: Request, { params }: { params: { guildId: string } }) {
+export async function GET(request: Request, ctx: { params: Promise<{ guildId: string }> }) {
   const result = await requireLogin();
   if (result instanceof NextResponse) return result;
   const { userId } = result;
 
-  const guildId = params.guildId;
+  const { guildId } = await ctx.params;
   const blocked = await requireGuildMembership(guildId);
   if (blocked) return blocked;
 
@@ -84,12 +84,12 @@ export async function GET(request: Request, { params }: { params: { guildId: str
  * 오직 세션에서만 가져온다 - 다른 유저의 user_id를 보내도 반영될 자리가 애초에 없다.
  * 필드를 null/빈 문자열로 보내면 "그 필드는 서버 기본값을 쓰겠다"는 뜻으로 저장한다.
  */
-export async function POST(request: Request, { params }: { params: { guildId: string } }) {
+export async function POST(request: Request, ctx: { params: Promise<{ guildId: string }> }) {
   const result = await requireLogin();
   if (result instanceof NextResponse) return result;
   const { userId } = result;
 
-  const guildId = params.guildId;
+  const { guildId } = await ctx.params;
   const blocked = await requireGuildMembership(guildId);
   if (blocked) return blocked;
 

@@ -30,6 +30,18 @@ export default function PersonalCardSettings() {
     loadSettings();
   }, [status, guildId]);
 
+  // API가 { error: "..." } / { status, message } 어느 모양으로 응답하든 사람이 읽을 문구를 뽑아낸다.
+  // "Failed to save. Please try again." 같은 뭉뚱그린 메시지 대신 실제 원인(401/403/500 + 서버 메시지)을
+  // 유저에게 그대로 보여줘야 DevTools 없이도 뭐가 문제인지 알 수 있다.
+  const extractErrorMessage = async (res: Response): Promise<string> => {
+    try {
+      const data = await res.json();
+      return data.message || data.error || `Request failed (${res.status})`;
+    } catch {
+      return `Request failed (${res.status})`;
+    }
+  };
+
   const loadSettings = async () => {
     setLoading(true);
     try {
@@ -45,11 +57,12 @@ export default function PersonalCardSettings() {
         setBackgroundUrl(effective.background_url || '');
         setHasOverride(Boolean(data.user_override));
         setIsDirty(false);
-      } else if (res.status === 403) {
-        showToast("You're not a member of this server.", 'error');
+      } else {
+        showToast(await extractErrorMessage(res), 'error');
       }
     } catch (err) {
       console.error(err);
+      showToast('Network error while loading your card settings.', 'error');
     } finally {
       setLoading(false);
     }
@@ -73,10 +86,11 @@ export default function PersonalCardSettings() {
         setIsDirty(false);
         setHasOverride(true);
       } else {
-        showToast('Failed to save. Please try again.', 'error');
+        showToast(await extractErrorMessage(res), 'error');
       }
     } catch (err) {
       console.error(err);
+      showToast('Network error while saving.', 'error');
     } finally {
       setIsSaving(false);
     }
@@ -93,9 +107,12 @@ export default function PersonalCardSettings() {
       if (res.ok) {
         showToast('Reset to server default.', 'success');
         await loadSettings();
+      } else {
+        showToast(await extractErrorMessage(res), 'error');
       }
     } catch (err) {
       console.error(err);
+      showToast('Network error while resetting.', 'error');
     } finally {
       setIsSaving(false);
     }
