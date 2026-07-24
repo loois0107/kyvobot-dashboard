@@ -147,6 +147,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             >
               🏅 Tier Role Mapping
             </Link>
+            <Link
+              href={`/dashboard/${currentGuildId}/twitch`}
+              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/twitch') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+            >
+              📺 Twitch Streamers
+            </Link>
             
             {/* ⚙️ FIXED: 사이드바 최하단에 'Custom Commands' 퀵 네비게이션 노드 추가 완료! 활성화 하이라이트 배경 완벽 연동 */}
             <Link 
