@@ -33,6 +33,7 @@ export default function TicketAiSettings() {
   const [knowledgeInput, setKnowledgeInput] = useState('');
   const [isInjecting, setIsInjecting] = useState(false);
   const [vectorNodes, setVectorNodes] = useState<VectorNode[]>([]);
+  const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
 
   useEffect(() => {
     const rawId = params?.guildId as string;
@@ -114,6 +115,25 @@ export default function TicketAiSettings() {
     finally { setIsSaving(false); }
   };
 
+  const extractKnowledgeErrorMessage = async (res: Response): Promise<string> => {
+    try {
+      const data = await res.json();
+      return data.error || data.message || `Request failed (${res.status})`;
+    } catch {
+      return `Request failed (${res.status})`;
+    }
+  };
+
+  const startEditingNode = (node: VectorNode) => {
+    setEditingNodeId(node.id);
+    setKnowledgeInput(node.content);
+  };
+
+  const cancelEditingNode = () => {
+    setEditingNodeId(null);
+    setKnowledgeInput('');
+  };
+
   const injectKnowledgeNode = async () => {
     if (!knowledgeInput.trim()) {
       showToast('Error: Cannot ingest an empty knowledge block.', 'error');
@@ -123,22 +143,35 @@ export default function TicketAiSettings() {
 
     setIsInjecting(true);
     try {
-      const res = await fetch('/api/ticket-knowledge', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ guild_id: guildId.trim(), content: knowledgeInput.trim() }),
-      });
+      // ✏️ 수정 모드면 PUT(재생성 + 옛 행 삭제), 아니면 기존과 동일한 POST(신규 추가).
+      const res = editingNodeId
+        ? await fetch('/api/ticket-knowledge', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: editingNodeId, guild_id: guildId.trim(), content: knowledgeInput.trim() }),
+          })
+        : await fetch('/api/ticket-knowledge', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ guild_id: guildId.trim(), content: knowledgeInput.trim() }),
+          });
 
       if (res.ok) {
         const result = await res.json();
-        const inserted = result.data?.[0];
-        if (inserted) {
-          setVectorNodes(prev => [...prev, { id: String(inserted.id), content: inserted.content }]);
+        const savedRow = result.data?.[0];
+        if (editingNodeId) {
+          setVectorNodes(prev => prev.filter(node => node.id !== editingNodeId).concat(
+            savedRow ? [{ id: String(savedRow.id), content: savedRow.content }] : []
+          ));
+          showToast(res.status === 207 ? await extractKnowledgeErrorMessage(res) : 'Knowledge entry updated (re-embedded).', res.status === 207 ? 'error' : 'success');
+        } else if (savedRow) {
+          setVectorNodes(prev => [...prev, { id: String(savedRow.id), content: savedRow.content }]);
+          showToast('Knowledge context injected into the vector database.', 'success');
         }
         setKnowledgeInput('');
-        showToast('Knowledge context injected into the vector database.', 'success');
+        setEditingNodeId(null);
       } else {
-        showToast('Failed to inject knowledge block.', 'error');
+        showToast(await extractKnowledgeErrorMessage(res), 'error');
       }
     } catch (err: any) {
       showToast(`Network Drop: ${err.message}`, 'error');
@@ -238,22 +271,36 @@ export default function TicketAiSettings() {
             className="w-full bg-[#111214] border border-[#232428] rounded-xl p-4 text-xs text-white focus:outline-none focus:border-yellow-500" 
           />
           
-          <button type="button" onClick={injectKnowledgeNode} disabled={isInjecting} className="w-full bg-yellow-600/10 hover:bg-yellow-600 border border-yellow-500/20 text-yellow-400 hover:text-white text-xs font-black py-3 rounded-xl tracking-widest transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
-            {isInjecting ? 'INJECTING...' : '+ INJECT KNOWLEDGE DATA CONTEXT INTO NEURAL NETWORK'}
-          </button>
+          <div className="flex gap-2">
+            <button type="button" onClick={injectKnowledgeNode} disabled={isInjecting} className="flex-1 bg-yellow-600/10 hover:bg-yellow-600 border border-yellow-500/20 text-yellow-400 hover:text-white text-xs font-black py-3 rounded-xl tracking-widest transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+              {isInjecting
+                ? (editingNodeId ? 'RE-EMBEDDING...' : 'INJECTING...')
+                : (editingNodeId ? '✏️ UPDATE KNOWLEDGE ENTRY (RE-EMBED)' : '+ INJECT KNOWLEDGE DATA CONTEXT INTO NEURAL NETWORK')}
+            </button>
+            {editingNodeId && (
+              <button type="button" onClick={cancelEditingNode} className="text-xs font-bold text-gray-400 hover:text-white px-4 py-3 rounded-xl border border-[#232428]">
+                Cancel
+              </button>
+            )}
+          </div>
 
           <div className="space-y-2 pt-2">
             {vectorNodes.map((node) => (
-              <div key={node.id} className="bg-[#111214] border border-[#232428] rounded-xl p-4 flex justify-between items-center group shadow-inner">
+              <div key={node.id} className={`bg-[#111214] border rounded-xl p-4 flex justify-between items-center group shadow-inner ${editingNodeId === node.id ? 'border-yellow-500' : 'border-[#232428]'}`}>
                 <div className="space-y-1 flex-1 mr-4">
                   <span className="bg-yellow-600/10 text-yellow-400 border border-yellow-500/20 text-[10px] font-mono px-2 py-0.5 rounded font-black uppercase">
                     ⚡ VECTOR NODE ID: {node.id.slice(-4)}...
                   </span>
                   <p className="text-xs sm:text-sm text-gray-200 font-medium pt-1 break-all">{node.content}</p>
                 </div>
-                <button type="button" onClick={() => purgeKnowledgeNode(node.id)} className="text-red-400 hover:text-white bg-red-950/20 hover:bg-red-600 text-[10px] font-black px-3 py-1.5 rounded-lg border border-red-500/10 transition-all cursor-pointer flex-shrink-0">
-                  PURGE
-                </button>
+                <div className="flex gap-2 flex-shrink-0">
+                  <button type="button" onClick={() => startEditingNode(node)} className="text-yellow-400 hover:text-white bg-yellow-950/20 hover:bg-yellow-600 text-[10px] font-black px-3 py-1.5 rounded-lg border border-yellow-500/10 transition-all cursor-pointer">
+                    EDIT
+                  </button>
+                  <button type="button" onClick={() => purgeKnowledgeNode(node.id)} className="text-red-400 hover:text-white bg-red-950/20 hover:bg-red-600 text-[10px] font-black px-3 py-1.5 rounded-lg border border-red-500/10 transition-all cursor-pointer">
+                    PURGE
+                  </button>
+                </div>
               </div>
             ))}
           </div>
