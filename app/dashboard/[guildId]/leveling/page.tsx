@@ -5,8 +5,11 @@ import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useToast } from '@/components/Toast';
 
+// 🛡️ cogs/economy.py의 /shop add·/shop view·/shop buy는 전부 item['name']을 읽는다 - 예전엔
+// 여기서 'title'로 저장해서 봇이 KeyError로 죽는 실제 크래시가 있었다(대시보드로 만든 아이템은
+// 명령어 쪽에서 아예 인식 못 함). 봇 쪽이 더 널리 쓰이는 컨벤션이라 그쪽 이름에 맞춘다.
 interface ShopItem {
-  title: string;
+  name: string;
   price: number;
   description: string;
 }
@@ -107,7 +110,7 @@ export default function LevelingEconomySettings() {
 
   const injectShopItem = () => {
     if (!newItemTitle.trim()) return;
-    const newItem: ShopItem = { title: newItemTitle.trim().replace(/\s+/g, '_'), price: Number(newItemPrice), description: newItemDescription.trim() };
+    const newItem: ShopItem = { name: newItemTitle.trim().replace(/\s+/g, '_'), price: Number(newItemPrice), description: newItemDescription.trim() };
     setShopItems(prev => [...prev, newItem]);
     setNewItemTitle(''); setNewItemPrice(100); setNewItemDescription(''); setIsDirty(true);
   };
@@ -284,7 +287,7 @@ export default function LevelingEconomySettings() {
                 {shopItems.map((item, idx) => (
                   <div key={idx} className="bg-[#111214] border border-[#232428] rounded-xl p-4 flex flex-col justify-between gap-3 shadow-md">
                     <div className="space-y-1">
-                      <div className="flex justify-between items-start"><h4 className="text-xs font-black text-white font-mono truncate max-w-[65%]">📦 {item.title}</h4><span className="text-[10px] font-bold text-green-400 bg-green-950/40 border border-green-500/20 px-2 py-0.5 rounded-full">{item.price.toLocaleString()} {currencyName}</span></div>
+                      <div className="flex justify-between items-start"><h4 className="text-xs font-black text-white font-mono truncate max-w-[65%]">📦 {item.name}</h4><span className="text-[10px] font-bold text-green-400 bg-green-950/40 border border-green-500/20 px-2 py-0.5 rounded-full">{item.price.toLocaleString()} {currencyName}</span></div>
                       <p className="text-[11px] text-gray-400 line-clamp-2">{item.description}</p>
                     </div>
                     <button type="button" onClick={() => purgeShopItem(idx)} className="w-full bg-red-950/30 hover:bg-red-600 text-red-400 hover:text-white text-[10px] font-black py-1.5 rounded-lg border border-red-500/10 transition-all">🗑️ PURGE ITEM NODE</button>
