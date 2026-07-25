@@ -8,6 +8,23 @@ import { useToast } from '@/components/Toast';
 const COLOR_PRESETS = ['#5865F2', '#23A55A', '#FEE75C', '#EB459E', '#ED4245', '#9B59B6', '#00D2D3', '#54A0FF', '#FF6B6B', '#FFFFFF'];
 const BG_COLOR_PRESETS = ['#1E1F22', '#2B2D31', '#313338', '#111214', '#0F0F1A', '#161626'];
 
+interface PartyHistoryEntry {
+  id: number;
+  queue_type: string;
+  lanes: string | null;
+  selected_game: string | null;
+  status: string;
+  created_at: string;
+  role: 'leader' | 'participant';
+}
+
+const STATUS_BADGE: Record<string, { label: string; className: string }> = {
+  recruiting: { label: 'Recruiting', className: 'border-[#5865F2] text-[#5865F2] bg-[#5865F2]/10' },
+  full: { label: 'Full', className: 'border-[#23A55A] text-[#23A55A] bg-[#23A55A]/10' },
+  closed: { label: 'Closed', className: 'border-[#949ba4] text-[#949ba4] bg-[#949ba4]/10' },
+  expired: { label: 'Expired', className: 'border-[#949ba4] text-[#949ba4] bg-[#949ba4]/10' },
+};
+
 export default function PersonalCardSettings() {
   const params = useParams();
   const { status } = useSession();
@@ -30,9 +47,14 @@ export default function PersonalCardSettings() {
   const [overlayOpacity, setOverlayOpacity] = useState(0.6);
   const [backgroundUrl, setBackgroundUrl] = useState('');
 
+  const [historyLoading, setHistoryLoading] = useState(true);
+  const [historyError, setHistoryError] = useState('');
+  const [history, setHistory] = useState<PartyHistoryEntry[]>([]);
+
   useEffect(() => {
     if (status !== 'authenticated' || !guildId) return;
     loadSettings();
+    loadHistory();
   }, [status, guildId]);
 
   // API가 { error: "..." } / { status, message } 어느 모양으로 응답하든 사람이 읽을 문구를 뽑아낸다.
@@ -44,6 +66,25 @@ export default function PersonalCardSettings() {
       return data.message || data.error || `Request failed (${res.status})`;
     } catch {
       return `Request failed (${res.status})`;
+    }
+  };
+
+  const loadHistory = async () => {
+    setHistoryLoading(true);
+    setHistoryError('');
+    try {
+      const res = await fetch(`/api/profile/${guildId}/party-history`);
+      if (res.ok) {
+        const data = await res.json();
+        setHistory(data.history || []);
+      } else {
+        setHistoryError(await extractErrorMessage(res));
+      }
+    } catch (err) {
+      console.error(err);
+      setHistoryError('Network error while loading your party history.');
+    } finally {
+      setHistoryLoading(false);
     }
   };
 
@@ -251,6 +292,50 @@ export default function PersonalCardSettings() {
               />
             </div>
           </div>
+        </div>
+
+        <div className="space-y-4 bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl">
+          <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+            🎮 My Party History
+          </h3>
+
+          {historyLoading ? (
+            <p className="text-sm text-[#949ba4] py-4">Loading your history...</p>
+          ) : historyError ? (
+            <div className="text-center py-4 space-y-2">
+              <p className="text-sm text-red-400">⚠️ {historyError}</p>
+              <button type="button" onClick={loadHistory} className="text-xs font-bold text-[#5865F2] hover:underline">
+                Retry
+              </button>
+            </div>
+          ) : history.length === 0 ? (
+            <p className="text-sm text-[#949ba4] py-4">📭 No party recruitments yet in this server - join one or start your own with /party_recruit.</p>
+          ) : (
+            <div className="space-y-2">
+              {history.map((entry) => {
+                const badge = STATUS_BADGE[entry.status] || { label: entry.status, className: 'border-[#949ba4] text-[#949ba4] bg-[#949ba4]/10' };
+                return (
+                  <div key={entry.id} className="flex items-center justify-between gap-3 bg-[#111214] rounded-lg px-3 py-2.5">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-[10px] shrink-0" title={entry.role === 'leader' ? 'You led this recruitment' : 'You joined this recruitment'}>
+                        {entry.role === 'leader' ? '👑' : '🙋'}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold text-white truncate">
+                          {entry.selected_game || entry.queue_type}
+                          {entry.lanes && <span className="text-[#949ba4] font-normal"> · {entry.lanes}</span>}
+                        </p>
+                        <p className="text-[10px] text-[#57576F]">{new Date(entry.created_at).toLocaleString()}</p>
+                      </div>
+                    </div>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded border shrink-0 ${badge.className}`}>
+                      {badge.label}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 
