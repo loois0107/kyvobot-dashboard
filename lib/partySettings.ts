@@ -29,12 +29,12 @@ export interface ValidationResult {
   errors?: string[];
 }
 
-function isValidHexColor(value: unknown): value is string {
+export function isValidHexColor(value: unknown): value is string {
   if (typeof value !== 'string') return false;
   return /^#?[0-9a-fA-F]{3}$|^#?[0-9a-fA-F]{6}$|^#?[0-9a-fA-F]{8}$/.test(value.trim());
 }
 
-function normalizeHexColor(value: string): string {
+export function normalizeHexColor(value: string): string {
   const trimmed = value.trim();
   return trimmed.startsWith('#') ? trimmed : `#${trimmed}`;
 }
