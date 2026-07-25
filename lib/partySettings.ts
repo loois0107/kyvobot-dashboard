@@ -10,6 +10,8 @@ export const DEFAULT_PARTY_SETTINGS = {
   card_description: '',
   card_lifetime_minutes: 60,
   channel_lifetime_hours: 6,
+  game_name: '',
+  card_thumbnail_url: '',
 };
 
 export interface PartySettings {
@@ -17,6 +19,8 @@ export interface PartySettings {
   card_description: string;
   card_lifetime_minutes: number;
   channel_lifetime_hours: number;
+  game_name: string;
+  card_thumbnail_url: string;
 }
 
 export interface ValidationResult {
@@ -67,6 +71,13 @@ export function validatePartySettings(input: any): ValidationResult {
     errors.push(`channel_lifetime_hours must be between ${PARTY_CHANNEL_LIFETIME_MIN_HOURS} and ${PARTY_CHANNEL_LIFETIME_MAX_HOURS}.`);
   }
 
+  const gameName = typeof input?.game_name === 'string' ? input.game_name.trim().slice(0, 256) : '';
+
+  const cardThumbnailUrlRaw = typeof input?.card_thumbnail_url === 'string' ? input.card_thumbnail_url.trim() : '';
+  if (cardThumbnailUrlRaw && !/^https?:\/\//i.test(cardThumbnailUrlRaw)) {
+    errors.push('card_thumbnail_url must start with http:// or https://.');
+  }
+
   if (errors.length > 0) {
     return { valid: false, errors };
   }
@@ -80,6 +91,8 @@ export function validatePartySettings(input: any): ValidationResult {
       card_description: cardDescription,
       card_lifetime_minutes: Math.round(cardLifetimeMinutes),
       channel_lifetime_hours: Math.round(channelLifetimeHours),
+      game_name: gameName,
+      card_thumbnail_url: cardThumbnailUrlRaw,
     },
   };
 }

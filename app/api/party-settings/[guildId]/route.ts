@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { requireGuildAdmin } from '@/lib/auth';
 import { invalidateGuildSettings } from '@/lib/redis';
 import { validatePartySettings, DEFAULT_PARTY_SETTINGS } from '@/lib/partySettings';
+import { validateThumbnailUrl } from '@/lib/partyThumbnail';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,6 +60,12 @@ export async function POST(request: Request, ctx: { params: Promise<{ guildId: s
   const validation = validatePartySettings(body);
   if (!validation.valid) {
     return NextResponse.json({ status: 'error', message: validation.errors!.join(' ') }, { status: 400 });
+  }
+
+  // 형식 검사는 validatePartySettings가 이미 했으니, 여기서는 실제로 살아있는 이미지인지 HEAD로 확인한다.
+  const thumbnailCheck = await validateThumbnailUrl(validation.settings!.card_thumbnail_url);
+  if (!thumbnailCheck.valid) {
+    return NextResponse.json({ status: 'error', message: thumbnailCheck.error }, { status: 400 });
   }
 
   // 🛡️ 다른 모듈(leveling/voice/twitch 등)의 설정을 지우지 않기 위해 기존 settings를 먼저 긁어온다.

@@ -29,6 +29,8 @@ export default function PartySettingsPage() {
   const [cardDescription, setCardDescription] = useState(DEFAULT_PARTY_SETTINGS.card_description);
   const [cardLifetimeMinutes, setCardLifetimeMinutes] = useState(DEFAULT_PARTY_SETTINGS.card_lifetime_minutes);
   const [channelLifetimeHours, setChannelLifetimeHours] = useState(DEFAULT_PARTY_SETTINGS.channel_lifetime_hours);
+  const [gameName, setGameName] = useState(DEFAULT_PARTY_SETTINGS.game_name);
+  const [cardThumbnailUrl, setCardThumbnailUrl] = useState('https://64.media.tumblr.com/1847d62bf566d47632f841c2ac0583ee/a72c90eea4141e92-5e/s1280x1920/c3d5902f839874fc3be572aaef35c47470bce4df.pnj');
 
   useEffect(() => {
     if (!guildId) return;
@@ -60,6 +62,8 @@ export default function PartySettingsPage() {
       setCardDescription(s.card_description);
       setCardLifetimeMinutes(s.card_lifetime_minutes);
       setChannelLifetimeHours(s.channel_lifetime_hours);
+      setGameName(s.game_name || '');
+      setCardThumbnailUrl(s.card_thumbnail_url || 'https://64.media.tumblr.com/1847d62bf566d47632f841c2ac0583ee/a72c90eea4141e92-5e/s1280x1920/c3d5902f839874fc3be572aaef35c47470bce4df.pnj');
       setIsDirty(false);
       setLoadStatus('loaded');
     } catch (err) {
@@ -80,6 +84,8 @@ export default function PartySettingsPage() {
           card_description: cardDescription,
           card_lifetime_minutes: cardLifetimeMinutes,
           channel_lifetime_hours: channelLifetimeHours,
+          game_name: gameName,
+          card_thumbnail_url: cardThumbnailUrl,
         }),
       });
       if (res.ok) {
@@ -143,9 +149,21 @@ export default function PartySettingsPage() {
         <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
           Preview (recruiting state only)
         </h3>
-        <div className="rounded-xl p-4 border-l-4 bg-[#111214]" style={{ borderColor: cardColor }}>
-          <p className="text-sm font-bold text-white">🎮 Looking for Duo - Solo Queue</p>
-          {cardDescription && <p className="text-xs text-[#b5bac1] mt-2 whitespace-pre-wrap">{cardDescription}</p>}
+        <div className="rounded-xl p-4 border-l-4 bg-[#111214] flex items-start justify-between gap-4" style={{ borderColor: cardColor }}>
+          <div className="min-w-0">
+            {gameName && <p className="text-[10px] font-bold text-[#949ba4] mb-1">🎮 {gameName}</p>}
+            <p className="text-sm font-bold text-white">Looking for Duo - Solo Queue</p>
+            {cardDescription && <p className="text-xs text-[#b5bac1] mt-2 whitespace-pre-wrap">{cardDescription}</p>}
+          </div>
+          {cardThumbnailUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={cardThumbnailUrl}
+              alt=""
+              className="w-14 h-14 rounded-lg object-cover shrink-0"
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+            />
+          )}
         </div>
 
         <div className="space-y-1.5 pt-2">
@@ -178,6 +196,30 @@ export default function PartySettingsPage() {
             placeholder="e.g. Please be respectful and use the mic!"
             className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5865F2]"
           />
+        </div>
+
+        <div className="space-y-1.5 pt-2">
+          <label className="text-xs font-bold text-[#b5bac1]">Game Name (optional)</label>
+          <input
+            type="text"
+            value={gameName}
+            onChange={(e) => { setGameName(e.target.value); setIsDirty(true); }}
+            maxLength={256}
+            placeholder="e.g. League of Legends"
+            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5865F2]"
+          />
+        </div>
+
+        <div className="space-y-1.5 pt-2">
+          <label className="text-xs font-bold text-[#b5bac1]">Card Thumbnail Image URL (optional)</label>
+          <input
+            type="text"
+            value={cardThumbnailUrl}
+            onChange={(e) => { setCardThumbnailUrl(e.target.value); setIsDirty(true); }}
+            placeholder="https://..."
+            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#5865F2]"
+          />
+          <p className="text-[10px] text-[#57576F]">Checked on save. If it later becomes unreachable, the card still posts without the thumbnail.</p>
         </div>
       </div>
 
