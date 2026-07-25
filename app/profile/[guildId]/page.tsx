@@ -18,6 +18,12 @@ interface PartyHistoryEntry {
   role: 'leader' | 'participant';
 }
 
+interface ShopItem {
+  name: string;
+  price: number | null;
+  description: string;
+}
+
 const STATUS_BADGE: Record<string, { label: string; className: string }> = {
   recruiting: { label: 'Recruiting', className: 'border-[#5865F2] text-[#5865F2] bg-[#5865F2]/10' },
   full: { label: 'Full', className: 'border-[#23A55A] text-[#23A55A] bg-[#23A55A]/10' },
@@ -51,10 +57,18 @@ export default function PersonalCardSettings() {
   const [historyError, setHistoryError] = useState('');
   const [history, setHistory] = useState<PartyHistoryEntry[]>([]);
 
+  const [shopLoading, setShopLoading] = useState(true);
+  const [shopError, setShopError] = useState('');
+  const [points, setPoints] = useState(0);
+  const [currencyName, setCurrencyName] = useState('Points');
+  const [shopItems, setShopItems] = useState<ShopItem[]>([]);
+  const [purchasingItem, setPurchasingItem] = useState('');
+
   useEffect(() => {
     if (status !== 'authenticated' || !guildId) return;
     loadSettings();
     loadHistory();
+    loadShop();
   }, [status, guildId]);
 
   // API가 { error: "..." } / { status, message } 어느 모양으로 응답하든 사람이 읽을 문구를 뽑아낸다.
@@ -85,6 +99,55 @@ export default function PersonalCardSettings() {
       setHistoryError('Network error while loading your party history.');
     } finally {
       setHistoryLoading(false);
+    }
+  };
+
+  const loadShop = async () => {
+    setShopLoading(true);
+    setShopError('');
+    try {
+      const res = await fetch(`/api/profile/${guildId}/shop`);
+      if (res.ok) {
+        const data = await res.json();
+        setPoints(data.points ?? 0);
+        setCurrencyName(data.currency_name || 'Points');
+        setShopItems(data.shop_items || []);
+      } else {
+        setShopError(await extractErrorMessage(res));
+      }
+    } catch (err) {
+      console.error(err);
+      setShopError('Network error while loading the shop.');
+    } finally {
+      setShopLoading(false);
+    }
+  };
+
+  // 🛡️ 구매 처리는 봇의 buy_item 커맨드와 동일한 내부 웹훅으로 위임된다(cogs/economy.py의
+  // _process_purchase) - 대시보드는 포인트/인벤토리를 직접 건드리지 않는다. active_transactions
+  // 락 덕분에 이 버튼을 더블클릭해도, 또는 같은 유저가 동시에 /shop buy 커맨드를 쳐도 하나만
+  // 통과한다(나머지는 "locked" 사유로 거부됨).
+  const handleBuy = async (itemName: string) => {
+    if (purchasingItem) return;
+    setPurchasingItem(itemName);
+    try {
+      const res = await fetch(`/api/profile/${guildId}/shop/buy`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ item_name: itemName }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        showToast(`Purchased ${data.item_name} for ${data.price?.toLocaleString()} ${data.currency_name}!`, 'success');
+        setPoints(data.remaining_points ?? points);
+      } else {
+        showToast(data.message || `Purchase failed (${res.status})`, 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Network error while purchasing.', 'error');
+    } finally {
+      setPurchasingItem('');
     }
   };
 
@@ -292,6 +355,58 @@ export default function PersonalCardSettings() {
               />
             </div>
           </div>
+        </div>
+
+        <div className="space-y-4 bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl">
+          <div className="flex items-center justify-between border-b border-[#2b2d31] pb-2">
+            <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase">
+              🛒 Point Shop
+            </h3>
+            {!shopLoading && !shopError && (
+              <span className="text-xs font-bold text-[#FFD700]">🪙 {points.toLocaleString()} {currencyName}</span>
+            )}
+          </div>
+
+          {shopLoading ? (
+            <p className="text-sm text-[#949ba4] py-4">Loading the shop...</p>
+          ) : shopError ? (
+            <div className="text-center py-4 space-y-2">
+              <p className="text-sm text-red-400">⚠️ {shopError}</p>
+              <button type="button" onClick={loadShop} className="text-xs font-bold text-[#5865F2] hover:underline">
+                Retry
+              </button>
+            </div>
+          ) : shopItems.length === 0 ? (
+            <p className="text-sm text-[#949ba4] py-4">🛒 The shop is currently empty. Staff hasn't added any items yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {shopItems.map((item) => {
+                const affordable = item.price !== null && points >= item.price;
+                const isPurchasing = purchasingItem === item.name;
+                return (
+                  <div key={item.name} className="flex items-center justify-between gap-3 bg-[#111214] rounded-lg px-3 py-2.5">
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-white truncate">{item.name}</p>
+                      {item.description && <p className="text-[10px] text-[#57576F] truncate">{item.description}</p>}
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-[10px] font-bold text-[#FFD700]">
+                        {item.price !== null ? `${item.price.toLocaleString()} ${currencyName}` : 'N/A'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleBuy(item.name)}
+                        disabled={item.price === null || !affordable || Boolean(purchasingItem)}
+                        className="bg-[#23A55A] hover:bg-[#1a7f43] disabled:bg-[#2b2d31] disabled:text-[#57576F] disabled:cursor-not-allowed text-white text-[10px] font-black px-3 py-1.5 rounded-lg transition-all"
+                      >
+                        {isPurchasing ? 'BUYING...' : item.price === null ? 'UNAVAILABLE' : affordable ? 'BUY' : 'NOT ENOUGH'}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <div className="space-y-4 bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl">
