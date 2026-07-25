@@ -105,7 +105,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             >
               🎛️ Control Hub Home
             </Link>
-            <Link 
+            <Link
+              href={`/dashboard/${currentGuildId}/automod`}
+              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/automod') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+            >
+              🛡️ AutoMod
+            </Link>
+            <Link
               href={`/dashboard/${currentGuildId}/leveling`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/leveling') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
