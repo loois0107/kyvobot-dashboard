@@ -63,7 +63,7 @@ export default function PartySettingsPage() {
       setCardLifetimeMinutes(s.card_lifetime_minutes);
       setChannelLifetimeHours(s.channel_lifetime_hours);
       setGameName(s.game_name || '');
-      setCardThumbnailUrl(s.card_thumbnail_url || 'https://64.media.tumblr.com/1847d62bf566d47632f841c2ac0583ee/a72c90eea4141e92-5e/s1280x1920/c3d5902f839874fc3be572aaef35c47470bce4df.png');
+      setCardThumbnailUrl(s.card_thumbnail_url || 'https://i.postimg.cc/vT2yjDCk/R.jpg');
       setIsDirty(false);
       setLoadStatus('loaded');
     } catch (err) {
