@@ -26,6 +26,35 @@ function getRedis(): Redis {
 /** 봇의 Cache-Aside 키와 반드시 동일한 포맷을 유지해야 한다. */
 export const settingsKey = (guildId: string) => `guild:${guildId}:settings`;
 
+/** 파티 통계 스냅샷 캐시 키. 매번 실시간 집계하지 않고 1시간 단위로만 재계산한다
+ * (7일 롤링 창으로 이미 쿼리 범위가 바운드돼 있어 부하 자체는 크지 않지만, 자주 열어보는
+ * 대시보드 페이지라 굳이 매 요청마다 다시 긁을 필요가 없다는 판단 - SETEX TTL로 충분). */
+export const partyStatsKey = (guildId: string) => `guild:${guildId}:party_stats`;
+const PARTY_STATS_CACHE_TTL_SECONDS = 3600;
+
+export async function getCachedPartyStats(guildId: string): Promise<any | null> {
+  const key = partyStatsKey(guildId);
+  try {
+    const redis = getRedis();
+    const cached = await redis.get<string>(key);
+    if (!cached) return null;
+    return typeof cached === 'string' ? JSON.parse(cached) : cached;
+  } catch (err) {
+    console.error(`[CACHE][WARN] party stats 조회 실패, 라이브 계산으로 우회 (${key}):`, err);
+    return null;
+  }
+}
+
+export async function setCachedPartyStats(guildId: string, data: unknown): Promise<void> {
+  const key = partyStatsKey(guildId);
+  try {
+    const redis = getRedis();
+    await redis.set(key, JSON.stringify(data), { ex: PARTY_STATS_CACHE_TTL_SECONDS });
+  } catch (err) {
+    console.error(`[CACHE][WARN] party stats 저장 실패 (${key}):`, err);
+  }
+}
+
 /**
  * 길드 설정 캐시를 무효화한다.
  * 지연 이중 삭제(Delayed Double Delete)로 "읽는 중 쓰기" 레이스 컨디션을 방어한다.
