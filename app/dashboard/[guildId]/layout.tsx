@@ -154,6 +154,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               🏅 Tier Role Mapping
             </Link>
             <Link
+              href={`/dashboard/${currentGuildId}/reaction-roles`}
+              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/reaction-roles') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+            >
+              🎭 Reaction Roles
+            </Link>
+            <Link
               href={`/dashboard/${currentGuildId}/twitch`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/twitch') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >

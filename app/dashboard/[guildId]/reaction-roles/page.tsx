@@ -1,0 +1,364 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { useToast } from '@/components/Toast';
+import { parseEmojiDisplay } from '@/lib/reactionRoles';
+
+interface RoleOption {
+  id: string;
+  name: string;
+  color: number;
+  position: number;
+  permissions: string;
+  managed: boolean;
+}
+
+interface Binding {
+  guild_id: string;
+  channel_id: string;
+  message_id: string;
+  emoji: string;
+  role_id: string;
+  role_name: string;
+  role_color: number;
+  created_by: string;
+  created_at: string;
+  jump_url: string;
+}
+
+interface MessagePreview {
+  author: string;
+  content: string;
+  timestamp: string;
+  jump_url: string;
+}
+
+type LoadStatus = 'loading' | 'loaded' | 'error';
+
+function roleColorHex(color: number): string {
+  return color === 0 ? '#99AAB5' : `#${color.toString(16).padStart(6, '0')}`;
+}
+
+function EmojiBadge({ emoji }: { emoji: string }) {
+  const parsed = parseEmojiDisplay(emoji);
+  if (parsed.kind === 'custom') {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={parsed.url} alt={parsed.name} className="w-5 h-5 inline-block" />;
+  }
+  return <span className="text-base">{parsed.value}</span>;
+}
+
+export default function ReactionRolesPage() {
+  const params = useParams();
+  const { showToast } = useToast();
+  const guildId = (params?.guildId as string) || '';
+
+  const [loadStatus, setLoadStatus] = useState<LoadStatus>('loading');
+  const [loadErrorMsg, setLoadErrorMsg] = useState('');
+  const [bindings, setBindings] = useState<Binding[]>([]);
+  const [roles, setRoles] = useState<RoleOption[]>([]);
+  const [deletingKey, setDeletingKey] = useState<string | null>(null);
+
+  const [channelId, setChannelId] = useState('');
+  const [messageId, setMessageId] = useState('');
+  const [isPreviewing, setIsPreviewing] = useState(false);
+  const [previewError, setPreviewError] = useState('');
+  const [preview, setPreview] = useState<MessagePreview | null>(null);
+
+  const [emoji, setEmoji] = useState('');
+  const [roleId, setRoleId] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState<{ dangerous: string[] } | null>(null);
+
+  useEffect(() => {
+    if (!guildId) return;
+    loadData();
+  }, [guildId]);
+
+  const extractErrorMessage = async (res: Response): Promise<string> => {
+    try {
+      const data = await res.json();
+      return data.message || `Request failed (${res.status})`;
+    } catch {
+      return `Request failed (${res.status})`;
+    }
+  };
+
+  const loadData = async () => {
+    setLoadStatus('loading');
+    setLoadErrorMsg('');
+    try {
+      const res = await fetch(`/api/reaction-roles/${guildId}`);
+      if (!res.ok) {
+        setLoadErrorMsg(await extractErrorMessage(res));
+        setLoadStatus('error');
+        return;
+      }
+      const data = await res.json();
+      setBindings(data.bindings || []);
+      setRoles(data.roles || []);
+      setLoadStatus('loaded');
+    } catch (err) {
+      console.error(err);
+      setLoadErrorMsg('Network error while loading reaction roles.');
+      setLoadStatus('error');
+    }
+  };
+
+  const resetForm = () => {
+    setChannelId('');
+    setMessageId('');
+    setPreview(null);
+    setPreviewError('');
+    setEmoji('');
+    setRoleId('');
+    setConfirmDialog(null);
+  };
+
+  const handlePreview = async () => {
+    setIsPreviewing(true);
+    setPreviewError('');
+    setPreview(null);
+    try {
+      const res = await fetch(`/api/reaction-roles/${guildId}/preview?channel_id=${encodeURIComponent(channelId)}&message_id=${encodeURIComponent(messageId)}`);
+      if (!res.ok) {
+        setPreviewError(await extractErrorMessage(res));
+        return;
+      }
+      const data = await res.json();
+      setPreview(data.message);
+    } catch (err) {
+      console.error(err);
+      setPreviewError('Network error while looking up that message.');
+    } finally {
+      setIsPreviewing(false);
+    }
+  };
+
+  const submitBinding = async (confirmedDangerous: boolean) => {
+    setIsSaving(true);
+    try {
+      const res = await fetch(`/api/reaction-roles/${guildId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ channel_id: channelId, message_id: messageId, emoji, role_id: roleId, confirmedDangerous }),
+      });
+      if (res.ok) {
+        showToast('Reaction role created!', 'success');
+        resetForm();
+        await loadData();
+        return;
+      }
+      if (res.status === 409) {
+        const data = await res.json();
+        setConfirmDialog({ dangerous: data.dangerous_permissions || [] });
+        return;
+      }
+      showToast(await extractErrorMessage(res), 'error');
+    } catch (err) {
+      console.error(err);
+      showToast('Network error while saving.', 'error');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async (b: Binding) => {
+    const key = `${b.message_id}:${b.emoji}`;
+    setDeletingKey(key);
+    try {
+      const res = await fetch(`/api/reaction-roles/${guildId}?message_id=${encodeURIComponent(b.message_id)}&emoji=${encodeURIComponent(b.emoji)}`, { method: 'DELETE' });
+      if (res.ok) {
+        showToast('Binding deleted.', 'success');
+        await loadData();
+      } else {
+        showToast(await extractErrorMessage(res), 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Network error while deleting.', 'error');
+    } finally {
+      setDeletingKey(null);
+    }
+  };
+
+  if (loadStatus === 'loading') {
+    return (
+      <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-sm">
+        Loading reaction roles...
+      </div>
+    );
+  }
+
+  if (loadStatus === 'error') {
+    return (
+      <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
+        <p className="text-red-400 font-bold">⚠️ Failed to load reaction roles</p>
+        <p className="text-sm text-[#949ba4]">{loadErrorMsg}</p>
+        <button type="button" onClick={loadData} className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl">
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-3xl mx-auto space-y-6 pb-16">
+      <header className="border-b border-[#2b2d31] pb-6">
+        <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">🎭 Reaction Roles</h1>
+        <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
+          React to gain a role, unreact to lose it
+        </p>
+      </header>
+
+      <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
+        <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+          Add a Binding
+        </h3>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-[#b5bac1]">Channel ID</label>
+            <input
+              type="text"
+              value={channelId}
+              onChange={(e) => { setChannelId(e.target.value); setPreview(null); }}
+              placeholder="123456789012345678"
+              className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#5865F2]"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-[#b5bac1]">Message ID</label>
+            <input
+              type="text"
+              value={messageId}
+              onChange={(e) => { setMessageId(e.target.value); setPreview(null); }}
+              placeholder="123456789012345678"
+              className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#5865F2]"
+            />
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={handlePreview}
+          disabled={!channelId || !messageId || isPreviewing}
+          className="bg-[#5865F2] hover:bg-[#4752C4] disabled:opacity-50 text-white text-xs font-black px-5 py-2.5 rounded-lg"
+        >
+          {isPreviewing ? 'CHECKING...' : 'PREVIEW MESSAGE'}
+        </button>
+
+        {previewError && <p className="text-xs text-red-400">⚠️ {previewError}</p>}
+
+        {preview && (
+          <div className="bg-[#111214] rounded-lg p-3 border-l-4 border-[#23A55A] space-y-1">
+            <p className="text-xs text-[#949ba4]">✅ Found it - by <span className="text-white font-bold">{preview.author}</span></p>
+            <p className="text-xs text-[#b5bac1] italic">&quot;{preview.content}&quot;</p>
+            <a href={preview.jump_url} target="_blank" rel="noreferrer" className="text-[10px] text-[#5865F2] hover:underline">
+              Jump to message ↗
+            </a>
+          </div>
+        )}
+
+        {preview && (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-[#b5bac1]">Emoji (paste the emoji itself)</label>
+                <input
+                  type="text"
+                  value={emoji}
+                  onChange={(e) => setEmoji(e.target.value)}
+                  placeholder="🎮"
+                  className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2]"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-[#b5bac1]">Role</label>
+                <select
+                  value={roleId}
+                  onChange={(e) => setRoleId(e.target.value)}
+                  className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5865F2]"
+                >
+                  <option value="">Select a role...</option>
+                  {roles.map((r) => (
+                    <option key={r.id} value={r.id}>{r.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => submitBinding(false)}
+              disabled={!emoji || !roleId || isSaving}
+              className="bg-[#23A55A] hover:bg-[#1a7f43] disabled:opacity-50 text-white text-xs font-black px-6 py-3 rounded-xl"
+            >
+              {isSaving ? 'SAVING...' : 'CREATE BINDING'}
+            </button>
+          </>
+        )}
+      </div>
+
+      {confirmDialog && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#1e1f22] border border-orange-500/50 rounded-2xl p-6 max-w-md w-full space-y-4">
+            <h3 className="text-orange-400 font-black text-sm">⚠️ Dangerous Permission Warning</h3>
+            <p className="text-xs text-[#b5bac1]">
+              This role has: {confirmDialog.dangerous.map((p) => <code key={p} className="text-orange-300">{p} </code>)}
+              — members who react will gain these permissions. Continue anyway?
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button type="button" onClick={() => setConfirmDialog(null)} className="text-xs font-bold text-gray-400 hover:text-white px-4 py-2">
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => { setConfirmDialog(null); submitBinding(true); }}
+                className="bg-red-600 hover:bg-red-500 text-white text-xs font-black px-5 py-2 rounded-lg"
+              >
+                Confirm & Save Anyway
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-3 shadow-xl">
+        <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+          Existing Bindings
+        </h3>
+        {bindings.length === 0 ? (
+          <p className="text-sm text-[#949ba4] py-4">📭 No reaction roles set up yet.</p>
+        ) : (
+          <div className="space-y-2">
+            {bindings.map((b) => {
+              const key = `${b.message_id}:${b.emoji}`;
+              return (
+                <div key={key} className="flex items-center justify-between gap-3 bg-[#111214] rounded-lg px-3 py-2.5">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <EmojiBadge emoji={b.emoji} />
+                    <span className="text-xs font-bold" style={{ color: roleColorHex(b.role_color) }}>{b.role_name}</span>
+                    <a href={b.jump_url} target="_blank" rel="noreferrer" className="text-[10px] text-[#5865F2] hover:underline shrink-0">
+                      Jump ↗
+                    </a>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(b)}
+                    disabled={deletingKey === key}
+                    className="text-[10px] font-bold text-red-400 hover:text-red-300 disabled:opacity-50 px-2 py-1 shrink-0"
+                  >
+                    {deletingKey === key ? 'Deleting...' : 'Delete'}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+        <p className="text-[10px] text-[#57576F] pt-2">Deleting a binding stops future reacts from granting/removing the role - it doesn&apos;t retroactively strip the role from current holders.</p>
+      </div>
+    </div>
+  );
+}
