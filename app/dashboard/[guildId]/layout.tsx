@@ -180,11 +180,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               ⚙️ Custom Commands
             </Link>
 
-            {/* /logs는 [guildId] 트리 밖의 독립 라우트라 링크에 currentGuildId를 안 붙인다 -
-                그 페이지 자체가 자체 서버 선택 드롭다운을 갖고 있다. */}
             <Link
-              href="/logs"
-              className="flex items-center px-3 py-2 rounded font-medium transition hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]"
+              href={`/dashboard/${currentGuildId}/audit-logs`}
+              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/audit-logs') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
               🛡️ Audit Logs
             </Link>

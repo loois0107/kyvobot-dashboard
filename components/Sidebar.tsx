@@ -19,7 +19,6 @@ export default function Sidebar() {
   const menuItems = [
     { href: '/', label: '🏠 Home', activeColor: 'text-white border-white' },
     { href: controlHubHref, label: '🎛️ Control Hub', activeColor: 'text-[#5865F2] border-[#5865F2]' },
-    { href: '/logs', label: '🛡️ Audit Logs', activeColor: 'text-red-500 border-red-500' },
   ];
 
   return (
