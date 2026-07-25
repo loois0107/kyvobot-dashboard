@@ -173,11 +173,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </Link>
 
             {/* ⚙️ FIXED: 사이드바 최하단에 'Custom Commands' 퀵 네비게이션 노드 추가 완료! 활성화 하이라이트 배경 완벽 연동 */}
-            <Link 
+            <Link
               href={`/dashboard/${currentGuildId}/settings`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/settings') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
               ⚙️ Custom Commands
+            </Link>
+
+            {/* /logs는 [guildId] 트리 밖의 독립 라우트라 링크에 currentGuildId를 안 붙인다 -
+                그 페이지 자체가 자체 서버 선택 드롭다운을 갖고 있다. */}
+            <Link
+              href="/logs"
+              className="flex items-center px-3 py-2 rounded font-medium transition hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]"
+            >
+              🛡️ Audit Logs
             </Link>
           </nav>
         </div>
