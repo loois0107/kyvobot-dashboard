@@ -178,7 +178,7 @@ export default function DashboardHome() {
         <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-6 sm:p-8 shadow-xl flex flex-col justify-between lg:col-span-1 min-h-[160px]">
           <div className="flex items-center gap-2 pb-4 border-b border-[#2b2d31]"><h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase">DISCORD ACCOUNT LINK</h3></div>
           <div className="pt-4 space-y-2">
-            <p className="text-sm text-gray-200 font-medium">Welcome, <strong className="text-[#5865F2] font-mono text-base">{session?.user?.name || 'kyvorn__'}</strong></p>
+            <p className="text-sm text-gray-200 font-medium">Welcome, <strong className="text-[#5865F2] font-mono text-base">{session?.user?.name || 'Server Member'}</strong></p>
             <p className="text-xs text-gray-500 leading-relaxed">Handshake encryption successful. Secure administrative terminal mainframes fully unlocked.</p>
           </div>
           <div className="pt-4">
