@@ -44,17 +44,27 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { guild_id, setup_title, setup_desc, welcome_title, welcome_desc, system_prompt } = body;
+    const { guild_id, setup_title, setup_desc, welcome_title, welcome_desc, system_prompt, daily_guild_limit, daily_user_limit } = body;
 
     const blocked = await requireGuildAdmin(guild_id);
     if (blocked) return blocked;
+
+    // 🛡️ 빈 문자열/0 이하 입력은 "기본값으로 되돌리기"로 취급 - null 저장 시 봇이 하드코딩된
+    // 기본값(서버 400 / 유저 20)으로 폴백한다(cogs/ticket_ai.py의 _get_daily_limits).
+    const normalizedGuildLimit = daily_guild_limit === '' || daily_guild_limit === null || daily_guild_limit === undefined
+      ? null : Number(daily_guild_limit) > 0 ? Number(daily_guild_limit) : null;
+    const normalizedUserLimit = daily_user_limit === '' || daily_user_limit === null || daily_user_limit === undefined
+      ? null : Number(daily_user_limit) > 0 ? Number(daily_user_limit) : null;
 
     const supabase = connectSupabase();
     if (!supabase) return NextResponse.json({ error: 'ENV_KEY_MISSING' }, { status: 500 });
 
     const { data, error } = await supabase
       .from('guild_ticket_settings')
-      .upsert({ guild_id, setup_title, setup_desc, welcome_title, welcome_desc, system_prompt })
+      .upsert({
+        guild_id, setup_title, setup_desc, welcome_title, welcome_desc, system_prompt,
+        daily_guild_limit: normalizedGuildLimit, daily_user_limit: normalizedUserLimit,
+      })
       .select();
 
     if (error) {

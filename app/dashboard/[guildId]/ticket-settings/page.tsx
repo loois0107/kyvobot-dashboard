@@ -54,6 +54,10 @@ export default function TicketAiSettings() {
   // 🧠 Cognitive AI Prompt State
   const [systemPrompt, setSystemPrompt] = useState('You are the premium Kyvo AI Smart Support Assistant... Use {context} to reference rules.');
 
+  // 🚦 Daily AI answer limits - empty string means "use the bot's default" (400 server / 20 user)
+  const [dailyGuildLimit, setDailyGuildLimit] = useState('');
+  const [dailyUserLimit, setDailyUserLimit] = useState('');
+
   // 🧬 RAG Knowledge Base States
   const [knowledgeInput, setKnowledgeInput] = useState('');
   const [isInjecting, setIsInjecting] = useState(false);
@@ -85,6 +89,8 @@ export default function TicketAiSettings() {
           setWelcomeTitle(data.welcome_title || '');
           setWelcomeDesc(data.welcome_desc || '');
           setSystemPrompt(data.system_prompt || '');
+          setDailyGuildLimit(data.daily_guild_limit != null ? String(data.daily_guild_limit) : '');
+          setDailyUserLimit(data.daily_user_limit != null ? String(data.daily_user_limit) : '');
         }
         setIsDirty(false);
       }
@@ -129,7 +135,9 @@ export default function TicketAiSettings() {
           setup_desc: panelDesc,
           welcome_title: welcomeTitle,
           welcome_desc: welcomeDesc,
-          system_prompt: systemPrompt
+          system_prompt: systemPrompt,
+          daily_guild_limit: dailyGuildLimit,
+          daily_user_limit: dailyUserLimit,
         }),
       });
 
@@ -280,10 +288,38 @@ export default function TicketAiSettings() {
             to forcefully thread the pgvector knowledge block search hits into that precise prompt segment.
           </span>
 
-          <textarea 
-            rows={5} value={systemPrompt} onChange={(e) => { setSystemPrompt(e.target.value); setIsDirty(true); }} 
-            className="w-full bg-[#111214] border border-[#232428] rounded-xl p-4 text-xs sm:text-sm text-white font-mono focus:outline-none focus:border-purple-500" 
+          <textarea
+            rows={5} value={systemPrompt} onChange={(e) => { setSystemPrompt(e.target.value); setIsDirty(true); }}
+            className="w-full bg-[#111214] border border-[#232428] rounded-xl p-4 text-xs sm:text-sm text-white font-mono focus:outline-none focus:border-purple-500"
           />
+        </div>
+
+        <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-3 shadow-xl">
+          <h2 className="text-xs font-black tracking-widest text-orange-400 uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">🚦 DAILY AI ANSWER LIMITS</h2>
+          <span className="text-xs sm:text-sm text-[#b5bac1] leading-relaxed font-medium block">
+            Caps AI answers per rolling 24 hours (per-server and per-user). Once either limit is hit, the ticket is
+            escalated straight to staff with no further AI calls. Leave blank to use the defaults (400 / 20).
+          </span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-[#b5bac1]">Server-wide daily limit</label>
+              <input
+                type="number" min={1} placeholder="400"
+                value={dailyGuildLimit}
+                onChange={(e) => { setDailyGuildLimit(e.target.value); setIsDirty(true); }}
+                className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-orange-500"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-[#b5bac1]">Per-user daily limit</label>
+              <input
+                type="number" min={1} placeholder="20"
+                value={dailyUserLimit}
+                onChange={(e) => { setDailyUserLimit(e.target.value); setIsDirty(true); }}
+                className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-orange-500"
+              />
+            </div>
+          </div>
         </div>
 
         <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-4 shadow-xl">
