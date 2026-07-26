@@ -2,9 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import { useToast } from '@/components/Toast';
+
+interface PendingReport {
+  id: number;
+  content: string;
+  status: string;
+  created_at: string;
+}
+
+type QueueLoadStatus = 'loading' | 'loaded' | 'error';
+type DecisionAction = 'approve' | 'reject' | 'block';
 
 export default function AnonymousReportsSettingsPage() {
   const params = useParams();
+  const { showToast } = useToast();
   const guildId = params?.guildId as string | undefined;
 
   const [adminChannelId, setAdminChannelId] = useState('');
@@ -12,6 +24,11 @@ export default function AnonymousReportsSettingsPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [hasLoaded, setHasLoaded] = useState(false);
+
+  const [queueStatus, setQueueStatus] = useState<QueueLoadStatus>('loading');
+  const [queueErrorMsg, setQueueErrorMsg] = useState('');
+  const [reports, setReports] = useState<PendingReport[]>([]);
+  const [decidingId, setDecidingId] = useState<number | null>(null);
 
   const isConfigured = Boolean(adminChannelId.trim());
 
@@ -42,7 +59,63 @@ export default function AnonymousReportsSettingsPage() {
 
   useEffect(() => {
     fetchSettings();
+    loadQueue();
   }, [guildId]);
+
+  const loadQueue = async () => {
+    if (!guildId || guildId === '[guildId]') return;
+    setQueueStatus('loading');
+    setQueueErrorMsg('');
+    try {
+      const res = await fetch(`/api/anonymous-reports/${guildId}`);
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setQueueErrorMsg(data.message || `Request failed (${res.status})`);
+        setQueueStatus('error');
+        return;
+      }
+      const data = await res.json();
+      setReports(data.reports || []);
+      setQueueStatus('loaded');
+    } catch (err) {
+      console.error(err);
+      setQueueErrorMsg('Network error while loading the queue.');
+      setQueueStatus('error');
+    }
+  };
+
+  // 🛡️ 처리는 봇의 내부 웹훅으로 위임된다(cogs/anonymous_reports.py의 _finalize_report) - 여기서
+  // 승인/거절/차단 로직을 직접 구현하지 않는다. 성공하면 디스코드 관리자 큐 메시지의 버튼도
+  // 봇이 같이 제거하므로, 여기서는 목록에서 optimistic하게 빼주기만 하면 된다.
+  const handleDecide = async (reportId: number, action: DecisionAction) => {
+    setDecidingId(reportId);
+    try {
+      const res = await fetch(`/api/anonymous-reports/${guildId}/decide`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ report_id: reportId, action }),
+      });
+      if (res.ok) {
+        showToast(
+          action === 'approve' ? 'Report approved and published.' : action === 'reject' ? 'Report rejected.' : 'Report rejected and reporter blocked.',
+          'success'
+        );
+        setReports((prev) => prev.filter((r) => r.id !== reportId));
+      } else {
+        const data = await res.json().catch(() => ({}));
+        showToast(data.message || `Request failed (${res.status})`, 'error');
+        if (res.status === 409) {
+          // 다른 경로(디스코드 버튼 등)가 이미 처리했다는 뜻 - 목록을 새로 맞춘다.
+          await loadQueue();
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Network error while processing this report.', 'error');
+    } finally {
+      setDecidingId(null);
+    }
+  };
 
   const handleSave = async () => {
     if (!guildId || guildId === '[guildId]') return;
@@ -155,6 +228,71 @@ export default function AnonymousReportsSettingsPage() {
           >
             {loading ? 'Saving...' : 'Save'}
           </button>
+        </div>
+
+        <div className="mt-8 flex flex-col gap-4 bg-[#161626] border border-[#2A1F40] p-6 rounded-xl shadow-xl">
+          <div className="flex items-start justify-between gap-4 border-b border-[#2A1F40] pb-3">
+            <div>
+              <h2 className="text-sm font-extrabold text-purple-400">📋 PENDING QUEUE</h2>
+              <p className="text-[10px] text-[#57576F] mt-1">Reporter identity is never shown here, same as the Discord admin channel.</p>
+            </div>
+            <button type="button" onClick={loadQueue} className="shrink-0 text-[10px] font-bold text-purple-400 hover:underline">
+              Refresh
+            </button>
+          </div>
+
+          {queueStatus === 'loading' ? (
+            <p className="text-xs text-gray-400 py-4">Loading reports...</p>
+          ) : queueStatus === 'error' ? (
+            <div className="text-center py-4 space-y-2">
+              <p className="text-xs text-red-400">⚠️ {queueErrorMsg}</p>
+              <button type="button" onClick={loadQueue} className="text-xs font-bold text-purple-400 hover:underline">
+                Retry
+              </button>
+            </div>
+          ) : reports.length === 0 ? (
+            <p className="text-xs text-gray-400 py-4">📭 No pending reports.</p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {reports.map((report) => {
+                const isDeciding = decidingId === report.id;
+                return (
+                  <div key={report.id} className="bg-[#0F0F1A] border border-[#2A1F40] rounded-lg p-4 flex flex-col gap-3">
+                    <p className="text-sm text-white whitespace-pre-wrap break-words">{report.content}</p>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-[10px] text-[#57576F]">{new Date(report.created_at).toLocaleString()}</span>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleDecide(report.id, 'approve')}
+                          disabled={isDeciding}
+                          className="bg-green-700 hover:bg-green-600 disabled:opacity-50 text-white text-[10px] font-black px-3 py-1.5 rounded-lg transition-all"
+                        >
+                          {isDeciding ? '...' : 'APPROVE'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDecide(report.id, 'reject')}
+                          disabled={isDeciding}
+                          className="bg-[#2A1F40] hover:bg-[#3a2a58] disabled:opacity-50 text-white text-[10px] font-black px-3 py-1.5 rounded-lg transition-all"
+                        >
+                          {isDeciding ? '...' : 'REJECT'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDecide(report.id, 'block')}
+                          disabled={isDeciding}
+                          className="bg-red-800 hover:bg-red-700 disabled:opacity-50 text-white text-[10px] font-black px-3 py-1.5 rounded-lg transition-all"
+                        >
+                          {isDeciding ? '...' : 'BLOCK'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>
