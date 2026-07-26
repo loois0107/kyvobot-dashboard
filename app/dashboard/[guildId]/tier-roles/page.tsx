@@ -168,7 +168,8 @@ export default function TierRolesSettings() {
       <header className="border-b border-[#2b2d31] pb-6">
         <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">🏅 Tier Role Mapping</h1>
         <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
-          Used by /tier_verify and /tier_set to grant a role for each rank tier
+          Used by /tier_verify and /tier_set to grant a role for each rank tier. A member can only hold one tier role at a time -
+          setting a new tier automatically removes their old one. /tier_verify also requires an admin to run /riot_region_set first.
         </p>
       </header>
 
@@ -184,6 +185,10 @@ export default function TierRolesSettings() {
       )}
 
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-3 shadow-xl">
+        <p className="text-[10px] text-[#57576F] pb-1">
+          매핑을 바꾸거나 비우면, 그 역할을 이미 갖고 있던 멤버에게서도 자동으로 회수됩니다 - 새로 설정되는 사람만이 아니라요.
+          비워두면(&quot;No role assigned&quot;) 그 티어는 /tier_set·/tier_verify에서 사용할 수 없어요(에러로 안내됨).
+        </p>
         {TIER_CHOICES.map((tier) => (
           <div key={tier} className="flex items-center gap-4">
             <label className="w-28 flex-shrink-0 text-xs font-bold text-[#b5bac1]">{tier}</label>
