@@ -64,11 +64,19 @@ export default function PersonalCardSettings() {
   const [shopItems, setShopItems] = useState<ShopItem[]>([]);
   const [purchasingItem, setPurchasingItem] = useState('');
 
+  const [favoriteGameLoading, setFavoriteGameLoading] = useState(true);
+  const [favoriteGameError, setFavoriteGameError] = useState('');
+  const [favoriteGame, setFavoriteGame] = useState<string | null>(null);
+  const [gamePresets, setGamePresets] = useState<string[]>([]);
+  const [selectedGameDraft, setSelectedGameDraft] = useState('');
+  const [isSavingFavoriteGame, setIsSavingFavoriteGame] = useState(false);
+
   useEffect(() => {
     if (status !== 'authenticated' || !guildId) return;
     loadSettings();
     loadHistory();
     loadShop();
+    loadFavoriteGame();
   }, [status, guildId]);
 
   // API가 { error: "..." } / { status, message } 어느 모양으로 응답하든 사람이 읽을 문구를 뽑아낸다.
@@ -148,6 +156,72 @@ export default function PersonalCardSettings() {
       showToast('Network error while purchasing.', 'error');
     } finally {
       setPurchasingItem('');
+    }
+  };
+
+  const loadFavoriteGame = async () => {
+    setFavoriteGameLoading(true);
+    setFavoriteGameError('');
+    try {
+      const res = await fetch(`/api/profile/${guildId}/favorite-game`);
+      if (res.ok) {
+        const data = await res.json();
+        setFavoriteGame(data.favorite_game_name || null);
+        setGamePresets(data.presets || []);
+        setSelectedGameDraft(data.favorite_game_name || '');
+      } else {
+        setFavoriteGameError(await extractErrorMessage(res));
+      }
+    } catch (err) {
+      console.error(err);
+      setFavoriteGameError('Network error while loading your favorite game.');
+    } finally {
+      setFavoriteGameLoading(false);
+    }
+  };
+
+  // 🛡️ /party_recruit이 game 파라미터를 생략했을 때 여기서 저장한 값을 자동으로 대신 쓴다
+  // (cogs/party.py의 resolve_effective_game) - Discord 슬래시 커맨드는 유저별 기본값을 UI
+  // 레벨에서 지원하지 않아서, 이게 실질적인 "기본값 자동 채움" 구현이다.
+  const handleSaveFavoriteGame = async () => {
+    if (!selectedGameDraft) return;
+    setIsSavingFavoriteGame(true);
+    try {
+      const res = await fetch(`/api/profile/${guildId}/favorite-game`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ game_name: selectedGameDraft }),
+      });
+      if (res.ok) {
+        setFavoriteGame(selectedGameDraft);
+        showToast(`${selectedGameDraft} set as your favorite game.`, 'success');
+      } else {
+        showToast(await extractErrorMessage(res), 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Network error while saving your favorite game.', 'error');
+    } finally {
+      setIsSavingFavoriteGame(false);
+    }
+  };
+
+  const handleClearFavoriteGame = async () => {
+    setIsSavingFavoriteGame(true);
+    try {
+      const res = await fetch(`/api/profile/${guildId}/favorite-game`, { method: 'DELETE' });
+      if (res.ok) {
+        setFavoriteGame(null);
+        setSelectedGameDraft('');
+        showToast('Favorite game cleared.', 'success');
+      } else {
+        showToast(await extractErrorMessage(res), 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Network error while clearing your favorite game.', 'error');
+    } finally {
+      setIsSavingFavoriteGame(false);
     }
   };
 
@@ -406,6 +480,62 @@ export default function PersonalCardSettings() {
                 );
               })}
             </div>
+          )}
+        </div>
+
+        <div className="space-y-4 bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl">
+          <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+            ⭐ Favorite Game
+          </h3>
+          <p className="text-[10px] text-[#57576F]">
+            Used to auto-fill the game field when you run /party_recruit without picking one.
+          </p>
+
+          {favoriteGameLoading ? (
+            <p className="text-sm text-[#949ba4] py-2">Loading...</p>
+          ) : favoriteGameError ? (
+            <div className="py-2 space-y-2">
+              <p className="text-sm text-red-400">⚠️ {favoriteGameError}</p>
+              <button type="button" onClick={loadFavoriteGame} className="text-xs font-bold text-[#5865F2] hover:underline">
+                Retry
+              </button>
+            </div>
+          ) : gamePresets.length === 0 ? (
+            <p className="text-sm text-[#949ba4] py-2">📭 This server has no saved game presets yet.</p>
+          ) : (
+            <div className="flex flex-col sm:flex-row gap-2">
+              <select
+                value={selectedGameDraft}
+                onChange={(e) => setSelectedGameDraft(e.target.value)}
+                className="flex-1 bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5865F2]"
+              >
+                <option value="" disabled>Select a game...</option>
+                {gamePresets.map((name) => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={handleSaveFavoriteGame}
+                disabled={isSavingFavoriteGame || !selectedGameDraft || selectedGameDraft === favoriteGame}
+                className="bg-[#5865F2] hover:bg-[#4752C4] disabled:opacity-50 text-white text-xs font-black px-4 py-2 rounded-lg transition-all"
+              >
+                {isSavingFavoriteGame ? 'SAVING...' : 'SAVE'}
+              </button>
+              {favoriteGame && (
+                <button
+                  type="button"
+                  onClick={handleClearFavoriteGame}
+                  disabled={isSavingFavoriteGame}
+                  className="bg-[#2b2d31] hover:bg-[#35373c] disabled:opacity-50 text-white text-xs font-black px-4 py-2 rounded-lg transition-all"
+                >
+                  CLEAR
+                </button>
+              )}
+            </div>
+          )}
+          {favoriteGame && !favoriteGameLoading && (
+            <p className="text-[10px] text-[#23A55A]">✅ Currently set to: {favoriteGame}</p>
           )}
         </div>
 
