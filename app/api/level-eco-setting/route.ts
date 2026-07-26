@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { requireGuildAdmin } from '@/lib/auth';
 import { invalidateGuildSettings } from '@/lib/redis';
+import { validateLevelingEconomySettings } from '@/lib/levelingEconomySettings';
 
 export const dynamic = 'force-dynamic';
 
@@ -71,6 +72,13 @@ export async function POST(request: Request) {
 
     const blocked = await requireGuildAdmin(guild_id);
     if (blocked) return blocked;
+
+    // 🛡️ "조용히 범위 밖 값을 허용하지 않는다" 원칙 - xp_rate/min_bet은 지금까지 UI 슬라이더/스텝
+    // 힌트만 있고 서버 검증이 없어서 범위 밖 값도 그대로 저장되던 문제였다. 저장 시점에 명확히 거부한다.
+    const validation = validateLevelingEconomySettings(leveling_settings, economy_settings);
+    if (!validation.valid) {
+      return NextResponse.json({ error: validation.errors!.join(' ') }, { status: 400 });
+    }
 
     const supabase = connectSupabase();
     if (!supabase) return NextResponse.json({ error: 'ENV_KEY_MISSING' }, { status: 500 });

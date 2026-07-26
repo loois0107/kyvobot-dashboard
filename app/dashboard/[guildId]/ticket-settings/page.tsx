@@ -249,10 +249,18 @@ export default function TicketAiSettings() {
           </button>
         </header>
 
+        <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl px-4 sm:px-6 py-4">
+          <p className="text-xs sm:text-sm text-[#b5bac1] leading-relaxed">
+            /ticket-setup으로 배포하는 공개 지원 패널과, 유저가 버튼을 눌러 티켓을 열었을 때 보이는 화면,
+            그리고 AI가 답변할 때 참고하는 지식을 여기서 전부 설정해요.
+          </p>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
+
           <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-4 shadow-xl">
             <h2 className="text-xs font-black tracking-widest text-[#5865F2] uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">⚗️ PANEL SETUP INTERFACE</h2>
+            <p className="text-[10px] text-[#57576F]">/ticket-setup 실행 시 게시되는 공개 임베드예요 - 유저가 이 버튼을 눌러야 티켓이 열려요.</p>
             <div className="space-y-1">
               <label className="text-[11px] font-black text-[#b5bac1] uppercase tracking-wider">📋 SETUP PANEL TITLE</label>
               <input type="text" value={panelTitle} onChange={(e) => { setPanelTitle(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]" />
@@ -265,6 +273,7 @@ export default function TicketAiSettings() {
 
           <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-4 shadow-xl">
             <h2 className="text-xs font-black tracking-widest text-green-400 uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">🔒 TICKET ACTIVE WELCOME EMBED</h2>
+            <p className="text-[10px] text-[#57576F]">티켓(개인 채널)이 실제로 생성된 직후, 그 채널 안에서 유저에게 보이는 첫 메시지예요.</p>
             <div className="space-y-1">
               <label className="text-[11px] font-black text-[#b5bac1] uppercase tracking-wider">🔒 WELCOME EMBED TITLE</label>
               <input type="text" value={welcomeTitle} onChange={(e) => { setWelcomeTitle(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-green-500" />

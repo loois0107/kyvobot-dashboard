@@ -138,7 +138,13 @@ export default function LevelingEconomySettings() {
           economy_settings: { currency_name: String(currencyName).trim(), min_bet: Number(minBet), shop_items: shopItems }
         }),
       });
-      if (res.ok) { showToast('Synchronized successfully!', 'success'); setIsDirty(false); }
+      if (res.ok) {
+        showToast('Synchronized successfully!', 'success');
+        setIsDirty(false);
+      } else {
+        const errBody = await res.json().catch(() => null);
+        showToast(errBody?.error || 'Failed to save - check your input values.', 'error');
+      }
     } catch (err) { console.error(err); } finally { setIsSaving(false); }
   };
 
@@ -160,6 +166,13 @@ export default function LevelingEconomySettings() {
             {isSaving ? 'COMMITTING...' : 'SAVE PROTOCOL CHANGES'}
           </button>
         </header>
+
+        <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl px-4 sm:px-6 py-4">
+          <p className="text-xs sm:text-sm text-[#b5bac1] leading-relaxed">
+            멤버가 메시지를 보낼 때마다 XP를 얻고 레벨업합니다. 레벨업 시 특정 레벨에 역할을 자동 지급할 수 있고,
+            서버 전용 화폐로 카지노 게임과 상점을 운영할 수 있어요.
+          </p>
+        </div>
 
         {/* ==========================================
             [SECTION 1: VISUAL DESIGN CLUSTER] -> 성격 맞는 애들끼리 최상단에 묶음!
@@ -209,6 +222,7 @@ export default function LevelingEconomySettings() {
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-[#b5bac1]">Vanguard Overlay Opacity: <span className="text-[#5865F2] font-mono">{Math.round(overlayOpacity*100)}%</span></label>
                 <input type="range" min="0.0" max="1.0" step="0.05" value={overlayOpacity} onChange={(e) => { setOverlayOpacity(parseFloat(e.target.value)); setIsDirty(true); }} className="w-full h-1 bg-[#232428] rounded-lg cursor-pointer accent-[#5865F2]" />
+                <p className="text-[10px] text-[#57576F]">배경 이미지 위에 깔리는 어두운 막의 농도예요 - 텍스트 가독성을 위해 있어요. 단색 배경(이미지 없음)일 땐 거의 티가 안 나요.</p>
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-[#b5bac1]">
@@ -241,9 +255,14 @@ export default function LevelingEconomySettings() {
           {/* LEVELING PROTOCOL SETTINGS */}
           <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-5 shadow-xl">
             <h2 className="text-xs font-black tracking-widest text-[#5865F2] uppercase border-b border-[#2b2d31] pb-2">🎮 LEVELING PROTOCOL SETTINGS</h2>
-            <div className="space-y-1.5"><label className="text-[11px] font-black text-[#b5bac1] tracking-wider uppercase">Global XP Multiplier Rate</label><input type="number" min="0.1" max="10" step="0.1" value={xpRate} onChange={(e) => { setXpRate(parseFloat(e.target.value)); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]" /></div>
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-black text-[#b5bac1] tracking-wider uppercase">Global XP Multiplier Rate</label>
+              <input type="number" min="0.1" max="10" step="0.1" value={xpRate} onChange={(e) => { setXpRate(parseFloat(e.target.value)); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]" />
+              <p className="text-[10px] text-[#57576F]">메시지 1개당 기본 15~25 XP에 곱해지는 배율이에요. 1.0이 기본값, 2.0이면 레벨업 속도가 2배 빨라져요. (허용 범위: 0.1~10)</p>
+            </div>
             <div className="space-y-3 pt-2">
               <label className="text-[11px] font-black text-[#b5bac1] tracking-wider uppercase block">🎖️ Milestone Role Rewards</label>
+              <p className="text-[10px] text-[#57576F]">⚠️ 해당 레벨에 정확히 도달했을 때만 지급돼요(예: 10·20 둘 다 등록해놔도 15에서 25로 바로 뛰면 둘 다 못 받음). 봇의 역할이 지급할 역할보다 서버 역할 목록에서 위에 있어야 정상 작동해요.</p>
               <div className="flex gap-2">
                 <input type="number" placeholder="Lvl" value={newLvl} onChange={(e) => setNewLvl(e.target.value)} className="w-1/4 bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none" />
                 <input type="text" placeholder="Role ID" value={newRoleId} onChange={(e) => setNewRoleId(e.target.value.replace(/[^0-9]/g, ''))} className="w-3/4 bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none" />
@@ -262,8 +281,16 @@ export default function LevelingEconomySettings() {
           {/* SERVER CURRENCY MATRIX */}
           <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-5 shadow-xl">
             <h2 className="text-xs font-black tracking-widest text-green-400 uppercase border-b border-[#2b2d31] pb-2">🪙 SERVER CURRENCY MATRIX</h2>
-            <div className="space-y-1.5"><label className="text-[11px] font-black text-[#b5bac1] tracking-wider uppercase">Currency Ticker Name</label><input type="text" value={currencyName} onChange={(e) => { setCurrencyName(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-green-500" /></div>
-            <div className="space-y-1.5 pt-2"><label className="text-[11px] font-black text-[#b5bac1] tracking-wider uppercase">Minimum Casino Bet Amount</label><input type="number" min="1" value={minBet} onChange={(e) => { setMinBet(parseInt(e.target.value) || 0); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-green-500" /></div>
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-black text-[#b5bac1] tracking-wider uppercase">Currency Ticker Name</label>
+              <input type="text" value={currencyName} onChange={(e) => { setCurrencyName(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-green-500" />
+              <p className="text-[10px] text-[#57576F]">/balance, /shop, /inventory 등 화폐가 표시되는 모든 곳에서 이 이름이 쓰여요.</p>
+            </div>
+            <div className="space-y-1.5 pt-2">
+              <label className="text-[11px] font-black text-[#b5bac1] tracking-wider uppercase">Minimum Casino Bet Amount</label>
+              <input type="number" min="1" max="5000" value={minBet} onChange={(e) => { setMinBet(parseInt(e.target.value) || 0); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-green-500" />
+              <p className="text-[10px] text-[#57576F]">/bet, /blackjack, /mines, /roulette 전체에 적용되는 최소 배팅액이에요. ⚠️ 5,000을 넘기면 Mines/Roulette은 아예 플레이할 수 없게 돼요(그 두 게임의 자체 최대 배팅 한도가 5,000이라서). (허용 범위: 1~5,000)</p>
+            </div>
           </div>
         </div>
 
@@ -273,7 +300,11 @@ export default function LevelingEconomySettings() {
         <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-5 shadow-xl">
           <h2 className="text-xs font-black tracking-wider text-yellow-500 uppercase border-b border-[#2b2d31] pb-2">🛒 AUTOMATED COMMERCE MARKET REGISTRY (SHOP ITEMS)</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="space-y-1"><label className="text-[10px] font-bold text-gray-400">ITEM ASSET TITLE</label><input type="text" placeholder="e.g. VIP_Pass" value={newItemTitle} onChange={(e) => setNewItemTitle(e.target.value)} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-yellow-500" /></div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-gray-400">ITEM ASSET TITLE</label>
+              <input type="text" placeholder="e.g. VIP_Pass" value={newItemTitle} onChange={(e) => setNewItemTitle(e.target.value)} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-yellow-500" />
+              <p className="text-[10px] text-[#57576F]">공백은 저장 시 자동으로 _로 바뀌어요(예: VIP Pass → VIP_Pass). /shop buy에서 이 이름으로 구매하며, 대소문자는 구분하지 않아요.</p>
+            </div>
             <div className="space-y-1"><label className="text-[10px] font-bold text-gray-400">COST PRICE</label><input type="number" min="0" value={newItemPrice} onChange={(e) => setNewItemPrice(parseInt(e.target.value) || 0)} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-yellow-500" /></div>
             <div className="space-y-1"><label className="text-[10px] font-bold text-gray-400">TELEMETRY DATA</label><input type="text" placeholder="Short Item Info" value={newItemDescription} onChange={(e) => setNewItemDescription(e.target.value)} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-yellow-500" /></div>
           </div>
