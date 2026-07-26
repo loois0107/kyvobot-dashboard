@@ -8,6 +8,31 @@ import { useToast } from '@/components/Toast';
 interface VectorNode {
   id: string;
   content: string;
+  feedback: { up: number; down: number; total: number };
+}
+
+const MIN_FEEDBACK_SAMPLE = 3; // 이 미만이면 비율 대신 "데이터 부족" 표시 - 매너 평가 배지와 같은 이유
+
+function FeedbackBadge({ feedback }: { feedback: { up: number; down: number; total: number } }) {
+  if (feedback.total < MIN_FEEDBACK_SAMPLE) {
+    return (
+      <span className="bg-gray-600/10 text-gray-400 border border-gray-500/20 text-[10px] font-mono px-2 py-0.5 rounded font-black uppercase">
+        📊 Data Insufficient ({feedback.total}/{MIN_FEEDBACK_SAMPLE})
+      </span>
+    );
+  }
+  const helpfulPct = Math.round((feedback.up / feedback.total) * 100);
+  const colorClass =
+    helpfulPct >= 70
+      ? 'bg-green-600/10 text-green-400 border-green-500/20'
+      : helpfulPct >= 50
+      ? 'bg-amber-600/10 text-amber-400 border-amber-500/20'
+      : 'bg-red-600/10 text-red-400 border-red-500/20';
+  return (
+    <span className={`${colorClass} border text-[10px] font-mono px-2 py-0.5 rounded font-black uppercase`}>
+      👍 {helpfulPct}% ({feedback.up}/{feedback.total})
+    </span>
+  );
 }
 
 export default function TicketAiSettings() {
@@ -72,7 +97,10 @@ export default function TicketAiSettings() {
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data)) {
-          setVectorNodes(data.map((node: any) => ({ id: String(node.id), content: node.content })));
+          setVectorNodes(data.map((node: any) => ({
+            id: String(node.id), content: node.content,
+            feedback: node.feedback || { up: 0, down: 0, total: 0 },
+          })));
         }
       }
     } catch (err) { console.error(err); }
@@ -161,11 +189,11 @@ export default function TicketAiSettings() {
         const savedRow = result.data?.[0];
         if (editingNodeId) {
           setVectorNodes(prev => prev.filter(node => node.id !== editingNodeId).concat(
-            savedRow ? [{ id: String(savedRow.id), content: savedRow.content }] : []
+            savedRow ? [{ id: String(savedRow.id), content: savedRow.content, feedback: { up: 0, down: 0, total: 0 } }] : []
           ));
           showToast(res.status === 207 ? await extractKnowledgeErrorMessage(res) : 'Knowledge entry updated (re-embedded).', res.status === 207 ? 'error' : 'success');
         } else if (savedRow) {
-          setVectorNodes(prev => [...prev, { id: String(savedRow.id), content: savedRow.content }]);
+          setVectorNodes(prev => [...prev, { id: String(savedRow.id), content: savedRow.content, feedback: { up: 0, down: 0, total: 0 } }]);
           showToast('Knowledge context injected into the vector database.', 'success');
         }
         setKnowledgeInput('');
@@ -288,9 +316,12 @@ export default function TicketAiSettings() {
             {vectorNodes.map((node) => (
               <div key={node.id} className={`bg-[#111214] border rounded-xl p-4 flex justify-between items-center group shadow-inner ${editingNodeId === node.id ? 'border-yellow-500' : 'border-[#232428]'}`}>
                 <div className="space-y-1 flex-1 mr-4">
-                  <span className="bg-yellow-600/10 text-yellow-400 border border-yellow-500/20 text-[10px] font-mono px-2 py-0.5 rounded font-black uppercase">
-                    ⚡ VECTOR NODE ID: {node.id.slice(-4)}...
-                  </span>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="bg-yellow-600/10 text-yellow-400 border border-yellow-500/20 text-[10px] font-mono px-2 py-0.5 rounded font-black uppercase">
+                      ⚡ VECTOR NODE ID: {node.id.slice(-4)}...
+                    </span>
+                    <FeedbackBadge feedback={node.feedback} />
+                  </div>
                   <p className="text-xs sm:text-sm text-gray-200 font-medium pt-1 break-all">{node.content}</p>
                 </div>
                 <div className="flex gap-2 flex-shrink-0">

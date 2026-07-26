@@ -60,7 +60,8 @@ async function addKnowledgeViaBot(guildId: string, content: string): Promise<{ o
   return { ok: true, id: body?.id ?? null };
 }
 
-// 📡 GET: Fetch all existing knowledge blocks for a specific guild instance
+// 📡 GET: Fetch all existing knowledge blocks for a specific guild instance, each annotated with
+// its 👍/👎 feedback stats (cogs/ticket_ai.py의 AI 답변 피드백 버튼이 채우는 ticket_ai_feedback).
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const guildId = searchParams.get('guild_id');
@@ -72,13 +73,29 @@ export async function GET(request: Request) {
   if (!supabase) return NextResponse.json({ error: 'ENV_KEY_MISSING' }, { status: 500 });
 
   try {
-    const { data, error } = await supabase
-      .from('guild_knowledge')
-      .select('id, content')
-      .eq('guild_id', guildId);
+    const [{ data, error }, { data: feedbackRows, error: feedbackError }] = await Promise.all([
+      supabase.from('guild_knowledge').select('id, content').eq('guild_id', guildId),
+      supabase.from('ticket_ai_feedback').select('knowledge_id, rating').eq('guild_id', guildId).not('rating', 'is', null),
+    ]);
 
     if (error) throw error;
-    return NextResponse.json(data || []);
+    if (feedbackError) throw feedbackError;
+
+    // knowledge_id별로 집계 - 투표가 없거나 지식 항목이 매칭 안 된(NULL) 피드백은 여기서 자연히 제외된다.
+    const statsById = new Map<number, { up: number; down: number }>();
+    for (const row of feedbackRows || []) {
+      if (row.knowledge_id === null) continue;
+      const entry = statsById.get(row.knowledge_id) || { up: 0, down: 0 };
+      if (row.rating) entry.up += 1; else entry.down += 1;
+      statsById.set(row.knowledge_id, entry);
+    }
+
+    const result = (data || []).map((node) => {
+      const stats = statsById.get(Number(node.id)) || { up: 0, down: 0 };
+      return { ...node, feedback: { up: stats.up, down: stats.down, total: stats.up + stats.down } };
+    });
+
+    return NextResponse.json(result);
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
