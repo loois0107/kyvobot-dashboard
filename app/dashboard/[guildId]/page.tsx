@@ -18,10 +18,36 @@ interface TelemetryData {
   automodLogs: number;
 }
 
+interface OnboardingState {
+  show_banner: boolean;
+  items: { automod: boolean; welcome: boolean; presets: boolean };
+}
+
+function ChecklistRow({ done, label, href }: { done: boolean; label: string; href: string }) {
+  return (
+    <Link
+      href={href}
+      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border transition-all ${
+        done ? 'border-[#23A55A]/20 bg-[#23A55A]/5' : 'border-[#232428] bg-[#111214] hover:border-[#5865F2]/40'
+      }`}
+    >
+      <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0 ${
+        done ? 'bg-[#23A55A] text-white' : 'border border-[#4e5058] text-transparent'
+      }`}>
+        {done ? '✓' : ''}
+      </span>
+      <span className={`text-xs font-bold flex-1 ${done ? 'text-[#23A55A] line-through decoration-2' : 'text-[#dbdee1]'}`}>
+        {label}
+      </span>
+      {!done && <span className="text-[10px] text-[#5865F2] font-bold shrink-0">SET UP →</span>}
+    </Link>
+  );
+}
+
 export default function DashboardHome() {
   const params = useParams();
   const { data: session, status } = useSession();
-  
+
   const guildId = params?.guildId as string | undefined;
 
   const [telemetry, setTelemetry] = useState<TelemetryData>({
@@ -30,10 +56,12 @@ export default function DashboardHome() {
     activeTickets: 0,
     automodLogs: 0
   });
-  
+
   const [isLoadingStats, setIsLoadingStats] = useState(true);
   const [isLoadingLogs, setIsLoadingLogs] = useState(true);
   const [statsError, setStatsError] = useState(false);
+
+  const [onboarding, setOnboarding] = useState<OnboardingState | null>(null);
 
   const [isPaused, setIsPaused] = useState(false);
   const [logFilter, setLogFilter] = useState<'ALL' | 'INFO' | 'SUCCESS' | 'WARN' | 'SYSTEM'>('ALL');
@@ -95,6 +123,33 @@ export default function DashboardHome() {
     }
   };
 
+  const fetchOnboardingStatus = async (targetId: string, signal?: AbortSignal) => {
+    if (!targetId || targetId === '[guildId]') return;
+    try {
+      const res = await fetch(`/api/onboarding/${targetId}`, { signal });
+      if (!res.ok) return;
+      const data = await res.json();
+      setOnboarding({ show_banner: !!data.show_banner, items: data.items });
+    } catch (err: any) {
+      if (err?.name === 'AbortError') return;
+      console.error('[ONBOARDING SYNC FAULT]', err);
+    }
+  };
+
+  const handleDismissOnboarding = async () => {
+    if (!guildId) return;
+    setOnboarding((prev) => (prev ? { ...prev, show_banner: false } : prev)); // 즉시 닫히는 것처럼 보이게
+    try {
+      await fetch(`/api/onboarding/${guildId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'dismiss' }),
+      });
+    } catch (err) {
+      console.error('[ONBOARDING DISMISS FAULT]', err);
+    }
+  };
+
   useEffect(() => {
     if (!guildId || guildId === '[guildId]') return;
 
@@ -102,6 +157,7 @@ export default function DashboardHome() {
     setIsLoadingStats(true);
     setStatsError(false);
     fetchRealtimeStats(guildId, controller.signal);
+    fetchOnboardingStatus(guildId, controller.signal);
 
     const statsInterval = setInterval(() => fetchRealtimeStats(guildId, controller.signal), 10000);
     return () => {
@@ -138,7 +194,31 @@ export default function DashboardHome() {
 
   return (
     <div className="max-w-[1300px] mx-auto w-full space-y-10 p-2 md:p-4 animate-in fade-in duration-300">
-      
+
+      {onboarding?.show_banner && (
+        <div className="bg-[#1e1f22] border border-[#5865F2]/30 rounded-2xl p-6 shadow-xl space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-black text-white">🚀 Quick Start Checklist</h3>
+              <p className="text-[10px] text-[#949ba4] mt-1">A few things worth setting up first - check them off as you go.</p>
+            </div>
+            <button
+              type="button"
+              onClick={handleDismissOnboarding}
+              className="text-gray-400 hover:text-white text-lg leading-none px-2"
+              aria-label="Dismiss checklist"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="space-y-2">
+            <ChecklistRow done={onboarding.items.automod} label="Configure AutoMod" href={`/dashboard/${guildId}/automod`} />
+            <ChecklistRow done={onboarding.items.welcome} label="Configure Welcome messages" href={`/dashboard/${guildId}/welcome`} />
+            <ChecklistRow done={onboarding.items.presets} label="Add a game preset (for Party Recruitment)" href={`/dashboard/${guildId}/party-presets`} />
+          </div>
+        </div>
+      )}
+
       {/* ==========================================
           [SECTION 1: STATUS OVERVIEW ROW]
          ========================================== */}
