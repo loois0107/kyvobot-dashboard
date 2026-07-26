@@ -135,6 +135,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             >
               🌳 Anonymous Reports
             </Link>
+            <Link
+              href={`/dashboard/${currentGuildId}/giveaways`}
+              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/giveaways') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+            >
+              🎁 Giveaways
+            </Link>
             <Link 
               href={`/dashboard/${currentGuildId}/ticket-settings`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/ticket-settings') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
