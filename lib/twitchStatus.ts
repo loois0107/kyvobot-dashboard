@@ -42,3 +42,20 @@ export function computePollHealth(lastCheckedAt: string | null | undefined, now:
   }
   return { status: 'stale', minutesSinceLastCheck: minutesSince };
 }
+
+export type RoleGrantStatus = 'not_configured' | 'incomplete' | 'configured';
+
+/**
+ * cogs/twitch.py의 _fanout_online/_fanout_offline은 member_id와 live_role_id가 "둘 다" 있어야만
+ * 실제로 역할을 지급/회수한다(twitch.py:533-534,541). /twitch_channel_set은 role만 있고 member가
+ * 없는 조합은 막지만(twitch.py:216-219), member만 있고 role이 없는 조합은 막지 않는다 - 그 상태로
+ * 저장되면 대시보드가 "Role Grant Target: {멤버}"만 보여줘서 역할이 지급되는 것처럼 보이지만 실제로는
+ * 아무 일도 안 일어난다. 이 함수가 그 반쪽 상태를 명시적으로 구분한다.
+ */
+export function computeRoleGrantStatus(memberId: string | null, liveRoleId: string | null): RoleGrantStatus {
+  const hasMember = !!memberId;
+  const hasRole = !!liveRoleId;
+  if (!hasMember && !hasRole) return 'not_configured';
+  if (hasMember !== hasRole) return 'incomplete';
+  return 'configured';
+}

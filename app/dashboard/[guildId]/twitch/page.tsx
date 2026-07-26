@@ -16,6 +16,8 @@ interface StreamerRow {
   member_id: string | null;
   member_display_name: string | null;
   live_role_id: string | null;
+  live_role_name: string | null;
+  role_grant_status: 'not_configured' | 'incomplete' | 'configured';
 }
 
 type LoadStatus = 'loading' | 'loaded' | 'error';
@@ -81,7 +83,11 @@ export default function TwitchStreamersSettings() {
         body: JSON.stringify({ broadcaster_id: streamer.broadcaster_id }),
       });
       if (res.ok) {
-        showToast(`${streamer.broadcaster_login} removed.`, 'success');
+        const data = await res.json().catch(() => null);
+        const detail = data?.subscriptions_also_removed
+          ? '트위치 구독 자체도 완전히 취소됐어요(다른 서버는 이 스트리머를 추적 중이지 않았어요).'
+          : '다른 서버도 이 스트리머를 추적 중이라 그쪽 알림은 계속 작동해요.';
+        showToast(`${streamer.broadcaster_login} removed. ${detail}`, 'success');
         setStreamers((prev) => prev.filter((s) => s.broadcaster_id !== streamer.broadcaster_id));
       } else {
         showToast(await extractErrorMessage(res), 'error');
@@ -123,7 +129,12 @@ export default function TwitchStreamersSettings() {
       <header className="border-b border-[#2b2d31] pb-6">
         <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">📺 Twitch Streamers</h1>
         <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
-          Registered via /twitch_channel_set - live announcements &amp; role grants
+          Registered via /twitch_channel_set - live announcements &amp; role grants. This page is view/remove only;
+          use the Discord command to add or change a streamer.
+        </p>
+        <p className="text-[10px] text-[#57576F] mt-2 normal-case">
+          🟢 10분 이내 정상 / 🟡 10~30분 지연(재배포 중일 수 있음) / 🔴 30분 초과(폴링 중단으로 판단) / ⚪ 등록 직후 아직 첫 확인 전.
+          이 배지는 안전망 폴링이 최근에 돌았는지만 보는 거라, 실제 라이브 알림 자체가 끊겼는지는 완벽히 보장하지 않아요.
         </p>
       </header>
 
@@ -159,16 +170,27 @@ export default function TwitchStreamersSettings() {
                     {s.announcement_channel_name ? `#${s.announcement_channel_name}` : `Unknown (${s.announcement_channel_id})`}
                   </div>
                   <div>
-                    <span className="text-[#57576F] uppercase text-[10px] font-bold block">Role Grant Target</span>
-                    {s.member_id ? (s.member_display_name || `Unknown member (${s.member_id})`) : '— not configured —'}
-                  </div>
-                  <div>
                     <span className="text-[#57576F] uppercase text-[10px] font-bold block">Last Poll Check</span>
                     {s.last_checked_at
                       ? `${Math.round(s.minutes_since_last_check ?? 0)} min ago`
                       : 'Never checked yet'}
                   </div>
+                  <div>
+                    <span className="text-[#57576F] uppercase text-[10px] font-bold block">Linked Member</span>
+                    {s.member_id ? (s.member_display_name || `Unknown member (${s.member_id})`) : '— not configured —'}
+                  </div>
+                  <div>
+                    <span className="text-[#57576F] uppercase text-[10px] font-bold block">Live Role</span>
+                    {s.live_role_id ? (s.live_role_name || `Unknown role (${s.live_role_id})`) : '— not configured —'}
+                  </div>
                 </div>
+
+                {s.role_grant_status === 'incomplete' && (
+                  <p className="text-[11px] font-bold text-amber-400 bg-amber-950/20 border border-amber-500/20 rounded-lg px-3 py-2">
+                    ⚠️ Incomplete - {s.member_id ? 'a member is linked but no role is set' : 'a role is set but no member is linked'},
+                    so the role grant won&apos;t trigger. Re-run /twitch_channel_set with both member and role to fix this.
+                  </p>
+                )}
 
                 <div className="pt-2 flex justify-end">
                   <button

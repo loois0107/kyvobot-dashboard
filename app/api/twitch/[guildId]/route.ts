@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { requireGuildAdministrator } from '@/lib/auth';
-import { computePollHealth } from '@/lib/twitchStatus';
+import { computePollHealth, computeRoleGrantStatus } from '@/lib/twitchStatus';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,6 +22,17 @@ async function fetchChannelName(channelId: string): Promise<string | null> {
   if (!res.ok) return null;
   const data = await res.json();
   return data.name || null;
+}
+
+async function fetchGuildRoles(guildId: string): Promise<{ id: string; name: string }[] | null> {
+  const botToken = process.env.DISCORD_BOT_TOKEN;
+  if (!botToken) return null;
+  const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/roles`, {
+    headers: { Authorization: `Bot ${botToken}` },
+    next: { revalidate: 30 },
+  });
+  if (!res.ok) return null;
+  return res.json();
 }
 
 async function fetchMemberDisplayName(guildId: string, userId: string): Promise<string | null> {
@@ -71,6 +82,8 @@ export async function GET(request: Request, ctx: { params: Promise<{ guildId: st
   }
 
   const streamerByBroadcasterId = new Map((streamers || []).map((s) => [s.broadcaster_id, s]));
+  const roles = await fetchGuildRoles(guildId);
+  const roleById = new Map((roles || []).map((r) => [r.id, r]));
 
   const result = await Promise.all(
     configs.map(async (cfg) => {
@@ -81,6 +94,7 @@ export async function GET(request: Request, ctx: { params: Promise<{ guildId: st
         fetchChannelName(cfg.announcement_channel_id),
         cfg.member_id ? fetchMemberDisplayName(guildId, cfg.member_id) : Promise.resolve(null),
       ]);
+      const liveRoleName = cfg.live_role_id ? (roleById.get(cfg.live_role_id)?.name || `Unknown role (${cfg.live_role_id})`) : null;
 
       return {
         broadcaster_id: cfg.broadcaster_id,
@@ -91,6 +105,8 @@ export async function GET(request: Request, ctx: { params: Promise<{ guildId: st
         minutes_since_last_check: health.minutesSinceLastCheck,
         announcement_channel_id: cfg.announcement_channel_id,
         announcement_channel_name: channelName,
+        live_role_name: liveRoleName,
+        role_grant_status: computeRoleGrantStatus(cfg.member_id, cfg.live_role_id),
         member_id: cfg.member_id,
         member_display_name: memberName,
         live_role_id: cfg.live_role_id,
