@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { requireGuildAdmin } from '@/lib/auth';
-import { validatePartyGamePreset, checkPresetCountCap } from '@/lib/partyPresets';
+import { validatePartyGamePreset, checkPresetCountCap, checkDuplicateName } from '@/lib/partyPresets';
 import { validateThumbnailUrl } from '@/lib/partyThumbnail';
 
 export const dynamic = 'force-dynamic';
@@ -70,10 +70,18 @@ export async function POST(request: Request, ctx: { params: Promise<{ guildId: s
     return NextResponse.json({ status: 'error', message: fetchError.message }, { status: 500 });
   }
 
-  const isNewPreset = !(existingRows || []).some((r) => r.game_name === preset.game_name);
-  const capCheck = checkPresetCountCap((existingRows || []).length, isNewPreset);
+  const existingNames = (existingRows || []).map((r) => r.game_name);
+  const isNewPreset = !existingNames.includes(preset.game_name);
+  const capCheck = checkPresetCountCap(existingNames.length, isNewPreset);
   if (!capCheck.ok) {
     return NextResponse.json({ status: 'error', message: capCheck.error }, { status: 400 });
+  }
+
+  // 🛡️ "조용히 범위 밖 값을 허용하지 않는다" 원칙 - 대소문자만 다른 프리셋이 경고 없이 따로
+  // 만들어지던 문제. 정확히 같은 이름(자기 자신 수정)은 통과시키고, 대소문자만 다른 새 이름만 거부한다.
+  const duplicateCheck = checkDuplicateName(existingNames, preset.game_name);
+  if (!duplicateCheck.ok) {
+    return NextResponse.json({ status: 'error', message: duplicateCheck.error }, { status: 400 });
   }
 
   const { error: upsertError } = await supabase

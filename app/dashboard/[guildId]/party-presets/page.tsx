@@ -144,6 +144,9 @@ export default function PartyPresetsPage() {
         <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
           Saved looks members can pick from with /party_recruit game:... - {presets.length}/{PARTY_GAME_PRESET_MAX_COUNT} used
         </p>
+        <p className="text-[10px] text-[#57576F] mt-1 normal-case">
+          These control the look (color/description/thumbnail) of the recruitment card when a member picks this game.
+        </p>
       </header>
 
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
@@ -185,7 +188,11 @@ export default function PartyPresetsPage() {
             placeholder="e.g. League of Legends"
             className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5865F2] disabled:opacity-50"
           />
-          {isEditing && <p className="text-[10px] text-[#57576F]">Rename by deleting this preset and creating a new one.</p>}
+          {isEditing ? (
+            <p className="text-[10px] text-[#57576F]">Rename by deleting this preset and creating a new one.</p>
+          ) : (
+            <p className="text-[10px] text-[#57576F]">대소문자까지 정확히 일치해야 같은 프리셋으로 인식돼요 - 자동완성 목록에서 골라 쓰는 걸 권장해요.</p>
+          )}
         </div>
 
         <div className="space-y-1.5">
@@ -228,6 +235,7 @@ export default function PartyPresetsPage() {
             placeholder="https://..."
             className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#5865F2]"
           />
+          <p className="text-[10px] text-[#57576F]">저장 시 실제로 접근 가능한 이미지인지 확인해요 - 이미지가 아니거나 응답이 없으면 저장이 거부돼요.</p>
         </div>
 
         <div className="flex gap-3 pt-2">

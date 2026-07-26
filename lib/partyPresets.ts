@@ -75,3 +75,26 @@ export function checkPresetCountCap(currentCount: number, isNewPreset: boolean):
   }
   return { ok: true };
 }
+
+/**
+ * 저장하려는 game_name이 기존 프리셋과 대소문자만 다른 채로 충돌하는지 검사한다 - party.py의
+ * _get_game_preset는 정확한 대소문자 일치로 조회하므로("League of Legends" ≠ "league of legends"),
+ * 대소문자만 다른 두 프리셋이 아무 경고 없이 따로 만들어지던 문제였다.
+ *
+ * 정확히 같은 문자열(대소문자까지 동일)은 "같은 프리셋을 수정하는 것"으로 취급해 충돌이 아니다 -
+ * 이 페이지는 수정 중엔 이름 입력을 비활성화하므로, 수정 저장은 항상 자기 자신과 완전히 같은
+ * 문자열로 들어온다.
+ */
+export function checkDuplicateName(existingNames: string[], gameName: string): CapCheckResult {
+  if (existingNames.includes(gameName)) {
+    return { ok: true }; // 정확히 같은 이름 - 자기 자신 수정
+  }
+  const conflict = existingNames.find((name) => name.toLowerCase() === gameName.toLowerCase());
+  if (conflict) {
+    return {
+      ok: false,
+      error: `A preset with a similar name already exists ("${conflict}"). Preset names are case-sensitive but must be distinct - please use a different name or edit the existing one.`,
+    };
+  }
+  return { ok: true };
+}
