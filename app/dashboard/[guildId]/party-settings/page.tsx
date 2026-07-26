@@ -32,6 +32,9 @@ export default function PartySettingsPage() {
   const [gameName, setGameName] = useState(DEFAULT_PARTY_SETTINGS.game_name);
   const [cardThumbnailUrl, setCardThumbnailUrl] = useState('https://64.media.tumblr.com/1847d62bf566d47632f841c2ac0583ee/a72c90eea4141e92-5e/s1280x1920/c3d5902f839874fc3be572aaef35c47470bce4df.png');
 
+  const [weeklyReportEnabled, setWeeklyReportEnabled] = useState(false);
+  const [weeklyReportChannelId, setWeeklyReportChannelId] = useState('');
+
   useEffect(() => {
     if (!guildId) return;
     loadData();
@@ -50,7 +53,10 @@ export default function PartySettingsPage() {
     setLoadStatus('loading');
     setLoadErrorMsg('');
     try {
-      const res = await fetch(`/api/party-settings/${guildId}`);
+      const [res, reportRes] = await Promise.all([
+        fetch(`/api/party-settings/${guildId}`),
+        fetch(`/api/weekly-report-settings/${guildId}`),
+      ]);
       if (!res.ok) {
         setLoadErrorMsg(await extractErrorMessage(res));
         setLoadStatus('error');
@@ -64,6 +70,14 @@ export default function PartySettingsPage() {
       setChannelLifetimeHours(s.channel_lifetime_hours);
       setGameName(s.game_name || '');
       setCardThumbnailUrl(s.card_thumbnail_url || 'https://i.ibb.co/4wBTDHsz/R.jpg');
+
+      if (reportRes.ok) {
+        const reportData = await reportRes.json();
+        const r = reportData.weekly_report_settings || {};
+        setWeeklyReportEnabled(!!r.enabled);
+        setWeeklyReportChannelId(r.channel_id ? String(r.channel_id) : '');
+      }
+
       setIsDirty(false);
       setLoadStatus('loaded');
     } catch (err) {
@@ -74,25 +88,40 @@ export default function PartySettingsPage() {
   };
 
   const handleSave = async () => {
+    if (weeklyReportEnabled && !weeklyReportChannelId.trim()) {
+      showToast('Validation Error: Weekly Report Channel ID is missing.', 'error');
+      return;
+    }
+
     setIsSaving(true);
     try {
-      const res = await fetch(`/api/party-settings/${guildId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          card_color: cardColor,
-          card_description: cardDescription,
-          card_lifetime_minutes: cardLifetimeMinutes,
-          channel_lifetime_hours: channelLifetimeHours,
-          game_name: gameName,
-          card_thumbnail_url: cardThumbnailUrl,
+      const [res, reportRes] = await Promise.all([
+        fetch(`/api/party-settings/${guildId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            card_color: cardColor,
+            card_description: cardDescription,
+            card_lifetime_minutes: cardLifetimeMinutes,
+            channel_lifetime_hours: channelLifetimeHours,
+            game_name: gameName,
+            card_thumbnail_url: cardThumbnailUrl,
+          }),
         }),
-      });
-      if (res.ok) {
+        fetch(`/api/weekly-report-settings/${guildId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            enabled: weeklyReportEnabled,
+            channel_id: weeklyReportChannelId.trim(),
+          }),
+        }),
+      ]);
+      if (res.ok && reportRes.ok) {
         showToast('Party settings saved! New recruitments will use these.', 'success');
         setIsDirty(false);
       } else {
-        showToast(await extractErrorMessage(res), 'error');
+        showToast(await extractErrorMessage(res.ok ? reportRes : res), 'error');
       }
     } catch (err) {
       console.error(err);
@@ -253,6 +282,37 @@ export default function PartySettingsPage() {
             value={channelLifetimeHours}
             onChange={(e) => { setChannelLifetimeHours(parseInt(e.target.value) || 0); setIsDirty(true); }}
             className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]"
+          />
+        </div>
+      </div>
+
+      <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
+        <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+          📊 Weekly Report
+        </h3>
+        <p className="text-[10px] text-[#57576F]">
+          Every Monday morning (KST), post a recap of the week's top party MVP, most-picked game, and best duo combo.
+        </p>
+
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-black text-white cursor-pointer" htmlFor="weekly-report-toggle">Enable Weekly Report</label>
+          <input
+            id="weekly-report-toggle"
+            type="checkbox"
+            checked={weeklyReportEnabled}
+            onChange={(e) => { setWeeklyReportEnabled(e.target.checked); setIsDirty(true); }}
+            className="w-4 h-4 accent-[#5865F2] cursor-pointer"
+          />
+        </div>
+
+        <div className="space-y-1.5 pt-2">
+          <label className="text-xs font-bold text-[#b5bac1]">Report Channel ID</label>
+          <input
+            type="text"
+            placeholder="e.g. 115072034920..."
+            value={weeklyReportChannelId}
+            onChange={(e) => { setWeeklyReportChannelId(e.target.value.replace(/[^0-9]/g, '')); setIsDirty(true); }}
+            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#5865F2]"
           />
         </div>
       </div>
