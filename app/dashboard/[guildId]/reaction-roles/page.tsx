@@ -70,6 +70,7 @@ export default function ReactionRolesPage() {
   const [roleId, setRoleId] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState<{ dangerous: string[] } | null>(null);
+  const [duplicateConfirm, setDuplicateConfirm] = useState<{ existing: Binding } | null>(null);
 
   useEffect(() => {
     if (!guildId) return;
@@ -114,6 +115,22 @@ export default function ReactionRolesPage() {
     setEmoji('');
     setRoleId('');
     setConfirmDialog(null);
+    setDuplicateConfirm(null);
+  };
+
+  // 🛡️ 같은 채널+메시지+이모지로 다시 만들면 봇 쪽 upsert(on_conflict="message_id,emoji")가 기존
+  // 매핑을 아무 경고 없이 대체한다 - 저장 전에 여기서 먼저 알려준다.
+  const findExistingBinding = (): Binding | null => {
+    return bindings.find((b) => b.channel_id === channelId && b.message_id === messageId && b.emoji === emoji) || null;
+  };
+
+  const handleCreateClick = () => {
+    const existing = findExistingBinding();
+    if (existing) {
+      setDuplicateConfirm({ existing });
+      return;
+    }
+    submitBinding(false);
   };
 
   const handlePreview = async () => {
@@ -208,7 +225,7 @@ export default function ReactionRolesPage() {
       <header className="border-b border-[#2b2d31] pb-6">
         <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">🎭 Reaction Roles</h1>
         <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
-          React to gain a role, unreact to lose it
+          React to gain a role, unreact to lose it. Works on any message Kyvo can see - pick the channel/message below, then choose which emoji maps to which role.
         </p>
       </header>
 
@@ -239,6 +256,7 @@ export default function ReactionRolesPage() {
             />
           </div>
         </div>
+        <p className="text-[10px] text-[#57576F]">메시지를 우클릭 → Copy Message Link 하면 URL 끝 두 숫자가 각각 채널 ID, 메시지 ID예요.</p>
 
         <button
           type="button"
@@ -273,6 +291,7 @@ export default function ReactionRolesPage() {
                   placeholder="🎮"
                   className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2]"
                 />
+                <p className="text-[10px] text-[#57576F]">유니코드 이모지는 그냥 붙여넣으면 되고, 커스텀 이모지는 디스코드에서 이모지를 우클릭 → Copy Emoji로 얻은 &lt;:name:id&gt; 형식 그대로 붙여넣으세요.</p>
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-[#b5bac1]">Role</label>
@@ -286,12 +305,13 @@ export default function ReactionRolesPage() {
                     <option key={r.id} value={r.id}>{r.name}</option>
                   ))}
                 </select>
+                <p className="text-[10px] text-[#57576F]">@everyone과 다른 봇이 연동한 역할은 목록에서 자동으로 빠져있어요.</p>
               </div>
             </div>
 
             <button
               type="button"
-              onClick={() => submitBinding(false)}
+              onClick={handleCreateClick}
               disabled={!emoji || !roleId || isSaving}
               className="bg-[#23A55A] hover:bg-[#1a7f43] disabled:opacity-50 text-white text-xs font-black px-6 py-3 rounded-xl"
             >
@@ -319,6 +339,29 @@ export default function ReactionRolesPage() {
                 className="bg-red-600 hover:bg-red-500 text-white text-xs font-black px-5 py-2 rounded-lg"
               >
                 Confirm & Save Anyway
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {duplicateConfirm && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#1e1f22] border border-orange-500/50 rounded-2xl p-6 max-w-md w-full space-y-4">
+            <h3 className="text-orange-400 font-black text-sm">⚠️ Binding Already Exists</h3>
+            <p className="text-xs text-[#b5bac1]">
+              이 메시지의 이 이모지엔 이미 <span className="text-white font-bold">{duplicateConfirm.existing.role_name}</span> 역할이 연결되어 있어요 - 계속하면 기존 매핑을 대체합니다.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button type="button" onClick={() => setDuplicateConfirm(null)} className="text-xs font-bold text-gray-400 hover:text-white px-4 py-2">
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => { setDuplicateConfirm(null); submitBinding(false); }}
+                className="bg-red-600 hover:bg-red-500 text-white text-xs font-black px-5 py-2 rounded-lg"
+              >
+                Replace Existing Binding
               </button>
             </div>
           </div>

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireGuildAdministrator } from '@/lib/auth';
+import { verifyChannelBelongsToGuild } from '@/lib/reactionRoles';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,6 +24,20 @@ export async function GET(request: Request, ctx: { params: Promise<{ guildId: st
   const botToken = process.env.DISCORD_BOT_TOKEN;
   if (!botToken) {
     return NextResponse.json({ status: 'error', message: 'Server configuration error (missing bot token).' }, { status: 500 });
+  }
+
+  // 🛡️ channel_id가 실제로 이 guildId 소속인지 먼저 확인한다 - 안 그러면 봇이 속한 다른 서버의
+  // channel_id+message_id를 아는 사람이 그 서버 메시지를 미리볼 수 있다(크로스-테넌트 유출).
+  const channelRes = await fetch(`https://discord.com/api/v10/channels/${channelId}`, {
+    headers: { Authorization: `Bot ${botToken}` },
+  });
+  const channelData = channelRes.ok ? await channelRes.json() : null;
+  const channelCheck = verifyChannelBelongsToGuild(channelData, guildId);
+  if (!channelCheck.ok) {
+    const message = channelCheck.reason === 'guild_mismatch'
+      ? "That channel doesn't belong to this server."
+      : 'That channel could not be found.';
+    return NextResponse.json({ status: 'error', message }, { status: channelCheck.reason === 'guild_mismatch' ? 403 : 404 });
   }
 
   const res = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages/${messageId}`, {
