@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { invalidateGuildSettings } from "@/lib/redis";
-import { verifyGuildAdmin } from "@/lib/auth";
+import { requireGuildAdministrator } from "@/lib/auth";
+import { validateCustomCommands } from "@/lib/customCommandsSettings";
 
 /** Creates a server-only Supabase client on demand to prevent build-time crashes. */
 const getSupabaseClient = () => {
@@ -50,9 +51,11 @@ export async function GET(
       return NextResponse.json({ error: "Invalid server ID." }, { status: 400 });
     }
 
-    if (!(await verifyGuildAdmin(guildId))) {
-      return NextResponse.json({ error: "Unauthorized access blocked." }, { status: 403 });
-    }
+    // 🛡️ 봇의 /cc_add·/cc_delete는 has_permissions(administrator=True)를 요구한다 - 서버 관리
+    // 권한만 있고 관리자 권한은 없는 유저가 슬래시 커맨드로는 매크로를 못 만드는데 대시보드로는
+    // 만들 수 있는 구멍을 막기 위해 이 라우트도 동일한 기준(requireGuildAdministrator)을 쓴다.
+    const blocked = await requireGuildAdministrator(guildId);
+    if (blocked) return blocked;
 
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
@@ -89,13 +92,21 @@ export async function POST(
       return NextResponse.json({ error: "Invalid server ID." }, { status: 400 });
     }
 
-    if (!(await verifyGuildAdmin(guildId))) {
-      return NextResponse.json({ error: "Unauthorized. Permission denied." }, { status: 403 });
-    }
+    const blocked = await requireGuildAdministrator(guildId);
+    if (blocked) return blocked;
 
     const settings = sanitizeBody(await req.json());
     if (Object.keys(settings).length === 0) {
       return NextResponse.json({ error: "No valid settings to update." }, { status: 400 });
+    }
+
+    // 🛡️ "조용히 범위 밖 값을 허용하지 않는다" 원칙 - 매크로 개수/트리거 길이/응답 길이(디스코드
+    // 2,000자 제한) 전부 지금까지 검증이 없었다. custom_commands가 이번 요청에 실려온 경우에만 검사한다.
+    if ("custom_commands" in settings) {
+      const validation = validateCustomCommands(settings.custom_commands as Record<string, unknown>);
+      if (!validation.valid) {
+        return NextResponse.json({ error: validation.errors!.join(' ') }, { status: 400 });
+      }
     }
 
     const supabase = getSupabaseClient();
