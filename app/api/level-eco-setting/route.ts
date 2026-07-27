@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { requireGuildAdmin } from '@/lib/auth';
 import { invalidateGuildSettings } from '@/lib/redis';
 import { validateLevelingEconomySettings } from '@/lib/levelingEconomySettings';
+import { validateWelcomeSettings } from '@/lib/welcomeSettings';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,6 +49,7 @@ export async function GET(request: Request) {
       economy_settings: botSettings.economy_settings || { currency_name: 'Points', min_bet: 10, shop_items: [] },
       goodbye_enabled: botSettings.goodbye_enabled ?? false,
       goodbye_channel_id: botSettings.goodbye_channel_id ?? null,
+      goodbye_message: botSettings.goodbye_message ?? '',
       welcome_settings: botSettings.welcome_settings || {},
     };
 
@@ -67,6 +69,7 @@ export async function POST(request: Request) {
       economy_settings,
       goodbye_enabled,
       goodbye_channel_id,
+      goodbye_message,
       welcome_settings,
     } = body;
 
@@ -78,6 +81,18 @@ export async function POST(request: Request) {
     const validation = validateLevelingEconomySettings(leveling_settings, economy_settings);
     if (!validation.valid) {
       return NextResponse.json({ error: validation.errors!.join(' ') }, { status: 400 });
+    }
+
+    // 🛡️ channel_id/card_color/card_bg_color 형식이 깨지면 on_member_join이 매 멤버 입장마다
+    // 조용히 실패한다(try/except는 이제 있지만, 그래도 "저장 자체를 막는" 게 훨씬 낫다).
+    const welcomeValidation = validateWelcomeSettings({
+      channel_id: welcome_settings?.channel_id,
+      goodbye_channel_id,
+      card_color: welcome_settings?.card_color,
+      card_bg_color: welcome_settings?.card_bg_color,
+    });
+    if (!welcomeValidation.valid) {
+      return NextResponse.json({ error: welcomeValidation.errors!.join(' ') }, { status: 400 });
     }
 
     const supabase = connectSupabase();
@@ -102,6 +117,7 @@ export async function POST(request: Request) {
       economy_settings: economy_settings || currentSettings.economy_settings || { currency_name: 'Points', min_bet: 10, shop_items: [] },
       goodbye_enabled: goodbye_enabled !== undefined ? Boolean(goodbye_enabled) : (currentSettings.goodbye_enabled ?? false),
       goodbye_channel_id: goodbye_channel_id !== undefined ? goodbye_channel_id : (currentSettings.goodbye_channel_id ?? null),
+      goodbye_message: goodbye_message !== undefined ? String(goodbye_message) : (currentSettings.goodbye_message ?? ''),
       welcome_settings: welcome_settings || currentSettings.welcome_settings || {},
     };
 

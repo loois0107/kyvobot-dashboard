@@ -22,6 +22,7 @@ export default function WelcomeSettings() {
   // 📤 👑 기능 불일치 해결: 퇴장 인사(Goodbye) 제어 상태 추가
   const [goodbyeEnabled, setGoodbyeEnabled] = useState(false);
   const [goodbyeChannelId, setGoodbyeChannelId] = useState('');
+  const [goodbyeMessage, setGoodbyeMessage] = useState('');
 
   // 🎨 High-Performance Design Matrix States
   const [cardColor, setCardColor] = useState('#5865F2');
@@ -62,6 +63,7 @@ export default function WelcomeSettings() {
         if (data) {
           setGoodbyeEnabled(!!data.goodbye_enabled);
           setGoodbyeChannelId(data.goodbye_channel_id ? String(data.goodbye_channel_id) : '');
+          setGoodbyeMessage(data.goodbye_message ? String(data.goodbye_message) : '');
         }
 
         if (data && data.welcome_settings) {
@@ -107,6 +109,7 @@ export default function WelcomeSettings() {
           economy_settings: originalData.economy_settings || {},
           goodbye_enabled: Boolean(goodbyeEnabled),
           goodbye_channel_id: String(goodbyeChannelId).trim(),
+          goodbye_message: String(goodbyeMessage).trim(),
           welcome_settings: {
             enabled: Boolean(enabled),
             channel_id: String(channelId).trim(),
@@ -183,10 +186,11 @@ export default function WelcomeSettings() {
               </div>
               <div className="space-y-1 pt-1 border-t border-[#2b2d31]/40">
                 <label className="text-[10px] font-bold text-[#b5bac1] uppercase block">🎯 Welcome Channel ID</label>
-                <input type="text" placeholder="e.g. 115072034920..." value={channelId} 
+                <input type="text" placeholder="e.g. 115072034920..." value={channelId}
                   onChange={(e) => { setChannelId(e.target.value.replace(/[^0-9]/g, '')); setIsDirty(true); }}
-                  className="w-full bg-[#1e1f22] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#5865F2]" 
+                  className="w-full bg-[#1e1f22] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#5865F2]"
                 />
+                <p className="text-[10px] text-[#57576F] normal-case">멤버가 서버에 들어올 때마다 이 채널에 환영 카드 이미지+임베드가 자동 발송돼요.</p>
               </div>
             </div>
 
@@ -197,10 +201,24 @@ export default function WelcomeSettings() {
               </div>
               <div className="space-y-1 pt-1 border-t border-[#2b2d31]/40">
                 <label className="text-[10px] font-bold text-[#b5bac1] uppercase block">📡 Goodbye Channel ID</label>
-                <input type="text" placeholder="e.g. 115072034920..." value={goodbyeChannelId} 
+                <input type="text" placeholder="e.g. 115072034920..." value={goodbyeChannelId}
                   onChange={(e) => { setGoodbyeChannelId(e.target.value.replace(/[^0-9]/g, '')); setIsDirty(true); }}
-                  className="w-full bg-[#1e1f22] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-red-500" 
+                  className="w-full bg-[#1e1f22] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-red-500"
                 />
+                <p className="text-[10px] text-[#57576F] normal-case">멤버가 나갈 때마다 이 채널에 퇴장 알림 임베드가 발송돼요.</p>
+              </div>
+              <div className="space-y-1 pt-1 border-t border-[#2b2d31]/40">
+                <label className="text-[10px] font-bold text-[#b5bac1] uppercase block">💬 Goodbye Message</label>
+                <textarea
+                  value={goodbyeMessage}
+                  onChange={(e) => { setGoodbyeMessage(e.target.value); setIsDirty(true); }}
+                  rows={2}
+                  placeholder="Has disconnected from the grid."
+                  className="w-full bg-[#1e1f22] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-red-500"
+                />
+                <p className="text-[10px] text-[#57576F] normal-case">
+                  {'{username}'}, {'{server}'}, {'{member_count}'}를 쓸 수 있어요 - 실제 발송 시 그대로 치환돼요. 비워두면 기본 문구로 돌아가요.
+                </p>
               </div>
             </div>
           </div>
@@ -222,6 +240,7 @@ export default function WelcomeSettings() {
             <div className="space-y-1.5 pt-2">
               <label className="text-xs font-bold text-[#b5bac1] flex justify-between"><span>Vanguard Overlay Opacity Matrix</span><span className="text-[#5865F2] font-mono">{Math.round(overlayOpacity * 100)}%</span></label>
               <input type="range" min="0.0" max="1.0" step="0.05" value={overlayOpacity} onChange={(e) => { setOverlayOpacity(parseFloat(e.target.value)); setIsDirty(true); }} className="w-full h-1 bg-[#232428] rounded-lg appearance-none cursor-pointer accent-[#5865F2]" />
+              <p className="text-[10px] text-[#57576F]">배경 이미지 위에 깔리는 어두운 막의 농도예요 - 텍스트 가독성용이에요.</p>
             </div>
 
             <div className="space-y-2 pt-2">
@@ -240,6 +259,7 @@ export default function WelcomeSettings() {
               </div>
               <div className="pt-1">
                 <input type="text" value={backgroundUrl} onChange={(e) => { setBackgroundUrl(e.target.value); setIsDirty(true); }} placeholder="Paste external secure image direct link here..." className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5865F2]" />
+                <p className="text-[10px] text-[#57576F] pt-1">이미지를 못 불러오면(5초 타임아웃) 자동으로 단색 배경으로 대체돼요 - 카드 발송 자체는 안 끊겨요.</p>
               </div>
             </div>
 
