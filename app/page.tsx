@@ -1,12 +1,21 @@
+import { cookies } from 'next/headers';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
+import { COOKIE_NAME, dictionaries, resolveInitialLanguage } from '@/lib/i18n';
 
 export default async function RootPage() {
+  // 🛡️ [다국어] 이 페이지는 서버 컴포넌트라 useT() 훅(클라이언트 Context)을 못 쓴다 - 루트
+  // 레이아웃과 동일한 방식으로 쿠키/Discord locale을 직접 계산해서 사전을 바로 조회한다.
+  const cookieStore = await cookies();
+
   // 1) Next-Auth Session Verification
   const session = await auth();
   if (!session?.user) {
     redirect('/api/auth/signin');
   }
+
+  const lang = resolveInitialLanguage(cookieStore.get(COOKIE_NAME)?.value, (session.user as any)?.discordLocale);
+  const t = dictionaries[lang];
 
   const accessToken = (session as any).accessToken;
 
@@ -19,7 +28,7 @@ export default async function RootPage() {
   if (!res.ok) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#111214] text-red-400 font-mono p-8 text-center">
-        ⚠️ Failed to load your Discord server list. Please re-authenticate your session.
+        {t.landingPage.guildListFailed}
       </div>
     );
   }
@@ -41,8 +50,8 @@ export default async function RootPage() {
   if (managed.length === 0) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#111214] text-gray-400 font-mono p-8 text-center flex-col gap-2">
-        <p className="text-lg font-bold text-white">🛡️ Kyvo Control Hub</p>
-        <p>No Discord servers found where you have management permissions.</p>
+        <p className="text-lg font-bold text-white">{t.landingPage.controlHubTitle}</p>
+        <p>{t.landingPage.noManagedServers}</p>
       </div>
     );
   }

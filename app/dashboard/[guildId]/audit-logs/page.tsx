@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import { useT } from '@/lib/i18n/LanguageContext';
 
 interface AuditLog {
   id: string;
@@ -23,6 +24,7 @@ function actionBadgeColor(action: string): string {
 
 export default function AuditLogsPage() {
   const params = useParams();
+  const t = useT();
   const guildId = (params?.guildId as string) || '';
 
   const [loadStatus, setLoadStatus] = useState<LoadStatus>('loading');
@@ -38,9 +40,9 @@ export default function AuditLogsPage() {
   const extractErrorMessage = async (res: Response): Promise<string> => {
     try {
       const data = await res.json();
-      return data.message || `Request failed (${res.status})`;
+      return data.message || t('common.requestFailed', { status: res.status });
     } catch {
-      return `Request failed (${res.status})`;
+      return t('common.requestFailed', { status: res.status });
     }
   };
 
@@ -60,7 +62,7 @@ export default function AuditLogsPage() {
       setLoadStatus('loaded');
     } catch (err) {
       console.error(err);
-      setLoadErrorMsg('Network error while loading audit logs.');
+      setLoadErrorMsg(t('auditLogsPage.networkError'));
       setLoadStatus('error');
     } finally {
       setIsRefreshing(false);
@@ -70,7 +72,7 @@ export default function AuditLogsPage() {
   if (loadStatus === 'loading') {
     return (
       <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-sm">
-        Loading audit logs...
+        {t('auditLogsPage.loadingLogs')}
       </div>
     );
   }
@@ -78,14 +80,14 @@ export default function AuditLogsPage() {
   if (loadStatus === 'error') {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
-        <p className="text-red-400 font-bold">⚠️ Failed to load audit logs</p>
+        <p className="text-red-400 font-bold">{t('auditLogsPage.loadFailed')}</p>
         <p className="text-sm text-[#949ba4]">{loadErrorMsg}</p>
         <button
           type="button"
           onClick={() => loadData(false)}
           className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl"
         >
-          Retry
+          {t('common.retry')}
         </button>
       </div>
     );
@@ -95,9 +97,9 @@ export default function AuditLogsPage() {
     <div className="max-w-3xl mx-auto space-y-6 pb-16">
       <header className="border-b border-[#2b2d31] pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">🛡️ Audit Logs</h1>
+          <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('auditLogsPage.title')}</h1>
           <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
-            Most recent 25 automod actions - always bot-driven, there's no human moderator field
+            {t('auditLogsPage.subtitle')}
           </p>
         </div>
         <button
@@ -106,13 +108,13 @@ export default function AuditLogsPage() {
           disabled={isRefreshing}
           className="w-full sm:w-auto bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all"
         >
-          {isRefreshing ? 'REFRESHING...' : 'REFRESH NOW'}
+          {isRefreshing ? t('auditLogsPage.refreshing') : t('auditLogsPage.refreshNow')}
         </button>
       </header>
 
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-3 shadow-xl">
         {logs.length === 0 ? (
-          <p className="text-sm text-[#949ba4] py-4">📭 No automod actions recorded yet.</p>
+          <p className="text-sm text-[#949ba4] py-4">{t('auditLogsPage.noLogsYet')}</p>
         ) : (
           <div className="space-y-2">
             {logs.map((log) => (
@@ -123,7 +125,7 @@ export default function AuditLogsPage() {
                       {log.action}
                     </span>
                     <span className="text-xs text-[#b5bac1] truncate">
-                      Target: <code className="text-white">{log.user_id}</code>
+                      {t('auditLogsPage.targetLabel')} <code className="text-white">{log.user_id}</code>
                     </span>
                   </div>
                   <span className="text-[10px] text-[#57576F] shrink-0">

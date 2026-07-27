@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
+import { useT } from '@/lib/i18n/LanguageContext';
 
 interface PendingReport {
   id: number;
@@ -17,6 +18,7 @@ type DecisionAction = 'approve' | 'reject' | 'block';
 export default function AnonymousReportsSettingsPage() {
   const params = useParams();
   const { showToast } = useToast();
+  const t = useT();
   const guildId = params?.guildId as string | undefined;
 
   const [adminChannelId, setAdminChannelId] = useState('');
@@ -44,14 +46,14 @@ export default function AnonymousReportsSettingsPage() {
           setAdminChannelId(data.anonymous_reports_settings?.admin_channel_id || '');
           setPublishChannelId(data.anonymous_reports_settings?.publish_channel_id || '');
         } else {
-          setMessage(`Load failed [${res.status}]: ${data.error || 'Unknown error.'}`);
+          setMessage(`${t('anonymousReportsPage.loadFailedPrefix')} [${res.status}]: ${data.error || t('anonymousReportsPage.unknownError')}`);
         }
         setLoading(false);
         setHasLoaded(true);
       })
       .catch((err) => {
         console.error(err);
-        setMessage('Failed to fetch settings.');
+        setMessage(t('anonymousReportsPage.fetchSettingsFailed'));
         setLoading(false);
         setHasLoaded(true);
       });
@@ -70,7 +72,7 @@ export default function AnonymousReportsSettingsPage() {
       const res = await fetch(`/api/anonymous-reports/${guildId}`);
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setQueueErrorMsg(data.message || `Request failed (${res.status})`);
+        setQueueErrorMsg(data.message || t('common.requestFailed', { status: res.status }));
         setQueueStatus('error');
         return;
       }
@@ -79,7 +81,7 @@ export default function AnonymousReportsSettingsPage() {
       setQueueStatus('loaded');
     } catch (err) {
       console.error(err);
-      setQueueErrorMsg('Network error while loading the queue.');
+      setQueueErrorMsg(t('anonymousReportsPage.queueLoadNetworkError'));
       setQueueStatus('error');
     }
   };
@@ -97,13 +99,13 @@ export default function AnonymousReportsSettingsPage() {
       });
       if (res.ok) {
         showToast(
-          action === 'approve' ? 'Report approved and published.' : action === 'reject' ? 'Report rejected.' : 'Report rejected and reporter blocked.',
+          action === 'approve' ? t('anonymousReportsPage.reportApproved') : action === 'reject' ? t('anonymousReportsPage.reportRejected') : t('anonymousReportsPage.reportRejectedBlocked'),
           'success'
         );
         setReports((prev) => prev.filter((r) => r.id !== reportId));
       } else {
         const data = await res.json().catch(() => ({}));
-        showToast(data.message || `Request failed (${res.status})`, 'error');
+        showToast(data.message || t('common.requestFailed', { status: res.status }), 'error');
         if (res.status === 409) {
           // 다른 경로(디스코드 버튼 등)가 이미 처리했다는 뜻 - 목록을 새로 맞춘다.
           await loadQueue();
@@ -111,7 +113,7 @@ export default function AnonymousReportsSettingsPage() {
       }
     } catch (err) {
       console.error(err);
-      showToast('Network error while processing this report.', 'error');
+      showToast(t('anonymousReportsPage.decideNetworkError'), 'error');
     } finally {
       setDecidingId(null);
     }
@@ -134,13 +136,13 @@ export default function AnonymousReportsSettingsPage() {
       const data = await res.json();
 
       if (res.ok && data.ok) {
-        setMessage('Settings saved successfully.');
+        setMessage(t('anonymousReportsPage.saveSettingsSuccess'));
       } else {
-        setMessage(`Save failed [${res.status}]: ${data.error || 'Unknown error.'}`);
+        setMessage(`${t('anonymousReportsPage.saveFailedPrefix')} [${res.status}]: ${data.error || t('anonymousReportsPage.unknownError')}`);
       }
     } catch (err) {
       console.error(err);
-      setMessage('Failed to save settings.');
+      setMessage(t('anonymousReportsPage.saveSettingsFailed'));
     } finally {
       setLoading(false);
     }
@@ -151,9 +153,9 @@ export default function AnonymousReportsSettingsPage() {
       <div className="max-w-2xl mx-auto">
         <header className="mb-8 border-b border-[#2A1F40] pb-4 flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-extrabold text-purple-400">🌳 ANONYMOUS REPORTS</h1>
+            <h1 className="text-2xl font-extrabold text-purple-400">{t('anonymousReportsPage.title')}</h1>
             <p className="text-xs text-[#57576F] mt-1">
-              Configure where anonymous reports are reviewed and published. Reporter identity is never shown to admins.
+              {t('anonymousReportsPage.subtitle')}
             </p>
           </div>
           {hasLoaded && (
@@ -164,54 +166,51 @@ export default function AnonymousReportsSettingsPage() {
                   : 'bg-amber-950/40 text-amber-400 border border-amber-500/30'
               }`}
             >
-              {isConfigured ? '✅ ACTIVE' : '⚠️ NOT CONFIGURED'}
+              {isConfigured ? t('anonymousReportsPage.active') : t('anonymousReportsPage.notConfigured')}
             </span>
           )}
         </header>
 
         <div className="flex flex-col gap-6 bg-[#161626] border border-[#2A1F40] p-6 rounded-xl shadow-xl">
           <div>
-            <label className="text-xs text-gray-400 block mb-1">ACTIVE CONTEXT</label>
+            <label className="text-xs text-gray-400 block mb-1">{t('common.activeContext')}</label>
             <div className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-purple-400 px-3 py-2 rounded font-bold select-none">
-              Guild {guildId ? guildId : 'Loading...'}
+              {t('common.guildLabel')} {guildId ? guildId : t('common.loading')}
             </div>
           </div>
 
           <div className="bg-[#0F0F1A] border border-[#2A1F40] rounded-lg p-3 text-[11px] text-gray-300 leading-relaxed">
-            Members submit reports via <span className="text-purple-300">/anonymous_report</span>. Each one goes to the
-            <span className="text-purple-300"> admin channel</span> with Approve / Reject / Block buttons - reporter identity
-            is stored in the database but never shown here. Approved reports are posted anonymously to the
-            <span className="text-purple-300"> publish channel</span>.
+            {t('anonymousReportsPage.explainer')}
           </div>
 
           <div>
-            <label className="text-xs text-gray-400 block mb-1">ADMIN REVIEW CHANNEL ID</label>
+            <label className="text-xs text-gray-400 block mb-1">{t('anonymousReportsPage.adminChannelLabel')}</label>
             <input
               type="text"
               value={adminChannelId}
               onChange={(e) => setAdminChannelId(e.target.value)}
               disabled={loading}
-              placeholder="e.g. 1234567890123456789"
+              placeholder={t('common.egPlaceholderId')}
               className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-white px-3 py-2 rounded focus:outline-none focus:border-[#5865f2] disabled:opacity-50"
             />
-            <p className="text-[10px] text-[#57576F] mt-2">Required. Only admins/mods should have access to this channel.</p>
+            <p className="text-[10px] text-[#57576F] mt-2">{t('anonymousReportsPage.adminChannelHelp')}</p>
           </div>
 
           <div>
-            <label className="text-xs text-gray-400 block mb-1">PUBLIC PUBLISH CHANNEL ID</label>
+            <label className="text-xs text-gray-400 block mb-1">{t('anonymousReportsPage.publishChannelLabel')}</label>
             <input
               type="text"
               value={publishChannelId}
               onChange={(e) => setPublishChannelId(e.target.value)}
               disabled={loading}
-              placeholder="e.g. 1234567890123456789"
+              placeholder={t('common.egPlaceholderId')}
               className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-white px-3 py-2 rounded focus:outline-none focus:border-[#5865f2] disabled:opacity-50"
             />
             <p className="text-[10px] text-[#57576F] mt-2">
-              Where approved reports get posted anonymously (e.g. a "bamboo forest" channel). Optional - if left empty, approvals just won't publish anywhere.
+              {t('anonymousReportsPage.publishChannelHelp')}
             </p>
             <p className="text-[10px] text-[#57576F] mt-2">
-              How to find a channel ID: Discord Settings → Advanced → enable Developer Mode → right-click the channel → Copy Channel ID.
+              {t('anonymousReportsPage.findChannelIdHelp')}
             </p>
           </div>
 
@@ -226,32 +225,32 @@ export default function AnonymousReportsSettingsPage() {
             disabled={loading}
             className="w-full text-sm bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 text-white px-4 py-2 rounded font-bold"
           >
-            {loading ? 'Saving...' : 'Save'}
+            {loading ? t('common.saving') : t('common.save')}
           </button>
         </div>
 
         <div className="mt-8 flex flex-col gap-4 bg-[#161626] border border-[#2A1F40] p-6 rounded-xl shadow-xl">
           <div className="flex items-start justify-between gap-4 border-b border-[#2A1F40] pb-3">
             <div>
-              <h2 className="text-sm font-extrabold text-purple-400">📋 PENDING QUEUE</h2>
-              <p className="text-[10px] text-[#57576F] mt-1">Reporter identity is never shown here, same as the Discord admin channel.</p>
+              <h2 className="text-sm font-extrabold text-purple-400">{t('anonymousReportsPage.queueTitle')}</h2>
+              <p className="text-[10px] text-[#57576F] mt-1">{t('anonymousReportsPage.queueSubtitle')}</p>
             </div>
             <button type="button" onClick={loadQueue} className="shrink-0 text-[10px] font-bold text-purple-400 hover:underline">
-              Refresh
+              {t('common.refresh')}
             </button>
           </div>
 
           {queueStatus === 'loading' ? (
-            <p className="text-xs text-gray-400 py-4">Loading reports...</p>
+            <p className="text-xs text-gray-400 py-4">{t('anonymousReportsPage.loadingReports')}</p>
           ) : queueStatus === 'error' ? (
             <div className="text-center py-4 space-y-2">
               <p className="text-xs text-red-400">⚠️ {queueErrorMsg}</p>
               <button type="button" onClick={loadQueue} className="text-xs font-bold text-purple-400 hover:underline">
-                Retry
+                {t('common.retry')}
               </button>
             </div>
           ) : reports.length === 0 ? (
-            <p className="text-xs text-gray-400 py-4">📭 No pending reports.</p>
+            <p className="text-xs text-gray-400 py-4">{t('anonymousReportsPage.noPendingReports')}</p>
           ) : (
             <div className="flex flex-col gap-3">
               {reports.map((report) => {
@@ -268,7 +267,7 @@ export default function AnonymousReportsSettingsPage() {
                           disabled={isDeciding}
                           className="bg-green-700 hover:bg-green-600 disabled:opacity-50 text-white text-[10px] font-black px-3 py-1.5 rounded-lg transition-all"
                         >
-                          {isDeciding ? '...' : 'APPROVE'}
+                          {isDeciding ? t('anonymousReportsPage.deciding') : t('anonymousReportsPage.approve')}
                         </button>
                         <button
                           type="button"
@@ -276,7 +275,7 @@ export default function AnonymousReportsSettingsPage() {
                           disabled={isDeciding}
                           className="bg-[#2A1F40] hover:bg-[#3a2a58] disabled:opacity-50 text-white text-[10px] font-black px-3 py-1.5 rounded-lg transition-all"
                         >
-                          {isDeciding ? '...' : 'REJECT'}
+                          {isDeciding ? t('anonymousReportsPage.deciding') : t('anonymousReportsPage.reject')}
                         </button>
                         <button
                           type="button"
@@ -284,7 +283,7 @@ export default function AnonymousReportsSettingsPage() {
                           disabled={isDeciding}
                           className="bg-red-800 hover:bg-red-700 disabled:opacity-50 text-white text-[10px] font-black px-3 py-1.5 rounded-lg transition-all"
                         >
-                          {isDeciding ? '...' : 'BLOCK'}
+                          {isDeciding ? t('anonymousReportsPage.deciding') : t('anonymousReportsPage.block')}
                         </button>
                       </div>
                     </div>

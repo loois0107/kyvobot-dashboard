@@ -18,12 +18,14 @@ import {
   AUTOMOD_FORBIDDEN_WORDS_MAX_COUNT,
   DEFAULT_AUTOMOD_SETTINGS,
 } from '@/lib/automodSettings';
+import { useT } from '@/lib/i18n/LanguageContext';
 
 type LoadStatus = 'loading' | 'loaded' | 'error';
 
 export default function AutomodSettingsPage() {
   const params = useParams();
   const { showToast } = useToast();
+  const t = useT();
   const guildId = (params?.guildId as string) || '';
 
   const [loadStatus, setLoadStatus] = useState<LoadStatus>('loading');
@@ -46,9 +48,9 @@ export default function AutomodSettingsPage() {
   const extractErrorMessage = async (res: Response): Promise<string> => {
     try {
       const data = await res.json();
-      return data.message || `Request failed (${res.status})`;
+      return data.message || t('common.requestFailed', { status: res.status });
     } catch {
-      return `Request failed (${res.status})`;
+      return t('common.requestFailed', { status: res.status });
     }
   };
 
@@ -74,7 +76,7 @@ export default function AutomodSettingsPage() {
       setLoadStatus('loaded');
     } catch (err) {
       console.error(err);
-      setLoadErrorMsg('Network error while loading automod settings.');
+      setLoadErrorMsg(t('automodPage.loadNetworkError'));
       setLoadStatus('error');
     }
   };
@@ -95,14 +97,14 @@ export default function AutomodSettingsPage() {
         }),
       });
       if (res.ok) {
-        showToast('AutoMod settings saved!', 'success');
+        showToast(t('automodPage.saveSuccess'), 'success');
         setIsDirty(false);
       } else {
         showToast(await extractErrorMessage(res), 'error');
       }
     } catch (err) {
       console.error(err);
-      showToast('Network error while saving.', 'error');
+      showToast(t('automodPage.networkError'), 'error');
     } finally {
       setIsSaving(false);
     }
@@ -111,7 +113,7 @@ export default function AutomodSettingsPage() {
   if (loadStatus === 'loading') {
     return (
       <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-sm">
-        Loading AutoMod settings...
+        {t('automodPage.loading')}
       </div>
     );
   }
@@ -119,14 +121,14 @@ export default function AutomodSettingsPage() {
   if (loadStatus === 'error') {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
-        <p className="text-red-400 font-bold">⚠️ Failed to load AutoMod settings</p>
+        <p className="text-red-400 font-bold">{t('automodPage.loadFailed')}</p>
         <p className="text-sm text-[#949ba4]">{loadErrorMsg}</p>
         <button
           type="button"
           onClick={loadData}
           className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl"
         >
-          Retry
+          {t('common.retry')}
         </button>
       </div>
     );
@@ -138,9 +140,9 @@ export default function AutomodSettingsPage() {
     <div className="max-w-3xl mx-auto space-y-6 pb-28">
       <header className="border-b border-[#2b2d31] pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">🛡️ AutoMod Settings</h1>
+          <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('automodPage.title')}</h1>
           <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
-            Spam detection thresholds and forbidden word list
+            {t('automodPage.subtitle')}
           </p>
         </div>
         <button
@@ -149,18 +151,18 @@ export default function AutomodSettingsPage() {
           disabled={isSaving}
           className="w-full sm:w-auto bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all"
         >
-          {isSaving ? 'SAVING...' : 'SAVE'}
+          {isSaving ? t('common.saving') : t('common.save')}
         </button>
       </header>
 
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
         <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
-          Spam Detection
+          {t('automodPage.spamDetectionTitle')}
         </h3>
 
         <div className="space-y-1.5">
           <label className="text-xs font-bold text-[#b5bac1]">
-            Message Limit ({AUTOMOD_SPAM_LIMIT_MIN}-{AUTOMOD_SPAM_LIMIT_MAX} messages)
+            {t('automodPage.messageLimitLabel', { min: AUTOMOD_SPAM_LIMIT_MIN, max: AUTOMOD_SPAM_LIMIT_MAX })}
           </label>
           <input
             type="number"
@@ -170,12 +172,12 @@ export default function AutomodSettingsPage() {
             onChange={(e) => { setSpamLimit(parseInt(e.target.value) || 0); setIsDirty(true); }}
             className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]"
           />
-          <p className="text-[10px] text-[#57576F]">More than this many messages within the time window triggers automod.</p>
+          <p className="text-[10px] text-[#57576F]">{t('automodPage.messageLimitHelp')}</p>
         </div>
 
         <div className="space-y-1.5 pt-2">
           <label className="text-xs font-bold text-[#b5bac1]">
-            Time Window ({AUTOMOD_SPAM_INTERVAL_MIN_SECONDS}-{AUTOMOD_SPAM_INTERVAL_MAX_SECONDS} seconds)
+            {t('automodPage.timeWindowLabel', { min: AUTOMOD_SPAM_INTERVAL_MIN_SECONDS, max: AUTOMOD_SPAM_INTERVAL_MAX_SECONDS })}
           </label>
           <input
             type="number"
@@ -189,7 +191,7 @@ export default function AutomodSettingsPage() {
 
         <div className="space-y-1.5 pt-2">
           <label className="text-xs font-bold text-[#b5bac1]">
-            Timeout Duration ({AUTOMOD_TIMEOUT_MIN_SECONDS}-{AUTOMOD_TIMEOUT_MAX_SECONDS} seconds)
+            {t('automodPage.timeoutDurationLabel', { min: AUTOMOD_TIMEOUT_MIN_SECONDS, max: AUTOMOD_TIMEOUT_MAX_SECONDS })}
           </label>
           <input
             type="number"
@@ -199,18 +201,18 @@ export default function AutomodSettingsPage() {
             onChange={(e) => { setTimeoutSeconds(parseInt(e.target.value) || 0); setIsDirty(true); }}
             className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]"
           />
-          <p className="text-[10px] text-[#57576F]">How long a member is timed out for when they trip the spam threshold.</p>
+          <p className="text-[10px] text-[#57576F]">{t('automodPage.timeoutDurationHelp')}</p>
         </div>
       </div>
 
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
         <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
-          Message Shape
+          {t('automodPage.messageShapeTitle')}
         </h3>
 
         <div className="space-y-1.5">
           <label className="text-xs font-bold text-[#b5bac1]">
-            Max Characters ({AUTOMOD_MAX_CHARS_MIN}-{AUTOMOD_MAX_CHARS_MAX} chars)
+            {t('automodPage.maxCharsLabel', { min: AUTOMOD_MAX_CHARS_MIN, max: AUTOMOD_MAX_CHARS_MAX })}
           </label>
           <input
             type="number"
@@ -220,12 +222,12 @@ export default function AutomodSettingsPage() {
             onChange={(e) => { setMaxChars(parseInt(e.target.value) || 0); setIsDirty(true); }}
             className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]"
           />
-          <p className="text-[10px] text-[#57576F]">A single message longer than this (outside of code blocks) is deleted, regardless of send rate.</p>
+          <p className="text-[10px] text-[#57576F]">{t('automodPage.maxCharsHelp')}</p>
         </div>
 
         <div className="space-y-1.5 pt-2">
           <label className="text-xs font-bold text-[#b5bac1]">
-            Max Lines ({AUTOMOD_MAX_LINES_MIN}-{AUTOMOD_MAX_LINES_MAX} lines)
+            {t('automodPage.maxLinesLabel', { min: AUTOMOD_MAX_LINES_MIN, max: AUTOMOD_MAX_LINES_MAX })}
           </label>
           <input
             type="number"
@@ -235,36 +237,36 @@ export default function AutomodSettingsPage() {
             onChange={(e) => { setMaxLines(parseInt(e.target.value) || 0); setIsDirty(true); }}
             className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]"
           />
-          <p className="text-[10px] text-[#57576F]">A single message with more line breaks than this (outside of code blocks) is deleted.</p>
+          <p className="text-[10px] text-[#57576F]">{t('automodPage.maxLinesHelp')}</p>
         </div>
       </div>
 
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-2 shadow-xl">
         <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
-          Forbidden Words
+          {t('automodPage.forbiddenWordsTitle')}
         </h3>
         <label className="text-xs font-bold text-[#b5bac1] block">
-          One word per line ({wordCount}/{AUTOMOD_FORBIDDEN_WORDS_MAX_COUNT}, {AUTOMOD_FORBIDDEN_WORD_MAX_LENGTH} chars max each)
+          {t('automodPage.forbiddenWordsLabel', { count: wordCount, max: AUTOMOD_FORBIDDEN_WORDS_MAX_COUNT, maxLen: AUTOMOD_FORBIDDEN_WORD_MAX_LENGTH })}
         </label>
         <textarea
           value={forbiddenWordsText}
           onChange={(e) => { setForbiddenWordsText(e.target.value); setIsDirty(true); }}
           rows={8}
-          placeholder="badword1\nbadword2"
+          placeholder={t('automodPage.forbiddenWordsPlaceholder')}
           className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#5865F2]"
         />
-        <p className="text-[10px] text-[#57576F]">Case-sensitive substring match - a message containing any of these words anywhere is deleted.</p>
+        <p className="text-[10px] text-[#57576F]">{t('automodPage.forbiddenWordsHelp')}</p>
       </div>
 
       {isDirty && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1e1f22]/95 border border-[#FFD700]/50 px-6 py-3.5 rounded-xl shadow-2xl flex items-center justify-between gap-8 backdrop-blur-md w-[90%] max-w-xl">
-          <span className="text-xs font-bold text-gray-200">⚠️ You have unsaved changes</span>
+          <span className="text-xs font-bold text-gray-200">{t('common.unsavedChanges')}</span>
           <div className="flex gap-3">
             <button type="button" onClick={loadData} className="text-xs font-bold text-gray-400 hover:text-white transition">
-              Discard
+              {t('common.discard')}
             </button>
             <button type="button" onClick={handleSave} className="bg-[#23A55A] hover:bg-[#1a7f43] text-white text-xs font-black px-5 py-2 rounded-lg">
-              Save
+              {t('common.save')}
             </button>
           </div>
         </div>

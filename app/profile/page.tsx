@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { useT } from '@/lib/i18n/LanguageContext';
 
 interface Guild {
   id: string;
@@ -13,6 +14,7 @@ interface Guild {
 export default function ProfileGuildPicker() {
   const router = useRouter();
   const { status } = useSession();
+  const t = useT();
   const [guilds, setGuilds] = useState<Guild[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -32,16 +34,16 @@ export default function ProfileGuildPicker() {
     <div className="min-h-screen bg-[#111214] text-[#dbdee1] p-4 sm:p-8">
       <div className="max-w-3xl mx-auto space-y-6">
         <header>
-          <h1 className="text-xl md:text-2xl font-black tracking-wider text-white">👤 My Profile</h1>
+          <h1 className="text-xl md:text-2xl font-black tracking-wider text-white">{t('profilePickerPage.title')}</h1>
           <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
-            Pick a server to customize your personal rank card
+            {t('profilePickerPage.subtitle')}
           </p>
         </header>
 
         {guilds.length === 0 ? (
           <div className="text-center py-12 border border-dashed border-[#2b2d31] rounded-xl bg-[#1e1f22]">
             <p className="text-sm text-gray-400">
-              No servers found where both you and Kyvo are present. Join a server that has Kyvo, then come back here.
+              {t('profilePickerPage.noServersFound')}
             </p>
           </div>
         ) : (

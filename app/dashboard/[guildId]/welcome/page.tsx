@@ -4,17 +4,19 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useToast } from '@/components/Toast';
+import { useT } from '@/lib/i18n/LanguageContext';
 
 export default function WelcomeSettings() {
   const router = useRouter();
   const params = useParams();
   const { data: session, status } = useSession();
   const { showToast } = useToast();
+  const t = useT();
   const [isSaving, setIsSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
-  
+
   const [guildId, setGuildId] = useState('');
-  
+
   // 📥 Welcome System Core States
   const [enabled, setEnabled] = useState(false);
   const [channelId, setChannelId] = useState('');
@@ -35,7 +37,7 @@ export default function WelcomeSettings() {
   const premiumPresets = [
     { name: '🌌 Cyber Neon', url: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=920&h=240&fit=crop' },
     { name: '🌆 Synthwave Dusk', url: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=920&h=240&fit=crop' },
-    { name: '🎋 Anime Lounge', url: 'https://images.unsplash.com/photo-1542838132-92c53300491e +q=80&w=920&h=240&fit=crop' },
+    { name: '🎋 Anime Lounge', url: 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=920&h=240&fit=crop' },
     { name: '🌠 Cosmic Nebula', url: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=920&h=240&fit=crop' },
     { name: '🏔️ Minimal Peak', url: 'https://images.unsplash.com/photo-1486873249359-2731bd6da57b?q=80&w=920&h=240&fit=crop' },
     { name: '🔮 Dark Magic', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=920&h=240&fit=crop' }
@@ -49,17 +51,12 @@ export default function WelcomeSettings() {
     }
   }, [params?.guildId]);
 
-  // 🛡️ [문지기 무력화 완료] 로컬 도커 환경 세션 검문소를 비활성화합니다.
-  // useEffect(() => {
-  //   if (status === 'unauthenticated') router.push('/');
-  // }, [status, router]);
-
   const loadSettings = async (id: string) => {
     try {
       const res = await fetch(`/api/level-eco-setting?guild_id=${id}`);
       if (res.ok) {
         const data = await res.json();
-        
+
         if (data) {
           setGoodbyeEnabled(!!data.goodbye_enabled);
           setGoodbyeChannelId(data.goodbye_channel_id ? String(data.goodbye_channel_id) : '');
@@ -85,11 +82,11 @@ export default function WelcomeSettings() {
     if (!guildId || guildId === '[guildId]') return;
 
     if (enabled && !channelId.trim()) {
-      showToast('Validation Error: Welcome Target Channel ID is missing.', 'error');
+      showToast(t('welcomePage.missingWelcomeChannel'), 'error');
       return;
     }
     if (goodbyeEnabled && !goodbyeChannelId.trim()) {
-      showToast('Validation Error: Goodbye Target Channel ID is missing.', 'error');
+      showToast(t('welcomePage.missingGoodbyeChannel'), 'error');
       return;
     }
 
@@ -122,14 +119,14 @@ export default function WelcomeSettings() {
       });
 
       if (res.ok) {
-        showToast('Welcome & Goodbye matrix protocols successfully synchronized!', 'success');
+        showToast(t('welcomePage.saveSuccess'), 'success');
         setIsDirty(false);
       } else {
         const errorBody = await res.json().catch(() => null);
         console.error('[WELCOME SAVE ERROR] status:', res.status, 'body:', errorBody);
-        showToast('Failed to save welcome protocol configs.', 'error');
+        showToast(t('welcomePage.saveFailed'), 'error');
       }
-    } catch (err: any) { showToast(`Network Drop: ${err.message}`, 'error'); }
+    } catch (err: any) { showToast(t('welcomePage.networkDrop', { message: err.message }), 'error'); }
     finally { setIsSaving(false); }
   };
 
@@ -138,24 +135,24 @@ export default function WelcomeSettings() {
   return (
     <div className="min-h-screen bg-[#111214] text-[#dbdee1] p-2 sm:p-4 md:p-6 pb-28">
       <div className="max-w-5xl mx-auto space-y-6">
-        
+
         <header className="mb-8 border-b border-[#2b2d31] pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">📥 INGRESS & EGRESS // CONFIGURATOR</h1>
+            <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('welcomePage.title')}</h1>
             <p className="text-xs text-[#b5bac1] mt-1 tracking-wide font-medium">
-              MANAGE USER LAYER ENTRY SIGNALS, LEAVE NOTIFICATIONS AND DYNAMIC WELCOME BANNERS
+              {t('welcomePage.subtitle')}
             </p>
           </div>
           <button type="submit" form="welcome-form" disabled={isSaving} className="w-full sm:w-auto bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all cursor-pointer">
-            {isSaving ? 'SYNCING MATRIX...' : 'SAVE GATEWAY PROTOCOL'}
+            {isSaving ? t('welcomePage.syncing') : t('welcomePage.saveButton')}
           </button>
         </header>
 
         <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl space-y-4">
           <div className="flex justify-between items-center border-b border-[#2b2d31] pb-3">
-            <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase">Live Banner Render Preview</h3>
+            <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase">{t('welcomePage.previewTitle')}</h3>
             <span className={`text-[10px] px-2 py-0.5 rounded font-black ${enabled ? 'bg-green-950/40 text-green-400 border border-green-500/20' : 'bg-red-950/40 text-red-400 border border-red-500/20'}`}>
-              {enabled ? 'GATEWAY CARD ACTIVE' : 'GATEWAY CARD OFFLINE'}
+              {enabled ? t('welcomePage.cardActive') : t('welcomePage.cardOffline')}
             </span>
           </div>
 
@@ -166,9 +163,9 @@ export default function WelcomeSettings() {
               <div className="flex items-center gap-6 w-full">
                 <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#313338] border-[3px] flex-shrink-0" style={{ borderColor: cardColor }} />
                 <div className="flex-1 font-mono">
-                  <span className="text-xs font-bold text-[#b5bac1] tracking-wider block">WELCOME TO THE SERVER</span>
+                  <span className="text-xs font-bold text-[#b5bac1] tracking-wider block">{t('welcomePage.welcomeToServer')}</span>
                   <span className="text-sm sm:text-2xl font-black text-white block mt-0.5" style={{ color: cardColor }}>NewOperative#0001</span>
-                  <span className="text-xs font-semibold text-gray-300 block mt-1">Operative #1,234</span>
+                  <span className="text-xs font-semibold text-gray-300 block mt-1">{t('welcomePage.memberNumber')}</span>
                 </div>
               </div>
             </div>
@@ -177,74 +174,74 @@ export default function WelcomeSettings() {
 
         <form id="welcome-form" onSubmit={handleSave} className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-5 shadow-xl md:col-span-1">
-            <h2 className="text-xs font-black tracking-widest text-[#5865F2] uppercase border-b border-[#2b2d31] pb-2">⚙️ GATEWAY PROTOCOLS</h2>
-            
+            <h2 className="text-xs font-black tracking-widest text-[#5865F2] uppercase border-b border-[#2b2d31] pb-2">{t('welcomePage.protocolsTitle')}</h2>
+
             <div className="space-y-3 p-3.5 bg-[#111214] rounded-xl border border-[#232428]">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-black text-white cursor-pointer" htmlFor="enable-toggle">1. Enable Welcome Card</label>
+                <label className="text-xs font-black text-white cursor-pointer" htmlFor="enable-toggle">{t('welcomePage.enableWelcomeLabel')}</label>
                 <input id="enable-toggle" type="checkbox" checked={enabled} onChange={(e) => { setEnabled(e.target.checked); setIsDirty(true); }} className="w-4 h-4 accent-[#5865F2] cursor-pointer" />
               </div>
               <div className="space-y-1 pt-1 border-t border-[#2b2d31]/40">
-                <label className="text-[10px] font-bold text-[#b5bac1] uppercase block">🎯 Welcome Channel ID</label>
-                <input type="text" placeholder="e.g. 115072034920..." value={channelId}
+                <label className="text-[10px] font-bold text-[#b5bac1] uppercase block">{t('welcomePage.welcomeChannelLabel')}</label>
+                <input type="text" placeholder={t('common.egPlaceholderId')} value={channelId}
                   onChange={(e) => { setChannelId(e.target.value.replace(/[^0-9]/g, '')); setIsDirty(true); }}
                   className="w-full bg-[#1e1f22] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#5865F2]"
                 />
-                <p className="text-[10px] text-[#57576F] normal-case">멤버가 서버에 들어올 때마다 이 채널에 환영 카드 이미지+임베드가 자동 발송돼요.</p>
+                <p className="text-[10px] text-[#57576F] normal-case">{t('welcomePage.welcomeChannelHelp')}</p>
               </div>
             </div>
 
             <div className="space-y-3 p-3.5 bg-[#111214] rounded-xl border border-[#232428]">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-black text-red-400 cursor-pointer" htmlFor="goodbye-toggle">2. Enable Goodbye System</label>
+                <label className="text-xs font-black text-red-400 cursor-pointer" htmlFor="goodbye-toggle">{t('welcomePage.enableGoodbyeLabel')}</label>
                 <input id="goodbye-toggle" type="checkbox" checked={goodbyeEnabled} onChange={(e) => { setGoodbyeEnabled(e.target.checked); setIsDirty(true); }} className="w-4 h-4 accent-red-500 cursor-pointer" />
               </div>
               <div className="space-y-1 pt-1 border-t border-[#2b2d31]/40">
-                <label className="text-[10px] font-bold text-[#b5bac1] uppercase block">📡 Goodbye Channel ID</label>
-                <input type="text" placeholder="e.g. 115072034920..." value={goodbyeChannelId}
+                <label className="text-[10px] font-bold text-[#b5bac1] uppercase block">{t('welcomePage.goodbyeChannelLabel')}</label>
+                <input type="text" placeholder={t('common.egPlaceholderId')} value={goodbyeChannelId}
                   onChange={(e) => { setGoodbyeChannelId(e.target.value.replace(/[^0-9]/g, '')); setIsDirty(true); }}
                   className="w-full bg-[#1e1f22] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-red-500"
                 />
-                <p className="text-[10px] text-[#57576F] normal-case">멤버가 나갈 때마다 이 채널에 퇴장 알림 임베드가 발송돼요.</p>
+                <p className="text-[10px] text-[#57576F] normal-case">{t('welcomePage.goodbyeChannelHelp')}</p>
               </div>
               <div className="space-y-1 pt-1 border-t border-[#2b2d31]/40">
-                <label className="text-[10px] font-bold text-[#b5bac1] uppercase block">💬 Goodbye Message</label>
+                <label className="text-[10px] font-bold text-[#b5bac1] uppercase block">{t('welcomePage.goodbyeMessageLabel')}</label>
                 <textarea
                   value={goodbyeMessage}
                   onChange={(e) => { setGoodbyeMessage(e.target.value); setIsDirty(true); }}
                   rows={2}
-                  placeholder="Has disconnected from the grid."
+                  placeholder={t('welcomePage.goodbyeMessagePlaceholder')}
                   className="w-full bg-[#1e1f22] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-red-500"
                 />
                 <p className="text-[10px] text-[#57576F] normal-case">
-                  {'{username}'}, {'{server}'}, {'{member_count}'}를 쓸 수 있어요 - 실제 발송 시 그대로 치환돼요. 비워두면 기본 문구로 돌아가요.
+                  {t('welcomePage.goodbyeMessageHelp')}
                 </p>
               </div>
             </div>
           </div>
 
           <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-4 shadow-xl md:col-span-2">
-            <h2 className="text-xs font-black tracking-widest text-green-400 uppercase border-b border-[#2b2d31] pb-2">🎨 AESTHETIC ENGINEERING CANVAS</h2>
+            <h2 className="text-xs font-black tracking-widest text-green-400 uppercase border-b border-[#2b2d31] pb-2">{t('welcomePage.aestheticTitle')}</h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#b5bac1]">Theme Accent Color</label>
+                <label className="text-xs font-bold text-[#b5bac1]">{t('welcomePage.accentColorLabel')}</label>
                 <div className="flex flex-wrap gap-1.5">{colorPresets.map((p) => (<button key={p} type="button" onClick={() => { setCardColor(p); setIsDirty(true); }} className={`w-5 h-5 rounded-full border ${cardColor.toLowerCase() === p.toLowerCase() ? 'border-white scale-110' : 'border-transparent opacity-60'}`} style={{ backgroundColor: p }} />))}</div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#b5bac1]">Solid Canvas BG</label>
+                <label className="text-xs font-bold text-[#b5bac1]">{t('welcomePage.solidBgLabel')}</label>
                 <div className="flex flex-wrap gap-1.5">{bgColorPresets.map((p) => (<button key={p} type="button" onClick={() => { setCardBgColor(p); setIsDirty(true); }} className={`w-5 h-5 rounded-full border ${cardBgColor.toLowerCase() === p.toLowerCase() ? 'border-white scale-110' : 'border-transparent opacity-60'}`} style={{ backgroundColor: p }} />))}</div>
               </div>
             </div>
 
             <div className="space-y-1.5 pt-2">
-              <label className="text-xs font-bold text-[#b5bac1] flex justify-between"><span>Vanguard Overlay Opacity Matrix</span><span className="text-[#5865F2] font-mono">{Math.round(overlayOpacity * 100)}%</span></label>
+              <label className="text-xs font-bold text-[#b5bac1] flex justify-between"><span>{t('welcomePage.overlayOpacityLabel')}</span><span className="text-[#5865F2] font-mono">{Math.round(overlayOpacity * 100)}%</span></label>
               <input type="range" min="0.0" max="1.0" step="0.05" value={overlayOpacity} onChange={(e) => { setOverlayOpacity(parseFloat(e.target.value)); setIsDirty(true); }} className="w-full h-1 bg-[#232428] rounded-lg appearance-none cursor-pointer accent-[#5865F2]" />
-              <p className="text-[10px] text-[#57576F]">배경 이미지 위에 깔리는 어두운 막의 농도예요 - 텍스트 가독성용이에요.</p>
+              <p className="text-[10px] text-[#57576F]">{t('welcomePage.overlayOpacityHelp')}</p>
             </div>
 
             <div className="space-y-2 pt-2">
-              <label className="text-xs font-bold text-[#b5bac1] block">Select Premium Wallpaper Preset (Click to Apply Changes Directly)</label>
+              <label className="text-xs font-bold text-[#b5bac1] block">{t('welcomePage.wallpaperLabel')}</label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {premiumPresets.map((preset, i) => (
                   <div key={i} onClick={() => { setBackgroundUrl(preset.url); setIsDirty(true); }}
@@ -258,8 +255,8 @@ export default function WelcomeSettings() {
                 ))}
               </div>
               <div className="pt-1">
-                <input type="text" value={backgroundUrl} onChange={(e) => { setBackgroundUrl(e.target.value); setIsDirty(true); }} placeholder="Paste external secure image direct link here..." className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5865F2]" />
-                <p className="text-[10px] text-[#57576F] pt-1">이미지를 못 불러오면(5초 타임아웃) 자동으로 단색 배경으로 대체돼요 - 카드 발송 자체는 안 끊겨요.</p>
+                <input type="text" value={backgroundUrl} onChange={(e) => { setBackgroundUrl(e.target.value); setIsDirty(true); }} placeholder={t('welcomePage.wallpaperUrlPlaceholder')} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5865F2]" />
+                <p className="text-[10px] text-[#57576F] pt-1">{t('welcomePage.wallpaperFallbackHelp')}</p>
               </div>
             </div>
 
@@ -270,10 +267,10 @@ export default function WelcomeSettings() {
 
       {isDirty && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1e1f22]/95 border border-[#5865F2]/60 px-6 py-3.5 rounded-xl shadow-2xl flex items-center justify-between gap-8 backdrop-blur-md w-[90%] max-w-xl animate-in fade-in">
-          <span className="text-xs font-bold text-gray-200">⚠️ Attention: Unsaved Gateway Protocol Changes Detected</span>
+          <span className="text-xs font-bold text-gray-200">{t('welcomePage.unsavedWarning')}</span>
           <div className="flex gap-3">
-            <button type="button" onClick={() => { loadSettings(guildId); setIsDirty(false); }} className="text-xs font-bold text-gray-400 hover:text-white transition">Reset</button>
-            <button type="submit" form="welcome-form" disabled={isSaving} className="bg-[#23A55A] hover:bg-[#1a7f43] text-white text-xs font-black px-5 py-2 rounded-lg">Save Protocol</button>
+            <button type="button" onClick={() => { loadSettings(guildId); setIsDirty(false); }} className="text-xs font-bold text-gray-400 hover:text-white transition">{t('welcomePage.reset')}</button>
+            <button type="submit" form="welcome-form" disabled={isSaving} className="bg-[#23A55A] hover:bg-[#1a7f43] text-white text-xs font-black px-5 py-2 rounded-lg">{t('welcomePage.saveProtocol')}</button>
           </div>
         </div>
       )}

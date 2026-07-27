@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
 import { PARTY_GAME_PRESET_MAX_COUNT, PARTY_GAME_PRESET_NAME_MAX_LENGTH, type PartyGamePreset } from '@/lib/partyPresets';
+import { useT } from '@/lib/i18n/LanguageContext';
 
 const COLOR_PRESETS = ['#5865F2', '#23A55A', '#FEE75C', '#EB459E', '#ED4245', '#9B59B6', '#00D2D3', '#54A0FF'];
 
@@ -14,6 +15,7 @@ const EMPTY_FORM: PartyGamePreset = { game_name: '', card_color: '#5865F2', card
 export default function PartyPresetsPage() {
   const params = useParams();
   const { showToast } = useToast();
+  const t = useT();
   const guildId = (params?.guildId as string) || '';
 
   const [loadStatus, setLoadStatus] = useState<LoadStatus>('loading');
@@ -32,9 +34,9 @@ export default function PartyPresetsPage() {
   const extractErrorMessage = async (res: Response): Promise<string> => {
     try {
       const data = await res.json();
-      return data.message || `Request failed (${res.status})`;
+      return data.message || t('common.requestFailed', { status: res.status });
     } catch {
-      return `Request failed (${res.status})`;
+      return t('common.requestFailed', { status: res.status });
     }
   };
 
@@ -53,7 +55,7 @@ export default function PartyPresetsPage() {
       setLoadStatus('loaded');
     } catch (err) {
       console.error(err);
-      setLoadErrorMsg('Network error while loading game presets.');
+      setLoadErrorMsg(t('partyPresetsPage.loadNetworkError'));
       setLoadStatus('error');
     }
   };
@@ -77,7 +79,7 @@ export default function PartyPresetsPage() {
         body: JSON.stringify(form),
       });
       if (res.ok) {
-        showToast(`Preset "${form.game_name}" saved!`, 'success');
+        showToast(t('partyPresetsPage.presetSaved', { name: form.game_name }), 'success');
         cancelEdit();
         await loadData();
       } else {
@@ -85,7 +87,7 @@ export default function PartyPresetsPage() {
       }
     } catch (err) {
       console.error(err);
-      showToast('Network error while saving.', 'error');
+      showToast(t('partyPresetsPage.saveNetworkError'), 'error');
     } finally {
       setIsSaving(false);
     }
@@ -96,7 +98,7 @@ export default function PartyPresetsPage() {
     try {
       const res = await fetch(`/api/party-presets/${guildId}?game_name=${encodeURIComponent(gameName)}`, { method: 'DELETE' });
       if (res.ok) {
-        showToast(`Preset "${gameName}" deleted.`, 'success');
+        showToast(t('partyPresetsPage.presetDeleted', { name: gameName }), 'success');
         if (editingOriginalName === gameName) cancelEdit();
         await loadData();
       } else {
@@ -104,7 +106,7 @@ export default function PartyPresetsPage() {
       }
     } catch (err) {
       console.error(err);
-      showToast('Network error while deleting.', 'error');
+      showToast(t('partyPresetsPage.deleteNetworkError'), 'error');
     } finally {
       setDeletingName(null);
     }
@@ -113,7 +115,7 @@ export default function PartyPresetsPage() {
   if (loadStatus === 'loading') {
     return (
       <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-sm">
-        Loading game presets...
+        {t('partyPresetsPage.loadingPresets')}
       </div>
     );
   }
@@ -121,14 +123,14 @@ export default function PartyPresetsPage() {
   if (loadStatus === 'error') {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
-        <p className="text-red-400 font-bold">⚠️ Failed to load game presets</p>
+        <p className="text-red-400 font-bold">{t('partyPresetsPage.loadFailed')}</p>
         <p className="text-sm text-[#949ba4]">{loadErrorMsg}</p>
         <button
           type="button"
           onClick={loadData}
           className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl"
         >
-          Retry
+          {t('common.retry')}
         </button>
       </div>
     );
@@ -140,30 +142,30 @@ export default function PartyPresetsPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-6 pb-16">
       <header className="border-b border-[#2b2d31] pb-6">
-        <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">🎮 Game Presets</h1>
+        <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('partyPresetsPage.title')}</h1>
         <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
-          Saved looks members can pick from with /party_recruit game:... - {presets.length}/{PARTY_GAME_PRESET_MAX_COUNT} used
+          {t('partyPresetsPage.subtitleUsage', { used: presets.length, max: PARTY_GAME_PRESET_MAX_COUNT })}
         </p>
         <p className="text-[10px] text-[#57576F] mt-1 normal-case">
-          These control the look (color/description/thumbnail) of the recruitment card when a member picks this game.
+          {t('partyPresetsPage.subtitleExplainer')}
         </p>
       </header>
 
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
         <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
-          {isEditing ? `Editing "${editingOriginalName}"` : 'Add a Preset'}
+          {isEditing ? t('partyPresetsPage.editingTitle', { name: editingOriginalName || '' }) : t('partyPresetsPage.addTitle')}
         </h3>
 
         {atCap && (
           <p className="text-xs text-red-400">
-            ⚠️ This server has reached the {PARTY_GAME_PRESET_MAX_COUNT}-preset limit. Delete one before adding another.
+            {t('partyPresetsPage.atCapWarning', { max: PARTY_GAME_PRESET_MAX_COUNT })}
           </p>
         )}
 
         <div className="rounded-xl p-4 border-l-4 bg-[#111214] flex items-start justify-between gap-4" style={{ borderColor: form.card_color }}>
           <div className="min-w-0">
             {form.game_name && <p className="text-[10px] font-bold text-[#949ba4] mb-1">🎮 {form.game_name}</p>}
-            <p className="text-sm font-bold text-white">Looking for Duo - Solo Queue</p>
+            <p className="text-sm font-bold text-white">{t('partyPresetsPage.previewLine')}</p>
             {form.card_description && <p className="text-xs text-[#b5bac1] mt-2 whitespace-pre-wrap">{form.card_description}</p>}
           </div>
           {form.card_thumbnail_url && (
@@ -178,25 +180,25 @@ export default function PartyPresetsPage() {
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-[#b5bac1]">Game Name (this is what shows up in /party_recruit's autocomplete)</label>
+          <label className="text-xs font-bold text-[#b5bac1]">{t('partyPresetsPage.gameNameLabel')}</label>
           <input
             type="text"
             value={form.game_name}
             onChange={(e) => setForm({ ...form, game_name: e.target.value })}
             maxLength={PARTY_GAME_PRESET_NAME_MAX_LENGTH}
             disabled={isEditing}
-            placeholder="e.g. League of Legends"
+            placeholder={t('partyPresetsPage.gameNamePlaceholder')}
             className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5865F2] disabled:opacity-50"
           />
           {isEditing ? (
-            <p className="text-[10px] text-[#57576F]">Rename by deleting this preset and creating a new one.</p>
+            <p className="text-[10px] text-[#57576F]">{t('partyPresetsPage.renameHelp')}</p>
           ) : (
-            <p className="text-[10px] text-[#57576F]">대소문자까지 정확히 일치해야 같은 프리셋으로 인식돼요 - 자동완성 목록에서 골라 쓰는 걸 권장해요.</p>
+            <p className="text-[10px] text-[#57576F]">{t('partyPresetsPage.duplicateWarning')}</p>
           )}
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-[#b5bac1]">Card Accent Color</label>
+          <label className="text-xs font-bold text-[#b5bac1]">{t('partyPresetsPage.colorLabel')}</label>
           <div className="flex flex-wrap gap-1.5">
             {COLOR_PRESETS.map((p) => (
               <button
@@ -217,7 +219,7 @@ export default function PartyPresetsPage() {
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-[#b5bac1]">Recruitment Card Message (optional)</label>
+          <label className="text-xs font-bold text-[#b5bac1]">{t('partyPresetsPage.descLabel')}</label>
           <textarea
             value={form.card_description}
             onChange={(e) => setForm({ ...form, card_description: e.target.value })}
@@ -227,7 +229,7 @@ export default function PartyPresetsPage() {
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-[#b5bac1]">Card Thumbnail Image URL (optional)</label>
+          <label className="text-xs font-bold text-[#b5bac1]">{t('partyPresetsPage.thumbnailLabel')}</label>
           <input
             type="text"
             value={form.card_thumbnail_url}
@@ -235,7 +237,7 @@ export default function PartyPresetsPage() {
             placeholder="https://..."
             className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#5865F2]"
           />
-          <p className="text-[10px] text-[#57576F]">저장 시 실제로 접근 가능한 이미지인지 확인해요 - 이미지가 아니거나 응답이 없으면 저장이 거부돼요.</p>
+          <p className="text-[10px] text-[#57576F]">{t('partyPresetsPage.thumbnailHelp')}</p>
         </div>
 
         <div className="flex gap-3 pt-2">
@@ -245,11 +247,11 @@ export default function PartyPresetsPage() {
             disabled={isSaving || !form.game_name.trim() || atCap}
             className="bg-[#5865F2] hover:bg-[#4752C4] disabled:opacity-50 text-white text-xs font-black px-6 py-3 rounded-xl"
           >
-            {isSaving ? 'SAVING...' : isEditing ? 'SAVE CHANGES' : 'ADD PRESET'}
+            {isSaving ? t('common.saving') : isEditing ? t('partyPresetsPage.saveChanges') : t('partyPresetsPage.addPreset')}
           </button>
           {isEditing && (
             <button type="button" onClick={cancelEdit} className="text-xs font-bold text-gray-400 hover:text-white transition px-4">
-              Cancel
+              {t('common.cancel')}
             </button>
           )}
         </div>
@@ -257,10 +259,10 @@ export default function PartyPresetsPage() {
 
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-3 shadow-xl">
         <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
-          Saved Presets
+          {t('partyPresetsPage.savedTitle')}
         </h3>
         {presets.length === 0 ? (
-          <p className="text-sm text-[#949ba4] py-4">📭 No presets yet - add one above.</p>
+          <p className="text-sm text-[#949ba4] py-4">{t('partyPresetsPage.noPresetsYet')}</p>
         ) : (
           <div className="space-y-2">
             {presets.map((p) => (
@@ -271,7 +273,7 @@ export default function PartyPresetsPage() {
                 </div>
                 <div className="flex gap-2 shrink-0">
                   <button type="button" onClick={() => startEdit(p)} className="text-[10px] font-bold text-[#5865F2] hover:text-white px-2 py-1">
-                    Edit
+                    {t('common.edit')}
                   </button>
                   <button
                     type="button"
@@ -279,7 +281,7 @@ export default function PartyPresetsPage() {
                     disabled={deletingName === p.game_name}
                     className="text-[10px] font-bold text-red-400 hover:text-red-300 disabled:opacity-50 px-2 py-1"
                   >
-                    {deletingName === p.game_name ? 'Deleting...' : 'Delete'}
+                    {deletingName === p.game_name ? t('common.deleting') : t('common.delete')}
                   </button>
                 </div>
               </div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
 import { buildReplaceWinnerToastMessage, replaceWinnerToastType } from '@/lib/giveawayReplace';
+import { useT } from '@/lib/i18n/LanguageContext';
 
 interface WinnerInfo {
   user_id: string;
@@ -27,6 +28,7 @@ type LoadStatus = 'loading' | 'loaded' | 'error';
 export default function GiveawaysPage() {
   const params = useParams();
   const { showToast } = useToast();
+  const t = useT();
   const guildId = (params?.guildId as string) || '';
 
   const [loadStatus, setLoadStatus] = useState<LoadStatus>('loading');
@@ -45,9 +47,9 @@ export default function GiveawaysPage() {
   const extractErrorMessage = async (res: Response): Promise<string> => {
     try {
       const data = await res.json();
-      return data.message || `Request failed (${res.status})`;
+      return data.message || t('common.requestFailed', { status: res.status });
     } catch {
-      return `Request failed (${res.status})`;
+      return t('common.requestFailed', { status: res.status });
     }
   };
 
@@ -66,7 +68,7 @@ export default function GiveawaysPage() {
       setLoadStatus('loaded');
     } catch (err) {
       console.error(err);
-      setLoadErrorMsg('Network error while loading giveaways.');
+      setLoadErrorMsg(t('giveawaysPage.loadNetworkError'));
       setLoadStatus('error');
     }
   };
@@ -102,11 +104,11 @@ export default function GiveawaysPage() {
         setReplaceTarget(null);
         await loadGiveaways();
       } else {
-        showToast(data.message || `Request failed (${res.status})`, 'error');
+        showToast(data.message || t('common.requestFailed', { status: res.status }), 'error');
       }
     } catch (err) {
       console.error(err);
-      showToast('Network error while replacing this winner.', 'error');
+      showToast(t('giveawaysPage.replaceNetworkError'), 'error');
     } finally {
       setIsReplacing(false);
     }
@@ -115,7 +117,7 @@ export default function GiveawaysPage() {
   if (loadStatus === 'loading') {
     return (
       <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-sm">
-        Loading giveaways...
+        {t('giveawaysPage.loadingGiveaways')}
       </div>
     );
   }
@@ -123,10 +125,10 @@ export default function GiveawaysPage() {
   if (loadStatus === 'error') {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
-        <p className="text-red-400 font-bold">⚠️ Failed to load giveaways</p>
+        <p className="text-red-400 font-bold">{t('giveawaysPage.loadFailed')}</p>
         <p className="text-sm text-[#949ba4]">{loadErrorMsg}</p>
         <button type="button" onClick={loadGiveaways} className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl">
-          Retry
+          {t('common.retry')}
         </button>
       </div>
     );
@@ -136,19 +138,19 @@ export default function GiveawaysPage() {
     <div className="max-w-3xl mx-auto space-y-6 pb-16">
       <header className="border-b border-[#2b2d31] pb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">🎁 Giveaways</h1>
+          <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('giveawaysPage.title')}</h1>
           <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
-            Concluded giveaways - replace a single winner if needed. To end an active giveaway early, use /giveaway end in Discord.
+            {t('giveawaysPage.subtitle')}
           </p>
         </div>
         <button type="button" onClick={loadGiveaways} className="text-xs font-bold text-[#5865F2] hover:underline">
-          Refresh
+          {t('common.refresh')}
         </button>
       </header>
 
       {giveaways.length === 0 ? (
         <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-6 shadow-xl">
-          <p className="text-sm text-[#949ba4] py-4">📭 No concluded giveaways with winners yet.</p>
+          <p className="text-sm text-[#949ba4] py-4">{t('giveawaysPage.noGiveawaysYet')}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -159,23 +161,25 @@ export default function GiveawaysPage() {
                 <span className="text-[10px] text-[#57576F]">{new Date(g.concluded_at).toLocaleString()}</span>
               </div>
               <p className="text-[10px] text-[#949ba4]">
-                {g.prize_type === 'points' ? `💰 ${g.prize_amount?.toLocaleString()} points per winner` : `🏅 Role: ${g.prize_role_name || g.prize_role_id}`}
+                {g.prize_type === 'points'
+                  ? t('giveawaysPage.pointsPerWinner', { amount: g.prize_amount?.toLocaleString() || '0' })
+                  : t('giveawaysPage.roleLabel', { role: g.prize_role_name || g.prize_role_id || '' })}
               </p>
               <div className="space-y-2">
                 {g.winners.map((w) => (
                   <div key={w.user_id} className="flex items-center justify-between gap-3 bg-[#111214] rounded-lg px-3 py-2.5">
                     <div className="min-w-0">
                       <p className="text-xs font-bold text-white truncate">
-                        {w.username || `Unknown User (${w.user_id})`}
+                        {w.username || t('giveawaysPage.unknownUser', { id: w.user_id })}
                       </p>
-                      {!w.in_server && <p className="text-[10px] text-red-400">⚠️ No longer in this server</p>}
+                      {!w.in_server && <p className="text-[10px] text-red-400">{t('giveawaysPage.noLongerInServer')}</p>}
                     </div>
                     <button
                       type="button"
                       onClick={() => openReplaceDialog(g, w)}
                       className="shrink-0 bg-[#2b2d31] hover:bg-[#35373c] text-white text-[10px] font-black px-3 py-1.5 rounded-lg transition-all"
                     >
-                      🔄 REPLACE
+                      {t('giveawaysPage.replaceButton')}
                     </button>
                   </div>
                 ))}
@@ -189,25 +193,23 @@ export default function GiveawaysPage() {
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
           <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
             <h3 className="text-sm font-black text-white">
-              Replace winner for <span className="text-[#FFD700]">{replaceTarget.giveaway.prize}</span>?
+              {t('giveawaysPage.replaceWinnerForPrefix')} <span className="text-[#FFD700]">{replaceTarget.giveaway.prize}</span>?
             </h3>
             <p className="text-xs text-[#b5bac1]">
-              {replaceTarget.winner.username || replaceTarget.winner.user_id} will be replaced with a random remaining entrant.
-              {replaceTarget.giveaway.prize_type === 'points' && ' Their prize points will be reclaimed automatically (if they\'ve already spent it, their balance can go negative).'}
+              {t('giveawaysPage.replaceWinnerBody', { winner: replaceTarget.winner.username || replaceTarget.winner.user_id })}
+              {replaceTarget.giveaway.prize_type === 'points' && t('giveawaysPage.replaceWinnerPointsNote')}
             </p>
             {replaceTarget.giveaway.prize_type === 'role' && (
               <div className="bg-amber-950/40 border border-amber-500/30 rounded-lg p-3 text-[11px] text-amber-300">
-                ⚠️ The role <strong>{replaceTarget.giveaway.prize_role_name || replaceTarget.giveaway.prize_role_id}</strong> will NOT be
-                automatically removed from the original winner - the bot can't tell whether they already had it for another reason.
-                Remove it manually afterward if appropriate.
+                {t('giveawaysPage.replaceWinnerRoleWarning', { role: replaceTarget.giveaway.prize_role_name || replaceTarget.giveaway.prize_role_id || '' })}
               </div>
             )}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-[#b5bac1]">Reason (required, kept in the audit log)</label>
+              <label className="text-xs font-bold text-[#b5bac1]">{t('giveawaysPage.reasonLabel')}</label>
               <textarea
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                placeholder="e.g. winner left the server"
+                placeholder={t('giveawaysPage.reasonPlaceholder')}
                 rows={2}
                 className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5865F2]"
               />
@@ -219,7 +221,7 @@ export default function GiveawaysPage() {
                 disabled={isReplacing}
                 className="text-xs font-bold text-gray-400 hover:text-white transition px-4 py-2"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 type="button"
@@ -227,7 +229,7 @@ export default function GiveawaysPage() {
                 disabled={isReplacing || !reason.trim()}
                 className="bg-[#ED4245] hover:bg-[#c13537] disabled:opacity-50 text-white text-xs font-black px-5 py-2 rounded-lg"
               >
-                {isReplacing ? 'REPLACING...' : 'CONFIRM REPLACE'}
+                {isReplacing ? t('giveawaysPage.replacing') : t('giveawaysPage.confirmReplace')}
               </button>
             </div>
           </div>

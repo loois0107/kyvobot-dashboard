@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useToast } from '@/components/Toast';
+import { useT } from '@/lib/i18n/LanguageContext';
 
 const COLOR_PRESETS = ['#5865F2', '#23A55A', '#FEE75C', '#EB459E', '#ED4245', '#9B59B6', '#00D2D3', '#54A0FF', '#FF6B6B', '#FFFFFF'];
 const BG_COLOR_PRESETS = ['#1E1F22', '#2B2D31', '#313338', '#111214', '#0F0F1A', '#161626'];
@@ -24,17 +25,18 @@ interface ShopItem {
   description: string;
 }
 
-const STATUS_BADGE: Record<string, { label: string; className: string }> = {
-  recruiting: { label: 'Recruiting', className: 'border-[#5865F2] text-[#5865F2] bg-[#5865F2]/10' },
-  full: { label: 'Full', className: 'border-[#23A55A] text-[#23A55A] bg-[#23A55A]/10' },
-  closed: { label: 'Closed', className: 'border-[#949ba4] text-[#949ba4] bg-[#949ba4]/10' },
-  expired: { label: 'Expired', className: 'border-[#949ba4] text-[#949ba4] bg-[#949ba4]/10' },
-};
-
 export default function PersonalCardSettings() {
   const params = useParams();
   const { status } = useSession();
   const { showToast } = useToast();
+  const t = useT();
+
+  const STATUS_BADGE: Record<string, { label: string; className: string }> = {
+    recruiting: { label: t('profileCardPage.statusRecruiting'), className: 'border-[#5865F2] text-[#5865F2] bg-[#5865F2]/10' },
+    full: { label: t('profileCardPage.statusFull'), className: 'border-[#23A55A] text-[#23A55A] bg-[#23A55A]/10' },
+    closed: { label: t('profileCardPage.statusClosed'), className: 'border-[#949ba4] text-[#949ba4] bg-[#949ba4]/10' },
+    expired: { label: t('profileCardPage.statusExpired'), className: 'border-[#949ba4] text-[#949ba4] bg-[#949ba4]/10' },
+  };
 
   const rawGuildId = params?.guildId as string | undefined;
   // 🛡️ Next.js가 하이드레이션 완료 전 잠깐 리터럴 "[guildId]" 플레이스홀더를 그대로 넘길 때가
@@ -85,9 +87,9 @@ export default function PersonalCardSettings() {
   const extractErrorMessage = async (res: Response): Promise<string> => {
     try {
       const data = await res.json();
-      return data.message || data.error || `Request failed (${res.status})`;
+      return data.message || data.error || t('common.requestFailed', { status: res.status });
     } catch {
-      return `Request failed (${res.status})`;
+      return t('common.requestFailed', { status: res.status });
     }
   };
 
@@ -104,7 +106,7 @@ export default function PersonalCardSettings() {
       }
     } catch (err) {
       console.error(err);
-      setHistoryError('Network error while loading your party history.');
+      setHistoryError(t('profileCardPage.historyNetworkError'));
     } finally {
       setHistoryLoading(false);
     }
@@ -125,7 +127,7 @@ export default function PersonalCardSettings() {
       }
     } catch (err) {
       console.error(err);
-      setShopError('Network error while loading the shop.');
+      setShopError(t('profileCardPage.shopNetworkError'));
     } finally {
       setShopLoading(false);
     }
@@ -146,14 +148,14 @@ export default function PersonalCardSettings() {
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        showToast(`Purchased ${data.item_name} for ${data.price?.toLocaleString()} ${data.currency_name}!`, 'success');
+        showToast(t('profileCardPage.purchasedSuccess', { item: data.item_name, price: data.price?.toLocaleString() || '0', currency: data.currency_name }), 'success');
         setPoints(data.remaining_points ?? points);
       } else {
-        showToast(data.message || `Purchase failed (${res.status})`, 'error');
+        showToast(data.message || t('profileCardPage.purchaseFailed', { status: res.status }), 'error');
       }
     } catch (err) {
       console.error(err);
-      showToast('Network error while purchasing.', 'error');
+      showToast(t('profileCardPage.purchaseNetworkError'), 'error');
     } finally {
       setPurchasingItem('');
     }
@@ -174,7 +176,7 @@ export default function PersonalCardSettings() {
       }
     } catch (err) {
       console.error(err);
-      setFavoriteGameError('Network error while loading your favorite game.');
+      setFavoriteGameError(t('profileCardPage.favoriteGameLoadNetworkError'));
     } finally {
       setFavoriteGameLoading(false);
     }
@@ -194,13 +196,13 @@ export default function PersonalCardSettings() {
       });
       if (res.ok) {
         setFavoriteGame(selectedGameDraft);
-        showToast(`${selectedGameDraft} set as your favorite game.`, 'success');
+        showToast(t('profileCardPage.favoriteGameSetSuccess', { game: selectedGameDraft }), 'success');
       } else {
         showToast(await extractErrorMessage(res), 'error');
       }
     } catch (err) {
       console.error(err);
-      showToast('Network error while saving your favorite game.', 'error');
+      showToast(t('profileCardPage.favoriteGameSaveNetworkError'), 'error');
     } finally {
       setIsSavingFavoriteGame(false);
     }
@@ -213,13 +215,13 @@ export default function PersonalCardSettings() {
       if (res.ok) {
         setFavoriteGame(null);
         setSelectedGameDraft('');
-        showToast('Favorite game cleared.', 'success');
+        showToast(t('profileCardPage.favoriteGameClearedSuccess'), 'success');
       } else {
         showToast(await extractErrorMessage(res), 'error');
       }
     } catch (err) {
       console.error(err);
-      showToast('Network error while clearing your favorite game.', 'error');
+      showToast(t('profileCardPage.favoriteGameClearNetworkError'), 'error');
     } finally {
       setIsSavingFavoriteGame(false);
     }
@@ -245,7 +247,7 @@ export default function PersonalCardSettings() {
       }
     } catch (err) {
       console.error(err);
-      showToast('Network error while loading your card settings.', 'error');
+      showToast(t('profileCardPage.cardLoadNetworkError'), 'error');
     } finally {
       setLoading(false);
     }
@@ -266,7 +268,7 @@ export default function PersonalCardSettings() {
         }),
       });
       if (res.ok) {
-        showToast('Your rank card has been updated!', 'success');
+        showToast(t('profileCardPage.cardUpdatedSuccess'), 'success');
         setIsDirty(false);
         setHasOverride(true);
       } else {
@@ -274,7 +276,7 @@ export default function PersonalCardSettings() {
       }
     } catch (err) {
       console.error(err);
-      showToast('Network error while saving.', 'error');
+      showToast(t('profileCardPage.cardSaveNetworkError'), 'error');
     } finally {
       setIsSaving(false);
     }
@@ -290,14 +292,14 @@ export default function PersonalCardSettings() {
         body: JSON.stringify({ card_color: null, card_bg_color: null, overlay_opacity: null, background_url: null }),
       });
       if (res.ok) {
-        showToast('Reset to server default.', 'success');
+        showToast(t('profileCardPage.resetToDefaultSuccess'), 'success');
         await loadSettings();
       } else {
         showToast(await extractErrorMessage(res), 'error');
       }
     } catch (err) {
       console.error(err);
-      showToast('Network error while resetting.', 'error');
+      showToast(t('profileCardPage.resetNetworkError'), 'error');
     } finally {
       setIsSaving(false);
     }
@@ -310,9 +312,9 @@ export default function PersonalCardSettings() {
       <div className="max-w-3xl mx-auto space-y-6">
         <header className="border-b border-[#2b2d31] pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">🎨 My Rank Card</h1>
+            <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('profileCardPage.title')}</h1>
             <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
-              {hasOverride ? 'Personal style active for this server' : 'Currently using this server\'s default style'}
+              {hasOverride ? t('profileCardPage.personalStyleActive') : t('profileCardPage.usingServerDefault')}
             </p>
           </div>
           <div className="flex gap-2 w-full sm:w-auto">
@@ -323,7 +325,7 @@ export default function PersonalCardSettings() {
                 disabled={isSaving}
                 className="flex-1 sm:flex-none bg-[#2b2d31] hover:bg-[#35373c] text-white text-xs font-black px-4 py-3 rounded-xl transition-all"
               >
-                Reset to Default
+                {t('profileCardPage.resetToDefault')}
               </button>
             )}
             <button
@@ -332,14 +334,14 @@ export default function PersonalCardSettings() {
               disabled={isSaving}
               className="flex-1 sm:flex-none bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all"
             >
-              {isSaving ? 'SAVING...' : 'SAVE MY CARD'}
+              {isSaving ? t('common.saving') : t('profileCardPage.saveMyCard')}
             </button>
           </div>
         </header>
 
         <div className="space-y-4 bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl">
           <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
-            /level Preview
+            {t('profileCardPage.previewTitle')}
           </h3>
 
           <div
@@ -361,7 +363,7 @@ export default function PersonalCardSettings() {
                   <div className="w-[144px] h-[144px] rounded-full bg-gradient-to-tr from-gray-700 to-gray-500" />
                 </div>
                 <div className="flex-1 flex flex-col justify-start h-[150px] pt-2 font-mono">
-                  <span className="text-2xl font-black text-white tracking-wide">You</span>
+                  <span className="text-2xl font-black text-white tracking-wide">{t('profileCardPage.youLabel')}</span>
                   <div className="w-full h-[24px] bg-[#2b2d31] rounded-xl mt-6 border border-[#232428] overflow-hidden">
                     <div className="h-full rounded-xl" style={{ width: '65%', backgroundColor: cardColor }} />
                   </div>
@@ -374,7 +376,7 @@ export default function PersonalCardSettings() {
           <div className="pt-4 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#b5bac1]">Accent Color</label>
+                <label className="text-xs font-bold text-[#b5bac1]">{t('profileCardPage.accentColorLabel')}</label>
                 <div className="flex flex-wrap gap-1.5">
                   {COLOR_PRESETS.map((p) => (
                     <button
@@ -388,7 +390,7 @@ export default function PersonalCardSettings() {
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#b5bac1]">Background Color</label>
+                <label className="text-xs font-bold text-[#b5bac1]">{t('profileCardPage.bgColorLabel')}</label>
                 <div className="flex flex-wrap gap-1.5">
                   {BG_COLOR_PRESETS.map((p) => (
                     <button
@@ -405,7 +407,7 @@ export default function PersonalCardSettings() {
 
             <div className="space-y-1.5 pt-2">
               <label className="text-xs font-bold text-[#b5bac1]">
-                Overlay Opacity: <span className="text-[#5865F2] font-mono">{Math.round(overlayOpacity * 100)}%</span>
+                {t('profileCardPage.overlayOpacityLabel')} <span className="text-[#5865F2] font-mono">{Math.round(overlayOpacity * 100)}%</span>
               </label>
               <input
                 type="range"
@@ -419,12 +421,12 @@ export default function PersonalCardSettings() {
             </div>
 
             <div className="space-y-2 pt-2">
-              <label className="text-xs font-bold text-[#b5bac1]">Background Image URL (optional)</label>
+              <label className="text-xs font-bold text-[#b5bac1]">{t('profileCardPage.bgImageUrlLabel')}</label>
               <input
                 type="text"
                 value={backgroundUrl}
                 onChange={(e) => { setBackgroundUrl(e.target.value); setIsDirty(true); }}
-                placeholder="Paste a direct image link..."
+                placeholder={t('profileCardPage.bgImageUrlPlaceholder')}
                 className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-[10px] text-white focus:outline-none focus:border-[#5865F2]"
               />
             </div>
@@ -434,7 +436,7 @@ export default function PersonalCardSettings() {
         <div className="space-y-4 bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl">
           <div className="flex items-center justify-between border-b border-[#2b2d31] pb-2">
             <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase">
-              🛒 Point Shop
+              {t('profileCardPage.shopTitle')}
             </h3>
             {!shopLoading && !shopError && (
               <span className="text-xs font-bold text-[#FFD700]">🪙 {points.toLocaleString()} {currencyName}</span>
@@ -442,16 +444,16 @@ export default function PersonalCardSettings() {
           </div>
 
           {shopLoading ? (
-            <p className="text-sm text-[#949ba4] py-4">Loading the shop...</p>
+            <p className="text-sm text-[#949ba4] py-4">{t('profileCardPage.loadingShop')}</p>
           ) : shopError ? (
             <div className="text-center py-4 space-y-2">
               <p className="text-sm text-red-400">⚠️ {shopError}</p>
               <button type="button" onClick={loadShop} className="text-xs font-bold text-[#5865F2] hover:underline">
-                Retry
+                {t('common.retry')}
               </button>
             </div>
           ) : shopItems.length === 0 ? (
-            <p className="text-sm text-[#949ba4] py-4">🛒 The shop is currently empty. Staff hasn't added any items yet.</p>
+            <p className="text-sm text-[#949ba4] py-4">{t('profileCardPage.shopEmpty')}</p>
           ) : (
             <div className="space-y-2">
               {shopItems.map((item) => {
@@ -473,7 +475,7 @@ export default function PersonalCardSettings() {
                         disabled={item.price === null || !affordable || Boolean(purchasingItem)}
                         className="bg-[#23A55A] hover:bg-[#1a7f43] disabled:bg-[#2b2d31] disabled:text-[#57576F] disabled:cursor-not-allowed text-white text-[10px] font-black px-3 py-1.5 rounded-lg transition-all"
                       >
-                        {isPurchasing ? 'BUYING...' : item.price === null ? 'UNAVAILABLE' : affordable ? 'BUY' : 'NOT ENOUGH'}
+                        {isPurchasing ? t('profileCardPage.buying') : item.price === null ? t('profileCardPage.unavailable') : affordable ? t('profileCardPage.buy') : t('profileCardPage.notEnough')}
                       </button>
                     </div>
                   </div>
@@ -485,23 +487,23 @@ export default function PersonalCardSettings() {
 
         <div className="space-y-4 bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl">
           <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
-            ⭐ Favorite Game
+            {t('profileCardPage.favoriteGameTitle')}
           </h3>
           <p className="text-[10px] text-[#57576F]">
-            Used to auto-fill the game field when you run /party_recruit without picking one.
+            {t('profileCardPage.favoriteGameDesc')}
           </p>
 
           {favoriteGameLoading ? (
-            <p className="text-sm text-[#949ba4] py-2">Loading...</p>
+            <p className="text-sm text-[#949ba4] py-2">{t('profileCardPage.loadingShort')}</p>
           ) : favoriteGameError ? (
             <div className="py-2 space-y-2">
               <p className="text-sm text-red-400">⚠️ {favoriteGameError}</p>
               <button type="button" onClick={loadFavoriteGame} className="text-xs font-bold text-[#5865F2] hover:underline">
-                Retry
+                {t('common.retry')}
               </button>
             </div>
           ) : gamePresets.length === 0 ? (
-            <p className="text-sm text-[#949ba4] py-2">📭 This server has no saved game presets yet.</p>
+            <p className="text-sm text-[#949ba4] py-2">{t('profileCardPage.noPresetsYet')}</p>
           ) : (
             <div className="flex flex-col sm:flex-row gap-2">
               <select
@@ -509,7 +511,7 @@ export default function PersonalCardSettings() {
                 onChange={(e) => setSelectedGameDraft(e.target.value)}
                 className="flex-1 bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5865F2]"
               >
-                <option value="" disabled>Select a game...</option>
+                <option value="" disabled>{t('profileCardPage.selectGamePlaceholder')}</option>
                 {gamePresets.map((name) => (
                   <option key={name} value={name}>{name}</option>
                 ))}
@@ -520,7 +522,7 @@ export default function PersonalCardSettings() {
                 disabled={isSavingFavoriteGame || !selectedGameDraft || selectedGameDraft === favoriteGame}
                 className="bg-[#5865F2] hover:bg-[#4752C4] disabled:opacity-50 text-white text-xs font-black px-4 py-2 rounded-lg transition-all"
               >
-                {isSavingFavoriteGame ? 'SAVING...' : 'SAVE'}
+                {isSavingFavoriteGame ? t('common.saving') : t('common.save')}
               </button>
               {favoriteGame && (
                 <button
@@ -529,32 +531,32 @@ export default function PersonalCardSettings() {
                   disabled={isSavingFavoriteGame}
                   className="bg-[#2b2d31] hover:bg-[#35373c] disabled:opacity-50 text-white text-xs font-black px-4 py-2 rounded-lg transition-all"
                 >
-                  CLEAR
+                  {t('profileCardPage.clear')}
                 </button>
               )}
             </div>
           )}
           {favoriteGame && !favoriteGameLoading && (
-            <p className="text-[10px] text-[#23A55A]">✅ Currently set to: {favoriteGame}</p>
+            <p className="text-[10px] text-[#23A55A]">{t('profileCardPage.currentlySetTo', { game: favoriteGame })}</p>
           )}
         </div>
 
         <div className="space-y-4 bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl">
           <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
-            🎮 My Party History
+            {t('profileCardPage.partyHistoryTitle')}
           </h3>
 
           {historyLoading ? (
-            <p className="text-sm text-[#949ba4] py-4">Loading your history...</p>
+            <p className="text-sm text-[#949ba4] py-4">{t('profileCardPage.loadingHistory')}</p>
           ) : historyError ? (
             <div className="text-center py-4 space-y-2">
               <p className="text-sm text-red-400">⚠️ {historyError}</p>
               <button type="button" onClick={loadHistory} className="text-xs font-bold text-[#5865F2] hover:underline">
-                Retry
+                {t('common.retry')}
               </button>
             </div>
           ) : history.length === 0 ? (
-            <p className="text-sm text-[#949ba4] py-4">📭 No party recruitments yet in this server - join one or start your own with /party_recruit.</p>
+            <p className="text-sm text-[#949ba4] py-4">{t('profileCardPage.noHistoryYet')}</p>
           ) : (
             <div className="space-y-2">
               {history.map((entry) => {
@@ -562,7 +564,7 @@ export default function PersonalCardSettings() {
                 return (
                   <div key={entry.id} className="flex items-center justify-between gap-3 bg-[#111214] rounded-lg px-3 py-2.5">
                     <div className="flex items-center gap-3 min-w-0">
-                      <span className="text-[10px] shrink-0" title={entry.role === 'leader' ? 'You led this recruitment' : 'You joined this recruitment'}>
+                      <span className="text-[10px] shrink-0" title={entry.role === 'leader' ? t('profileCardPage.ledRecruitment') : t('profileCardPage.joinedRecruitment')}>
                         {entry.role === 'leader' ? '👑' : '🙋'}
                       </span>
                       <div className="min-w-0">
@@ -586,13 +588,13 @@ export default function PersonalCardSettings() {
 
       {isDirty && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1e1f22]/95 border border-[#FFD700]/50 px-6 py-3.5 rounded-xl shadow-2xl flex items-center justify-between gap-8 backdrop-blur-md w-[90%] max-w-xl">
-          <span className="text-xs font-bold text-gray-200">⚠️ You have unsaved changes</span>
+          <span className="text-xs font-bold text-gray-200">{t('common.unsavedChanges')}</span>
           <div className="flex gap-3">
             <button type="button" onClick={loadSettings} className="text-xs font-bold text-gray-400 hover:text-white transition">
-              Discard
+              {t('common.discard')}
             </button>
             <button type="button" onClick={handleSave} className="bg-[#23A55A] hover:bg-[#1a7f43] text-white text-xs font-black px-5 py-2 rounded-lg">
-              Save
+              {t('common.save')}
             </button>
           </div>
         </div>

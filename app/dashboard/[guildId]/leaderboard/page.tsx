@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { useT } from '@/lib/i18n/LanguageContext';
 
 interface LeaderboardUser {
   user_id: string;
@@ -18,6 +18,7 @@ export default function GuildLeaderboardTerminal() {
   const router = useRouter();
   const params = useParams();
   const { status } = useSession();
+  const t = useT();
 
   // 💡 NEXT.JS MAGIC: 주소창에 박혀있는 현재 서버 ID를 유저의 입력 없이 자동 추출!
   const guildId = params?.guildId as string;
@@ -91,10 +92,10 @@ export default function GuildLeaderboardTerminal() {
     return (
       <div className="text-center space-y-3 border border-red-500/30 bg-[#161626] p-8 rounded-xl max-w-md mx-auto shadow-2xl mt-20">
         <p className="text-sm text-red-400 font-bold tracking-widest animate-pulse">
-          🔒 CRITICAL: ACCESS DENIED
+          {t('leaderboardPage.accessDenied')}
         </p>
         <p className="text-xs text-[#57576F]">
-          Discord handshake verification required. Redirecting to mainframe...
+          {t('leaderboardPage.redirecting')}
         </p>
       </div>
     );
@@ -123,25 +124,25 @@ export default function GuildLeaderboardTerminal() {
       <div className="space-y-6">
         <div className="flex justify-between items-center border-b border-[#2A1F40] pb-4">
           <div>
-            <h1 className="text-xl md:text-2xl font-black tracking-wider text-white">🏆 SERVER STANDINGS MATRIX</h1>
+            <h1 className="text-xl md:text-2xl font-black tracking-wider text-white">{t('leaderboardPage.title')}</h1>
             <p className="text-xs text-[#57576F] mt-1 tracking-wide">
-              Showing rankings directly linked to node: <code className="text-[#5865F2]">{guildId}</code>
+              {t('leaderboardPage.subtitle')} <code className="text-[#5865F2]">{guildId}</code>
             </p>
           </div>
           <span className="text-[10px] bg-[#2A1F40] text-[#FFD700] px-3 py-1 rounded font-black tracking-widest hidden sm:inline">
-            ALL PREMIUM BYPASS ACTIVE
+            {t('leaderboardPage.premiumBadge')}
           </span>
         </div>
 
         <div className="space-y-3">
           {loading ? (
             <div className="text-center py-20 border border-[#2A1F40] bg-[#161626] rounded-xl animate-pulse">
-              <p className="text-sm text-[#FFD700] tracking-widest">▶ INTERROGATING DATABASE STANDINGS MATRIX...</p>
+              <p className="text-sm text-[#FFD700] tracking-widest">{t('leaderboardPage.loadingStandings')}</p>
             </div>
           ) : users.length === 0 ? (
             <div className="text-center py-20 border border-red-500/20 bg-[#161626] rounded-xl">
-              <p className="text-sm text-red-400 tracking-wider font-bold">❌ NO OPERATOR PROFILE STAMPS DETECTED IN GUILD DESK.</p>
-              <p className="text-xs text-[#57576F] mt-2 font-sans">Ensure users are active and chat logs are generated inside Server Node ID.</p>
+              <p className="text-sm text-red-400 tracking-wider font-bold">{t('leaderboardPage.noUsersTitle')}</p>
+              <p className="text-xs text-[#57576F] mt-2 font-sans">{t('leaderboardPage.noUsersSubtitle')}</p>
             </div>
           ) : (
             users.map((user, index) => {
@@ -158,7 +159,7 @@ export default function GuildLeaderboardTerminal() {
                     </div>
                     <div className="truncate">
                       <h3 className="text-sm md:text-base font-bold text-white truncate">{user.username}</h3>
-                      <p className="text-[10px] text-[#57576F] font-mono mt-0.5">NODE_ID // {user.user_id}</p>
+                      <p className="text-[10px] text-[#57576F] font-mono mt-0.5">{t('leaderboardPage.nodeIdLabel')} {user.user_id}</p>
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-8 w-full sm:w-auto justify-end">
@@ -173,11 +174,11 @@ export default function GuildLeaderboardTerminal() {
                     </div>
                     <div className="flex justify-between sm:justify-end gap-6 text-right font-mono min-w-[120px]">
                       <div>
-                        <div className="text-[10px] text-[#57576F] tracking-wider">LEVEL</div>
+                        <div className="text-[10px] text-[#57576F] tracking-wider">{t('leaderboardPage.level')}</div>
                         <div className="text-sm md:text-base font-black text-white">{user.level}</div>
                       </div>
                       <div>
-                        <div className="text-[10px] text-[#57576F] tracking-wider">POINTS</div>
+                        <div className="text-[10px] text-[#57576F] tracking-wider">{t('leaderboardPage.points')}</div>
                         <div className="text-sm md:text-base font-black text-[#FFD700]">{formatMetric(user.points)}P</div>
                       </div>
                     </div>

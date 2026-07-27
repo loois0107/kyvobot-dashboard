@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import { useT } from '@/lib/i18n/LanguageContext';
 
 interface QueueComboStat {
   queue_type: string;
@@ -30,6 +31,7 @@ type LoadStatus = 'loading' | 'loaded' | 'error';
 
 export default function PartyStatsPage() {
   const params = useParams();
+  const t = useT();
   const guildId = (params?.guildId as string) || '';
 
   const [loadStatus, setLoadStatus] = useState<LoadStatus>('loading');
@@ -45,9 +47,9 @@ export default function PartyStatsPage() {
   const extractErrorMessage = async (res: Response): Promise<string> => {
     try {
       const data = await res.json();
-      return data.message || `Request failed (${res.status})`;
+      return data.message || t('common.requestFailed', { status: res.status });
     } catch {
-      return `Request failed (${res.status})`;
+      return t('common.requestFailed', { status: res.status });
     }
   };
 
@@ -67,7 +69,7 @@ export default function PartyStatsPage() {
       setLoadStatus('loaded');
     } catch (err) {
       console.error(err);
-      setLoadErrorMsg('Network error while loading party stats.');
+      setLoadErrorMsg(t('partyStatsPage.networkError'));
       setLoadStatus('error');
     } finally {
       setIsRefreshing(false);
@@ -77,7 +79,7 @@ export default function PartyStatsPage() {
   if (loadStatus === 'loading') {
     return (
       <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-sm">
-        Loading party stats...
+        {t('partyStatsPage.loadingStats')}
       </div>
     );
   }
@@ -85,14 +87,14 @@ export default function PartyStatsPage() {
   if (loadStatus === 'error') {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
-        <p className="text-red-400 font-bold">⚠️ Failed to load party stats</p>
+        <p className="text-red-400 font-bold">{t('partyStatsPage.loadFailed')}</p>
         <p className="text-sm text-[#949ba4]">{loadErrorMsg}</p>
         <button
           type="button"
           onClick={() => loadData(false)}
           className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl"
         >
-          Retry
+          {t('common.retry')}
         </button>
       </div>
     );
@@ -104,9 +106,9 @@ export default function PartyStatsPage() {
     <div className="max-w-3xl mx-auto space-y-6 pb-16">
       <header className="border-b border-[#2b2d31] pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">📊 Party Recruitment Stats</h1>
+          <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('partyStatsPage.title')}</h1>
           <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
-            Rolling {stats.window_days}-day window · {stats.cached ? 'Cached snapshot' : 'Freshly computed'}
+            {t('partyStatsPage.subtitle', { days: stats.window_days, cacheState: stats.cached ? t('partyStatsPage.cachedSnapshot') : t('partyStatsPage.freshlyComputed') })}
           </p>
         </div>
         <button
@@ -115,25 +117,25 @@ export default function PartyStatsPage() {
           disabled={isRefreshing}
           className="w-full sm:w-auto bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all"
         >
-          {isRefreshing ? 'REFRESHING...' : 'REFRESH NOW'}
+          {isRefreshing ? t('auditLogsPage.refreshing') : t('auditLogsPage.refreshNow')}
         </button>
       </header>
 
       {/* 이번 주 결성 건수 */}
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-3 shadow-xl">
         <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
-          Recruitments (last {stats.window_days} days)
+          {t('partyStatsPage.recruitmentsTitle', { days: stats.window_days })}
         </h3>
         {stats.is_empty ? (
           <p className="text-sm text-[#949ba4] py-4">
-            📭 Not enough data yet - no recruitment posts in the last {stats.window_days} days.
+            {t('partyStatsPage.notEnoughDataDays', { days: stats.window_days })}
           </p>
         ) : (
           <div>
             <p className="text-4xl font-black text-white">{stats.weekly_count}</p>
             {stats.is_sparse && (
               <p className="text-[10px] text-[#57576F] mt-1">
-                ⚠️ Small sample size - treat this as a rough signal, not a trend.
+                {t('partyStatsPage.smallSampleWarning')}
               </p>
             )}
           </div>
@@ -143,10 +145,10 @@ export default function PartyStatsPage() {
       {/* 인기 큐타입/라인 조합 */}
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-3 shadow-xl">
         <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
-          Most Popular Queue / Lane Combos
+          {t('partyStatsPage.popularCombosTitle')}
         </h3>
         {stats.top_combos.length === 0 ? (
-          <p className="text-sm text-[#949ba4] py-4">📭 Not enough data yet.</p>
+          <p className="text-sm text-[#949ba4] py-4">{t('partyStatsPage.notEnoughData')}</p>
         ) : (
           <div className="space-y-2">
             {stats.top_combos.map((combo, i) => (
@@ -161,34 +163,34 @@ export default function PartyStatsPage() {
           </div>
         )}
         {stats.is_sparse && stats.top_combos.length > 0 && (
-          <p className="text-[10px] text-[#57576F]">⚠️ Small sample size - treat this as a rough signal, not a trend.</p>
+          <p className="text-[10px] text-[#57576F]">{t('partyStatsPage.smallSampleWarning')}</p>
         )}
       </div>
 
       {/* 티어 분포 */}
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-3 shadow-xl">
         <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
-          Verified Tier Distribution
+          {t('partyStatsPage.tierDistTitle')}
         </h3>
         <p className="text-[10px] text-[#57576F]">
-          Based on the latest /tier_verify result per member ({stats.verified_user_count} verified member{stats.verified_user_count === 1 ? '' : 's'}) - not live role membership.
+          {t('partyStatsPage.tierDistSubtitle', { count: stats.verified_user_count, plural: stats.verified_user_count === 1 ? '' : 's' })}
         </p>
         {stats.tier_distribution.length === 0 ? (
-          <p className="text-sm text-[#949ba4] py-4">📭 No members have run /tier_verify yet.</p>
+          <p className="text-sm text-[#949ba4] py-4">{t('partyStatsPage.noVerifiedYet')}</p>
         ) : (
           <div className="space-y-1.5">
             {(() => {
-              const max = Math.max(...stats.tier_distribution.map((t) => t.count));
-              return stats.tier_distribution.map((t) => (
-                <div key={t.tier} className="flex items-center gap-3">
-                  <span className="text-xs text-[#b5bac1] w-28 shrink-0">{t.tier}</span>
+              const max = Math.max(...stats.tier_distribution.map((entry) => entry.count));
+              return stats.tier_distribution.map((tier) => (
+                <div key={tier.tier} className="flex items-center gap-3">
+                  <span className="text-xs text-[#b5bac1] w-28 shrink-0">{tier.tier}</span>
                   <div className="flex-1 bg-[#111214] rounded-full h-4 overflow-hidden">
                     <div
                       className="h-full bg-[#5865F2] rounded-full"
-                      style={{ width: `${Math.max((t.count / max) * 100, 4)}%` }}
+                      style={{ width: `${Math.max((tier.count / max) * 100, 4)}%` }}
                     />
                   </div>
-                  <span className="text-xs font-black text-white w-6 text-right shrink-0">{t.count}</span>
+                  <span className="text-xs font-black text-white w-6 text-right shrink-0">{tier.count}</span>
                 </div>
               ));
             })()}

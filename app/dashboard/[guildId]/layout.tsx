@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { useT } from '@/lib/i18n/LanguageContext';
+import LanguageToggle from '@/components/LanguageToggle';
 
 type ManagedGuild = { id: string; name: string };
 
@@ -14,6 +16,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const params = useParams();
   const router = useRouter();
   const pathname = usePathname();
+  const t = useT();
 
   const rawGuildId = params?.guildId as string | undefined;
   const currentGuildId = isValidGuildId(rawGuildId) ? rawGuildId : undefined;
@@ -83,7 +86,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div>
           <div className="mb-6 flex justify-between items-center">
             <div>
-              <label className="block text-xs font-bold text-[#949ba4] uppercase tracking-wider mb-2">Select Server</label>
+              <label className="block text-xs font-bold text-[#949ba4] uppercase tracking-wider mb-2">{t('sidebar.selectServer')}</label>
               <select
                 value={currentGuildId || ''}
                 onChange={(e) => handleGuildChange(e.target.value)}
@@ -98,96 +101,96 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
 
           <nav className="space-y-1">
-            <label className="block text-xs font-bold text-[#949ba4] uppercase tracking-wider mb-2 px-2">Modules</label>
-            <Link 
+            <label className="block text-xs font-bold text-[#949ba4] uppercase tracking-wider mb-2 px-2">{t('sidebar.modules')}</label>
+            <Link
               href={`/dashboard/${currentGuildId}`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname === `/dashboard/${currentGuildId}` ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
-              🎛️ Control Hub Home
+              {t('sidebar.controlHubHome')}
             </Link>
             <Link
               href={`/dashboard/${currentGuildId}/automod`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/automod') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
-              🛡️ AutoMod
+              {t('sidebar.automod')}
             </Link>
             <Link
               href={`/dashboard/${currentGuildId}/leveling`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/leveling') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
-              ✨ Leveling & Economy
+              {t('sidebar.levelingEconomy')}
             </Link>
             <Link
               href={`/dashboard/${currentGuildId}/welcome`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/welcome') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
-              📥 Welcome Settings
+              {t('sidebar.welcomeSettings')}
             </Link>
             <Link
               href={`/dashboard/${currentGuildId}/voice`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/voice') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
-              🎙️ Join to Create
+              {t('sidebar.joinToCreate')}
             </Link>
             <Link
               href={`/dashboard/${currentGuildId}/anonymous-reports`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/anonymous-reports') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
-              🌳 Anonymous Reports
+              {t('sidebar.anonymousReports')}
             </Link>
             <Link
               href={`/dashboard/${currentGuildId}/giveaways`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/giveaways') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
-              🎁 Giveaways
+              {t('sidebar.giveaways')}
             </Link>
-            <Link 
+            <Link
               href={`/dashboard/${currentGuildId}/ticket-settings`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/ticket-settings') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
-              🎫 AI Support Ticket
+              {t('sidebar.aiSupportTicket')}
             </Link>
             <Link
               href={`/dashboard/${currentGuildId}/leaderboard`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/leaderboard') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
-              🏆 Server Leaderboard
+              {t('sidebar.serverLeaderboard')}
             </Link>
             <Link
               href={`/dashboard/${currentGuildId}/tier-roles`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/tier-roles') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
-              🏅 Tier Role Mapping
+              {t('sidebar.tierRoleMapping')}
             </Link>
             <Link
               href={`/dashboard/${currentGuildId}/reaction-roles`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/reaction-roles') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
-              🎭 Reaction Roles
+              {t('sidebar.reactionRoles')}
             </Link>
             <Link
               href={`/dashboard/${currentGuildId}/twitch`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/twitch') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
-              📺 Twitch Streamers
+              {t('sidebar.twitchStreamers')}
             </Link>
             <Link
               href={`/dashboard/${currentGuildId}/party-settings`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/party-settings') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
-              🎮 Party Recruitment
+              {t('sidebar.partyRecruitment')}
             </Link>
             <Link
               href={`/dashboard/${currentGuildId}/party-stats`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/party-stats') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
-              📊 Party Stats
+              {t('sidebar.partyStats')}
             </Link>
             <Link
               href={`/dashboard/${currentGuildId}/party-presets`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/party-presets') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
-              🎨 Game Presets
+              {t('sidebar.gamePresets')}
             </Link>
 
             {/* ⚙️ FIXED: 사이드바 최하단에 'Custom Commands' 퀵 네비게이션 노드 추가 완료! 활성화 하이라이트 배경 완벽 연동 */}
@@ -195,20 +198,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               href={`/dashboard/${currentGuildId}/settings`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/settings') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
-              ⚙️ Custom Commands
+              {t('sidebar.customCommands')}
             </Link>
 
             <Link
               href={`/dashboard/${currentGuildId}/audit-logs`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/audit-logs') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
-              🛡️ Audit Logs
+              {t('sidebar.auditLogs')}
             </Link>
           </nav>
         </div>
 
         <div className="pt-4 border-t border-[#2b2d31] text-xs text-[#949ba4]">
-          <p>Current Active Node:</p>
+          <p>{t('sidebar.currentActiveNode')}</p>
           <code className="text-[#5865f2] block mt-1 truncate">{currentGuildId}</code>
         </div>
       </aside>
@@ -218,19 +221,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <button type="button" onClick={() => setIsMobileMenuOpen(true)} className="text-gray-300 hover:text-white p-1 focus:outline-none">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
-          <span className="text-xs font-black tracking-widest text-[#FFD700] uppercase">Kyvo Control Hub</span>
-          <div className="w-8"></div>
+          <span className="text-xs font-black tracking-widest text-[#FFD700] uppercase">{t('sidebar.mobileHeaderTitle')}</span>
+          <LanguageToggle />
         </div>
 
         <main className="flex-1 p-5 md:p-8 overflow-y-auto">
           <header className="mb-6 pb-4 border-b border-[#2b2d31] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <h1 className="text-xl md:text-2xl font-bold text-white uppercase tracking-wide break-words max-w-full">Kyvo Central Control Hub</h1>
-            <div className="bg-[#232428] px-3 py-1 rounded-full text-xs text-[#23a55a] font-semibold flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#23a55a] animate-pulse"></span> Endpoint Matrix Sync</div>
+            <h1 className="text-xl md:text-2xl font-bold text-white uppercase tracking-wide break-words max-w-full">{t('sidebar.mainHeaderTitle')}</h1>
+            <div className="flex items-center gap-3">
+              <div className="bg-[#232428] px-3 py-1 rounded-full text-xs text-[#23a55a] font-semibold flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#23a55a] animate-pulse"></span> {t('sidebar.syncStatus')}</div>
+              <div className="hidden md:block">
+                <LanguageToggle />
+              </div>
+            </div>
           </header>
 
           {isSubPage && (
             <div className="mb-6">
-              <button type="button" onClick={() => router.back()} className="inline-flex items-center gap-2 text-xs font-bold text-[#5865F2] hover:text-white bg-[#5865F2]/10 hover:bg-[#5865F2] border border-[#5865F2]/20 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer shadow-md"><span>◀</span> GO BACK</button>
+              <button type="button" onClick={() => router.back()} className="inline-flex items-center gap-2 text-xs font-bold text-[#5865F2] hover:text-white bg-[#5865F2]/10 hover:bg-[#5865F2] border border-[#5865F2]/20 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer shadow-md"><span>◀</span> {t('sidebar.goBack')}</button>
             </div>
           )}
           {children}

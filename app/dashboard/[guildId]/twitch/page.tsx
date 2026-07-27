@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
+import { useT } from '@/lib/i18n/LanguageContext';
 
 interface StreamerRow {
   broadcaster_id: string;
@@ -22,17 +23,18 @@ interface StreamerRow {
 
 type LoadStatus = 'loading' | 'loaded' | 'error';
 
-const HEALTH_BADGE: Record<StreamerRow['poll_health'], { emoji: string; label: string; color: string }> = {
-  healthy: { emoji: '🟢', label: 'Polling healthy', color: 'text-green-400' },
-  warning: { emoji: '🟡', label: 'Polling delayed', color: 'text-amber-400' },
-  stale: { emoji: '🔴', label: 'Polling stalled', color: 'text-red-400' },
-  pending: { emoji: '⚪', label: 'Awaiting first check', color: 'text-gray-400' },
-};
-
 export default function TwitchStreamersSettings() {
   const params = useParams();
   const { showToast } = useToast();
+  const t = useT();
   const guildId = (params?.guildId as string) || '';
+
+  const HEALTH_BADGE: Record<StreamerRow['poll_health'], { emoji: string; label: string; color: string }> = {
+    healthy: { emoji: '🟢', label: t('twitchPage.healthyLabel'), color: 'text-green-400' },
+    warning: { emoji: '🟡', label: t('twitchPage.delayedLabel'), color: 'text-amber-400' },
+    stale: { emoji: '🔴', label: t('twitchPage.stalledLabel'), color: 'text-red-400' },
+    pending: { emoji: '⚪', label: t('twitchPage.pendingLabel'), color: 'text-gray-400' },
+  };
 
   const [loadStatus, setLoadStatus] = useState<LoadStatus>('loading');
   const [loadErrorMsg, setLoadErrorMsg] = useState('');
@@ -47,9 +49,9 @@ export default function TwitchStreamersSettings() {
   const extractErrorMessage = async (res: Response): Promise<string> => {
     try {
       const data = await res.json();
-      return data.message || `Request failed (${res.status})`;
+      return data.message || t('common.requestFailed', { status: res.status });
     } catch {
-      return `Request failed (${res.status})`;
+      return t('common.requestFailed', { status: res.status });
     }
   };
 
@@ -68,13 +70,13 @@ export default function TwitchStreamersSettings() {
       setLoadStatus('loaded');
     } catch (err) {
       console.error(err);
-      setLoadErrorMsg('Network error while loading streamer data.');
+      setLoadErrorMsg(t('twitchPage.loadNetworkError'));
       setLoadStatus('error');
     }
   };
 
   const handleRemove = async (streamer: StreamerRow) => {
-    if (!window.confirm(`Stop tracking ${streamer.broadcaster_login}? This can't be undone from here.`)) return;
+    if (!window.confirm(t('twitchPage.confirmStopTracking', { login: streamer.broadcaster_login }))) return;
     setRemovingId(streamer.broadcaster_id);
     try {
       const res = await fetch(`/api/twitch/${guildId}`, {
@@ -85,16 +87,16 @@ export default function TwitchStreamersSettings() {
       if (res.ok) {
         const data = await res.json().catch(() => null);
         const detail = data?.subscriptions_also_removed
-          ? '트위치 구독 자체도 완전히 취소됐어요(다른 서버는 이 스트리머를 추적 중이지 않았어요).'
-          : '다른 서버도 이 스트리머를 추적 중이라 그쪽 알림은 계속 작동해요.';
-        showToast(`${streamer.broadcaster_login} removed. ${detail}`, 'success');
+          ? t('twitchPage.subscriptionAlsoRemoved')
+          : t('twitchPage.subscriptionStillActive');
+        showToast(t('twitchPage.removedSuccess', { login: streamer.broadcaster_login, detail }), 'success');
         setStreamers((prev) => prev.filter((s) => s.broadcaster_id !== streamer.broadcaster_id));
       } else {
         showToast(await extractErrorMessage(res), 'error');
       }
     } catch (err) {
       console.error(err);
-      showToast('Network error while removing.', 'error');
+      showToast(t('twitchPage.removeNetworkError'), 'error');
     } finally {
       setRemovingId(null);
     }
@@ -103,7 +105,7 @@ export default function TwitchStreamersSettings() {
   if (loadStatus === 'loading') {
     return (
       <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-sm">
-        Loading streamers...
+        {t('twitchPage.loading')}
       </div>
     );
   }
@@ -111,14 +113,14 @@ export default function TwitchStreamersSettings() {
   if (loadStatus === 'error') {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
-        <p className="text-red-400 font-bold">⚠️ Failed to load streamer data</p>
+        <p className="text-red-400 font-bold">{t('twitchPage.loadFailed')}</p>
         <p className="text-sm text-[#949ba4]">{loadErrorMsg}</p>
         <button
           type="button"
           onClick={loadData}
           className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl"
         >
-          Retry
+          {t('common.retry')}
         </button>
       </div>
     );
@@ -127,21 +129,19 @@ export default function TwitchStreamersSettings() {
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-16">
       <header className="border-b border-[#2b2d31] pb-6">
-        <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">📺 Twitch Streamers</h1>
+        <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('twitchPage.title')}</h1>
         <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
-          Registered via /twitch_channel_set - live announcements &amp; role grants. This page is view/remove only;
-          use the Discord command to add or change a streamer.
+          {t('twitchPage.subtitle')}
         </p>
         <p className="text-[10px] text-[#57576F] mt-2 normal-case">
-          🟢 10분 이내 정상 / 🟡 10~30분 지연(재배포 중일 수 있음) / 🔴 30분 초과(폴링 중단으로 판단) / ⚪ 등록 직후 아직 첫 확인 전.
-          이 배지는 안전망 폴링이 최근에 돌았는지만 보는 거라, 실제 라이브 알림 자체가 끊겼는지는 완벽히 보장하지 않아요.
+          {t('twitchPage.healthLegend')}
         </p>
       </header>
 
       {streamers.length === 0 ? (
         <div className="text-center py-12 border border-dashed border-[#2b2d31] rounded-xl bg-[#1e1f22]">
           <p className="text-sm text-gray-400">
-            No Twitch streamers registered yet. Use <code className="text-[#5865F2]">/twitch_channel_set</code> in Discord to add one.
+            {t('twitchPage.noStreamersYetPrefix')} <code className="text-[#5865F2]">/twitch_channel_set</code> {t('twitchPage.noStreamersYetSuffix')}
           </p>
         </div>
       ) : (
@@ -154,9 +154,9 @@ export default function TwitchStreamersSettings() {
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-black text-white">{s.broadcaster_login}</span>
                     {s.is_live ? (
-                      <span className="text-[10px] font-black text-white bg-red-600 px-2 py-0.5 rounded-full">🔴 LIVE</span>
+                      <span className="text-[10px] font-black text-white bg-red-600 px-2 py-0.5 rounded-full">{t('twitchPage.live')}</span>
                     ) : (
-                      <span className="text-[10px] font-bold text-gray-500 bg-[#111214] px-2 py-0.5 rounded-full">Offline</span>
+                      <span className="text-[10px] font-bold text-gray-500 bg-[#111214] px-2 py-0.5 rounded-full">{t('twitchPage.offline')}</span>
                     )}
                   </div>
                   <span className={`text-[11px] font-bold ${badge.color}`}>
@@ -166,29 +166,30 @@ export default function TwitchStreamersSettings() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-[#b5bac1]">
                   <div>
-                    <span className="text-[#57576F] uppercase text-[10px] font-bold block">Announcement Channel</span>
-                    {s.announcement_channel_name ? `#${s.announcement_channel_name}` : `Unknown (${s.announcement_channel_id})`}
+                    <span className="text-[#57576F] uppercase text-[10px] font-bold block">{t('twitchPage.announcementChannel')}</span>
+                    {s.announcement_channel_name ? `#${s.announcement_channel_name}` : t('twitchPage.unknownChannel', { id: s.announcement_channel_id })}
                   </div>
                   <div>
-                    <span className="text-[#57576F] uppercase text-[10px] font-bold block">Last Poll Check</span>
+                    <span className="text-[#57576F] uppercase text-[10px] font-bold block">{t('twitchPage.lastPollCheck')}</span>
                     {s.last_checked_at
-                      ? `${Math.round(s.minutes_since_last_check ?? 0)} min ago`
-                      : 'Never checked yet'}
+                      ? t('twitchPage.minutesAgo', { minutes: Math.round(s.minutes_since_last_check ?? 0) })
+                      : t('twitchPage.neverChecked')}
                   </div>
                   <div>
-                    <span className="text-[#57576F] uppercase text-[10px] font-bold block">Linked Member</span>
-                    {s.member_id ? (s.member_display_name || `Unknown member (${s.member_id})`) : '— not configured —'}
+                    <span className="text-[#57576F] uppercase text-[10px] font-bold block">{t('twitchPage.linkedMember')}</span>
+                    {s.member_id ? (s.member_display_name || `Unknown member (${s.member_id})`) : t('twitchPage.notConfiguredDash')}
                   </div>
                   <div>
-                    <span className="text-[#57576F] uppercase text-[10px] font-bold block">Live Role</span>
-                    {s.live_role_id ? (s.live_role_name || `Unknown role (${s.live_role_id})`) : '— not configured —'}
+                    <span className="text-[#57576F] uppercase text-[10px] font-bold block">{t('twitchPage.liveRole')}</span>
+                    {s.live_role_id ? (s.live_role_name || `Unknown role (${s.live_role_id})`) : t('twitchPage.notConfiguredDash')}
                   </div>
                 </div>
 
                 {s.role_grant_status === 'incomplete' && (
                   <p className="text-[11px] font-bold text-amber-400 bg-amber-950/20 border border-amber-500/20 rounded-lg px-3 py-2">
-                    ⚠️ Incomplete - {s.member_id ? 'a member is linked but no role is set' : 'a role is set but no member is linked'},
-                    so the role grant won&apos;t trigger. Re-run /twitch_channel_set with both member and role to fix this.
+                    {t('twitchPage.incompleteWarning', {
+                      reason: s.member_id ? t('twitchPage.incompleteReasonNoRole') : t('twitchPage.incompleteReasonNoMember'),
+                    })}
                   </p>
                 )}
 
@@ -199,7 +200,7 @@ export default function TwitchStreamersSettings() {
                     disabled={removingId === s.broadcaster_id}
                     className="text-[11px] font-black text-red-400 hover:text-white hover:bg-red-600 border border-red-500/30 px-4 py-2 rounded-lg transition-all"
                   >
-                    {removingId === s.broadcaster_id ? 'Removing...' : '🗑️ Remove'}
+                    {removingId === s.broadcaster_id ? t('twitchPage.removing') : t('twitchPage.remove')}
                   </button>
                 </div>
               </div>

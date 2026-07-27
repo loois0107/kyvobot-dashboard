@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
+import { useT } from '@/lib/i18n/LanguageContext';
 
 const TIER_CHOICES = ['Iron', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Emerald', 'Diamond', 'Master', 'Grandmaster', 'Challenger'];
 
@@ -33,6 +34,7 @@ type LoadStatus = 'loading' | 'loaded' | 'error';
 export default function TierRolesSettings() {
   const params = useParams();
   const { showToast } = useToast();
+  const t = useT();
   const guildId = (params?.guildId as string) || '';
 
   const [loadStatus, setLoadStatus] = useState<LoadStatus>('loading');
@@ -46,7 +48,7 @@ export default function TierRolesSettings() {
   const [blockedItems, setBlockedItems] = useState<BlockedItem[]>([]);
   const [needsConfirmation, setNeedsConfirmation] = useState<NeedsConfirmationItem[]>([]);
 
-  const isDirty = TIER_CHOICES.some((t) => (selections[t] || '') !== (savedSelections[t] || ''));
+  const isDirty = TIER_CHOICES.some((tier) => (selections[tier] || '') !== (savedSelections[tier] || ''));
 
   useEffect(() => {
     if (!guildId) return;
@@ -56,9 +58,9 @@ export default function TierRolesSettings() {
   const extractErrorMessage = async (res: Response): Promise<string> => {
     try {
       const data = await res.json();
-      return data.message || `Request failed (${res.status})`;
+      return data.message || t('common.requestFailed', { status: res.status });
     } catch {
-      return `Request failed (${res.status})`;
+      return t('common.requestFailed', { status: res.status });
     }
   };
 
@@ -83,14 +85,14 @@ export default function TierRolesSettings() {
       setLoadStatus('loaded');
     } catch (err) {
       console.error(err);
-      setLoadErrorMsg('Network error while loading role data.');
+      setLoadErrorMsg(t('tierRolesPage.loadNetworkError'));
       setLoadStatus('error');
     }
   };
 
   const handleDiscard = () => {
     if (!isDirty) return;
-    if (window.confirm('Discard your unsaved changes?')) {
+    if (window.confirm(t('tierRolesPage.discardConfirm'))) {
       setSelections(savedSelections);
       setBlockedItems([]);
       setNeedsConfirmation([]);
@@ -109,7 +111,7 @@ export default function TierRolesSettings() {
       const data = await res.json().catch(() => null);
 
       if (res.ok && data?.status === 'success') {
-        showToast('Tier role mappings saved!', 'success');
+        showToast(t('tierRolesPage.savedSuccess'), 'success');
         setSavedSelections(selections);
         setNeedsConfirmation([]);
         return;
@@ -122,14 +124,14 @@ export default function TierRolesSettings() {
 
       if (data?.status === 'blocked') {
         setBlockedItems(data.blocked || []);
-        showToast('Some roles could not be saved - see details below.', 'error');
+        showToast(t('tierRolesPage.someRolesBlocked'), 'error');
         return;
       }
 
-      showToast(data?.message || `Request failed (${res.status})`, 'error');
+      showToast(data?.message || t('common.requestFailed', { status: res.status }), 'error');
     } catch (err) {
       console.error(err);
-      showToast('Network error while saving.', 'error');
+      showToast(t('tierRolesPage.saveNetworkError'), 'error');
     } finally {
       setIsSaving(false);
     }
@@ -142,7 +144,7 @@ export default function TierRolesSettings() {
   if (loadStatus === 'loading') {
     return (
       <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-sm">
-        Loading roles...
+        {t('tierRolesPage.loadingRoles')}
       </div>
     );
   }
@@ -150,14 +152,14 @@ export default function TierRolesSettings() {
   if (loadStatus === 'error') {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
-        <p className="text-red-400 font-bold">⚠️ Failed to load role data</p>
+        <p className="text-red-400 font-bold">{t('tierRolesPage.loadFailed')}</p>
         <p className="text-sm text-[#949ba4]">{loadErrorMsg}</p>
         <button
           type="button"
           onClick={loadData}
           className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl"
         >
-          Retry
+          {t('common.retry')}
         </button>
       </div>
     );
@@ -166,16 +168,15 @@ export default function TierRolesSettings() {
   return (
     <div className="max-w-3xl mx-auto space-y-6 pb-28">
       <header className="border-b border-[#2b2d31] pb-6">
-        <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">🏅 Tier Role Mapping</h1>
+        <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('tierRolesPage.title')}</h1>
         <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
-          Used by /tier_verify and /tier_set to grant a role for each rank tier. A member can only hold one tier role at a time -
-          setting a new tier automatically removes their old one. /tier_verify also requires an admin to run /riot_region_set first.
+          {t('tierRolesPage.subtitle')}
         </p>
       </header>
 
       {blockedItems.length > 0 && (
         <div className="bg-red-950/30 border border-red-500/30 rounded-xl p-4 space-y-2">
-          <p className="text-xs font-black text-red-400 uppercase">These couldn't be saved:</p>
+          <p className="text-xs font-black text-red-400 uppercase">{t('tierRolesPage.couldNotSave')}</p>
           {blockedItems.map((item, i) => (
             <p key={i} className="text-xs text-red-300">
               {item.tier ? <strong>{item.tier}</strong> : null} {item.role_name ? `(${item.role_name})` : ''} — {item.reason}
@@ -186,8 +187,7 @@ export default function TierRolesSettings() {
 
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-3 shadow-xl">
         <p className="text-[10px] text-[#57576F] pb-1">
-          매핑을 바꾸거나 비우면, 그 역할을 이미 갖고 있던 멤버에게서도 자동으로 회수됩니다 - 새로 설정되는 사람만이 아니라요.
-          비워두면(&quot;No role assigned&quot;) 그 티어는 /tier_set·/tier_verify에서 사용할 수 없어요(에러로 안내됨).
+          {t('tierRolesPage.reassignmentNote')}
         </p>
         {TIER_CHOICES.map((tier) => (
           <div key={tier} className="flex items-center gap-4">
@@ -197,7 +197,7 @@ export default function TierRolesSettings() {
               onChange={(e) => setSelections((prev) => ({ ...prev, [tier]: e.target.value }))}
               className="flex-1 bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5865F2]"
             >
-              <option value="">-- No role assigned --</option>
+              <option value="">{t('tierRolesPage.noRoleAssigned')}</option>
               {roles.map((r) => (
                 <option key={r.id} value={r.id}>{r.name}</option>
               ))}
@@ -208,10 +208,10 @@ export default function TierRolesSettings() {
 
       {isDirty && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1e1f22]/95 border border-[#FFD700]/50 px-6 py-3.5 rounded-xl shadow-2xl flex items-center justify-between gap-8 backdrop-blur-md w-[90%] max-w-xl">
-          <span className="text-xs font-bold text-gray-200">⚠️ You have unsaved changes</span>
+          <span className="text-xs font-bold text-gray-200">{t('common.unsavedChanges')}</span>
           <div className="flex gap-3">
             <button type="button" onClick={handleDiscard} className="text-xs font-bold text-gray-400 hover:text-white transition">
-              Discard
+              {t('common.discard')}
             </button>
             <button
               type="button"
@@ -219,7 +219,7 @@ export default function TierRolesSettings() {
               disabled={isSaving}
               className="bg-[#23A55A] hover:bg-[#1a7f43] text-white text-xs font-black px-5 py-2 rounded-lg"
             >
-              {isSaving ? 'Saving...' : 'Save'}
+              {isSaving ? t('common.saving') : t('common.save')}
             </button>
           </div>
         </div>
@@ -228,7 +228,7 @@ export default function TierRolesSettings() {
       {needsConfirmation.length > 0 && (
         <div className="fixed inset-0 z-[60] bg-black/70 flex items-center justify-center p-4">
           <div className="bg-[#1e1f22] border border-amber-500/40 rounded-2xl p-6 max-w-lg w-full space-y-4">
-            <p className="text-sm font-black text-amber-400">⚠️ These roles have elevated permissions</p>
+            <p className="text-sm font-black text-amber-400">{t('tierRolesPage.elevatedPermsTitle')}</p>
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {needsConfirmation.map((item) => (
                 <div key={item.tier} className="bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs">
@@ -238,7 +238,7 @@ export default function TierRolesSettings() {
               ))}
             </div>
             <p className="text-xs text-[#949ba4]">
-              Anyone who reaches these tiers will be granted a role with these permissions. Continue anyway?
+              {t('tierRolesPage.elevatedPermsBody')}
             </p>
             <div className="flex gap-3 justify-end">
               <button
@@ -246,7 +246,7 @@ export default function TierRolesSettings() {
                 onClick={handleCancelConfirmation}
                 className="text-xs font-bold text-gray-400 hover:text-white px-4 py-2"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 type="button"
@@ -254,7 +254,7 @@ export default function TierRolesSettings() {
                 disabled={isSaving}
                 className="bg-red-600 hover:bg-red-700 text-white text-xs font-black px-5 py-2 rounded-lg"
               >
-                {isSaving ? 'Saving...' : 'Confirm & Save Anyway'}
+                {isSaving ? t('common.saving') : t('tierRolesPage.confirmSaveAnyway')}
               </button>
             </div>
           </div>

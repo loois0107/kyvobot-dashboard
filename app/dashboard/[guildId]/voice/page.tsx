@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import { useT } from '@/lib/i18n/LanguageContext';
 
 export default function VoiceSettingsPage() {
   const params = useParams();
+  const t = useT();
   const guildId = params?.guildId as string | undefined;
 
   const [triggerChannelId, setTriggerChannelId] = useState('');
@@ -25,14 +27,14 @@ export default function VoiceSettingsPage() {
         if (res.ok && data.ok) {
           setTriggerChannelId(data.voice_settings?.trigger_channel_id || '');
         } else {
-          setMessage(`Load failed [${res.status}]: ${data.error || 'Unknown error.'}`);
+          setMessage(`${t('voicePage.loadFailedPrefix')} [${res.status}]: ${data.error || t('voicePage.unknownError')}`);
         }
         setLoading(false);
         setHasLoaded(true);
       })
       .catch((err) => {
         console.error(err);
-        setMessage('Failed to fetch voice settings.');
+        setMessage(t('voicePage.fetchFailed'));
         setLoading(false);
         setHasLoaded(true);
       });
@@ -56,13 +58,13 @@ export default function VoiceSettingsPage() {
       const data = await res.json();
 
       if (res.ok && data.ok) {
-        setMessage('Voice settings saved successfully.');
+        setMessage(t('voicePage.saveSuccess'));
       } else {
-        setMessage(`Save failed [${res.status}]: ${data.error || 'Unknown error.'}`);
+        setMessage(`${t('voicePage.saveFailedPrefix')} [${res.status}]: ${data.error || t('voicePage.unknownError')}`);
       }
     } catch (err) {
       console.error(err);
-      setMessage('Failed to save voice settings.');
+      setMessage(t('voicePage.saveFailed'));
     } finally {
       setLoading(false);
     }
@@ -73,9 +75,9 @@ export default function VoiceSettingsPage() {
       <div className="max-w-2xl mx-auto">
         <header className="mb-8 border-b border-[#2A1F40] pb-4 flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-extrabold text-purple-400">🎙️ JOIN TO CREATE</h1>
+            <h1 className="text-2xl font-extrabold text-purple-400">{t('voicePage.title')}</h1>
             <p className="text-xs text-[#57576F] mt-1">
-              Configure the trigger voice channel. Joining it spawns a personal temp channel and moves the member in automatically.
+              {t('voicePage.subtitle')}
             </p>
           </div>
           {hasLoaded && (
@@ -86,38 +88,35 @@ export default function VoiceSettingsPage() {
                   : 'bg-amber-950/40 text-amber-400 border border-amber-500/30'
               }`}
             >
-              {isConfigured ? '✅ ACTIVE' : '⚠️ NOT CONFIGURED'}
+              {isConfigured ? t('voicePage.active') : t('voicePage.notConfigured')}
             </span>
           )}
         </header>
 
         <div className="flex flex-col gap-6 bg-[#161626] border border-[#2A1F40] p-6 rounded-xl shadow-xl">
           <div>
-            <label className="text-xs text-gray-400 block mb-1">ACTIVE CONTEXT</label>
+            <label className="text-xs text-gray-400 block mb-1">{t('common.activeContext')}</label>
             <div className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-purple-400 px-3 py-2 rounded font-bold select-none">
-              Guild {guildId ? guildId : 'Loading...'}
+              {t('common.guildLabel')} {guildId ? guildId : t('common.loading')}
             </div>
           </div>
 
           <div className="bg-[#0F0F1A] border border-[#2A1F40] rounded-lg p-3 text-[11px] text-gray-300 leading-relaxed">
-            First, create a voice channel on your server (e.g. <span className="text-purple-300">"➕ Create a Room"</span>).
-            Once you enter its channel ID below, a personal voice channel will be created automatically
-            whenever a member joins it.
+            {t('voicePage.explainer')}
           </div>
 
           <div>
-            <label className="text-xs text-gray-400 block mb-1">TRIGGER VOICE CHANNEL ID</label>
+            <label className="text-xs text-gray-400 block mb-1">{t('voicePage.triggerChannelLabel')}</label>
             <input
               type="text"
               value={triggerChannelId}
               onChange={(e) => setTriggerChannelId(e.target.value)}
               disabled={loading}
-              placeholder="e.g. 1234567890123456789"
+              placeholder={t('common.egPlaceholderId')}
               className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-white px-3 py-2 rounded focus:outline-none focus:border-[#5865f2] disabled:opacity-50"
             />
             <p className="text-[10px] text-[#57576F] mt-2">
-              How to find a channel ID: Discord Settings → Advanced → enable Developer Mode → right-click the channel → Copy Channel ID.
-              Leave empty to disable Join to Create.
+              {t('voicePage.triggerChannelHelp')}
             </p>
           </div>
 
@@ -132,7 +131,7 @@ export default function VoiceSettingsPage() {
             disabled={loading}
             className="w-full text-sm bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 text-white px-4 py-2 rounded font-bold"
           >
-            {loading ? 'Saving...' : 'Save'}
+            {loading ? t('common.saving') : t('common.save')}
           </button>
         </div>
       </div>

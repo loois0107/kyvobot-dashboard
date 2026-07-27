@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
 import { parseEmojiDisplay } from '@/lib/reactionRoles';
+import { useT } from '@/lib/i18n/LanguageContext';
 
 interface RoleOption {
   id: string;
@@ -52,6 +53,7 @@ function EmojiBadge({ emoji }: { emoji: string }) {
 export default function ReactionRolesPage() {
   const params = useParams();
   const { showToast } = useToast();
+  const t = useT();
   const guildId = (params?.guildId as string) || '';
 
   const [loadStatus, setLoadStatus] = useState<LoadStatus>('loading');
@@ -80,9 +82,9 @@ export default function ReactionRolesPage() {
   const extractErrorMessage = async (res: Response): Promise<string> => {
     try {
       const data = await res.json();
-      return data.message || `Request failed (${res.status})`;
+      return data.message || t('common.requestFailed', { status: res.status });
     } catch {
-      return `Request failed (${res.status})`;
+      return t('common.requestFailed', { status: res.status });
     }
   };
 
@@ -102,7 +104,7 @@ export default function ReactionRolesPage() {
       setLoadStatus('loaded');
     } catch (err) {
       console.error(err);
-      setLoadErrorMsg('Network error while loading reaction roles.');
+      setLoadErrorMsg(t('reactionRolesPage.loadNetworkError'));
       setLoadStatus('error');
     }
   };
@@ -147,7 +149,7 @@ export default function ReactionRolesPage() {
       setPreview(data.message);
     } catch (err) {
       console.error(err);
-      setPreviewError('Network error while looking up that message.');
+      setPreviewError(t('reactionRolesPage.previewNetworkError'));
     } finally {
       setIsPreviewing(false);
     }
@@ -162,7 +164,7 @@ export default function ReactionRolesPage() {
         body: JSON.stringify({ channel_id: channelId, message_id: messageId, emoji, role_id: roleId, confirmedDangerous }),
       });
       if (res.ok) {
-        showToast('Reaction role created!', 'success');
+        showToast(t('reactionRolesPage.createdSuccess'), 'success');
         resetForm();
         await loadData();
         return;
@@ -175,7 +177,7 @@ export default function ReactionRolesPage() {
       showToast(await extractErrorMessage(res), 'error');
     } catch (err) {
       console.error(err);
-      showToast('Network error while saving.', 'error');
+      showToast(t('reactionRolesPage.saveNetworkError'), 'error');
     } finally {
       setIsSaving(false);
     }
@@ -187,14 +189,14 @@ export default function ReactionRolesPage() {
     try {
       const res = await fetch(`/api/reaction-roles/${guildId}?message_id=${encodeURIComponent(b.message_id)}&emoji=${encodeURIComponent(b.emoji)}`, { method: 'DELETE' });
       if (res.ok) {
-        showToast('Binding deleted.', 'success');
+        showToast(t('reactionRolesPage.deletedSuccess'), 'success');
         await loadData();
       } else {
         showToast(await extractErrorMessage(res), 'error');
       }
     } catch (err) {
       console.error(err);
-      showToast('Network error while deleting.', 'error');
+      showToast(t('reactionRolesPage.deleteNetworkError'), 'error');
     } finally {
       setDeletingKey(null);
     }
@@ -203,7 +205,7 @@ export default function ReactionRolesPage() {
   if (loadStatus === 'loading') {
     return (
       <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-sm">
-        Loading reaction roles...
+        {t('reactionRolesPage.loading')}
       </div>
     );
   }
@@ -211,10 +213,10 @@ export default function ReactionRolesPage() {
   if (loadStatus === 'error') {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
-        <p className="text-red-400 font-bold">⚠️ Failed to load reaction roles</p>
+        <p className="text-red-400 font-bold">{t('reactionRolesPage.loadFailed')}</p>
         <p className="text-sm text-[#949ba4]">{loadErrorMsg}</p>
         <button type="button" onClick={loadData} className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl">
-          Retry
+          {t('common.retry')}
         </button>
       </div>
     );
@@ -223,20 +225,20 @@ export default function ReactionRolesPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-6 pb-16">
       <header className="border-b border-[#2b2d31] pb-6">
-        <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">🎭 Reaction Roles</h1>
+        <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('reactionRolesPage.title')}</h1>
         <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
-          React to gain a role, unreact to lose it. Works on any message Kyvo can see - pick the channel/message below, then choose which emoji maps to which role.
+          {t('reactionRolesPage.subtitle')}
         </p>
       </header>
 
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
         <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
-          Add a Binding
+          {t('reactionRolesPage.addBindingTitle')}
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-[#b5bac1]">Channel ID</label>
+            <label className="text-xs font-bold text-[#b5bac1]">{t('reactionRolesPage.channelIdLabel')}</label>
             <input
               type="text"
               value={channelId}
@@ -246,7 +248,7 @@ export default function ReactionRolesPage() {
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-[#b5bac1]">Message ID</label>
+            <label className="text-xs font-bold text-[#b5bac1]">{t('reactionRolesPage.messageIdLabel')}</label>
             <input
               type="text"
               value={messageId}
@@ -256,7 +258,7 @@ export default function ReactionRolesPage() {
             />
           </div>
         </div>
-        <p className="text-[10px] text-[#57576F]">메시지를 우클릭 → Copy Message Link 하면 URL 끝 두 숫자가 각각 채널 ID, 메시지 ID예요.</p>
+        <p className="text-[10px] text-[#57576F]">{t('reactionRolesPage.findIdsHelp')}</p>
 
         <button
           type="button"
@@ -264,17 +266,17 @@ export default function ReactionRolesPage() {
           disabled={!channelId || !messageId || isPreviewing}
           className="bg-[#5865F2] hover:bg-[#4752C4] disabled:opacity-50 text-white text-xs font-black px-5 py-2.5 rounded-lg"
         >
-          {isPreviewing ? 'CHECKING...' : 'PREVIEW MESSAGE'}
+          {isPreviewing ? t('reactionRolesPage.checking') : t('reactionRolesPage.previewMessage')}
         </button>
 
         {previewError && <p className="text-xs text-red-400">⚠️ {previewError}</p>}
 
         {preview && (
           <div className="bg-[#111214] rounded-lg p-3 border-l-4 border-[#23A55A] space-y-1">
-            <p className="text-xs text-[#949ba4]">✅ Found it - by <span className="text-white font-bold">{preview.author}</span></p>
+            <p className="text-xs text-[#949ba4]">{t('reactionRolesPage.foundItBy')} <span className="text-white font-bold">{preview.author}</span></p>
             <p className="text-xs text-[#b5bac1] italic">&quot;{preview.content}&quot;</p>
             <a href={preview.jump_url} target="_blank" rel="noreferrer" className="text-[10px] text-[#5865F2] hover:underline">
-              Jump to message ↗
+              {t('reactionRolesPage.jumpToMessage')}
             </a>
           </div>
         )}
@@ -283,7 +285,7 @@ export default function ReactionRolesPage() {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#b5bac1]">Emoji (paste the emoji itself)</label>
+                <label className="text-xs font-bold text-[#b5bac1]">{t('reactionRolesPage.emojiLabel')}</label>
                 <input
                   type="text"
                   value={emoji}
@@ -291,21 +293,21 @@ export default function ReactionRolesPage() {
                   placeholder="🎮"
                   className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2]"
                 />
-                <p className="text-[10px] text-[#57576F]">유니코드 이모지는 그냥 붙여넣으면 되고, 커스텀 이모지는 디스코드에서 이모지를 우클릭 → Copy Emoji로 얻은 &lt;:name:id&gt; 형식 그대로 붙여넣으세요.</p>
+                <p className="text-[10px] text-[#57576F]">{t('reactionRolesPage.emojiHelp')}</p>
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#b5bac1]">Role</label>
+                <label className="text-xs font-bold text-[#b5bac1]">{t('reactionRolesPage.roleLabel')}</label>
                 <select
                   value={roleId}
                   onChange={(e) => setRoleId(e.target.value)}
                   className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5865F2]"
                 >
-                  <option value="">Select a role...</option>
+                  <option value="">{t('reactionRolesPage.selectRolePlaceholder')}</option>
                   {roles.map((r) => (
                     <option key={r.id} value={r.id}>{r.name}</option>
                   ))}
                 </select>
-                <p className="text-[10px] text-[#57576F]">@everyone과 다른 봇이 연동한 역할은 목록에서 자동으로 빠져있어요.</p>
+                <p className="text-[10px] text-[#57576F]">{t('reactionRolesPage.roleListHelp')}</p>
               </div>
             </div>
 
@@ -315,7 +317,7 @@ export default function ReactionRolesPage() {
               disabled={!emoji || !roleId || isSaving}
               className="bg-[#23A55A] hover:bg-[#1a7f43] disabled:opacity-50 text-white text-xs font-black px-6 py-3 rounded-xl"
             >
-              {isSaving ? 'SAVING...' : 'CREATE BINDING'}
+              {isSaving ? t('reactionRolesPage.creatingBinding') : t('reactionRolesPage.createBinding')}
             </button>
           </>
         )}
@@ -324,21 +326,20 @@ export default function ReactionRolesPage() {
       {confirmDialog && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
           <div className="bg-[#1e1f22] border border-orange-500/50 rounded-2xl p-6 max-w-md w-full space-y-4">
-            <h3 className="text-orange-400 font-black text-sm">⚠️ Dangerous Permission Warning</h3>
+            <h3 className="text-orange-400 font-black text-sm">{t('reactionRolesPage.dangerousPermTitle')}</h3>
             <p className="text-xs text-[#b5bac1]">
-              This role has: {confirmDialog.dangerous.map((p) => <code key={p} className="text-orange-300">{p} </code>)}
-              — members who react will gain these permissions. Continue anyway?
+              {t('reactionRolesPage.dangerousPermBody', { perms: confirmDialog.dangerous.join(', ') })}
             </p>
             <div className="flex gap-3 justify-end">
               <button type="button" onClick={() => setConfirmDialog(null)} className="text-xs font-bold text-gray-400 hover:text-white px-4 py-2">
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 type="button"
                 onClick={() => { setConfirmDialog(null); submitBinding(true); }}
                 className="bg-red-600 hover:bg-red-500 text-white text-xs font-black px-5 py-2 rounded-lg"
               >
-                Confirm & Save Anyway
+                {t('reactionRolesPage.confirmSaveAnyway')}
               </button>
             </div>
           </div>
@@ -348,20 +349,20 @@ export default function ReactionRolesPage() {
       {duplicateConfirm && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
           <div className="bg-[#1e1f22] border border-orange-500/50 rounded-2xl p-6 max-w-md w-full space-y-4">
-            <h3 className="text-orange-400 font-black text-sm">⚠️ Binding Already Exists</h3>
+            <h3 className="text-orange-400 font-black text-sm">{t('reactionRolesPage.duplicateExistsTitle')}</h3>
             <p className="text-xs text-[#b5bac1]">
-              이 메시지의 이 이모지엔 이미 <span className="text-white font-bold">{duplicateConfirm.existing.role_name}</span> 역할이 연결되어 있어요 - 계속하면 기존 매핑을 대체합니다.
+              {t('reactionRolesPage.duplicateExistsBody', { role: duplicateConfirm.existing.role_name })}
             </p>
             <div className="flex gap-3 justify-end">
               <button type="button" onClick={() => setDuplicateConfirm(null)} className="text-xs font-bold text-gray-400 hover:text-white px-4 py-2">
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 type="button"
                 onClick={() => { setDuplicateConfirm(null); submitBinding(false); }}
                 className="bg-red-600 hover:bg-red-500 text-white text-xs font-black px-5 py-2 rounded-lg"
               >
-                Replace Existing Binding
+                {t('reactionRolesPage.replaceExisting')}
               </button>
             </div>
           </div>
@@ -370,10 +371,10 @@ export default function ReactionRolesPage() {
 
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-3 shadow-xl">
         <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
-          Existing Bindings
+          {t('reactionRolesPage.existingBindingsTitle')}
         </h3>
         {bindings.length === 0 ? (
-          <p className="text-sm text-[#949ba4] py-4">📭 No reaction roles set up yet.</p>
+          <p className="text-sm text-[#949ba4] py-4">{t('reactionRolesPage.noBindingsYet')}</p>
         ) : (
           <div className="space-y-2">
             {bindings.map((b) => {
@@ -384,7 +385,7 @@ export default function ReactionRolesPage() {
                     <EmojiBadge emoji={b.emoji} />
                     <span className="text-xs font-bold" style={{ color: roleColorHex(b.role_color) }}>{b.role_name}</span>
                     <a href={b.jump_url} target="_blank" rel="noreferrer" className="text-[10px] text-[#5865F2] hover:underline shrink-0">
-                      Jump ↗
+                      {t('reactionRolesPage.jump')}
                     </a>
                   </div>
                   <button
@@ -393,14 +394,14 @@ export default function ReactionRolesPage() {
                     disabled={deletingKey === key}
                     className="text-[10px] font-bold text-red-400 hover:text-red-300 disabled:opacity-50 px-2 py-1 shrink-0"
                   >
-                    {deletingKey === key ? 'Deleting...' : 'Delete'}
+                    {deletingKey === key ? t('reactionRolesPage.deletingBinding') : t('common.delete')}
                   </button>
                 </div>
               );
             })}
           </div>
         )}
-        <p className="text-[10px] text-[#57576F] pt-2">Deleting a binding stops future reacts from granting/removing the role - it doesn&apos;t retroactively strip the role from current holders.</p>
+        <p className="text-[10px] text-[#57576F] pt-2">{t('reactionRolesPage.deleteBindingFooter')}</p>
       </div>
     </div>
   );

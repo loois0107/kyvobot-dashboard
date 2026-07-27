@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useToast } from '@/components/Toast';
+import { useT } from '@/lib/i18n/LanguageContext';
 
 interface VectorNode {
   id: string;
@@ -14,10 +15,11 @@ interface VectorNode {
 const MIN_FEEDBACK_SAMPLE = 3; // 이 미만이면 비율 대신 "데이터 부족" 표시 - 매너 평가 배지와 같은 이유
 
 function FeedbackBadge({ feedback }: { feedback: { up: number; down: number; total: number } }) {
+  const t = useT();
   if (feedback.total < MIN_FEEDBACK_SAMPLE) {
     return (
       <span className="bg-gray-600/10 text-gray-400 border border-gray-500/20 text-[10px] font-mono px-2 py-0.5 rounded font-black uppercase">
-        📊 Data Insufficient ({feedback.total}/{MIN_FEEDBACK_SAMPLE})
+        {t('ticketSettingsPage.dataInsufficient', { total: feedback.total, min: MIN_FEEDBACK_SAMPLE })}
       </span>
     );
   }
@@ -40,7 +42,8 @@ export default function TicketAiSettings() {
   const params = useParams();
   const { data: session, status } = useSession();
   const { showToast } = useToast();
-  
+  const t = useT();
+
   const [guildId, setGuildId] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
@@ -72,11 +75,6 @@ export default function TicketAiSettings() {
       loadKnowledgeNodes(rawId);
     }
   }, [params?.guildId]);
-
-  // 🛡️ [문지기 무력화 완료] 로컬 도커 환경 세션 검문소를 비활성화합니다.
-  // useEffect(() => {
-  //   if (status === 'unauthenticated') router.push('/');
-  // }, [status, router]);
 
   const loadTicketSettings = async (id: string) => {
     try {
@@ -118,7 +116,7 @@ export default function TicketAiSettings() {
 
     // 🛡️ CRITICAL AI GUARD: 프롬프트에 {context} 변수가 누락되었는지 확인하여 봇이 바보가 되는 현상 차단
     if (!systemPrompt.includes('{context}')) {
-      showToast('Configuration Rejected: Your Cognitive System Prompt MUST contain the exact text token `{context}` so the RAG pipeline can inject knowledge base vectors!', 'error');
+      showToast(t('ticketSettingsPage.missingContextToken'), 'error');
       return;
     }
 
@@ -142,21 +140,21 @@ export default function TicketAiSettings() {
       });
 
       if (res.ok) {
-        showToast('Master infrastructure configurations committed to neural nexus!', 'success');
+        showToast(t('ticketSettingsPage.saveMasterSuccess'), 'success');
         setIsDirty(false);
       } else {
-        showToast('Failed to save AI configuration maps.', 'error');
+        showToast(t('ticketSettingsPage.saveMasterFailed'), 'error');
       }
-    } catch (err: any) { showToast(`Network Drop: ${err.message}`, 'error'); }
+    } catch (err: any) { showToast(t('ticketSettingsPage.networkDrop', { message: err.message }), 'error'); }
     finally { setIsSaving(false); }
   };
 
   const extractKnowledgeErrorMessage = async (res: Response): Promise<string> => {
     try {
       const data = await res.json();
-      return data.error || data.message || `Request failed (${res.status})`;
+      return data.error || data.message || t('common.requestFailed', { status: res.status });
     } catch {
-      return `Request failed (${res.status})`;
+      return t('common.requestFailed', { status: res.status });
     }
   };
 
@@ -172,7 +170,7 @@ export default function TicketAiSettings() {
 
   const injectKnowledgeNode = async () => {
     if (!knowledgeInput.trim()) {
-      showToast('Error: Cannot ingest an empty knowledge block.', 'error');
+      showToast(t('ticketSettingsPage.emptyKnowledgeError'), 'error');
       return;
     }
     if (!guildId || guildId === '[guildId]') return;
@@ -199,10 +197,10 @@ export default function TicketAiSettings() {
           setVectorNodes(prev => prev.filter(node => node.id !== editingNodeId).concat(
             savedRow ? [{ id: String(savedRow.id), content: savedRow.content, feedback: { up: 0, down: 0, total: 0 } }] : []
           ));
-          showToast(res.status === 207 ? await extractKnowledgeErrorMessage(res) : 'Knowledge entry updated (re-embedded).', res.status === 207 ? 'error' : 'success');
+          showToast(res.status === 207 ? await extractKnowledgeErrorMessage(res) : t('ticketSettingsPage.updatedEntrySuccess'), res.status === 207 ? 'error' : 'success');
         } else if (savedRow) {
           setVectorNodes(prev => [...prev, { id: String(savedRow.id), content: savedRow.content, feedback: { up: 0, down: 0, total: 0 } }]);
-          showToast('Knowledge context injected into the vector database.', 'success');
+          showToast(t('ticketSettingsPage.injectedEntrySuccess'), 'success');
         }
         setKnowledgeInput('');
         setEditingNodeId(null);
@@ -210,7 +208,7 @@ export default function TicketAiSettings() {
         showToast(await extractKnowledgeErrorMessage(res), 'error');
       }
     } catch (err: any) {
-      showToast(`Network Drop: ${err.message}`, 'error');
+      showToast(t('ticketSettingsPage.networkDrop', { message: err.message }), 'error');
     } finally {
       setIsInjecting(false);
     }
@@ -224,12 +222,12 @@ export default function TicketAiSettings() {
       });
       if (res.ok) {
         setVectorNodes(prev => prev.filter(node => node.id !== id));
-        showToast('Vector grid synapse disconnected.', 'info');
+        showToast(t('ticketSettingsPage.deleteEntrySuccess'), 'info');
       } else {
-        showToast('Failed to delete knowledge block.', 'error');
+        showToast(t('ticketSettingsPage.deleteEntryFailed'), 'error');
       }
     } catch (err: any) {
-      showToast(`Network Drop: ${err.message}`, 'error');
+      showToast(t('ticketSettingsPage.networkDrop', { message: err.message }), 'error');
     }
   };
 
@@ -238,48 +236,47 @@ export default function TicketAiSettings() {
   return (
     <div className="min-h-screen bg-[#111214] text-[#dbdee1] p-2 sm:p-4 md:p-6 pb-28">
       <div className="max-w-5xl mx-auto space-y-6">
-        
+
         <header className="border-b border-[#2b2d31] pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">🗃️ TICKET AI // CUSTOMIZER CONTROL</h1>
-            <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">CONFIGURE AUTOMATED HELP DESK PANEL LAYOUTS AND INTERCEPT MATRIX PROMPTS</p>
+            <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('ticketSettingsPage.title')}</h1>
+            <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">{t('ticketSettingsPage.subtitle')}</p>
           </div>
           <button type="button" onClick={handleSaveMasterConfigs} disabled={isSaving} className="w-full sm:w-auto bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all cursor-pointer">
-            {isSaving ? 'INJECTING...' : 'SAVE & INJECT MASTER CONFIGURATIONS'}
+            {isSaving ? t('ticketSettingsPage.injecting') : t('ticketSettingsPage.saveButton')}
           </button>
         </header>
 
         <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl px-4 sm:px-6 py-4">
           <p className="text-xs sm:text-sm text-[#b5bac1] leading-relaxed">
-            /ticket-setup으로 배포하는 공개 지원 패널과, 유저가 버튼을 눌러 티켓을 열었을 때 보이는 화면,
-            그리고 AI가 답변할 때 참고하는 지식을 여기서 전부 설정해요.
+            {t('ticketSettingsPage.intro')}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-4 shadow-xl">
-            <h2 className="text-xs font-black tracking-widest text-[#5865F2] uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">⚗️ PANEL SETUP INTERFACE</h2>
-            <p className="text-[10px] text-[#57576F]">/ticket-setup 실행 시 게시되는 공개 임베드예요 - 유저가 이 버튼을 눌러야 티켓이 열려요.</p>
+            <h2 className="text-xs font-black tracking-widest text-[#5865F2] uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">{t('ticketSettingsPage.panelSetupTitle')}</h2>
+            <p className="text-[10px] text-[#57576F]">{t('ticketSettingsPage.panelSetupDesc')}</p>
             <div className="space-y-1">
-              <label className="text-[11px] font-black text-[#b5bac1] uppercase tracking-wider">📋 SETUP PANEL TITLE</label>
+              <label className="text-[11px] font-black text-[#b5bac1] uppercase tracking-wider">{t('ticketSettingsPage.panelTitleLabel')}</label>
               <input type="text" value={panelTitle} onChange={(e) => { setPanelTitle(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]" />
             </div>
             <div className="space-y-1">
-              <label className="text-[11px] font-black text-[#b5bac1] uppercase tracking-wider">📑 SETUP PANEL DESCRIPTION</label>
+              <label className="text-[11px] font-black text-[#b5bac1] uppercase tracking-wider">{t('ticketSettingsPage.panelDescLabel')}</label>
               <textarea rows={3} value={panelDesc} onChange={(e) => { setPanelDesc(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white resize-none focus:outline-none focus:border-[#5865F2]" />
             </div>
           </div>
 
           <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-4 shadow-xl">
-            <h2 className="text-xs font-black tracking-widest text-green-400 uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">🔒 TICKET ACTIVE WELCOME EMBED</h2>
-            <p className="text-[10px] text-[#57576F]">티켓(개인 채널)이 실제로 생성된 직후, 그 채널 안에서 유저에게 보이는 첫 메시지예요.</p>
+            <h2 className="text-xs font-black tracking-widest text-green-400 uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">{t('ticketSettingsPage.welcomeEmbedTitle')}</h2>
+            <p className="text-[10px] text-[#57576F]">{t('ticketSettingsPage.welcomeEmbedDesc')}</p>
             <div className="space-y-1">
-              <label className="text-[11px] font-black text-[#b5bac1] uppercase tracking-wider">🔒 WELCOME EMBED TITLE</label>
+              <label className="text-[11px] font-black text-[#b5bac1] uppercase tracking-wider">{t('ticketSettingsPage.welcomeTitleLabel')}</label>
               <input type="text" value={welcomeTitle} onChange={(e) => { setWelcomeTitle(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-green-500" />
             </div>
             <div className="space-y-1">
-              <label className="text-[11px] font-black text-[#b5bac1] uppercase tracking-wider">💬 TICKET ROOM WELCOME DESCRIPTION</label>
+              <label className="text-[11px] font-black text-[#b5bac1] uppercase tracking-wider">{t('ticketSettingsPage.welcomeDescLabel')}</label>
               <textarea rows={3} value={welcomeDesc} onChange={(e) => { setWelcomeDesc(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white resize-none focus:outline-none focus:border-green-500" />
             </div>
           </div>
@@ -287,14 +284,14 @@ export default function TicketAiSettings() {
         </div>
 
         <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-3 shadow-xl">
-          <h2 className="text-xs font-black tracking-widest text-purple-400 uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">🤖 COGNITIVE SYSTEM PROMPT (AI CORE ROLE)</h2>
-          
+          <h2 className="text-xs font-black tracking-widest text-purple-400 uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">{t('ticketSettingsPage.systemPromptTitle')}</h2>
+
           <span className="text-xs sm:text-sm text-[#b5bac1] leading-relaxed font-medium block">
-            Personality and formatting instructions injection array. Include the variable token{' '}
+            {t('ticketSettingsPage.systemPromptDescPrefix')}{' '}
             <code className="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-1.5 py-0.5 rounded text-xs font-mono font-bold font-black">
               {"{context}"}
             </code>{' '}
-            to forcefully thread the pgvector knowledge block search hits into that precise prompt segment.
+            {t('ticketSettingsPage.systemPromptDescSuffix')}
           </span>
 
           <textarea
@@ -304,14 +301,13 @@ export default function TicketAiSettings() {
         </div>
 
         <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-3 shadow-xl">
-          <h2 className="text-xs font-black tracking-widest text-orange-400 uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">🚦 DAILY AI ANSWER LIMITS</h2>
+          <h2 className="text-xs font-black tracking-widest text-orange-400 uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">{t('ticketSettingsPage.dailyLimitsTitle')}</h2>
           <span className="text-xs sm:text-sm text-[#b5bac1] leading-relaxed font-medium block">
-            Caps AI answers per rolling 24 hours (per-server and per-user). Once either limit is hit, the ticket is
-            escalated straight to staff with no further AI calls. Leave blank to use the defaults (400 / 20).
+            {t('ticketSettingsPage.dailyLimitsDesc')}
           </span>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-[#b5bac1]">Server-wide daily limit</label>
+              <label className="text-xs font-bold text-[#b5bac1]">{t('ticketSettingsPage.guildLimitLabel')}</label>
               <input
                 type="number" min={1} placeholder="400"
                 value={dailyGuildLimit}
@@ -320,7 +316,7 @@ export default function TicketAiSettings() {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-[#b5bac1]">Per-user daily limit</label>
+              <label className="text-xs font-bold text-[#b5bac1]">{t('ticketSettingsPage.userLimitLabel')}</label>
               <input
                 type="number" min={1} placeholder="20"
                 value={dailyUserLimit}
@@ -332,27 +328,27 @@ export default function TicketAiSettings() {
         </div>
 
         <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-4 shadow-xl">
-          <h2 className="text-xs font-black tracking-wider text-yellow-500 uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">🧠 AI VECTOR KNOWLEDGE BASE REGISTRY (RAG MATRIX)</h2>
-          
+          <h2 className="text-xs font-black tracking-wider text-yellow-500 uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">{t('ticketSettingsPage.knowledgeBaseTitle')}</h2>
+
           <span className="text-xs sm:text-sm text-[#b5bac1] leading-relaxed font-medium block">
-            Teach the AI your server rules, sanction thresholds, or frequently asked questions. Every entry saved here is automatically tokenized into vector matrices inside Supabase and mapped to the ticket RAG search pipeline dynamically.
+            {t('ticketSettingsPage.knowledgeBaseDesc')}
           </span>
 
-          <textarea 
-            rows={3} placeholder="Enter server rules or guidelines here (e.g., 'Profanity Rule: Mild insults trigger 2 warnings, 3rd offense inflicts a 10-minute timeout...')" 
+          <textarea
+            rows={3} placeholder={t('ticketSettingsPage.knowledgePlaceholder')}
             value={knowledgeInput} onChange={(e) => setKnowledgeInput(e.target.value)}
-            className="w-full bg-[#111214] border border-[#232428] rounded-xl p-4 text-xs text-white focus:outline-none focus:border-yellow-500" 
+            className="w-full bg-[#111214] border border-[#232428] rounded-xl p-4 text-xs text-white focus:outline-none focus:border-yellow-500"
           />
-          
+
           <div className="flex gap-2">
             <button type="button" onClick={injectKnowledgeNode} disabled={isInjecting} className="flex-1 bg-yellow-600/10 hover:bg-yellow-600 border border-yellow-500/20 text-yellow-400 hover:text-white text-xs font-black py-3 rounded-xl tracking-widest transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
               {isInjecting
-                ? (editingNodeId ? 'RE-EMBEDDING...' : 'INJECTING...')
-                : (editingNodeId ? '✏️ UPDATE KNOWLEDGE ENTRY (RE-EMBED)' : '+ INJECT KNOWLEDGE DATA CONTEXT INTO NEURAL NETWORK')}
+                ? (editingNodeId ? t('ticketSettingsPage.reEmbedding') : t('ticketSettingsPage.injectingShort'))
+                : (editingNodeId ? t('ticketSettingsPage.updateEntry') : t('ticketSettingsPage.injectEntry'))}
             </button>
             {editingNodeId && (
               <button type="button" onClick={cancelEditingNode} className="text-xs font-bold text-gray-400 hover:text-white px-4 py-3 rounded-xl border border-[#232428]">
-                Cancel
+                {t('common.cancel')}
               </button>
             )}
           </div>
@@ -363,7 +359,7 @@ export default function TicketAiSettings() {
                 <div className="space-y-1 flex-1 mr-4">
                   <div className="flex flex-wrap items-center gap-1.5">
                     <span className="bg-yellow-600/10 text-yellow-400 border border-yellow-500/20 text-[10px] font-mono px-2 py-0.5 rounded font-black uppercase">
-                      ⚡ VECTOR NODE ID: {node.id.slice(-4)}...
+                      {t('ticketSettingsPage.vectorNodeId', { id: node.id.slice(-4) })}
                     </span>
                     <FeedbackBadge feedback={node.feedback} />
                   </div>
@@ -371,10 +367,10 @@ export default function TicketAiSettings() {
                 </div>
                 <div className="flex gap-2 flex-shrink-0">
                   <button type="button" onClick={() => startEditingNode(node)} className="text-yellow-400 hover:text-white bg-yellow-950/20 hover:bg-yellow-600 text-[10px] font-black px-3 py-1.5 rounded-lg border border-yellow-500/10 transition-all cursor-pointer">
-                    EDIT
+                    {t('ticketSettingsPage.edit')}
                   </button>
                   <button type="button" onClick={() => purgeKnowledgeNode(node.id)} className="text-red-400 hover:text-white bg-red-950/20 hover:bg-red-600 text-[10px] font-black px-3 py-1.5 rounded-lg border border-red-500/10 transition-all cursor-pointer">
-                    PURGE
+                    {t('ticketSettingsPage.purge')}
                   </button>
                 </div>
               </div>
@@ -386,10 +382,10 @@ export default function TicketAiSettings() {
 
       {isDirty && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1e1f22]/95 border border-[#FFD700]/50 px-6 py-3.5 rounded-xl shadow-2xl flex items-center justify-between gap-8 backdrop-blur-md w-[90%] max-w-xl">
-          <span className="text-xs font-bold text-gray-200">⚠️ Uncommitted Core Brain Changes Detected</span>
+          <span className="text-xs font-bold text-gray-200">{t('ticketSettingsPage.unsavedWarning')}</span>
           <div className="flex gap-3">
-            <button type="button" onClick={() => { loadTicketSettings(guildId); setIsDirty(false); }} className="text-xs font-bold text-gray-400 hover:text-white transition">Discard</button>
-            <button type="button" onClick={handleSaveMasterConfigs} className="bg-[#23A55A] hover:bg-[#1a7f43] text-white text-xs font-black px-5 py-2 rounded-lg">Commit Brain</button>
+            <button type="button" onClick={() => { loadTicketSettings(guildId); setIsDirty(false); }} className="text-xs font-bold text-gray-400 hover:text-white transition">{t('common.discard')}</button>
+            <button type="button" onClick={handleSaveMasterConfigs} className="bg-[#23A55A] hover:bg-[#1a7f43] text-white text-xs font-black px-5 py-2 rounded-lg">{t('ticketSettingsPage.commitBrain')}</button>
           </div>
         </div>
       )}

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import { useT } from '@/lib/i18n/LanguageContext';
 
 interface LogLine {
   timestamp: string;
@@ -24,6 +25,7 @@ interface OnboardingState {
 }
 
 function ChecklistRow({ done, label, href }: { done: boolean; label: string; href: string }) {
+  const t = useT();
   return (
     <Link
       href={href}
@@ -39,7 +41,7 @@ function ChecklistRow({ done, label, href }: { done: boolean; label: string; hre
       <span className={`text-xs font-bold flex-1 ${done ? 'text-[#23A55A] line-through decoration-2' : 'text-[#dbdee1]'}`}>
         {label}
       </span>
-      {!done && <span className="text-[10px] text-[#5865F2] font-bold shrink-0">SET UP →</span>}
+      {!done && <span className="text-[10px] text-[#5865F2] font-bold shrink-0">{t('dashboardHome.setUpArrow')}</span>}
     </Link>
   );
 }
@@ -47,6 +49,7 @@ function ChecklistRow({ done, label, href }: { done: boolean; label: string; hre
 export default function DashboardHome() {
   const params = useParams();
   const { data: session, status } = useSession();
+  const t = useT();
 
   const guildId = params?.guildId as string | undefined;
 
@@ -183,7 +186,7 @@ export default function DashboardHome() {
   if (!guildId || guildId === '[guildId]') {
     return (
       <div className="flex min-h-[400px] items-center justify-center bg-[#111214] text-red-400 font-mono p-8 text-center border border-red-500/20 rounded-2xl">
-        ⚠️ 잘못된 접근입니다. 사이드바에서 활성화할 디스코드 서버를 선택해 주세요.
+        {t('dashboardHome.invalidAccess')}
       </div>
     );
   }
@@ -199,22 +202,22 @@ export default function DashboardHome() {
         <div className="bg-[#1e1f22] border border-[#5865F2]/30 rounded-2xl p-6 shadow-xl space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-black text-white">🚀 Quick Start Checklist</h3>
-              <p className="text-[10px] text-[#949ba4] mt-1">A few things worth setting up first - check them off as you go.</p>
+              <h3 className="text-sm font-black text-white">{t('dashboardHome.quickStartTitle')}</h3>
+              <p className="text-[10px] text-[#949ba4] mt-1">{t('dashboardHome.quickStartSubtitle')}</p>
             </div>
             <button
               type="button"
               onClick={handleDismissOnboarding}
               className="text-gray-400 hover:text-white text-lg leading-none px-2"
-              aria-label="Dismiss checklist"
+              aria-label={t('dashboardHome.dismissChecklist')}
             >
               ✕
             </button>
           </div>
           <div className="space-y-2">
-            <ChecklistRow done={onboarding.items.automod} label="Configure AutoMod" href={`/dashboard/${guildId}/automod`} />
-            <ChecklistRow done={onboarding.items.welcome} label="Configure Welcome messages" href={`/dashboard/${guildId}/welcome`} />
-            <ChecklistRow done={onboarding.items.presets} label="Add a game preset (for Party Recruitment)" href={`/dashboard/${guildId}/party-presets`} />
+            <ChecklistRow done={onboarding.items.automod} label={t('dashboardHome.checklistAutomod')} href={`/dashboard/${guildId}/automod`} />
+            <ChecklistRow done={onboarding.items.welcome} label={t('dashboardHome.checklistWelcome')} href={`/dashboard/${guildId}/welcome`} />
+            <ChecklistRow done={onboarding.items.presets} label={t('dashboardHome.checklistPresets')} href={`/dashboard/${guildId}/party-presets`} />
           </div>
         </div>
       )}
@@ -228,38 +231,38 @@ export default function DashboardHome() {
           <div className="flex items-center justify-between pb-4 border-b border-[#2b2d31]">
             <div className="flex items-center gap-2">
               <span className={`w-2.5 h-2.5 rounded-full ${isConnectionFailed ? 'bg-red-500 animate-ping' : isDataEmpty ? 'bg-gray-500' : 'bg-[#23a55a] animate-pulse'}`}></span>
-              <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase">SYSTEM OPERATIONAL STATUS</h3>
+              <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase">{t('dashboardHome.systemStatus')}</h3>
             </div>
-            
+
             {isConnectionFailed && (
               <span className="bg-red-950/50 text-red-400 border border-red-500/30 text-[10px] font-black px-2.5 py-1 rounded font-mono animate-pulse">
-                ⚠️ STATS API UNREACHABLE (404/500)
+                {t('dashboardHome.statsUnreachable')}
               </span>
             )}
             {isDataEmpty && (
               <span className="bg-gray-800/50 text-gray-400 border border-gray-500/30 text-[10px] font-black px-2.5 py-1 rounded font-mono">
-                ℹ️ NO DATA YET
+                {t('dashboardHome.noDataYet')}
               </span>
             )}
           </div>
           <div className="grid grid-cols-2 gap-6 pt-6 font-mono text-sm">
-            <div className="space-y-1"><span className="text-gray-500 block text-xs">CORE ALIAS:</span><strong className="text-white text-base tracking-wide">KYVOBOT AI</strong></div>
-            <div className="space-y-1"><span className="text-gray-500 block text-xs">MATRIX VER:</span><strong className="text-yellow-400 text-base tracking-wide">v2.4.0-pro</strong></div>
+            <div className="space-y-1"><span className="text-gray-500 block text-xs">{t('dashboardHome.coreAlias')}</span><strong className="text-white text-base tracking-wide">KYVOBOT AI</strong></div>
+            <div className="space-y-1"><span className="text-gray-500 block text-xs">{t('dashboardHome.matrixVer')}</span><strong className="text-yellow-400 text-base tracking-wide">v2.4.0-pro</strong></div>
             <div className="space-y-1">
-              <span className="text-gray-500 block text-xs">ACTIVE CONTEXT:</span>
+              <span className="text-gray-500 block text-xs">{t('dashboardHome.activeContext')}</span>
               <strong className="text-[#5865F2] text-base tracking-wide truncate max-w-[180px]">
-                Guild {guildId.slice(0, 6)}...
+                {t('dashboardHome.activeContextValue', { id: guildId.slice(0, 6) })}
               </strong>
             </div>
-            <div className="space-y-1"><span className="text-gray-500 block text-xs">LATENCY TICK:</span><strong className="text-[#23a55a] text-base tracking-wide">20ms Stable</strong></div>
+            <div className="space-y-1"><span className="text-gray-500 block text-xs">{t('dashboardHome.latencyTick')}</span><strong className="text-[#23a55a] text-base tracking-wide">{t('dashboardHome.latencyValue')}</strong></div>
           </div>
         </div>
 
         <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-6 sm:p-8 shadow-xl flex flex-col justify-between lg:col-span-1 min-h-[160px]">
-          <div className="flex items-center gap-2 pb-4 border-b border-[#2b2d31]"><h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase">DISCORD ACCOUNT LINK</h3></div>
+          <div className="flex items-center gap-2 pb-4 border-b border-[#2b2d31]"><h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase">{t('dashboardHome.discordAccountLink')}</h3></div>
           <div className="pt-4 space-y-2">
-            <p className="text-sm text-gray-200 font-medium">Welcome, <strong className="text-[#5865F2] font-mono text-base">{session?.user?.name || 'Server Member'}</strong></p>
-            <p className="text-xs text-gray-500 leading-relaxed">Handshake encryption successful. Secure administrative terminal mainframes fully unlocked.</p>
+            <p className="text-sm text-gray-200 font-medium">{t('dashboardHome.welcomeLabel')} <strong className="text-[#5865F2] font-mono text-base">{session?.user?.name || t('dashboardHome.defaultMemberName')}</strong></p>
+            <p className="text-xs text-gray-500 leading-relaxed">{t('dashboardHome.handshakeDesc')}</p>
           </div>
           <div className="pt-4">
             <div className={`text-center py-2 rounded text-xs font-black tracking-widest uppercase ${
@@ -267,9 +270,9 @@ export default function DashboardHome() {
               isDataEmpty ? 'bg-gray-800/20 text-gray-400 border border-gray-500/10' :
               'bg-green-950/30 text-[#23a55a] border border-green-500/10'
             }`}>
-              {isConnectionFailed ? '● PIPELINE SYNC STALLED' : 
-               isDataEmpty ? '● NO ACTIVE DATA STREAM' : 
-               '● MATRIX SYNC ACTIVE'}
+              {isConnectionFailed ? t('dashboardHome.pipelineStalled') :
+               isDataEmpty ? t('dashboardHome.noActiveStream') :
+               t('dashboardHome.matrixSyncActive')}
             </div>
           </div>
         </div>
@@ -286,35 +289,35 @@ export default function DashboardHome() {
           href={`/dashboard/${guildId}/settings`}
           className="bg-[#111214] border border-[#232428] hover:border-[#5865F2]/40 rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center transition-all duration-200 group"
         >
-          <span className="text-xs font-black text-gray-500 uppercase tracking-wider block">Custom Commands</span>
+          <span className="text-xs font-black text-gray-500 uppercase tracking-wider block">{t('dashboardHome.customCommandsLabel')}</span>
           <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.customCommands === 0 ? 'text-gray-600' : 'text-[#5865F2]'}`}>
             {isLoadingStats ? '...' : telemetry.customCommands.toLocaleString()}
-            <span className="text-xs text-[#5865F2]/60 font-sans ml-1">Commands</span>
+            <span className="text-xs text-[#5865F2]/60 font-sans ml-1">{t('dashboardHome.customCommandsUnit')}</span>
           </span>
           <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase pt-1 group-hover:text-[#5865F2] transition-colors text-left">
-            MANAGE ➔
+            {t('dashboardHome.manageArrow')}
           </span>
         </Link>
 
         <div className="bg-[#111214] border border-[#232428] rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center">
-          <span className="text-xs font-black text-gray-500 uppercase tracking-wider block">Guild RAG Vectors</span>
+          <span className="text-xs font-black text-gray-500 uppercase tracking-wider block">{t('dashboardHome.ragVectorsLabel')}</span>
           <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.ragSynapses === 0 ? 'text-gray-600' : 'text-purple-400'}`}>
             {isLoadingStats ? '...' : telemetry.ragSynapses.toLocaleString()}
-            <span className="text-xs text-purple-600 font-sans ml-1">Vectors</span>
+            <span className="text-xs text-purple-600 font-sans ml-1">{t('dashboardHome.ragVectorsUnit')}</span>
           </span>
         </div>
         <div className="bg-[#111214] border border-[#232428] rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center">
-          <span className="text-xs font-black text-gray-500 uppercase tracking-wider block">Active Guild Tickets</span>
+          <span className="text-xs font-black text-gray-500 uppercase tracking-wider block">{t('dashboardHome.activeTicketsLabel')}</span>
           <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.activeTickets === 0 ? 'text-gray-600' : 'text-yellow-500'}`}>
             {isLoadingStats ? '...' : telemetry.activeTickets}
-            <span className="text-xs text-yellow-600 font-sans ml-1">Bridges</span>
+            <span className="text-xs text-yellow-600 font-sans ml-1">{t('dashboardHome.activeTicketsUnit')}</span>
           </span>
         </div>
         <div className="bg-[#111214] border border-[#232428] rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center">
-          <span className="text-xs font-black text-gray-500 uppercase tracking-wider block">Automod Logs</span>
+          <span className="text-xs font-black text-gray-500 uppercase tracking-wider block">{t('dashboardHome.automodLogsLabel')}</span>
           <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.automodLogs === 0 ? 'text-gray-600' : 'text-white'}`}>
             {isLoadingStats ? '...' : telemetry.automodLogs.toLocaleString()}
-            <span className="text-xs text-red-600 font-sans ml-1">Incidents</span>
+            <span className="text-xs text-red-600 font-sans ml-1">{t('dashboardHome.automodLogsUnit')}</span>
           </span>
         </div>
       </div>
@@ -323,19 +326,19 @@ export default function DashboardHome() {
           [SECTION 3: ⚡ CORE MODULE QUICK DISPATCH]
          ========================================== */}
       <div className="space-y-4">
-        <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase px-1">⚡ CORE MODULE QUICK DISPATCH</h3>
+        <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase px-1">{t('dashboardHome.quickDispatchTitle')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Link href={`/dashboard/${guildId}/leveling`} className="bg-[#1e1f22] hover:bg-[#232428] border border-[#2b2d31] hover:border-[#5865F2]/40 rounded-2xl p-8 shadow-md transition-all duration-200 group cursor-pointer text-left flex flex-col justify-between min-h-[210px]">
-            <div><span className="text-3xl block mb-3">✨</span><h4 className="text-sm font-black text-white group-hover:text-[#5865F2] uppercase tracking-wider">Leveling & Eco</h4><p className="text-xs text-gray-400 mt-2 leading-relaxed">Configure user reward tiers, XP multipliers, and server market item registries.</p></div>
-            <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase mt-4 block group-hover:text-white transition-colors">DISPATCH INTERFACE ➔</span>
+            <div><span className="text-3xl block mb-3">✨</span><h4 className="text-sm font-black text-white group-hover:text-[#5865F2] uppercase tracking-wider">{t('dashboardHome.levelingEcoTitle')}</h4><p className="text-xs text-gray-400 mt-2 leading-relaxed">{t('dashboardHome.levelingEcoDesc')}</p></div>
+            <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase mt-4 block group-hover:text-white transition-colors">{t('dashboardHome.dispatchArrow')}</span>
           </Link>
           <Link href={`/dashboard/${guildId}/welcome`} className="bg-[#1e1f22] hover:bg-[#232428] border border-[#2b2d31] hover:border-green-500/40 rounded-2xl p-8 shadow-md transition-all duration-200 group cursor-pointer text-left flex flex-col justify-between min-h-[210px]">
-            <div><span className="text-3xl block mb-3">📥</span><h4 className="text-sm font-black text-white group-hover:text-green-400 uppercase tracking-wider">Gateway Welcome</h4><p className="text-xs text-gray-400 mt-2 leading-relaxed">Design premium PIL canvas entry banners and toggle automated greeting/leave scripts.</p></div>
-            <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase mt-4 block group-hover:text-white transition-colors">DISPATCH INTERFACE ➔</span>
+            <div><span className="text-3xl block mb-3">📥</span><h4 className="text-sm font-black text-white group-hover:text-green-400 uppercase tracking-wider">{t('dashboardHome.welcomeTitle')}</h4><p className="text-xs text-gray-400 mt-2 leading-relaxed">{t('dashboardHome.welcomeDesc')}</p></div>
+            <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase mt-4 block group-hover:text-white transition-colors">{t('dashboardHome.dispatchArrow')}</span>
           </Link>
           <Link href={`/dashboard/${guildId}/ticket-settings`} className="bg-[#1e1f22] hover:bg-[#232428] border border-[#2b2d31] hover:border-purple-500/40 rounded-2xl p-8 shadow-md transition-all duration-200 group cursor-pointer text-left flex flex-col justify-between min-h-[210px]">
-            <div><span className="text-3xl block mb-3">🎫</span><h4 className="text-sm font-black text-white group-hover:text-purple-400 uppercase tracking-wider">Cognitive Support</h4><p className="text-xs text-gray-400 mt-2 leading-relaxed">Inject private vector knowledge chunks to power up your context-aware ticket AI.</p></div>
-            <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase mt-4 block group-hover:text-white transition-colors">DISPATCH INTERFACE ➔</span>
+            <div><span className="text-3xl block mb-3">🎫</span><h4 className="text-sm font-black text-white group-hover:text-purple-400 uppercase tracking-wider">{t('dashboardHome.ticketTitle')}</h4><p className="text-xs text-gray-400 mt-2 leading-relaxed">{t('dashboardHome.ticketDesc')}</p></div>
+            <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase mt-4 block group-hover:text-white transition-colors">{t('dashboardHome.dispatchArrow')}</span>
           </Link>
         </div>
       </div>
@@ -349,41 +352,41 @@ export default function DashboardHome() {
             <div className="w-3 h-3 bg-red-500 rounded-full"></div>
             <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-xs font-black font-mono text-gray-500 tracking-widest uppercase ml-2">CORE_TERMINAL_LOGS // MANAGEMENT_STAGE</span>
+            <span className="text-xs font-black font-mono text-gray-500 tracking-widest uppercase ml-2">{t('dashboardHome.terminalHeader')}</span>
           </div>
-          
+
           <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-            <select 
-              value={logFilter} 
+            <select
+              value={logFilter}
               onChange={(e) => setLogFilter(e.target.value as any)}
               className="bg-[#1e1f22] border border-[#2b2d31] text-[#b5bac1] font-mono text-[10px] font-black px-3 py-1.5 rounded cursor-pointer uppercase focus:outline-none focus:border-[#5865F2]"
             >
-              <option value="ALL">🔍 ALL STREAMS</option>
-              <option value="INFO">🔹 INFO ONLY</option>
-              <option value="SUCCESS">🟢 SUCCESS ONLY</option>
-              <option value="WARN">🟡 WARN ONLY</option>
-              <option value="SYSTEM">🔮 SYSTEM ONLY</option>
+              <option value="ALL">{t('dashboardHome.filterAll')}</option>
+              <option value="INFO">{t('dashboardHome.filterInfo')}</option>
+              <option value="SUCCESS">{t('dashboardHome.filterSuccess')}</option>
+              <option value="WARN">{t('dashboardHome.filterWarn')}</option>
+              <option value="SYSTEM">{t('dashboardHome.filterSystem')}</option>
             </select>
 
             <button
               type="button"
               onClick={() => setIsPaused(!isPaused)}
               className={`font-mono text-[10px] font-black px-4 py-1.5 rounded uppercase tracking-wider transition-all duration-150 ${
-                isPaused 
-                  ? 'bg-yellow-500 text-black border border-yellow-400 font-bold' 
+                isPaused
+                  ? 'bg-yellow-500 text-black border border-yellow-400 font-bold'
                   : 'bg-[#2b2d31] text-white hover:bg-[#35373c] border border-[#4e5058]/20'
               }`}
             >
-              {isPaused ? '▶ RESUME STREAM' : '⏸️ PAUSE STREAM'}
+              {isPaused ? t('dashboardHome.resumeStream') : t('dashboardHome.pauseStream')}
             </button>
           </div>
         </div>
-        
+
         <div className="font-mono text-xs sm:text-sm p-2 space-y-2.5 min-h-[380px] max-h-[450px] overflow-y-auto select-text scrollbar-thin scrollbar-thumb-gray-800">
           {isLoadingLogs ? (
-            <div className="text-center py-20 text-gray-500 text-xs font-semibold">Synchronizing terminal console logs payload...</div>
+            <div className="text-center py-20 text-gray-500 text-xs font-semibold">{t('dashboardHome.syncingLogs')}</div>
           ) : filteredLogs.length === 0 ? (
-            <div className="text-center py-20 text-gray-600 text-xs font-semibold">No synchronized log blocks match the active telemetry filter matrix.</div>
+            <div className="text-center py-20 text-gray-600 text-xs font-semibold">{t('dashboardHome.noLogsMatch')}</div>
           ) : (
             filteredLogs.map((log, i) => (
               <div key={`${log.timestamp}-${log.type}-${log.message}-${i}`} className="flex gap-4 items-start leading-relaxed animate-in fade-in slide-in-from-left-1 duration-150">
