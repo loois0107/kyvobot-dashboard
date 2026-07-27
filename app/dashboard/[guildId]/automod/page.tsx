@@ -10,6 +10,10 @@ import {
   AUTOMOD_SPAM_INTERVAL_MAX_SECONDS,
   AUTOMOD_TIMEOUT_MIN_SECONDS,
   AUTOMOD_TIMEOUT_MAX_SECONDS,
+  AUTOMOD_MAX_CHARS_MIN,
+  AUTOMOD_MAX_CHARS_MAX,
+  AUTOMOD_MAX_LINES_MIN,
+  AUTOMOD_MAX_LINES_MAX,
   AUTOMOD_FORBIDDEN_WORD_MAX_LENGTH,
   AUTOMOD_FORBIDDEN_WORDS_MAX_COUNT,
   DEFAULT_AUTOMOD_SETTINGS,
@@ -30,6 +34,8 @@ export default function AutomodSettingsPage() {
   const [spamLimit, setSpamLimit] = useState(DEFAULT_AUTOMOD_SETTINGS.spam_limit);
   const [spamIntervalSeconds, setSpamIntervalSeconds] = useState(DEFAULT_AUTOMOD_SETTINGS.spam_interval_seconds);
   const [timeoutSeconds, setTimeoutSeconds] = useState(DEFAULT_AUTOMOD_SETTINGS.timeout_seconds);
+  const [maxChars, setMaxChars] = useState(DEFAULT_AUTOMOD_SETTINGS.max_chars);
+  const [maxLines, setMaxLines] = useState(DEFAULT_AUTOMOD_SETTINGS.max_lines);
   const [forbiddenWordsText, setForbiddenWordsText] = useState('');
 
   useEffect(() => {
@@ -61,6 +67,8 @@ export default function AutomodSettingsPage() {
       setSpamLimit(s.spam_limit);
       setSpamIntervalSeconds(s.spam_interval_seconds);
       setTimeoutSeconds(s.timeout_seconds);
+      setMaxChars(s.max_chars ?? DEFAULT_AUTOMOD_SETTINGS.max_chars);
+      setMaxLines(s.max_lines ?? DEFAULT_AUTOMOD_SETTINGS.max_lines);
       setForbiddenWordsText((s.forbidden_words || []).join('\n'));
       setIsDirty(false);
       setLoadStatus('loaded');
@@ -81,6 +89,8 @@ export default function AutomodSettingsPage() {
           spam_limit: spamLimit,
           spam_interval_seconds: spamIntervalSeconds,
           timeout_seconds: timeoutSeconds,
+          max_chars: maxChars,
+          max_lines: maxLines,
           forbidden_words_text: forbiddenWordsText,
         }),
       });
@@ -190,6 +200,42 @@ export default function AutomodSettingsPage() {
             className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]"
           />
           <p className="text-[10px] text-[#57576F]">How long a member is timed out for when they trip the spam threshold.</p>
+        </div>
+      </div>
+
+      <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
+        <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+          Message Shape
+        </h3>
+
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold text-[#b5bac1]">
+            Max Characters ({AUTOMOD_MAX_CHARS_MIN}-{AUTOMOD_MAX_CHARS_MAX} chars)
+          </label>
+          <input
+            type="number"
+            min={AUTOMOD_MAX_CHARS_MIN}
+            max={AUTOMOD_MAX_CHARS_MAX}
+            value={maxChars}
+            onChange={(e) => { setMaxChars(parseInt(e.target.value) || 0); setIsDirty(true); }}
+            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]"
+          />
+          <p className="text-[10px] text-[#57576F]">A single message longer than this (outside of code blocks) is deleted, regardless of send rate.</p>
+        </div>
+
+        <div className="space-y-1.5 pt-2">
+          <label className="text-xs font-bold text-[#b5bac1]">
+            Max Lines ({AUTOMOD_MAX_LINES_MIN}-{AUTOMOD_MAX_LINES_MAX} lines)
+          </label>
+          <input
+            type="number"
+            min={AUTOMOD_MAX_LINES_MIN}
+            max={AUTOMOD_MAX_LINES_MAX}
+            value={maxLines}
+            onChange={(e) => { setMaxLines(parseInt(e.target.value) || 0); setIsDirty(true); }}
+            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]"
+          />
+          <p className="text-[10px] text-[#57576F]">A single message with more line breaks than this (outside of code blocks) is deleted.</p>
         </div>
       </div>
 

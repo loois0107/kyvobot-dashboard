@@ -16,10 +16,20 @@ export const AUTOMOD_TIMEOUT_DEFAULT_SECONDS = 600; // 기존 하드코딩값과
 export const AUTOMOD_FORBIDDEN_WORD_MAX_LENGTH = 50;
 export const AUTOMOD_FORBIDDEN_WORDS_MAX_COUNT = 200;
 
+export const AUTOMOD_MAX_CHARS_MIN = 100;
+export const AUTOMOD_MAX_CHARS_MAX = 4000;
+export const AUTOMOD_MAX_CHARS_DEFAULT = 800;
+
+export const AUTOMOD_MAX_LINES_MIN = 3;
+export const AUTOMOD_MAX_LINES_MAX = 50;
+export const AUTOMOD_MAX_LINES_DEFAULT = 12;
+
 export const DEFAULT_AUTOMOD_SETTINGS = {
   spam_limit: AUTOMOD_SPAM_LIMIT_DEFAULT,
   spam_interval_seconds: AUTOMOD_SPAM_INTERVAL_DEFAULT_SECONDS,
   timeout_seconds: AUTOMOD_TIMEOUT_DEFAULT_SECONDS,
+  max_chars: AUTOMOD_MAX_CHARS_DEFAULT,
+  max_lines: AUTOMOD_MAX_LINES_DEFAULT,
   forbidden_words: [] as string[],
 };
 
@@ -27,6 +37,8 @@ export interface AutomodSettings {
   spam_limit: number;
   spam_interval_seconds: number;
   timeout_seconds: number;
+  max_chars: number;
+  max_lines: number;
   forbidden_words: string[];
 }
 
@@ -74,6 +86,16 @@ export function validateAutomodSettings(input: any): ValidationResult {
     errors.push(`timeout_seconds must be between ${AUTOMOD_TIMEOUT_MIN_SECONDS} and ${AUTOMOD_TIMEOUT_MAX_SECONDS}.`);
   }
 
+  const maxChars = Number(input?.max_chars);
+  if (!Number.isFinite(maxChars) || maxChars < AUTOMOD_MAX_CHARS_MIN || maxChars > AUTOMOD_MAX_CHARS_MAX) {
+    errors.push(`max_chars must be between ${AUTOMOD_MAX_CHARS_MIN} and ${AUTOMOD_MAX_CHARS_MAX}.`);
+  }
+
+  const maxLines = Number(input?.max_lines);
+  if (!Number.isFinite(maxLines) || maxLines < AUTOMOD_MAX_LINES_MIN || maxLines > AUTOMOD_MAX_LINES_MAX) {
+    errors.push(`max_lines must be between ${AUTOMOD_MAX_LINES_MIN} and ${AUTOMOD_MAX_LINES_MAX}.`);
+  }
+
   const forbiddenWordsText = typeof input?.forbidden_words_text === 'string' ? input.forbidden_words_text : '';
   const forbiddenWords = parseForbiddenWordsText(forbiddenWordsText);
 
@@ -95,6 +117,8 @@ export function validateAutomodSettings(input: any): ValidationResult {
       spam_limit: Math.round(spamLimit),
       spam_interval_seconds: Math.round(spamInterval),
       timeout_seconds: Math.round(timeoutSeconds),
+      max_chars: Math.round(maxChars),
+      max_lines: Math.round(maxLines),
       forbidden_words: forbiddenWords,
     },
   };
