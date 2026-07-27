@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
+import { buildReplaceWinnerToastMessage, replaceWinnerToastType } from '@/lib/giveawayReplace';
 
 interface WinnerInfo {
   user_id: string;
@@ -93,11 +94,10 @@ export default function GiveawaysPage() {
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
+        const roleLabel = replaceTarget.giveaway.prize_role_name || replaceTarget.giveaway.prize_role_id;
         showToast(
-          data.role_note
-            ? `Winner replaced. Remember to manually remove the "${replaceTarget.giveaway.prize_role_name || replaceTarget.giveaway.prize_role_id}" role from the original winner if appropriate.`
-            : 'Winner replaced successfully.',
-          'success'
+          buildReplaceWinnerToastMessage(!!data.role_note, data.payout_ok, roleLabel),
+          replaceWinnerToastType(data.payout_ok)
         );
         setReplaceTarget(null);
         await loadGiveaways();
@@ -193,7 +193,7 @@ export default function GiveawaysPage() {
             </h3>
             <p className="text-xs text-[#b5bac1]">
               {replaceTarget.winner.username || replaceTarget.winner.user_id} will be replaced with a random remaining entrant.
-              {replaceTarget.giveaway.prize_type === 'points' && ' Their prize points will be reclaimed automatically.'}
+              {replaceTarget.giveaway.prize_type === 'points' && ' Their prize points will be reclaimed automatically (if they\'ve already spent it, their balance can go negative).'}
             </p>
             {replaceTarget.giveaway.prize_type === 'role' && (
               <div className="bg-amber-950/40 border border-amber-500/30 rounded-lg p-3 text-[11px] text-amber-300">
