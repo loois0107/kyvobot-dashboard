@@ -17,7 +17,7 @@ export async function validateThumbnailUrl(url: string, fetchImpl: typeof fetch 
   }
 
   try {
-    const res = await fetchImpl(trimmed, { method: 'HEAD', signal: AbortSignal.timeout(5000) });
+    const res = await fetchImpl(trimmed, { method: 'HEAD', signal: AbortSignal.timeout(10000) });
     if (!res.ok) {
       return { valid: false, error: `card_thumbnail_url returned status ${res.status}. Please check the link.` };
     }
