@@ -4,6 +4,7 @@ import { auth } from '@/auth';
 import { COOKIE_NAME, dictionaries, resolveInitialLanguage } from '@/lib/i18n';
 import LandingHeader from '@/components/landing/LandingHeader';
 import PartyPreviewCard from '@/components/landing/PartyPreviewCard';
+import FeatureScreenshotRow from '@/components/landing/FeatureScreenshotRow';
 import RankCardMockup from '@/components/landing/RankCardMockup';
 import PartyPresetMockup from '@/components/landing/PartyPresetMockup';
 import AiKnowledgeMockup from '@/components/landing/AiKnowledgeMockup';
@@ -62,6 +63,33 @@ const FEATURES = [
     badgeBg: 'bg-[#9146FF]/15',
     border: 'hover:border-[#9146FF]/50',
     shadow: 'hover:shadow-[0_0_25px_rgba(145,70,255,0.25)]',
+  },
+] as const;
+
+const SCREENSHOTS = [
+  {
+    titleKey: 'screenshotPartyTitle',
+    descKey: 'screenshotPartyDesc',
+    icon: '🎮',
+    futureImageSrc: '/images/features/party-recruit.png',
+  },
+  {
+    titleKey: 'screenshotBalancerTitle',
+    descKey: 'screenshotBalancerDesc',
+    icon: '⚖️',
+    futureImageSrc: '/images/features/team-balancer.png',
+  },
+  {
+    titleKey: 'screenshotAiTicketTitle',
+    descKey: 'screenshotAiTicketDesc',
+    icon: '🤖',
+    futureImageSrc: '/images/features/ai-ticket.png',
+  },
+  {
+    titleKey: 'screenshotRankCardTitle',
+    descKey: 'screenshotRankCardDesc',
+    icon: '🎨',
+    futureImageSrc: '/images/features/rank-card.png',
   },
 ] as const;
 
@@ -188,6 +216,23 @@ export default async function RootPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="relative max-w-4xl mx-auto w-full px-4 pb-20 space-y-16">
+        <h2 className="text-center text-xs font-black tracking-widest text-[#FFD700] uppercase">
+          {t.landingPage.screenshotsTitle}
+        </h2>
+        {SCREENSHOTS.map((item, i) => (
+          <FeatureScreenshotRow
+            key={item.titleKey}
+            title={t.landingPage[item.titleKey]}
+            description={t.landingPage[item.descKey]}
+            icon={item.icon}
+            comingSoonLabel={t.landingPage.screenshotComingSoon}
+            futureImageSrc={item.futureImageSrc}
+            reverse={i % 2 === 1}
+          />
+        ))}
       </section>
 
       <section className="relative max-w-5xl mx-auto w-full px-4 pb-20">
