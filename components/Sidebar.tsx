@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { usePathname, useParams } from 'next/navigation';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { useT } from '@/lib/i18n/LanguageContext';
 
 export default function Sidebar() {
   const pathname = usePathname();
   const params = useParams();
+  const { data: session } = useSession();
   const t = useT();
 
   // The dashboard section renders its own full sidebar/navigation - don't stack a second one next to it.
@@ -16,13 +17,17 @@ export default function Sidebar() {
   }
 
   const guildId = params?.guildId as string | undefined;
-  // No known guild yet - send to '/', which resolves a real one via the Discord API rather than guessing.
+  // No known guild in the URL - send to '/', which resolves a real one via the Discord API rather than guessing.
   const controlHubHref = guildId ? `/dashboard/${guildId}` : '/';
 
-  const menuItems = [
-    { href: '/', label: t('sidebar.genericHome'), activeColor: 'text-white border-white' },
-    { href: controlHubHref, label: t('sidebar.genericControlHub'), activeColor: 'text-[#5865F2] border-[#5865F2]' },
-  ];
+  // Logged-out visitors only get "Home" (the marketing landing page) - there's nothing to control yet.
+  // Logged-in visitors only get "Control Hub" - the landing page has nothing left for them since '/'
+  // just auto-redirects them straight back into their dashboard. Showing exactly one item per auth
+  // state (instead of always showing both) is what actually fixes the two ever resolving to the same
+  // href - previously they silently collided whenever the URL had no guildId (i.e. on '/' or '/profile').
+  const menuItems = session
+    ? [{ id: 'controlHub', href: controlHubHref, label: t('sidebar.genericControlHub'), activeColor: 'text-[#5865F2] border-[#5865F2]' }]
+    : [{ id: 'home', href: '/', label: t('sidebar.genericHome'), activeColor: 'text-white border-white' }];
 
   return (
     <aside className="w-full md:w-64 bg-[#161626] border-b md:border-b-0 md:border-r border-[#2A1F40] p-4 md:p-6 flex flex-row md:flex-col justify-between items-center md:items-stretch sticky top-0 z-50">
@@ -38,7 +43,7 @@ export default function Sidebar() {
 
             return (
               <Link
-                key={item.href}
+                key={item.id}
                 href={item.href}
                 className={`transition-all duration-200 whitespace-nowrap font-bold relative md:pl-3 py-1 md:border-l-2 ${
                   isActive 
