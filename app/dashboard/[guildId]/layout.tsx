@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { signOut } from 'next-auth/react';
 import { useT } from '@/lib/i18n/LanguageContext';
 import LanguageToggle from '@/components/LanguageToggle';
 
@@ -210,9 +211,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </nav>
         </div>
 
-        <div className="pt-4 border-t border-[#2b2d31] text-xs text-[#949ba4]">
-          <p>{t('sidebar.currentActiveNode')}</p>
-          <code className="text-[#5865f2] block mt-1 truncate">{currentGuildId}</code>
+        <div className="pt-4 border-t border-[#2b2d31] text-xs text-[#949ba4] space-y-3">
+          <div>
+            <p>{t('sidebar.currentActiveNode')}</p>
+            <code className="text-[#5865f2] block mt-1 truncate">{currentGuildId}</code>
+          </div>
+          <button
+            type="button"
+            onClick={() => signOut({ callbackUrl: '/' })}
+            className="w-full flex items-center justify-center px-3 py-2 rounded font-medium text-xs text-[#f23f42] border border-[#f23f42]/30 hover:bg-[#f23f42]/10 transition"
+          >
+            {t('sidebar.logout')}
+          </button>
         </div>
       </aside>
 

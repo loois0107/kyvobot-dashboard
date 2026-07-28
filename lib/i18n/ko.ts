@@ -32,6 +32,7 @@ const ko: typeof en = {
     mainHeaderTitle: 'Kyvo 중앙 컨트롤 허브',
     syncStatus: '엔드포인트 매트릭스 동기화됨',
     goBack: '뒤로 가기',
+    logout: '🚪 로그아웃',
   },
   dashboardHome: {
     invalidAccess: '⚠️ 잘못된 접근입니다. 사이드바에서 활성화할 디스코드 서버를 선택해 주세요.',

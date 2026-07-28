@@ -30,6 +30,7 @@ const en = {
     mainHeaderTitle: 'Kyvo Central Control Hub',
     syncStatus: 'Endpoint Matrix Sync',
     goBack: 'GO BACK',
+    logout: '🚪 Log Out',
   },
   dashboardHome: {
     invalidAccess: '⚠️ Invalid access. Please select an active Discord server from the sidebar.',

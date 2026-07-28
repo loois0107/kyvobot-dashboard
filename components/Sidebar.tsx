@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useParams } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 import { useT } from '@/lib/i18n/LanguageContext';
 
 export default function Sidebar() {
@@ -52,8 +53,17 @@ export default function Sidebar() {
         </nav>
       </div>
 
-      <div className="hidden md:block text-[10px] text-[#57576F]">
-        {t('sidebar.genericStatus')}
+      <div className="flex flex-row md:flex-col items-center md:items-stretch gap-3 md:gap-2">
+        <button
+          type="button"
+          onClick={() => signOut({ callbackUrl: '/' })}
+          className="whitespace-nowrap text-xs md:text-sm font-bold text-[#f23f42]/80 hover:text-[#f23f42] transition-colors"
+        >
+          {t('sidebar.logout')}
+        </button>
+        <div className="hidden md:block text-[10px] text-[#57576F]">
+          {t('sidebar.genericStatus')}
+        </div>
       </div>
     </aside>
   );
