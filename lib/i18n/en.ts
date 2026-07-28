@@ -544,6 +544,25 @@ const en = {
     guildListFailed: '⚠️ Failed to load your Discord server list. Please re-authenticate your session.',
     controlHubTitle: '🛡️ Kyvo Control Hub',
     noManagedServers: 'No Discord servers found where you have management permissions.',
+    heroTitle: 'KyvoBot',
+    heroTagline: 'One Discord bot for moderation, leveling, party recruiting, and AI-powered ticket support - configured from a real web dashboard.',
+    loginCta: 'Login with Discord',
+    featuresTitle: 'What KyvoBot Does',
+    featurePartyTitle: '🎮 Party Recruiting',
+    featurePartyDesc: '/party_recruit, /gg, and /scrim_start let members instantly put together a group.',
+    featureTicketTitle: '🤖 AI Ticket Support',
+    featureTicketDesc: 'A 24/7 AI-powered support desk that answers from your own server knowledge base.',
+    featureLevelingTitle: '📊 Leveling & Economy',
+    featureLevelingDesc: 'XP rates, role rewards, and a server shop, all configurable from the dashboard.',
+    featureAutomodTitle: '🛡️ Auto-Moderation',
+    featureAutomodDesc: 'Spam and word filtering, message-shape rules, and anonymous reports.',
+    featureReactionRolesTitle: '🎭 Reaction Roles',
+    featureReactionRolesDesc: 'Let members pick up roles by reacting to any message.',
+    featureTwitchTitle: '📺 Twitch Integration',
+    featureTwitchDesc: 'Live announcements and an automatic role while a linked streamer is live.',
+    footerTagline: 'A free, independently-operated Discord bot.',
+    footerPrivacy: 'Privacy Policy',
+    footerTerms: 'Terms of Service',
   },
   profilePickerPage: {
     title: '👤 My Profile',
@@ -601,6 +620,82 @@ const en = {
     cardLoadNetworkError: 'Network error while loading your card settings.',
     cardSaveNetworkError: 'Network error while saving.',
     resetNetworkError: 'Network error while resetting.',
+  },
+  privacyPage: {
+    metaTitle: 'Privacy Policy',
+    backToHome: '← Back to Home',
+    lastUpdated: 'Last updated: {date}',
+    intro: 'KyvoBot ("we", "us", "the Bot") is a Discord bot and companion web dashboard that provides server moderation, leveling and economy, party recruiting, AI-powered ticket support, and related community-management features. This policy explains what data we collect, how we use it, and how you can request it be deleted.',
+
+    section1Title: '1. Who We Are',
+    section1Body: 'KyvoBot is a free, independently-operated Discord bot and is not a registered company. This policy covers data handled by the Bot itself and by its companion web dashboard.',
+
+    section2Title: '2. Information We Collect',
+    section2aTitle: 'a. Discord account data (dashboard login)',
+    section2aBody: 'When you log in to the dashboard with Discord, we receive your Discord user ID, username, and avatar via OAuth. We do not request or receive your email address. Your Discord access token and language preference are stored only in an encrypted session cookie in your own browser - never in our database. The list of servers you belong to is fetched from Discord\'s API each time you use the dashboard, and is cached for at most 60 seconds by our hosting infrastructure (a standard Next.js request cache) - it is not stored in our database or in Redis.',
+    section2bTitle: 'b. Data linked to your Discord account, per server',
+    section2bBody: 'When you use the Bot\'s commands in a server, we may store the following, tied to your Discord user ID and that server\'s ID:\n• Economy/leveling data: points, XP, and level\n• League of Legends account link (/tier_verify): we send the Riot ID (game name + tag line) you provide to Riot Games\' API and receive back your PUUID and ranked tier/rank/LP in response, which we store together with the Riot ID and a verification timestamp\n• Steam account link (/steam_link): the SteamID64 you provide (self-reported - we do not verify you own the account), plus a cached snapshot of your CS2 inventory analysis\n• Twitch live-role linkage: the Discord member ID an admin links to a tracked Twitch streamer\n• Your personal rank-card style preferences\n• Your saved favorite game preset\n• Party/scrim/quick-RSVP/giveaway participation history: which recruitment posts you joined or led, your self-reported tier, timestamps, and status\n• Anonymous reports: if you submit a report via /anonymous_report, the full report text and your Discord user ID are stored in our database for anti-abuse purposes, even though your identity is never shown to server admins in the dashboard or on Discord\n• If you are banned from the anonymous report system, that ban record (your Discord ID and the admin who applied it)\n• Automated moderation action logs: your Discord ID, the action taken, and a brief reason (which may include a short excerpt of the message that triggered it) - full message content is not stored\n• AI ticket support feedback: which knowledge-base entry answered your question and your 👍/👎 rating - not the conversation text itself (see Section 3 for how ticket conversations are actually processed)',
+    section2cTitle: 'c. Server (guild) configuration data',
+    section2cBody: 'Server administrators can configure settings through the dashboard - automod thresholds, welcome/goodbye messages and channels, leveling/economy rules, custom command macros, ticket panel text and AI instructions, party presets, tier-to-role mappings, and the server\'s preferred bot language. This configuration data is not personal to any individual member.',
+
+    section3Title: '3. Third-Party Services We Share Data With',
+    section3Body: '• OpenAI: when a member asks the AI ticket support a question, that question is sent to OpenAI\'s API to generate an answer. When a ticket is closed, up to the last 150 messages in that ticket channel are sent to OpenAI\'s API to generate a short summary, which is then posted as a Discord message in the server\'s admin log channel - this summary is never saved in our database.\n• Riot Games: the Riot ID (game name + tag line) and region you provide are sent to Riot\'s API to look up your PUUID and ranked tier.\n• Valve (Steam): the SteamID64 you provide is sent to Steam\'s Web API to retrieve your public profile and CS2 inventory.\n• Twitch: broadcaster IDs and login names are sent to Twitch\'s API and EventSub webhook system to detect when a linked streamer goes live.\n• Discord: as a Discord bot and OAuth application, all of the above ultimately flows through Discord\'s platform, which has its own privacy policy.',
+
+    section4Title: '4. Information We Do Not Collect',
+    section4Body: 'We do not collect your email address; real-time or precise location data (GPS or similar); payment or billing information; or voice/audio content - our "Join to Create" feature only detects when you join or leave a voice channel, it never records or processes audio. We do not use any third-party analytics or tracking scripts.',
+
+    section5Title: '5. How We Use Your Information',
+    section5Body: 'We use the data described above solely to operate the features you or your server\'s administrators enable - for example, tracking XP for leveling, verifying a linked Riot/Steam account for the relevant commands, remembering your saved preferences, and applying automated moderation rules a server\'s admins configured.',
+
+    section6Title: '6. Data Retention & Deletion',
+    section6Body: 'We do not currently have an automated process that deletes a server\'s data when the Bot is removed from that server - data tied to a server ID remains in our database indefinitely unless deleted manually. If you would like your personal data, or a server\'s data, deleted, please contact us at {email} and we will process your request manually.',
+
+    section7Title: '7. Children\'s Privacy',
+    section7Body: 'Discord requires users to be at least 13 years old (or the minimum age required in your country). We do not knowingly collect data from anyone who does not meet Discord\'s own age requirements.',
+
+    section8Title: '8. Changes to This Policy',
+    section8Body: 'We may update this policy as the Bot\'s features change. Significant changes will be reflected by updating the "last updated" date above.',
+
+    section9Title: '9. Contact Us',
+    section9Body: 'Questions about this policy, or requests regarding your data, can be sent to {email}.',
+  },
+  termsPage: {
+    metaTitle: 'Terms of Service',
+    backToHome: '← Back to Home',
+    lastUpdated: 'Last updated: {date}',
+
+    section1Title: '1. Acceptance of Terms',
+    section1Body: 'By adding KyvoBot ("the Bot") to a Discord server, using its commands, or logging into its web dashboard ("the Dashboard"), you agree to these Terms of Service. If you do not agree, please do not use the Bot or the Dashboard.',
+
+    section2Title: '2. Description of Service',
+    section2Body: 'KyvoBot is a free, independently-operated Discord bot providing moderation, leveling/economy, party recruiting, ticket support, and related community tools, along with a companion web dashboard for configuration. It is not affiliated with, endorsed by, or operated by Discord Inc., Riot Games, Valve Corporation, or Twitch Interactive.',
+
+    section3Title: '3. Self-Reported Account Links',
+    section3Body: 'Features that link a Riot Games or Steam account to your Discord account (/tier_verify, /steam_link) rely on information you provide yourself. We do not verify that you actually own the linked account. Do not link an account you do not own or do not have permission to reference.',
+
+    section4Title: '4. Server Administrator Responsibilities',
+    section4Body: 'If you add the Bot to a server or configure its settings through the Dashboard, you are responsible for how those settings are used within your community, including any automated moderation rules, custom commands, or AI ticket support instructions you configure.',
+
+    section5Title: '5. Automated Moderation & AI Features',
+    section5Body: 'Automated moderation (spam/word filtering) and AI-generated ticket responses and summaries are provided on a best-effort basis and may occasionally be inaccurate, produce false positives, or behave unexpectedly. AI responses are not official guidance from Riot Games, Valve, Twitch, or any other third party referenced by the Bot\'s features.',
+
+    section6Title: '6. Prohibited Use',
+    section6Body: 'You may not use the Bot to violate Discord\'s Terms of Service or Community Guidelines, to harass or abuse other users, to attempt to disrupt or reverse-engineer the Bot or Dashboard, or for any unlawful purpose.',
+
+    section7Title: '7. Availability',
+    section7Body: 'The Bot and Dashboard are provided free of charge, on a best-effort basis, without any guarantee of uptime or availability. We may modify, suspend, or discontinue any feature, the Bot, or the Dashboard at any time without notice.',
+
+    section8Title: '8. Termination',
+    section8Body: 'Server administrators may remove the Bot from their server at any time. We may also restrict or block access to the Bot or Dashboard for any user or server, at our discretion, particularly in cases of abuse.',
+
+    section9Title: '9. Disclaimer & Limitation of Liability',
+    section9Body: 'The Bot and Dashboard are provided "as is," without warranties of any kind. To the fullest extent permitted by law, we are not liable for any damages arising from your use of, or inability to use, the Bot or Dashboard.',
+
+    section10Title: '10. Changes to These Terms',
+    section10Body: 'We may update these Terms as the Bot\'s features change. Continued use of the Bot or Dashboard after changes take effect constitutes acceptance of the updated Terms.',
+
+    section11Title: '11. Contact Us',
+    section11Body: 'Questions about these Terms can be sent to {email}.',
   },
 };
 
