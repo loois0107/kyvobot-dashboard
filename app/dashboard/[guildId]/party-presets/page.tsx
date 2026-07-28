@@ -5,6 +5,8 @@ import { useParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
 import { PARTY_GAME_PRESET_MAX_COUNT, PARTY_GAME_PRESET_NAME_MAX_LENGTH, type PartyGamePreset } from '@/lib/partyPresets';
 import { useT } from '@/lib/i18n/LanguageContext';
+import HelpText from '@/components/HelpText';
+import SettingsPageContainer from '@/components/SettingsPageContainer';
 
 const COLOR_PRESETS = ['#5865F2', '#23A55A', '#FEE75C', '#EB459E', '#ED4245', '#9B59B6', '#00D2D3', '#54A0FF'];
 
@@ -140,15 +142,15 @@ export default function PartyPresetsPage() {
   const atCap = !isEditing && presets.length >= PARTY_GAME_PRESET_MAX_COUNT;
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-16">
+    <SettingsPageContainer className="pb-16">
       <header className="border-b border-[#2b2d31] pb-6">
         <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('partyPresetsPage.title')}</h1>
-        <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
+        <HelpText className="mt-1 tracking-widest uppercase">
           {t('partyPresetsPage.subtitleUsage', { used: presets.length, max: PARTY_GAME_PRESET_MAX_COUNT })}
-        </p>
-        <p className="text-[10px] text-[#57576F] mt-1 normal-case">
+        </HelpText>
+        <HelpText className="mt-1 normal-case">
           {t('partyPresetsPage.subtitleExplainer')}
-        </p>
+        </HelpText>
       </header>
 
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
@@ -191,9 +193,9 @@ export default function PartyPresetsPage() {
             className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5865F2] disabled:opacity-50"
           />
           {isEditing ? (
-            <p className="text-[10px] text-[#57576F]">{t('partyPresetsPage.renameHelp')}</p>
+            <HelpText>{t('partyPresetsPage.renameHelp')}</HelpText>
           ) : (
-            <p className="text-[10px] text-[#57576F]">{t('partyPresetsPage.duplicateWarning')}</p>
+            <HelpText>{t('partyPresetsPage.duplicateWarning')}</HelpText>
           )}
         </div>
 
@@ -237,7 +239,7 @@ export default function PartyPresetsPage() {
             placeholder="https://..."
             className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#5865F2]"
           />
-          <p className="text-[10px] text-[#57576F]">{t('partyPresetsPage.thumbnailHelp')}</p>
+          <HelpText>{t('partyPresetsPage.thumbnailHelp')}</HelpText>
         </div>
 
         <div className="flex gap-3 pt-2">
@@ -289,6 +291,6 @@ export default function PartyPresetsPage() {
           </div>
         )}
       </div>
-    </div>
+    </SettingsPageContainer>
   );
 }

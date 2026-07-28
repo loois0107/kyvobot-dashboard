@@ -5,6 +5,8 @@ import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useToast } from '@/components/Toast';
 import { useT } from '@/lib/i18n/LanguageContext';
+import HelpText from '@/components/HelpText';
+import SettingsPageContainer from '@/components/SettingsPageContainer';
 
 interface VectorNode {
   id: string;
@@ -235,12 +237,12 @@ export default function TicketAiSettings() {
 
   return (
     <div className="min-h-screen bg-[#111214] text-[#dbdee1] p-2 sm:p-4 md:p-6 pb-28">
-      <div className="max-w-5xl mx-auto space-y-6">
+      <SettingsPageContainer>
 
         <header className="border-b border-[#2b2d31] pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('ticketSettingsPage.title')}</h1>
-            <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">{t('ticketSettingsPage.subtitle')}</p>
+            <HelpText className="mt-1 tracking-widest uppercase">{t('ticketSettingsPage.subtitle')}</HelpText>
           </div>
           <button type="button" onClick={handleSaveMasterConfigs} disabled={isSaving} className="w-full sm:w-auto bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all cursor-pointer">
             {isSaving ? t('ticketSettingsPage.injecting') : t('ticketSettingsPage.saveButton')}
@@ -257,7 +259,7 @@ export default function TicketAiSettings() {
 
           <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-4 shadow-xl">
             <h2 className="text-xs font-black tracking-widest text-[#5865F2] uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">{t('ticketSettingsPage.panelSetupTitle')}</h2>
-            <p className="text-[10px] text-[#57576F]">{t('ticketSettingsPage.panelSetupDesc')}</p>
+            <HelpText>{t('ticketSettingsPage.panelSetupDesc')}</HelpText>
             <div className="space-y-1">
               <label className="text-[11px] font-black text-[#b5bac1] uppercase tracking-wider">{t('ticketSettingsPage.panelTitleLabel')}</label>
               <input type="text" value={panelTitle} onChange={(e) => { setPanelTitle(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]" />
@@ -270,7 +272,7 @@ export default function TicketAiSettings() {
 
           <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-4 shadow-xl">
             <h2 className="text-xs font-black tracking-widest text-green-400 uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">{t('ticketSettingsPage.welcomeEmbedTitle')}</h2>
-            <p className="text-[10px] text-[#57576F]">{t('ticketSettingsPage.welcomeEmbedDesc')}</p>
+            <HelpText>{t('ticketSettingsPage.welcomeEmbedDesc')}</HelpText>
             <div className="space-y-1">
               <label className="text-[11px] font-black text-[#b5bac1] uppercase tracking-wider">{t('ticketSettingsPage.welcomeTitleLabel')}</label>
               <input type="text" value={welcomeTitle} onChange={(e) => { setWelcomeTitle(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-green-500" />
@@ -378,7 +380,7 @@ export default function TicketAiSettings() {
           </div>
         </div>
 
-      </div>
+      </SettingsPageContainer>
 
       {isDirty && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1e1f22]/95 border border-[#FFD700]/50 px-6 py-3.5 rounded-xl shadow-2xl flex items-center justify-between gap-8 backdrop-blur-md w-[90%] max-w-xl">

@@ -5,6 +5,8 @@ import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useToast } from '@/components/Toast';
 import { useT } from '@/lib/i18n/LanguageContext';
+import HelpText from '@/components/HelpText';
+import SettingsPageContainer from '@/components/SettingsPageContainer';
 
 export default function WelcomeSettings() {
   const router = useRouter();
@@ -134,7 +136,7 @@ export default function WelcomeSettings() {
 
   return (
     <div className="min-h-screen bg-[#111214] text-[#dbdee1] p-2 sm:p-4 md:p-6 pb-28">
-      <div className="max-w-5xl mx-auto space-y-6">
+      <SettingsPageContainer>
 
         <header className="mb-8 border-b border-[#2b2d31] pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
@@ -187,7 +189,7 @@ export default function WelcomeSettings() {
                   onChange={(e) => { setChannelId(e.target.value.replace(/[^0-9]/g, '')); setIsDirty(true); }}
                   className="w-full bg-[#1e1f22] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#5865F2]"
                 />
-                <p className="text-[10px] text-[#57576F] normal-case">{t('welcomePage.welcomeChannelHelp')}</p>
+                <HelpText className="normal-case">{t('welcomePage.welcomeChannelHelp')}</HelpText>
               </div>
             </div>
 
@@ -202,7 +204,7 @@ export default function WelcomeSettings() {
                   onChange={(e) => { setGoodbyeChannelId(e.target.value.replace(/[^0-9]/g, '')); setIsDirty(true); }}
                   className="w-full bg-[#1e1f22] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-red-500"
                 />
-                <p className="text-[10px] text-[#57576F] normal-case">{t('welcomePage.goodbyeChannelHelp')}</p>
+                <HelpText className="normal-case">{t('welcomePage.goodbyeChannelHelp')}</HelpText>
               </div>
               <div className="space-y-1 pt-1 border-t border-[#2b2d31]/40">
                 <label className="text-[10px] font-bold text-[#b5bac1] uppercase block">{t('welcomePage.goodbyeMessageLabel')}</label>
@@ -213,9 +215,9 @@ export default function WelcomeSettings() {
                   placeholder={t('welcomePage.goodbyeMessagePlaceholder')}
                   className="w-full bg-[#1e1f22] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-red-500"
                 />
-                <p className="text-[10px] text-[#57576F] normal-case">
+                <HelpText className="normal-case">
                   {t('welcomePage.goodbyeMessageHelp')}
-                </p>
+                </HelpText>
               </div>
             </div>
           </div>
@@ -237,7 +239,7 @@ export default function WelcomeSettings() {
             <div className="space-y-1.5 pt-2">
               <label className="text-xs font-bold text-[#b5bac1] flex justify-between"><span>{t('welcomePage.overlayOpacityLabel')}</span><span className="text-[#5865F2] font-mono">{Math.round(overlayOpacity * 100)}%</span></label>
               <input type="range" min="0.0" max="1.0" step="0.05" value={overlayOpacity} onChange={(e) => { setOverlayOpacity(parseFloat(e.target.value)); setIsDirty(true); }} className="w-full h-1 bg-[#232428] rounded-lg appearance-none cursor-pointer accent-[#5865F2]" />
-              <p className="text-[10px] text-[#57576F]">{t('welcomePage.overlayOpacityHelp')}</p>
+              <HelpText>{t('welcomePage.overlayOpacityHelp')}</HelpText>
             </div>
 
             <div className="space-y-2 pt-2">
@@ -256,14 +258,14 @@ export default function WelcomeSettings() {
               </div>
               <div className="pt-1">
                 <input type="text" value={backgroundUrl} onChange={(e) => { setBackgroundUrl(e.target.value); setIsDirty(true); }} placeholder={t('welcomePage.wallpaperUrlPlaceholder')} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5865F2]" />
-                <p className="text-[10px] text-[#57576F] pt-1">{t('welcomePage.wallpaperFallbackHelp')}</p>
+                <HelpText className="pt-1">{t('welcomePage.wallpaperFallbackHelp')}</HelpText>
               </div>
             </div>
 
           </div>
         </form>
 
-      </div>
+      </SettingsPageContainer>
 
       {isDirty && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1e1f22]/95 border border-[#5865F2]/60 px-6 py-3.5 rounded-xl shadow-2xl flex items-center justify-between gap-8 backdrop-blur-md w-[90%] max-w-xl animate-in fade-in">

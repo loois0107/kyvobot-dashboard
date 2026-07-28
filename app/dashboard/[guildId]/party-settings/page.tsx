@@ -11,6 +11,8 @@ import {
   DEFAULT_PARTY_SETTINGS,
 } from '@/lib/partySettings';
 import { useT } from '@/lib/i18n/LanguageContext';
+import HelpText from '@/components/HelpText';
+import SettingsPageContainer from '@/components/SettingsPageContainer';
 
 const COLOR_PRESETS = ['#5865F2', '#23A55A', '#FEE75C', '#EB459E', '#ED4245', '#9B59B6', '#00D2D3', '#54A0FF'];
 
@@ -158,13 +160,13 @@ export default function PartySettingsPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-28">
+    <SettingsPageContainer className="pb-28">
       <header className="border-b border-[#2b2d31] pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('partySettingsPage.title')}</h1>
-          <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
+          <HelpText className="mt-1 tracking-widest uppercase">
             {t('partySettingsPage.subtitle')}
-          </p>
+          </HelpText>
         </div>
         <button
           type="button"
@@ -250,7 +252,7 @@ export default function PartySettingsPage() {
             placeholder="https://..."
             className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#5865F2]"
           />
-          <p className="text-[10px] text-[#57576F]">{t('partySettingsPage.thumbnailHelp')}</p>
+          <HelpText>{t('partySettingsPage.thumbnailHelp')}</HelpText>
         </div>
       </div>
 
@@ -292,9 +294,9 @@ export default function PartySettingsPage() {
         <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
           {t('partySettingsPage.weeklyReportTitle')}
         </h3>
-        <p className="text-[10px] text-[#57576F]">
+        <HelpText>
           {t('partySettingsPage.weeklyReportDesc')}
-        </p>
+        </HelpText>
 
         <div className="flex items-center justify-between">
           <label className="text-xs font-black text-white cursor-pointer" htmlFor="weekly-report-toggle">{t('partySettingsPage.weeklyReportEnableLabel')}</label>
@@ -332,6 +334,6 @@ export default function PartySettingsPage() {
           </div>
         </div>
       )}
-    </div>
+    </SettingsPageContainer>
   );
 }

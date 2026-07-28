@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { MACRO_TRIGGER_MAX_LENGTH, MACRO_RESPONSE_MAX_LENGTH, MACRO_MAX_COUNT } from '@/lib/customCommandsSettings';
 import { useT } from '@/lib/i18n/LanguageContext';
+import HelpText from '@/components/HelpText';
+import SettingsPageContainer from '@/components/SettingsPageContainer';
 
 // 🛡️ /cc_add role_add·role_remove(봇 전용 관리자 슬래시 커맨드)로 만든 매크로는 문자열이 아니라
 // {type, role_id} 객체로 저장된다(cogs/custom_commands.py의 _normalize_command_entry와 동일한
@@ -134,7 +136,7 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-[#0F0F1A] text-white p-6 font-mono selection:bg-[#2A1F40]">
-      <div className="max-w-2xl mx-auto">
+      <SettingsPageContainer>
         <header className="mb-8 border-b border-[#2A1F40] pb-4">
           <h1 className="text-2xl font-extrabold text-purple-400">{t('settingsPage.title')}</h1>
           <p className="text-xs text-[#57576F] mt-1">
@@ -162,7 +164,7 @@ export default function SettingsPage() {
                 <option value="en">🇺🇸 English (EN)</option>
                 <option value="ko">🇰🇷 한국어 (KO)</option>
               </select>
-              <p className="text-[10px] text-[#57576F] mt-1">{t('settingsPage.serverLanguageHelp')}</p>
+              <HelpText className="mt-1">{t('settingsPage.serverLanguageHelp')}</HelpText>
             </div>
           </div>
 
@@ -183,9 +185,9 @@ export default function SettingsPage() {
                 {t('settingsPage.addNew')}
               </button>
             </div>
-            <p className="text-[10px] text-[#57576F] mb-3">
+            <HelpText className="mb-3">
               {t('settingsPage.macrosHelp', { max: MACRO_RESPONSE_MAX_LENGTH.toLocaleString() })}
-            </p>
+            </HelpText>
 
             {Object.keys(commands).length === 0 ? (
               <p className="text-xs text-[#57576F] text-center py-4">{t('settingsPage.noMacros')}</p>
@@ -217,7 +219,7 @@ export default function SettingsPage() {
             )}
           </div>
         </div>
-      </div>
+      </SettingsPageContainer>
     </div>
   );
 }

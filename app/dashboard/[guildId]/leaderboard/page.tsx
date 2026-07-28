@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useT } from '@/lib/i18n/LanguageContext';
+import HelpText from '@/components/HelpText';
 
 interface LeaderboardUser {
   user_id: string;
@@ -159,7 +160,7 @@ export default function GuildLeaderboardTerminal() {
                     </div>
                     <div className="truncate">
                       <h3 className="text-sm md:text-base font-bold text-white truncate">{user.username}</h3>
-                      <p className="text-[10px] text-[#57576F] font-mono mt-0.5">{t('leaderboardPage.nodeIdLabel')} {user.user_id}</p>
+                      <HelpText className="font-mono mt-0.5">{t('leaderboardPage.nodeIdLabel')} {user.user_id}</HelpText>
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-8 w-full sm:w-auto justify-end">
@@ -174,11 +175,11 @@ export default function GuildLeaderboardTerminal() {
                     </div>
                     <div className="flex justify-between sm:justify-end gap-6 text-right font-mono min-w-[120px]">
                       <div>
-                        <div className="text-[10px] text-[#57576F] tracking-wider">{t('leaderboardPage.level')}</div>
+                        <div className="text-xs text-[#8b8d98] tracking-wider">{t('leaderboardPage.level')}</div>
                         <div className="text-sm md:text-base font-black text-white">{user.level}</div>
                       </div>
                       <div>
-                        <div className="text-[10px] text-[#57576F] tracking-wider">{t('leaderboardPage.points')}</div>
+                        <div className="text-xs text-[#8b8d98] tracking-wider">{t('leaderboardPage.points')}</div>
                         <div className="text-sm md:text-base font-black text-[#FFD700]">{formatMetric(user.points)}P</div>
                       </div>
                     </div>

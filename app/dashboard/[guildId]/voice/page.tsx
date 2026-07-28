@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useT } from '@/lib/i18n/LanguageContext';
+import HelpText from '@/components/HelpText';
+import SettingsPageContainer from '@/components/SettingsPageContainer';
 
 export default function VoiceSettingsPage() {
   const params = useParams();
@@ -72,7 +74,7 @@ export default function VoiceSettingsPage() {
 
   return (
     <div className="min-h-screen bg-[#0F0F1A] text-white p-6 font-mono selection:bg-[#2A1F40]">
-      <div className="max-w-2xl mx-auto">
+      <SettingsPageContainer>
         <header className="mb-8 border-b border-[#2A1F40] pb-4 flex items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-extrabold text-purple-400">{t('voicePage.title')}</h1>
@@ -115,9 +117,9 @@ export default function VoiceSettingsPage() {
               placeholder={t('common.egPlaceholderId')}
               className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-white px-3 py-2 rounded focus:outline-none focus:border-[#5865f2] disabled:opacity-50"
             />
-            <p className="text-[10px] text-[#57576F] mt-2">
+            <HelpText className="mt-2">
               {t('voicePage.triggerChannelHelp')}
-            </p>
+            </HelpText>
           </div>
 
           {message && (
@@ -134,7 +136,7 @@ export default function VoiceSettingsPage() {
             {loading ? t('common.saving') : t('common.save')}
           </button>
         </div>
-      </div>
+      </SettingsPageContainer>
     </div>
   );
 }

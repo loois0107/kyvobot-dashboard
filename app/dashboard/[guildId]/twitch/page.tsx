@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
 import { useT } from '@/lib/i18n/LanguageContext';
+import HelpText from '@/components/HelpText';
+import SettingsPageContainer from '@/components/SettingsPageContainer';
 
 interface StreamerRow {
   broadcaster_id: string;
@@ -127,15 +129,15 @@ export default function TwitchStreamersSettings() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-16">
+    <SettingsPageContainer className="pb-16">
       <header className="border-b border-[#2b2d31] pb-6">
         <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('twitchPage.title')}</h1>
-        <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
+        <HelpText className="mt-1 tracking-widest uppercase">
           {t('twitchPage.subtitle')}
-        </p>
-        <p className="text-[10px] text-[#57576F] mt-2 normal-case">
+        </HelpText>
+        <HelpText className="mt-2 normal-case">
           {t('twitchPage.healthLegend')}
-        </p>
+        </HelpText>
       </header>
 
       {streamers.length === 0 ? (
@@ -208,6 +210,6 @@ export default function TwitchStreamersSettings() {
           })}
         </div>
       )}
-    </div>
+    </SettingsPageContainer>
   );
 }

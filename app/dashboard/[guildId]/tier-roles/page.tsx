@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
 import { useT } from '@/lib/i18n/LanguageContext';
+import HelpText from '@/components/HelpText';
+import SettingsPageContainer from '@/components/SettingsPageContainer';
 
 const TIER_CHOICES = ['Iron', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Emerald', 'Diamond', 'Master', 'Grandmaster', 'Challenger'];
 
@@ -166,12 +168,12 @@ export default function TierRolesSettings() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-28">
+    <SettingsPageContainer className="pb-28">
       <header className="border-b border-[#2b2d31] pb-6">
         <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('tierRolesPage.title')}</h1>
-        <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
+        <HelpText className="mt-1 tracking-widest uppercase">
           {t('tierRolesPage.subtitle')}
-        </p>
+        </HelpText>
       </header>
 
       {blockedItems.length > 0 && (
@@ -186,9 +188,9 @@ export default function TierRolesSettings() {
       )}
 
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-3 shadow-xl">
-        <p className="text-[10px] text-[#57576F] pb-1">
+        <HelpText className="pb-1">
           {t('tierRolesPage.reassignmentNote')}
-        </p>
+        </HelpText>
         {TIER_CHOICES.map((tier) => (
           <div key={tier} className="flex items-center gap-4">
             <label className="w-28 flex-shrink-0 text-xs font-bold text-[#b5bac1]">{tier}</label>
@@ -260,6 +262,6 @@ export default function TierRolesSettings() {
           </div>
         </div>
       )}
-    </div>
+    </SettingsPageContainer>
   );
 }

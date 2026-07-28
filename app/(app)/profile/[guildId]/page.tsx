@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useToast } from '@/components/Toast';
 import { useT } from '@/lib/i18n/LanguageContext';
+import HelpText from '@/components/HelpText';
 
 const COLOR_PRESETS = ['#5865F2', '#23A55A', '#FEE75C', '#EB459E', '#ED4245', '#9B59B6', '#00D2D3', '#54A0FF', '#FF6B6B', '#FFFFFF'];
 const BG_COLOR_PRESETS = ['#1E1F22', '#2B2D31', '#313338', '#111214', '#0F0F1A', '#161626'];
@@ -313,9 +314,9 @@ export default function PersonalCardSettings() {
         <header className="border-b border-[#2b2d31] pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('profileCardPage.title')}</h1>
-            <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
+            <HelpText className="mt-1 tracking-widest uppercase">
               {hasOverride ? t('profileCardPage.personalStyleActive') : t('profileCardPage.usingServerDefault')}
-            </p>
+            </HelpText>
           </div>
           <div className="flex gap-2 w-full sm:w-auto">
             {hasOverride && (
@@ -463,7 +464,7 @@ export default function PersonalCardSettings() {
                   <div key={item.name} className="flex items-center justify-between gap-3 bg-[#111214] rounded-lg px-3 py-2.5">
                     <div className="min-w-0">
                       <p className="text-xs font-bold text-white truncate">{item.name}</p>
-                      {item.description && <p className="text-[10px] text-[#57576F] truncate">{item.description}</p>}
+                      {item.description && <HelpText className="truncate">{item.description}</HelpText>}
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <span className="text-[10px] font-bold text-[#FFD700]">
@@ -489,9 +490,9 @@ export default function PersonalCardSettings() {
           <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
             {t('profileCardPage.favoriteGameTitle')}
           </h3>
-          <p className="text-[10px] text-[#57576F]">
+          <HelpText>
             {t('profileCardPage.favoriteGameDesc')}
-          </p>
+          </HelpText>
 
           {favoriteGameLoading ? (
             <p className="text-sm text-[#949ba4] py-2">{t('profileCardPage.loadingShort')}</p>
@@ -572,7 +573,7 @@ export default function PersonalCardSettings() {
                           {entry.selected_game || entry.queue_type}
                           {entry.lanes && <span className="text-[#949ba4] font-normal"> · {entry.lanes}</span>}
                         </p>
-                        <p className="text-[10px] text-[#57576F]">{new Date(entry.created_at).toLocaleString()}</p>
+                        <HelpText>{new Date(entry.created_at).toLocaleString()}</HelpText>
                       </div>
                     </div>
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded border shrink-0 ${badge.className}`}>

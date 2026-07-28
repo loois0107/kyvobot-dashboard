@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useT } from '@/lib/i18n/LanguageContext';
+import HelpText from '@/components/HelpText';
 
 interface Guild {
   id: string;
@@ -35,9 +36,9 @@ export default function ProfileGuildPicker() {
       <div className="max-w-3xl mx-auto space-y-6">
         <header>
           <h1 className="text-xl md:text-2xl font-black tracking-wider text-white">{t('profilePickerPage.title')}</h1>
-          <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
+          <HelpText className="mt-1 tracking-widest uppercase">
             {t('profilePickerPage.subtitle')}
-          </p>
+          </HelpText>
         </header>
 
         {guilds.length === 0 ? (

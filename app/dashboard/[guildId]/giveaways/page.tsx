@@ -5,6 +5,8 @@ import { useParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
 import { buildReplaceWinnerToastMessage, replaceWinnerToastType } from '@/lib/giveawayReplace';
 import { useT } from '@/lib/i18n/LanguageContext';
+import HelpText from '@/components/HelpText';
+import SettingsPageContainer from '@/components/SettingsPageContainer';
 
 interface WinnerInfo {
   user_id: string;
@@ -135,13 +137,13 @@ export default function GiveawaysPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-16">
+    <SettingsPageContainer className="pb-16">
       <header className="border-b border-[#2b2d31] pb-6 flex items-center justify-between">
         <div>
           <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('giveawaysPage.title')}</h1>
-          <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
+          <HelpText className="mt-1 tracking-widest uppercase">
             {t('giveawaysPage.subtitle')}
-          </p>
+          </HelpText>
         </div>
         <button type="button" onClick={loadGiveaways} className="text-xs font-bold text-[#5865F2] hover:underline">
           {t('common.refresh')}
@@ -158,7 +160,7 @@ export default function GiveawaysPage() {
             <div key={g.id} className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl space-y-3">
               <div className="flex items-center justify-between border-b border-[#2b2d31] pb-2">
                 <h3 className="text-sm font-black text-white">🎁 {g.prize}</h3>
-                <span className="text-[10px] text-[#57576F]">{new Date(g.concluded_at).toLocaleString()}</span>
+                <span className="text-xs text-[#8b8d98]">{new Date(g.concluded_at).toLocaleString()}</span>
               </div>
               <p className="text-[10px] text-[#949ba4]">
                 {g.prize_type === 'points'
@@ -235,6 +237,6 @@ export default function GiveawaysPage() {
           </div>
         </div>
       )}
-    </div>
+    </SettingsPageContainer>
   );
 }

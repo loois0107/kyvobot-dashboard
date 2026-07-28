@@ -5,6 +5,8 @@ import { useParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
 import { parseEmojiDisplay } from '@/lib/reactionRoles';
 import { useT } from '@/lib/i18n/LanguageContext';
+import HelpText from '@/components/HelpText';
+import SettingsPageContainer from '@/components/SettingsPageContainer';
 
 interface RoleOption {
   id: string;
@@ -223,12 +225,12 @@ export default function ReactionRolesPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-16">
+    <SettingsPageContainer className="pb-16">
       <header className="border-b border-[#2b2d31] pb-6">
         <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('reactionRolesPage.title')}</h1>
-        <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
+        <HelpText className="mt-1 tracking-widest uppercase">
           {t('reactionRolesPage.subtitle')}
-        </p>
+        </HelpText>
       </header>
 
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
@@ -258,7 +260,7 @@ export default function ReactionRolesPage() {
             />
           </div>
         </div>
-        <p className="text-[10px] text-[#57576F]">{t('reactionRolesPage.findIdsHelp')}</p>
+        <HelpText>{t('reactionRolesPage.findIdsHelp')}</HelpText>
 
         <button
           type="button"
@@ -293,7 +295,7 @@ export default function ReactionRolesPage() {
                   placeholder="🎮"
                   className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2]"
                 />
-                <p className="text-[10px] text-[#57576F]">{t('reactionRolesPage.emojiHelp')}</p>
+                <HelpText>{t('reactionRolesPage.emojiHelp')}</HelpText>
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-[#b5bac1]">{t('reactionRolesPage.roleLabel')}</label>
@@ -307,7 +309,7 @@ export default function ReactionRolesPage() {
                     <option key={r.id} value={r.id}>{r.name}</option>
                   ))}
                 </select>
-                <p className="text-[10px] text-[#57576F]">{t('reactionRolesPage.roleListHelp')}</p>
+                <HelpText>{t('reactionRolesPage.roleListHelp')}</HelpText>
               </div>
             </div>
 
@@ -401,8 +403,8 @@ export default function ReactionRolesPage() {
             })}
           </div>
         )}
-        <p className="text-[10px] text-[#57576F] pt-2">{t('reactionRolesPage.deleteBindingFooter')}</p>
+        <HelpText className="pt-2">{t('reactionRolesPage.deleteBindingFooter')}</HelpText>
       </div>
-    </div>
+    </SettingsPageContainer>
   );
 }

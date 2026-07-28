@@ -19,6 +19,8 @@ import {
   DEFAULT_AUTOMOD_SETTINGS,
 } from '@/lib/automodSettings';
 import { useT } from '@/lib/i18n/LanguageContext';
+import HelpText from '@/components/HelpText';
+import SettingsPageContainer from '@/components/SettingsPageContainer';
 
 type LoadStatus = 'loading' | 'loaded' | 'error';
 
@@ -137,13 +139,13 @@ export default function AutomodSettingsPage() {
   const wordCount = forbiddenWordsText.split('\n').map((w) => w.trim()).filter(Boolean).length;
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-28">
+    <SettingsPageContainer className="pb-28">
       <header className="border-b border-[#2b2d31] pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('automodPage.title')}</h1>
-          <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
+          <HelpText className="mt-1 tracking-widest uppercase">
             {t('automodPage.subtitle')}
-          </p>
+          </HelpText>
         </div>
         <button
           type="button"
@@ -172,7 +174,7 @@ export default function AutomodSettingsPage() {
             onChange={(e) => { setSpamLimit(parseInt(e.target.value) || 0); setIsDirty(true); }}
             className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]"
           />
-          <p className="text-[10px] text-[#57576F]">{t('automodPage.messageLimitHelp')}</p>
+          <HelpText>{t('automodPage.messageLimitHelp')}</HelpText>
         </div>
 
         <div className="space-y-1.5 pt-2">
@@ -201,7 +203,7 @@ export default function AutomodSettingsPage() {
             onChange={(e) => { setTimeoutSeconds(parseInt(e.target.value) || 0); setIsDirty(true); }}
             className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]"
           />
-          <p className="text-[10px] text-[#57576F]">{t('automodPage.timeoutDurationHelp')}</p>
+          <HelpText>{t('automodPage.timeoutDurationHelp')}</HelpText>
         </div>
       </div>
 
@@ -222,7 +224,7 @@ export default function AutomodSettingsPage() {
             onChange={(e) => { setMaxChars(parseInt(e.target.value) || 0); setIsDirty(true); }}
             className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]"
           />
-          <p className="text-[10px] text-[#57576F]">{t('automodPage.maxCharsHelp')}</p>
+          <HelpText>{t('automodPage.maxCharsHelp')}</HelpText>
         </div>
 
         <div className="space-y-1.5 pt-2">
@@ -237,7 +239,7 @@ export default function AutomodSettingsPage() {
             onChange={(e) => { setMaxLines(parseInt(e.target.value) || 0); setIsDirty(true); }}
             className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]"
           />
-          <p className="text-[10px] text-[#57576F]">{t('automodPage.maxLinesHelp')}</p>
+          <HelpText>{t('automodPage.maxLinesHelp')}</HelpText>
         </div>
       </div>
 
@@ -255,7 +257,7 @@ export default function AutomodSettingsPage() {
           placeholder={t('automodPage.forbiddenWordsPlaceholder')}
           className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#5865F2]"
         />
-        <p className="text-[10px] text-[#57576F]">{t('automodPage.forbiddenWordsHelp')}</p>
+        <HelpText>{t('automodPage.forbiddenWordsHelp')}</HelpText>
       </div>
 
       {isDirty && (
@@ -271,6 +273,6 @@ export default function AutomodSettingsPage() {
           </div>
         </div>
       )}
-    </div>
+    </SettingsPageContainer>
   );
 }

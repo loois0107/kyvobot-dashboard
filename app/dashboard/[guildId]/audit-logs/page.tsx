@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useT } from '@/lib/i18n/LanguageContext';
+import HelpText from '@/components/HelpText';
+import SettingsPageContainer from '@/components/SettingsPageContainer';
 
 interface AuditLog {
   id: string;
@@ -94,13 +96,13 @@ export default function AuditLogsPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-16">
+    <SettingsPageContainer className="pb-16">
       <header className="border-b border-[#2b2d31] pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('auditLogsPage.title')}</h1>
-          <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
+          <HelpText className="mt-1 tracking-widest uppercase">
             {t('auditLogsPage.subtitle')}
-          </p>
+          </HelpText>
         </div>
         <button
           type="button"
@@ -128,7 +130,7 @@ export default function AuditLogsPage() {
                       {t('auditLogsPage.targetLabel')} <code className="text-white">{log.user_id}</code>
                     </span>
                   </div>
-                  <span className="text-[10px] text-[#57576F] shrink-0">
+                  <span className="text-xs text-[#8b8d98] shrink-0">
                     {new Date(log.created_at).toLocaleString()}
                   </span>
                 </div>
@@ -138,6 +140,6 @@ export default function AuditLogsPage() {
           </div>
         )}
       </div>
-    </div>
+    </SettingsPageContainer>
   );
 }

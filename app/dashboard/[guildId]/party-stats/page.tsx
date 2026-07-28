@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useT } from '@/lib/i18n/LanguageContext';
+import HelpText from '@/components/HelpText';
+import SettingsPageContainer from '@/components/SettingsPageContainer';
 
 interface QueueComboStat {
   queue_type: string;
@@ -103,13 +105,13 @@ export default function PartyStatsPage() {
   if (!stats) return null;
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-16">
+    <SettingsPageContainer className="pb-16">
       <header className="border-b border-[#2b2d31] pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('partyStatsPage.title')}</h1>
-          <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">
+          <HelpText className="mt-1 tracking-widest uppercase">
             {t('partyStatsPage.subtitle', { days: stats.window_days, cacheState: stats.cached ? t('partyStatsPage.cachedSnapshot') : t('partyStatsPage.freshlyComputed') })}
-          </p>
+          </HelpText>
         </div>
         <button
           type="button"
@@ -134,9 +136,9 @@ export default function PartyStatsPage() {
           <div>
             <p className="text-4xl font-black text-white">{stats.weekly_count}</p>
             {stats.is_sparse && (
-              <p className="text-[10px] text-[#57576F] mt-1">
+              <HelpText className="mt-1">
                 {t('partyStatsPage.smallSampleWarning')}
-              </p>
+              </HelpText>
             )}
           </div>
         )}
@@ -163,7 +165,7 @@ export default function PartyStatsPage() {
           </div>
         )}
         {stats.is_sparse && stats.top_combos.length > 0 && (
-          <p className="text-[10px] text-[#57576F]">{t('partyStatsPage.smallSampleWarning')}</p>
+          <HelpText>{t('partyStatsPage.smallSampleWarning')}</HelpText>
         )}
       </div>
 
@@ -172,9 +174,9 @@ export default function PartyStatsPage() {
         <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
           {t('partyStatsPage.tierDistTitle')}
         </h3>
-        <p className="text-[10px] text-[#57576F]">
+        <HelpText>
           {t('partyStatsPage.tierDistSubtitle', { count: stats.verified_user_count, plural: stats.verified_user_count === 1 ? '' : 's' })}
-        </p>
+        </HelpText>
         {stats.tier_distribution.length === 0 ? (
           <p className="text-sm text-[#949ba4] py-4">{t('partyStatsPage.noVerifiedYet')}</p>
         ) : (
@@ -197,6 +199,6 @@ export default function PartyStatsPage() {
           </div>
         )}
       </div>
-    </div>
+    </SettingsPageContainer>
   );
 }

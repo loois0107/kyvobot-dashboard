@@ -5,6 +5,8 @@ import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useToast } from '@/components/Toast';
 import { useT } from '@/lib/i18n/LanguageContext';
+import HelpText from '@/components/HelpText';
+import SettingsPageContainer from '@/components/SettingsPageContainer';
 
 // 🛡️ cogs/economy.py의 /shop add·/shop view·/shop buy는 전부 item['name']을 읽는다 - 예전엔
 // 여기서 'title'로 저장해서 봇이 KeyError로 죽는 실제 크래시가 있었다(대시보드로 만든 아이템은
@@ -152,7 +154,7 @@ export default function LevelingEconomySettings() {
 
   return (
     <div className="min-h-screen bg-[#111214] text-[#dbdee1] p-2 sm:p-4 md:p-6 pb-28">
-      <div className="max-w-5xl mx-auto space-y-6">
+      <SettingsPageContainer>
 
         {/* ==========================================
             [SECTION 0: HEADER PROTOCOL]
@@ -160,7 +162,7 @@ export default function LevelingEconomySettings() {
         <header className="border-b border-[#2b2d31] pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('levelingPage.title')}</h1>
-            <p className="text-[10px] text-[#57576F] mt-1 tracking-widest uppercase">{t('levelingPage.subtitle')}</p>
+            <HelpText className="mt-1 tracking-widest uppercase">{t('levelingPage.subtitle')}</HelpText>
           </div>
           <button type="button" onClick={handleSaveAll} disabled={isSaving} className="w-full sm:w-auto bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all cursor-pointer">
             {isSaving ? t('levelingPage.committing') : t('levelingPage.saveButton')}
@@ -221,7 +223,7 @@ export default function LevelingEconomySettings() {
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-[#b5bac1]">{t('levelingPage.overlayOpacityLabel')} <span className="text-[#5865F2] font-mono">{Math.round(overlayOpacity*100)}%</span></label>
                 <input type="range" min="0.0" max="1.0" step="0.05" value={overlayOpacity} onChange={(e) => { setOverlayOpacity(parseFloat(e.target.value)); setIsDirty(true); }} className="w-full h-1 bg-[#232428] rounded-lg cursor-pointer accent-[#5865F2]" />
-                <p className="text-[10px] text-[#57576F]">{t('levelingPage.overlayOpacityHelp')}</p>
+                <HelpText>{t('levelingPage.overlayOpacityHelp')}</HelpText>
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-[#b5bac1]">
@@ -232,7 +234,7 @@ export default function LevelingEconomySettings() {
                   <option value="font-sans">📱 Clean Sans-Serif</option>
                   <option value="font-serif">🏛️ Elegant Serif</option>
                 </select>
-                <p className="text-[10px] text-[#57576F]">{t('levelingPage.fontHelp')}</p>
+                <HelpText>{t('levelingPage.fontHelp')}</HelpText>
               </div>
             </div>
             <div className="space-y-2 pt-2">
@@ -257,11 +259,11 @@ export default function LevelingEconomySettings() {
             <div className="space-y-1.5">
               <label className="text-[11px] font-black text-[#b5bac1] tracking-wider uppercase">{t('levelingPage.xpRateLabel')}</label>
               <input type="number" min="0.1" max="10" step="0.1" value={xpRate} onChange={(e) => { setXpRate(parseFloat(e.target.value)); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]" />
-              <p className="text-[10px] text-[#57576F]">{t('levelingPage.xpRateHelp')}</p>
+              <HelpText>{t('levelingPage.xpRateHelp')}</HelpText>
             </div>
             <div className="space-y-3 pt-2">
               <label className="text-[11px] font-black text-[#b5bac1] tracking-wider uppercase block">{t('levelingPage.milestoneLabel')}</label>
-              <p className="text-[10px] text-[#57576F]">{t('levelingPage.milestoneHelp')}</p>
+              <HelpText>{t('levelingPage.milestoneHelp')}</HelpText>
               <div className="flex gap-2">
                 <input type="number" placeholder={t('levelingPage.levelPlaceholder')} value={newLvl} onChange={(e) => setNewLvl(e.target.value)} className="w-1/4 bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none" />
                 <input type="text" placeholder={t('levelingPage.roleIdPlaceholder')} value={newRoleId} onChange={(e) => setNewRoleId(e.target.value.replace(/[^0-9]/g, ''))} className="w-3/4 bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none" />
@@ -283,12 +285,12 @@ export default function LevelingEconomySettings() {
             <div className="space-y-1.5">
               <label className="text-[11px] font-black text-[#b5bac1] tracking-wider uppercase">{t('levelingPage.currencyNameLabel')}</label>
               <input type="text" value={currencyName} onChange={(e) => { setCurrencyName(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-green-500" />
-              <p className="text-[10px] text-[#57576F]">{t('levelingPage.currencyNameHelp')}</p>
+              <HelpText>{t('levelingPage.currencyNameHelp')}</HelpText>
             </div>
             <div className="space-y-1.5 pt-2">
               <label className="text-[11px] font-black text-[#b5bac1] tracking-wider uppercase">{t('levelingPage.minBetLabel')}</label>
               <input type="number" min="1" max="5000" value={minBet} onChange={(e) => { setMinBet(parseInt(e.target.value) || 0); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-green-500" />
-              <p className="text-[10px] text-[#57576F]">{t('levelingPage.minBetHelp')}</p>
+              <HelpText>{t('levelingPage.minBetHelp')}</HelpText>
             </div>
           </div>
         </div>
@@ -302,7 +304,7 @@ export default function LevelingEconomySettings() {
             <div className="space-y-1">
               <label className="text-[10px] font-bold text-gray-400">{t('levelingPage.itemTitleLabel')}</label>
               <input type="text" placeholder="e.g. VIP_Pass" value={newItemTitle} onChange={(e) => setNewItemTitle(e.target.value)} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-yellow-500" />
-              <p className="text-[10px] text-[#57576F]">{t('levelingPage.itemTitleHelp')}</p>
+              <HelpText>{t('levelingPage.itemTitleHelp')}</HelpText>
             </div>
             <div className="space-y-1"><label className="text-[10px] font-bold text-gray-400">{t('levelingPage.itemPriceLabel')}</label><input type="number" min="0" value={newItemPrice} onChange={(e) => setNewItemPrice(parseInt(e.target.value) || 0)} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-yellow-500" /></div>
             <div className="space-y-1"><label className="text-[10px] font-bold text-gray-400">{t('levelingPage.itemDescLabel')}</label><input type="text" placeholder={t('levelingPage.itemDescPlaceholder')} value={newItemDescription} onChange={(e) => setNewItemDescription(e.target.value)} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-yellow-500" /></div>
@@ -328,7 +330,7 @@ export default function LevelingEconomySettings() {
           </div>
         </div>
 
-      </div>
+      </SettingsPageContainer>
 
       {/* Floating Status Warning Alert */}
       {isDirty && (

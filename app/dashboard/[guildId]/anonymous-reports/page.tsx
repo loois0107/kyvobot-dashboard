@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
 import { useT } from '@/lib/i18n/LanguageContext';
+import HelpText from '@/components/HelpText';
+import SettingsPageContainer from '@/components/SettingsPageContainer';
 
 interface PendingReport {
   id: number;
@@ -150,7 +152,7 @@ export default function AnonymousReportsSettingsPage() {
 
   return (
     <div className="min-h-screen bg-[#0F0F1A] text-white p-6 font-mono selection:bg-[#2A1F40]">
-      <div className="max-w-2xl mx-auto">
+      <SettingsPageContainer>
         <header className="mb-8 border-b border-[#2A1F40] pb-4 flex items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-extrabold text-purple-400">{t('anonymousReportsPage.title')}</h1>
@@ -193,7 +195,7 @@ export default function AnonymousReportsSettingsPage() {
               placeholder={t('common.egPlaceholderId')}
               className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-white px-3 py-2 rounded focus:outline-none focus:border-[#5865f2] disabled:opacity-50"
             />
-            <p className="text-[10px] text-[#57576F] mt-2">{t('anonymousReportsPage.adminChannelHelp')}</p>
+            <HelpText className="mt-2">{t('anonymousReportsPage.adminChannelHelp')}</HelpText>
           </div>
 
           <div>
@@ -206,12 +208,12 @@ export default function AnonymousReportsSettingsPage() {
               placeholder={t('common.egPlaceholderId')}
               className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-white px-3 py-2 rounded focus:outline-none focus:border-[#5865f2] disabled:opacity-50"
             />
-            <p className="text-[10px] text-[#57576F] mt-2">
+            <HelpText className="mt-2">
               {t('anonymousReportsPage.publishChannelHelp')}
-            </p>
-            <p className="text-[10px] text-[#57576F] mt-2">
+            </HelpText>
+            <HelpText className="mt-2">
               {t('anonymousReportsPage.findChannelIdHelp')}
-            </p>
+            </HelpText>
           </div>
 
           {message && (
@@ -233,7 +235,7 @@ export default function AnonymousReportsSettingsPage() {
           <div className="flex items-start justify-between gap-4 border-b border-[#2A1F40] pb-3">
             <div>
               <h2 className="text-sm font-extrabold text-purple-400">{t('anonymousReportsPage.queueTitle')}</h2>
-              <p className="text-[10px] text-[#57576F] mt-1">{t('anonymousReportsPage.queueSubtitle')}</p>
+              <HelpText className="mt-1">{t('anonymousReportsPage.queueSubtitle')}</HelpText>
             </div>
             <button type="button" onClick={loadQueue} className="shrink-0 text-[10px] font-bold text-purple-400 hover:underline">
               {t('common.refresh')}
@@ -259,7 +261,7 @@ export default function AnonymousReportsSettingsPage() {
                   <div key={report.id} className="bg-[#0F0F1A] border border-[#2A1F40] rounded-lg p-4 flex flex-col gap-3">
                     <p className="text-sm text-white whitespace-pre-wrap break-words">{report.content}</p>
                     <div className="flex items-center justify-between gap-3">
-                      <span className="text-[10px] text-[#57576F]">{new Date(report.created_at).toLocaleString()}</span>
+                      <span className="text-xs text-[#8b8d98]">{new Date(report.created_at).toLocaleString()}</span>
                       <div className="flex gap-2">
                         <button
                           type="button"
@@ -293,7 +295,7 @@ export default function AnonymousReportsSettingsPage() {
             </div>
           )}
         </div>
-      </div>
+      </SettingsPageContainer>
     </div>
   );
 }
