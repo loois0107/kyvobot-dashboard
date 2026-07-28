@@ -2,7 +2,6 @@ import { cookies } from 'next/headers';
 import { Inter } from 'next/font/google';
 import { auth } from '@/auth';
 import { Providers } from './providers';
-import Sidebar from '@/components/Sidebar';
 import { COOKIE_NAME, resolveInitialLanguage } from '@/lib/i18n';
 import './globals.css';
 
@@ -31,18 +30,8 @@ export default async function RootLayout({
   return (
     <html lang={initialLang}>
       <body className={`${inter.className} bg-[#0F0F1A] text-white min-h-screen`}>
-        <Providers initialLang={initialLang}>
-          <div className="flex flex-col md:flex-row min-h-screen font-mono">
-            
-            {/* 💡 컴포넌트 하나로 레이아웃이 획기적으로 청소됨 */}
-            <Sidebar />
-
-            {/* 메인 콘텐츠 출력 영역 */}
-            <main className="flex-1 w-full bg-[#0F0F1A] p-4 md:p-8 overflow-x-hidden">
-              {children}
-            </main>
-
-          </div>
+        <Providers initialLang={initialLang} session={session}>
+          {children}
         </Providers>
       </body>
     </html>
