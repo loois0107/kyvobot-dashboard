@@ -3,14 +3,63 @@ import Link from 'next/link';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import { COOKIE_NAME, dictionaries, resolveInitialLanguage } from '@/lib/i18n';
+import PartyPreviewCard from '@/components/landing/PartyPreviewCard';
+
+// TODO: set NEXT_PUBLIC_BOT_INVITE_URL in the environment to the real bot invite link
+// (client_id + permissions bitfield) - this fallback is a placeholder only.
+const BOT_INVITE_URL =
+  process.env.NEXT_PUBLIC_BOT_INVITE_URL ||
+  'https://discord.com/oauth2/authorize?client_id=REPLACE_WITH_REAL_CLIENT_ID&permissions=8&scope=bot%20applications.commands';
 
 const FEATURES = [
-  ['featurePartyTitle', 'featurePartyDesc'],
-  ['featureTicketTitle', 'featureTicketDesc'],
-  ['featureLevelingTitle', 'featureLevelingDesc'],
-  ['featureAutomodTitle', 'featureAutomodDesc'],
-  ['featureReactionRolesTitle', 'featureReactionRolesDesc'],
-  ['featureTwitchTitle', 'featureTwitchDesc'],
+  {
+    titleKey: 'featurePartyTitle',
+    descKey: 'featurePartyDesc',
+    icon: '🎮',
+    badgeBg: 'bg-[#5865F2]/15',
+    border: 'hover:border-[#5865F2]/50',
+    shadow: 'hover:shadow-[0_0_25px_rgba(88,101,242,0.25)]',
+  },
+  {
+    titleKey: 'featureTicketTitle',
+    descKey: 'featureTicketDesc',
+    icon: '🤖',
+    badgeBg: 'bg-purple-500/15',
+    border: 'hover:border-purple-500/50',
+    shadow: 'hover:shadow-[0_0_25px_rgba(168,85,247,0.25)]',
+  },
+  {
+    titleKey: 'featureLevelingTitle',
+    descKey: 'featureLevelingDesc',
+    icon: '📊',
+    badgeBg: 'bg-green-500/15',
+    border: 'hover:border-green-500/50',
+    shadow: 'hover:shadow-[0_0_25px_rgba(34,197,94,0.25)]',
+  },
+  {
+    titleKey: 'featureAutomodTitle',
+    descKey: 'featureAutomodDesc',
+    icon: '🛡️',
+    badgeBg: 'bg-red-500/15',
+    border: 'hover:border-red-500/50',
+    shadow: 'hover:shadow-[0_0_25px_rgba(239,68,68,0.25)]',
+  },
+  {
+    titleKey: 'featureReactionRolesTitle',
+    descKey: 'featureReactionRolesDesc',
+    icon: '🎭',
+    badgeBg: 'bg-[#FFD700]/15',
+    border: 'hover:border-[#FFD700]/50',
+    shadow: 'hover:shadow-[0_0_25px_rgba(255,215,0,0.25)]',
+  },
+  {
+    titleKey: 'featureTwitchTitle',
+    descKey: 'featureTwitchDesc',
+    icon: '📺',
+    badgeBg: 'bg-[#9146FF]/15',
+    border: 'hover:border-[#9146FF]/50',
+    shadow: 'hover:shadow-[0_0_25px_rgba(145,70,255,0.25)]',
+  },
 ] as const;
 
 export default async function RootPage() {
@@ -28,33 +77,70 @@ export default async function RootPage() {
   // 유저는 기존 로직(관리 서버 자동 리다이렉트)을 그대로 탄다.
   if (!session?.user) {
     return (
-      <div className="min-h-screen bg-[#0F0F1A] text-[#dbdee1] flex flex-col">
-        <main className="flex-1 flex flex-col items-center justify-center text-center px-4 py-20 gap-6">
-          <h1 className="text-4xl md:text-6xl font-black text-white tracking-wide">{t.landingPage.heroTitle}</h1>
+      <div className="min-h-screen bg-[#0F0F1A] text-[#dbdee1] flex flex-col relative overflow-hidden">
+        {/* Decorative background glow, spans hero through the preview section so there's no dead space between them */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+          <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-[#5865F2]/25 rounded-full blur-[130px]" />
+          <div className="absolute top-64 -right-32 w-[500px] h-[500px] bg-[#FFD700]/10 rounded-full blur-[130px]" />
+        </div>
+
+        <main className="relative flex-1 flex flex-col items-center justify-center text-center px-4 pt-20 pb-16 gap-6">
+          <h1 className="text-4xl md:text-6xl font-black tracking-wide">
+            <span className="bg-gradient-to-r from-white via-[#c7cdfd] to-[#5865F2] bg-clip-text text-transparent">
+              {t.landingPage.heroTitle}
+            </span>
+          </h1>
           <p className="max-w-xl text-sm md:text-base text-[#b5bac1] leading-relaxed">{t.landingPage.heroTagline}</p>
-          <a
-            href="/api/auth/signin"
-            className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-8 py-3.5 rounded-xl shadow-lg transition-all"
-          >
-            {t.landingPage.loginCta}
-          </a>
+          <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
+            <a
+              href={BOT_INVITE_URL}
+              className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-8 py-3.5 rounded-xl shadow-[0_0_30px_rgba(88,101,242,0.45)] hover:shadow-[0_0_45px_rgba(88,101,242,0.65)] transition-all"
+            >
+              🤖 {t.landingPage.addBotCta}
+            </a>
+            <a
+              href="/api/auth/signin"
+              className="border border-[#5865F2]/40 hover:border-[#5865F2] text-[#b5bac1] hover:text-white text-sm font-bold px-8 py-3.5 rounded-xl transition-all"
+            >
+              {t.landingPage.loginCta}
+            </a>
+          </div>
         </main>
 
-        <section className="max-w-4xl mx-auto w-full px-4 pb-20">
-          <h2 className="text-center text-xs font-black tracking-widest text-[#57576F] uppercase mb-8">
+        <section className="relative max-w-4xl mx-auto w-full px-4 pb-20 flex flex-col items-center gap-5">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-[#5865F2] font-black">
+            {t.landingPage.previewLabel}
+          </span>
+          <PartyPreviewCard
+            title={t.landingPage.previewCardTitle}
+            hostLabel={t.landingPage.previewCardHostLabel}
+            hostName={t.landingPage.previewCardHostName}
+            slotsLabel={t.landingPage.previewCardSlotsLabel}
+            joinCta={t.landingPage.previewCardJoinCta}
+          />
+        </section>
+
+        <section className="relative max-w-5xl mx-auto w-full px-4 pb-20">
+          <h2 className="text-center text-xs font-black tracking-widest text-[#FFD700] uppercase mb-10">
             {t.landingPage.featuresTitle}
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {FEATURES.map(([titleKey, descKey]) => (
-              <div key={titleKey} className="bg-[#161626] border border-[#2A1F40] rounded-2xl p-5 space-y-2">
-                <h3 className="text-sm font-bold text-white">{t.landingPage[titleKey]}</h3>
-                <p className="text-xs text-[#949ba4] leading-relaxed">{t.landingPage[descKey]}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {FEATURES.map((feature) => (
+              <div
+                key={feature.titleKey}
+                className={`bg-[#161626] border border-[#2A1F40] rounded-2xl p-6 space-y-3 transition-all duration-200 hover:-translate-y-1 ${feature.border} ${feature.shadow}`}
+              >
+                <div className={`w-14 h-14 rounded-full flex items-center justify-center text-3xl ${feature.badgeBg}`}>
+                  {feature.icon}
+                </div>
+                <h3 className="text-sm font-bold text-white">{t.landingPage[feature.titleKey]}</h3>
+                <p className="text-xs text-[#949ba4] leading-relaxed">{t.landingPage[feature.descKey]}</p>
               </div>
             ))}
           </div>
         </section>
 
-        <footer className="border-t border-[#2A1F40] py-6 px-4 flex flex-col sm:flex-row items-center justify-center gap-3 text-xs text-[#57576F]">
+        <footer className="relative border-t border-[#2A1F40] py-6 px-4 flex flex-col sm:flex-row items-center justify-center gap-3 text-xs text-[#57576F]">
           <span>{t.landingPage.footerTagline}</span>
           <span className="hidden sm:inline">·</span>
           <Link href="/privacy" className="hover:text-[#5865F2] hover:underline">{t.landingPage.footerPrivacy}</Link>
