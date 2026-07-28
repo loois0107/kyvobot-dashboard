@@ -218,7 +218,7 @@ export default async function RootPage() {
         </div>
       </section>
 
-      <section className="relative max-w-4xl mx-auto w-full px-4 pb-20 space-y-16">
+      <section className="relative max-w-6xl mx-auto w-full px-4 pb-20 space-y-16">
         <h2 className="text-center text-xs font-black tracking-widest text-[#FFD700] uppercase">
           {t.landingPage.screenshotsTitle}
         </h2>

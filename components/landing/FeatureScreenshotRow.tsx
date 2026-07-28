@@ -23,7 +23,7 @@ export default function FeatureScreenshotRow({
   return (
     <div className={`flex flex-col ${reverse ? 'md:flex-row-reverse' : 'md:flex-row'} items-center gap-8 md:gap-12`}>
       <div className="w-full md:w-1/2" title={futureImageSrc}>
-        <div className="aspect-[16/10] rounded-2xl bg-[#161626] border border-[#2A1F40] flex flex-col items-center justify-center gap-3">
+        <div className="aspect-[16/9] rounded-2xl bg-[#161626] border border-[#2A1F40] flex flex-col items-center justify-center gap-3">
           <span className="text-5xl opacity-60">{icon}</span>
           <span className="font-mono text-[10px] uppercase tracking-widest text-[#5f6570]">{comingSoonLabel}</span>
         </div>
