@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 import { COOKIE_NAME, dictionaries, getByPath, type Lang, type TranslationKey } from './index';
 
 interface LanguageContextValue {
@@ -16,13 +17,19 @@ const LanguageContext = createContext<LanguageContextValue | null>(null);
  */
 export function LanguageProvider({ initialLang, children }: { initialLang: Lang; children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>(initialLang);
+  const router = useRouter();
 
   const setLang = useCallback((next: Lang) => {
     setLangState(next);
     // 🛡️ 이 쿠키는 UI 취향 하나만 담는 비민감 정보라 httpOnly가 필요 없다 - 클라이언트에서
     // 즉시 써야 다음 새로고침/새 탭에서도 서버가 바로 올바른 언어로 렌더링할 수 있다.
     document.cookie = `${COOKIE_NAME}=${next}; path=/; max-age=31536000; SameSite=Lax`;
-  }, []);
+    // 🛡️ 서버 컴포넌트(예: 랜딩 페이지 app/page.tsx)는 이 쿠키를 요청 시점에 한 번만 읽으므로,
+    // 클라이언트 state만 바꿔서는 다시 그려지지 않는다 - router.refresh()로 현재 라우트의 서버
+    // 컴포넌트를 방금 쓴 새 쿠키로 다시 가져오게 만든다. 클라이언트 state(이 lang 포함)나 스크롤
+    // 위치는 유지되고 풀 리로드가 아니라서 깜빡임도 없다.
+    router.refresh();
+  }, [router]);
 
   const value = useMemo(() => ({ lang, setLang }), [lang, setLang]);
 
