@@ -168,21 +168,21 @@ export default function TwitchStreamersSettings() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-[#b5bac1]">
                   <div>
-                    <span className="text-[#57576F] uppercase text-[10px] font-bold block">{t('twitchPage.announcementChannel')}</span>
+                    <span className="text-[#a1a1aa] uppercase text-[10px] font-bold block">{t('twitchPage.announcementChannel')}</span>
                     {s.announcement_channel_name ? `#${s.announcement_channel_name}` : t('twitchPage.unknownChannel', { id: s.announcement_channel_id })}
                   </div>
                   <div>
-                    <span className="text-[#57576F] uppercase text-[10px] font-bold block">{t('twitchPage.lastPollCheck')}</span>
+                    <span className="text-[#a1a1aa] uppercase text-[10px] font-bold block">{t('twitchPage.lastPollCheck')}</span>
                     {s.last_checked_at
                       ? t('twitchPage.minutesAgo', { minutes: Math.round(s.minutes_since_last_check ?? 0) })
                       : t('twitchPage.neverChecked')}
                   </div>
                   <div>
-                    <span className="text-[#57576F] uppercase text-[10px] font-bold block">{t('twitchPage.linkedMember')}</span>
+                    <span className="text-[#a1a1aa] uppercase text-[10px] font-bold block">{t('twitchPage.linkedMember')}</span>
                     {s.member_id ? (s.member_display_name || `Unknown member (${s.member_id})`) : t('twitchPage.notConfiguredDash')}
                   </div>
                   <div>
-                    <span className="text-[#57576F] uppercase text-[10px] font-bold block">{t('twitchPage.liveRole')}</span>
+                    <span className="text-[#a1a1aa] uppercase text-[10px] font-bold block">{t('twitchPage.liveRole')}</span>
                     {s.live_role_id ? (s.live_role_name || `Unknown role (${s.live_role_id})`) : t('twitchPage.notConfiguredDash')}
                   </div>
                 </div>

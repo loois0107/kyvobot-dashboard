@@ -139,9 +139,9 @@ export default function SettingsPage() {
       <SettingsPageContainer>
         <header className="mb-8 border-b border-[#2A1F40] pb-4">
           <h1 className="text-2xl font-extrabold text-purple-400">{t('settingsPage.title')}</h1>
-          <p className="text-xs text-[#57576F] mt-1">
+          <HelpText className="mt-1">
             {t('settingsPage.subtitle')}
-          </p>
+          </HelpText>
         </header>
 
         <div className="flex flex-col gap-6 bg-[#161626] border border-[#2A1F40] p-6 rounded-xl shadow-xl">
@@ -190,7 +190,7 @@ export default function SettingsPage() {
             </HelpText>
 
             {Object.keys(commands).length === 0 ? (
-              <p className="text-xs text-[#57576F] text-center py-4">{t('settingsPage.noMacros')}</p>
+              <HelpText className="text-center py-4">{t('settingsPage.noMacros')}</HelpText>
             ) : (
               <div className="flex flex-col gap-2 max-h-40 overflow-y-auto">
                 {Object.entries(commands).map(([trigger, value]) => (

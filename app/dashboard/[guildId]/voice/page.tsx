@@ -78,9 +78,9 @@ export default function VoiceSettingsPage() {
         <header className="mb-8 border-b border-[#2A1F40] pb-4 flex items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-extrabold text-purple-400">{t('voicePage.title')}</h1>
-            <p className="text-xs text-[#57576F] mt-1">
+            <HelpText className="mt-1">
               {t('voicePage.subtitle')}
-            </p>
+            </HelpText>
           </div>
           {hasLoaded && (
             <span

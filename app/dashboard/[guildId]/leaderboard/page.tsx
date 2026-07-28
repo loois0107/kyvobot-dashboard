@@ -84,7 +84,7 @@ export default function GuildLeaderboardTerminal() {
         return {
           bg: 'bg-[#161626] border-[#2A1F40] hover:border-[#5865F2]/40 hover:shadow-[0_0_20px_rgba(88,101,242,0.15)]',
           badge: `#${index + 1}`,
-          text: 'text-[#57576F] font-mono',
+          text: 'text-[#a1a1aa] font-mono',
         };
     }
   };
@@ -95,9 +95,9 @@ export default function GuildLeaderboardTerminal() {
         <p className="text-sm text-red-400 font-bold tracking-widest animate-pulse">
           {t('leaderboardPage.accessDenied')}
         </p>
-        <p className="text-xs text-[#57576F]">
+        <HelpText>
           {t('leaderboardPage.redirecting')}
-        </p>
+        </HelpText>
       </div>
     );
   }
@@ -126,9 +126,9 @@ export default function GuildLeaderboardTerminal() {
         <div className="flex justify-between items-center border-b border-[#2A1F40] pb-4">
           <div>
             <h1 className="text-xl md:text-2xl font-black tracking-wider text-white">{t('leaderboardPage.title')}</h1>
-            <p className="text-xs text-[#57576F] mt-1 tracking-wide">
+            <HelpText className="mt-1 tracking-wide">
               {t('leaderboardPage.subtitle')} <code className="text-[#5865F2]">{guildId}</code>
-            </p>
+            </HelpText>
           </div>
           <span className="text-[10px] bg-[#2A1F40] text-[#FFD700] px-3 py-1 rounded font-black tracking-widest hidden sm:inline">
             {t('leaderboardPage.premiumBadge')}
@@ -143,7 +143,7 @@ export default function GuildLeaderboardTerminal() {
           ) : users.length === 0 ? (
             <div className="text-center py-20 border border-red-500/20 bg-[#161626] rounded-xl">
               <p className="text-sm text-red-400 tracking-wider font-bold">{t('leaderboardPage.noUsersTitle')}</p>
-              <p className="text-xs text-[#57576F] mt-2 font-sans">{t('leaderboardPage.noUsersSubtitle')}</p>
+              <HelpText className="mt-2 font-sans">{t('leaderboardPage.noUsersSubtitle')}</HelpText>
             </div>
           ) : (
             users.map((user, index) => {
