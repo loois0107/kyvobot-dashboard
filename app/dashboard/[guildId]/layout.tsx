@@ -216,6 +216,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <p>{t('sidebar.currentActiveNode')}</p>
             <code className="text-[#5865f2] block mt-1 truncate">{currentGuildId}</code>
           </div>
+          <Link
+            href={`/profile/${currentGuildId}`}
+            className="w-full flex items-center justify-center px-3 py-2 rounded font-medium text-xs text-[#b5bac1] border border-[#2b2d31] hover:bg-[#35373c] hover:text-white transition"
+          >
+            {t('profilePickerPage.title')}
+          </Link>
           <button
             type="button"
             onClick={() => signOut({ callbackUrl: '/' })}

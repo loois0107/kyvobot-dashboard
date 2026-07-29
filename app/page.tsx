@@ -180,7 +180,15 @@ export default async function RootPage() {
           ) : guildFetchFailed ? (
             <p className="text-sm text-red-400">{t.landingPage.guildListFailed}</p>
           ) : (
-            <p className="text-sm text-[#949ba4]">{t.landingPage.noManagedServers}</p>
+            <div className="flex flex-col items-center gap-4">
+              <p className="text-sm text-[#949ba4]">{t.landingPage.noManagedServers}</p>
+              <Link
+                href="/profile"
+                className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-8 py-3.5 rounded-xl shadow-[0_0_30px_rgba(88,101,242,0.45)] hover:shadow-[0_0_45px_rgba(88,101,242,0.65)] transition-all"
+              >
+                {t.profilePickerPage.title}
+              </Link>
+            </div>
           )}
         </div>
       </main>

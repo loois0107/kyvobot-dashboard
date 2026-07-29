@@ -59,6 +59,13 @@ export default function LandingHeader({ dashboardHref }: LandingHeaderProps) {
                     🎛️ {t('landingPage.goToDashboardCta')}
                   </Link>
                 )}
+                <Link
+                  href="/profile"
+                  onClick={() => setMenuOpen(false)}
+                  className="block px-4 py-2.5 text-xs font-bold text-[#dbdee1] hover:bg-[#2b2d31] transition-colors"
+                >
+                  {t('profilePickerPage.title')}
+                </Link>
                 <button
                   type="button"
                   onClick={() => signOut({ callbackUrl: '/' })}
