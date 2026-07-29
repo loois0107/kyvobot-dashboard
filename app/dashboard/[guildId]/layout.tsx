@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { signOut } from 'next-auth/react';
 import { useT } from '@/lib/i18n/LanguageContext';
 import LanguageToggle from '@/components/LanguageToggle';
+import AccountMenu from '@/components/AccountMenu';
 
 type ManagedGuild = { id: string; name: string };
 
@@ -101,134 +101,131 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <button type="button" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-400 hover:text-white md:hidden text-lg p-1 mt-5">✕</button>
           </div>
 
-          <nav className="space-y-1">
-            <label className="block text-xs font-bold text-[#949ba4] uppercase tracking-wider mb-2 px-2">{t('sidebar.modules')}</label>
+          <nav className="space-y-4">
             <Link
               href={`/dashboard/${currentGuildId}`}
               className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname === `/dashboard/${currentGuildId}` ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
             >
               {t('sidebar.controlHubHome')}
             </Link>
-            <Link
-              href={`/dashboard/${currentGuildId}/automod`}
-              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/automod') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-            >
-              {t('sidebar.automod')}
-            </Link>
-            <Link
-              href={`/dashboard/${currentGuildId}/leveling`}
-              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/leveling') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-            >
-              {t('sidebar.levelingEconomy')}
-            </Link>
-            <Link
-              href={`/dashboard/${currentGuildId}/welcome`}
-              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/welcome') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-            >
-              {t('sidebar.welcomeSettings')}
-            </Link>
-            <Link
-              href={`/dashboard/${currentGuildId}/voice`}
-              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/voice') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-            >
-              {t('sidebar.joinToCreate')}
-            </Link>
-            <Link
-              href={`/dashboard/${currentGuildId}/anonymous-reports`}
-              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/anonymous-reports') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-            >
-              {t('sidebar.anonymousReports')}
-            </Link>
-            <Link
-              href={`/dashboard/${currentGuildId}/giveaways`}
-              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/giveaways') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-            >
-              {t('sidebar.giveaways')}
-            </Link>
-            <Link
-              href={`/dashboard/${currentGuildId}/ticket-settings`}
-              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/ticket-settings') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-            >
-              {t('sidebar.aiSupportTicket')}
-            </Link>
-            <Link
-              href={`/dashboard/${currentGuildId}/leaderboard`}
-              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/leaderboard') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-            >
-              {t('sidebar.serverLeaderboard')}
-            </Link>
-            <Link
-              href={`/dashboard/${currentGuildId}/tier-roles`}
-              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/tier-roles') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-            >
-              {t('sidebar.tierRoleMapping')}
-            </Link>
-            <Link
-              href={`/dashboard/${currentGuildId}/reaction-roles`}
-              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/reaction-roles') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-            >
-              {t('sidebar.reactionRoles')}
-            </Link>
-            <Link
-              href={`/dashboard/${currentGuildId}/twitch`}
-              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/twitch') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-            >
-              {t('sidebar.twitchStreamers')}
-            </Link>
-            <Link
-              href={`/dashboard/${currentGuildId}/party-settings`}
-              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/party-settings') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-            >
-              {t('sidebar.partyRecruitment')}
-            </Link>
-            <Link
-              href={`/dashboard/${currentGuildId}/party-stats`}
-              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/party-stats') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-            >
-              {t('sidebar.partyStats')}
-            </Link>
-            <Link
-              href={`/dashboard/${currentGuildId}/party-presets`}
-              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/party-presets') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-            >
-              {t('sidebar.gamePresets')}
-            </Link>
 
-            {/* ⚙️ FIXED: 사이드바 최하단에 'Custom Commands' 퀵 네비게이션 노드 추가 완료! 활성화 하이라이트 배경 완벽 연동 */}
-            <Link
-              href={`/dashboard/${currentGuildId}/settings`}
-              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/settings') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-            >
-              {t('sidebar.customCommands')}
-            </Link>
+            <div className="space-y-1">
+              <label className="block text-xs font-bold text-[#949ba4] uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryCommunity')}</label>
+              <Link
+                href={`/dashboard/${currentGuildId}/automod`}
+                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/automod') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+              >
+                {t('sidebar.automod')}
+              </Link>
+              <Link
+                href={`/dashboard/${currentGuildId}/welcome`}
+                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/welcome') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+              >
+                {t('sidebar.welcomeSettings')}
+              </Link>
+              <Link
+                href={`/dashboard/${currentGuildId}/voice`}
+                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/voice') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+              >
+                {t('sidebar.joinToCreate')}
+              </Link>
+              <Link
+                href={`/dashboard/${currentGuildId}/anonymous-reports`}
+                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/anonymous-reports') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+              >
+                {t('sidebar.anonymousReports')}
+              </Link>
+              <Link
+                href={`/dashboard/${currentGuildId}/reaction-roles`}
+                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/reaction-roles') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+              >
+                {t('sidebar.reactionRoles')}
+              </Link>
+              <Link
+                href={`/dashboard/${currentGuildId}/settings`}
+                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/settings') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+              >
+                {t('sidebar.customCommands')}
+              </Link>
+              <Link
+                href={`/dashboard/${currentGuildId}/audit-logs`}
+                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/audit-logs') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+              >
+                {t('sidebar.auditLogs')}
+              </Link>
+            </div>
 
-            <Link
-              href={`/dashboard/${currentGuildId}/audit-logs`}
-              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/audit-logs') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-            >
-              {t('sidebar.auditLogs')}
-            </Link>
+            <div className="space-y-1">
+              <label className="block text-xs font-bold text-[#949ba4] uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryPartyGames')}</label>
+              <Link
+                href={`/dashboard/${currentGuildId}/party-settings`}
+                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/party-settings') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+              >
+                {t('sidebar.partyRecruitment')}
+              </Link>
+              <Link
+                href={`/dashboard/${currentGuildId}/party-stats`}
+                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/party-stats') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+              >
+                {t('sidebar.partyStats')}
+              </Link>
+              <Link
+                href={`/dashboard/${currentGuildId}/party-presets`}
+                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/party-presets') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+              >
+                {t('sidebar.gamePresets')}
+              </Link>
+              <Link
+                href={`/dashboard/${currentGuildId}/tier-roles`}
+                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/tier-roles') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+              >
+                {t('sidebar.tierRoleMapping')}
+              </Link>
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-xs font-bold text-[#949ba4] uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryEconomy')}</label>
+              <Link
+                href={`/dashboard/${currentGuildId}/leveling`}
+                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/leveling') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+              >
+                {t('sidebar.levelingEconomy')}
+              </Link>
+              <Link
+                href={`/dashboard/${currentGuildId}/leaderboard`}
+                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/leaderboard') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+              >
+                {t('sidebar.serverLeaderboard')}
+              </Link>
+              <Link
+                href={`/dashboard/${currentGuildId}/giveaways`}
+                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/giveaways') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+              >
+                {t('sidebar.giveaways')}
+              </Link>
+            </div>
+
+            <div className="space-y-1">
+              <label className="block text-xs font-bold text-[#949ba4] uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryIntegrationsAI')}</label>
+              <Link
+                href={`/dashboard/${currentGuildId}/twitch`}
+                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/twitch') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+              >
+                {t('sidebar.twitchStreamers')}
+              </Link>
+              <Link
+                href={`/dashboard/${currentGuildId}/ticket-settings`}
+                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/ticket-settings') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+              >
+                {t('sidebar.aiSupportTicket')}
+              </Link>
+            </div>
           </nav>
         </div>
 
-        <div className="pt-4 border-t border-[#2b2d31] text-xs text-[#949ba4] space-y-3">
-          <div>
-            <p>{t('sidebar.currentActiveNode')}</p>
-            <code className="text-[#5865f2] block mt-1 truncate">{currentGuildId}</code>
-          </div>
-          <Link
-            href={`/profile/${currentGuildId}`}
-            className="w-full flex items-center justify-center px-3 py-2 rounded font-medium text-xs text-[#b5bac1] border border-[#2b2d31] hover:bg-[#35373c] hover:text-white transition"
-          >
-            {t('profilePickerPage.title')}
-          </Link>
-          <button
-            type="button"
-            onClick={() => signOut({ callbackUrl: '/' })}
-            className="w-full flex items-center justify-center px-3 py-2 rounded font-medium text-xs text-[#f23f42] border border-[#f23f42]/30 hover:bg-[#f23f42]/10 transition"
-          >
-            {t('sidebar.logout')}
-          </button>
+        <div className="pt-4 border-t border-[#2b2d31] text-xs text-[#949ba4]">
+          <p>{t('sidebar.currentActiveNode')}</p>
+          <code className="text-[#5865f2] block mt-1 truncate">{currentGuildId}</code>
         </div>
       </aside>
 
@@ -249,6 +246,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <div className="hidden md:block">
                 <LanguageToggle />
               </div>
+              <AccountMenu profileHref={`/profile/${currentGuildId}`} />
             </div>
           </header>
 

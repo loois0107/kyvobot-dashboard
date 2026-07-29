@@ -48,7 +48,7 @@ function ChecklistRow({ done, label, href }: { done: boolean; label: string; hre
 
 export default function DashboardHome() {
   const params = useParams();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const t = useT();
 
   const guildId = params?.guildId as string | undefined;
@@ -225,9 +225,8 @@ export default function DashboardHome() {
       {/* ==========================================
           [SECTION 1: STATUS OVERVIEW ROW]
          ========================================== */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-6 sm:p-8 shadow-xl flex flex-col justify-between lg:col-span-2 min-h-[160px] relative overflow-hidden">
+      <div className="grid grid-cols-1 gap-6">
+        <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-6 sm:p-8 shadow-xl flex flex-col justify-between min-h-[160px] relative overflow-hidden">
           <div className="flex items-center justify-between pb-4 border-b border-[#2b2d31]">
             <div className="flex items-center gap-2">
               <span className={`w-2.5 h-2.5 rounded-full ${isConnectionFailed ? 'bg-red-500 animate-ping' : isDataEmpty ? 'bg-gray-500' : 'bg-[#23a55a] animate-pulse'}`}></span>
@@ -245,7 +244,7 @@ export default function DashboardHome() {
               </span>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-6 pt-6 font-mono text-sm">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-6 font-mono text-sm">
             <div className="space-y-1"><span className="text-gray-500 block text-xs">{t('dashboardHome.coreAlias')}</span><strong className="text-white text-base tracking-wide">KYVOBOT AI</strong></div>
             <div className="space-y-1"><span className="text-gray-500 block text-xs">{t('dashboardHome.matrixVer')}</span><strong className="text-yellow-400 text-base tracking-wide">v2.4.0-pro</strong></div>
             <div className="space-y-1">
@@ -257,26 +256,6 @@ export default function DashboardHome() {
             <div className="space-y-1"><span className="text-gray-500 block text-xs">{t('dashboardHome.latencyTick')}</span><strong className="text-[#23a55a] text-base tracking-wide">{t('dashboardHome.latencyValue')}</strong></div>
           </div>
         </div>
-
-        <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-6 sm:p-8 shadow-xl flex flex-col justify-between lg:col-span-1 min-h-[160px]">
-          <div className="flex items-center gap-2 pb-4 border-b border-[#2b2d31]"><h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase">{t('dashboardHome.discordAccountLink')}</h3></div>
-          <div className="pt-4 space-y-2">
-            <p className="text-sm text-gray-200 font-medium">{t('dashboardHome.welcomeLabel')} <strong className="text-[#5865F2] font-mono text-base">{session?.user?.name || t('dashboardHome.defaultMemberName')}</strong></p>
-            <p className="text-xs text-gray-500 leading-relaxed">{t('dashboardHome.handshakeDesc')}</p>
-          </div>
-          <div className="pt-4">
-            <div className={`text-center py-2 rounded text-xs font-black tracking-widest uppercase ${
-              isConnectionFailed ? 'bg-red-950/20 text-red-400 border border-red-500/10' :
-              isDataEmpty ? 'bg-gray-800/20 text-gray-400 border border-gray-500/10' :
-              'bg-green-950/30 text-[#23a55a] border border-green-500/10'
-            }`}>
-              {isConnectionFailed ? t('dashboardHome.pipelineStalled') :
-               isDataEmpty ? t('dashboardHome.noActiveStream') :
-               t('dashboardHome.matrixSyncActive')}
-            </div>
-          </div>
-        </div>
-
       </div>
 
       {/* ==========================================
