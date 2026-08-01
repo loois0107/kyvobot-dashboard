@@ -36,6 +36,14 @@ const en = {
     goBack: 'GO BACK',
     logout: '🚪 Log Out',
   },
+  botNotInvited: {
+    checking: 'Checking whether Kyvo is in this server...',
+    title: "🤖 Kyvo hasn't been invited to this server yet",
+    body: "This dashboard controls Kyvo's settings for a specific server, but Kyvo isn't a member of this one yet. Invite it first, then come back here.",
+    inviteCta: '🤖 Invite Kyvo',
+    recheckCta: '🔄 Check again',
+    rechecking: 'Checking...',
+  },
   dashboardHome: {
     invalidAccess: '⚠️ Invalid access. Please select an active Discord server from the sidebar.',
     quickStartTitle: '🚀 Quick Start Checklist',

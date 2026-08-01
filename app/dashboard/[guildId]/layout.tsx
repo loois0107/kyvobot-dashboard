@@ -6,8 +6,10 @@ import Link from 'next/link';
 import { useT } from '@/lib/i18n/LanguageContext';
 import LanguageToggle from '@/components/LanguageToggle';
 import AccountMenu from '@/components/AccountMenu';
+import BotNotInvitedNotice from '@/components/BotNotInvitedNotice';
 
 type ManagedGuild = { id: string; name: string };
+type BotStatus = 'checking' | 'present' | 'absent' | 'unknown';
 
 function isValidGuildId(id: unknown): id is string {
   return typeof id === 'string' && id.length > 0 && !id.includes('[') && !id.includes('%5B');
@@ -24,6 +26,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const [guilds, setGuilds] = useState<ManagedGuild[]>([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [botStatus, setBotStatus] = useState<BotStatus>('checking');
 
   const isSubPage = pathname ? pathname !== `/dashboard/${currentGuildId}` : false;
 
@@ -59,6 +62,33 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       cancelled = true;
     };
   }, []);
+
+  // Gates every page under this layout on whether Kyvo is actually in the guild being viewed -
+  // user permission (owner/MANAGE_GUILD) and bot membership are completely independent, so without
+  // this, channel/role pickers and stats just silently degrade with no explanation. Fails open
+  // (treats a failed check as 'unknown', not 'absent') since this is a UX guide rail, not the
+  // security boundary - the per-page requireGuildAdmin calls still enforce real access control.
+  const checkBotStatus = async (guildId: string) => {
+    try {
+      const res = await fetch(`/api/guilds/${guildId}/bot-status`);
+      if (!res.ok) {
+        console.error('[BOT_STATUS_CHECK_FAULT] non-OK response:', res.status);
+        setBotStatus('unknown');
+        return;
+      }
+      const data = await res.json();
+      setBotStatus(data.bot_present ? 'present' : 'absent');
+    } catch (err) {
+      console.error('[BOT_STATUS_CHECK_FAULT]', err);
+      setBotStatus('unknown');
+    }
+  };
+
+  useEffect(() => {
+    if (!currentGuildId) return;
+    setBotStatus('checking');
+    checkBotStatus(currentGuildId);
+  }, [currentGuildId]);
 
   const handleGuildChange = (targetId: string) => {
     if (!targetId || !pathname) return;
@@ -250,12 +280,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </header>
 
-          {isSubPage && (
-            <div className="mb-6">
-              <button type="button" onClick={() => router.back()} className="inline-flex items-center gap-2 text-xs font-bold text-[#5865F2] hover:text-white bg-[#5865F2]/10 hover:bg-[#5865F2] border border-[#5865F2]/20 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer shadow-md"><span>◀</span> {t('sidebar.goBack')}</button>
-            </div>
+          {botStatus === 'checking' ? (
+            <div className="flex items-center justify-center py-20 text-sm text-[#6d7178]">{t('botNotInvited.checking')}</div>
+          ) : botStatus === 'absent' ? (
+            <BotNotInvitedNotice onRecheck={() => checkBotStatus(currentGuildId)} />
+          ) : (
+            <>
+              {isSubPage && (
+                <div className="mb-6">
+                  <button type="button" onClick={() => router.back()} className="inline-flex items-center gap-2 text-xs font-bold text-[#5865F2] hover:text-white bg-[#5865F2]/10 hover:bg-[#5865F2] border border-[#5865F2]/20 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer shadow-md"><span>◀</span> {t('sidebar.goBack')}</button>
+                </div>
+              )}
+              {children}
+            </>
           )}
-          {children}
         </main>
       </div>
 

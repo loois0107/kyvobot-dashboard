@@ -38,6 +38,14 @@ const ko: typeof en = {
     goBack: '뒤로 가기',
     logout: '🚪 로그아웃',
   },
+  botNotInvited: {
+    checking: 'Kyvo가 이 서버에 있는지 확인하는 중...',
+    title: '🤖 이 서버에는 아직 Kyvo가 초대되지 않았어요',
+    body: '이 대시보드는 특정 서버에 있는 Kyvo의 설정을 관리하는 곳인데, 이 서버에는 아직 Kyvo가 들어와 있지 않아요. 먼저 봇을 초대한 다음 다시 와주세요.',
+    inviteCta: '🤖 Kyvo 초대하기',
+    recheckCta: '🔄 다시 확인',
+    rechecking: '확인 중...',
+  },
   dashboardHome: {
     invalidAccess: '⚠️ 잘못된 접근입니다. 사이드바에서 활성화할 디스코드 서버를 선택해 주세요.',
     quickStartTitle: '🚀 빠른 시작 체크리스트',

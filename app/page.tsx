@@ -8,12 +8,7 @@ import FeatureScreenshotRow from '@/components/landing/FeatureScreenshotRow';
 import RankCardMockup from '@/components/landing/RankCardMockup';
 import PartyPresetMockup from '@/components/landing/PartyPresetMockup';
 import AiKnowledgeMockup from '@/components/landing/AiKnowledgeMockup';
-
-// TODO: set NEXT_PUBLIC_BOT_INVITE_URL in the environment to the real bot invite link
-// (client_id + permissions bitfield) - this fallback is a placeholder only.
-const BOT_INVITE_URL =
-  process.env.NEXT_PUBLIC_BOT_INVITE_URL ||
-  'https://discord.com/oauth2/authorize?client_id=REPLACE_WITH_REAL_CLIENT_ID&permissions=8&scope=bot%20applications.commands';
+import { BOT_INVITE_URL } from '@/lib/botInvite';
 
 const FEATURES = [
   {
