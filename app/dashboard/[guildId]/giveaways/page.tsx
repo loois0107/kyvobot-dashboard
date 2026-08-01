@@ -100,7 +100,7 @@ export default function GiveawaysPage() {
       if (res.ok) {
         const roleLabel = replaceTarget.giveaway.prize_role_name || replaceTarget.giveaway.prize_role_id;
         showToast(
-          buildReplaceWinnerToastMessage(!!data.role_note, data.payout_ok, roleLabel),
+          buildReplaceWinnerToastMessage(t, !!data.role_note, data.payout_ok, roleLabel),
           replaceWinnerToastType(data.payout_ok)
         );
         setReplaceTarget(null);
@@ -149,6 +149,10 @@ export default function GiveawaysPage() {
           {t('common.refresh')}
         </button>
       </header>
+
+      <div className="bg-[#5865F2]/10 border border-[#5865F2]/30 rounded-2xl p-4 sm:p-5">
+        <p className="text-xs sm:text-sm text-[#c7cdfd] leading-relaxed">{t('giveawaysPage.startGuide')}</p>
+      </div>
 
       {giveaways.length === 0 ? (
         <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-6 shadow-xl">
