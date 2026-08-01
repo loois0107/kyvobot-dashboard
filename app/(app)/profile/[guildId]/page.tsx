@@ -342,7 +342,7 @@ export default function PersonalCardSettings() {
         </header>
 
         <div className="space-y-4 bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl">
-          <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+          <h3 className="text-xs font-black tracking-widest text-[#949ba4] border-b border-[#2b2d31] pb-2">
             {t('profileCardPage.previewTitle')}
           </h3>
 

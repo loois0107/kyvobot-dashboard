@@ -197,7 +197,7 @@ export default function SettingsPage() {
                   <div key={trigger} className="flex justify-between items-center text-xs bg-[#161626] p-2 rounded border border-[#2A1F40]">
                     <span className="text-green-400 font-bold">/{trigger}</span>
                     {isRoleMacro(value) ? (
-                      <span className="text-[10px] font-bold text-amber-400 bg-amber-950/30 border border-amber-500/20 px-2 py-0.5 rounded uppercase">
+                      <span className="text-[10px] font-bold text-amber-400 bg-amber-950/30 border border-amber-500/20 px-2 py-0.5 rounded">
                         {t('settingsPage.roleMacroBadge', {
                           action: value.type === 'role_add' ? t('settingsPage.grants') : t('settingsPage.removes'),
                           roleId: value.role_id,

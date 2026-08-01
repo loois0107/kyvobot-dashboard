@@ -179,7 +179,7 @@ export default function LevelingEconomySettings() {
             [SECTION 1: VISUAL DESIGN CLUSTER] -> 성격 맞는 애들끼리 최상단에 묶음!
            ========================================== */}
         <div className="space-y-4 bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl">
-          <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">{t('levelingPage.cardPreviewTitle')}</h3>
+          <h3 className="text-xs font-black tracking-widest text-[#949ba4] border-b border-[#2b2d31] pb-2">{t('levelingPage.cardPreviewTitle')}</h3>
 
           {/* Card Preview Canvas */}
           <div

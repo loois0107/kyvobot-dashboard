@@ -171,10 +171,15 @@ export default function TierRolesSettings() {
     <SettingsPageContainer className="pb-28">
       <header className="border-b border-[#2b2d31] pb-6">
         <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('tierRolesPage.title')}</h1>
-        <HelpText className="mt-1 tracking-widest uppercase">
+        <HelpText className="mt-1">
           {t('tierRolesPage.subtitle')}
         </HelpText>
       </header>
+
+      <div className="bg-amber-950/20 border border-amber-500/30 border-l-4 border-l-purple-500 rounded-xl p-4 space-y-1">
+        <p className="text-xs font-black text-amber-400">{t('tierRolesPage.prereqWarningTitle')}</p>
+        <p className="text-xs text-amber-200/90 leading-relaxed">{t('tierRolesPage.prereqWarningBody')}</p>
+      </div>
 
       {blockedItems.length > 0 && (
         <div className="bg-red-950/30 border border-red-500/30 rounded-xl p-4 space-y-2">
@@ -187,10 +192,16 @@ export default function TierRolesSettings() {
         </div>
       )}
 
+      <div className="bg-[#111214] border border-[#232428] rounded-xl p-4 space-y-1.5">
+        <p className="text-xs font-bold text-[#dbdee1]">{t('tierRolesPage.infoBoxTitle')}</p>
+        <ul className="text-xs text-[#a1a1aa] leading-relaxed list-disc list-inside space-y-1">
+          <li>{t('tierRolesPage.infoBoxPoint1')}</li>
+          <li>{t('tierRolesPage.infoBoxPoint2')}</li>
+          <li>{t('tierRolesPage.infoBoxPoint3')}</li>
+        </ul>
+      </div>
+
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-3 shadow-xl">
-        <HelpText className="pb-1">
-          {t('tierRolesPage.reassignmentNote')}
-        </HelpText>
         {TIER_CHOICES.map((tier) => (
           <div key={tier} className="flex items-center gap-4">
             <label className="w-28 flex-shrink-0 text-xs font-bold text-[#b5bac1]">{tier}</label>

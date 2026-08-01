@@ -145,7 +145,7 @@ export default function PartyPresetsPage() {
     <SettingsPageContainer className="pb-16">
       <header className="border-b border-[#2b2d31] pb-6">
         <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('partyPresetsPage.title')}</h1>
-        <HelpText className="mt-1 tracking-widest uppercase">
+        <HelpText className="mt-1">
           {t('partyPresetsPage.subtitleUsage', { used: presets.length, max: PARTY_GAME_PRESET_MAX_COUNT })}
         </HelpText>
         <HelpText className="mt-1 normal-case">

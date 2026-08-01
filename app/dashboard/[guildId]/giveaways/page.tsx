@@ -141,7 +141,7 @@ export default function GiveawaysPage() {
       <header className="border-b border-[#2b2d31] pb-6 flex items-center justify-between">
         <div>
           <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('giveawaysPage.title')}</h1>
-          <HelpText className="mt-1 tracking-widest uppercase">
+          <HelpText className="mt-1">
             {t('giveawaysPage.subtitle')}
           </HelpText>
         </div>

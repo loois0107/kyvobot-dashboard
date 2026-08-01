@@ -165,7 +165,7 @@ export default function PartySettingsPage() {
       <header className="border-b border-[#2b2d31] pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('partySettingsPage.title')}</h1>
-          <HelpText className="mt-1 tracking-widest uppercase">
+          <HelpText className="mt-1">
             {t('partySettingsPage.subtitle')}
           </HelpText>
         </div>

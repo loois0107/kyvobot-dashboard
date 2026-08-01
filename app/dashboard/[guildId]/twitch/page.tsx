@@ -132,7 +132,7 @@ export default function TwitchStreamersSettings() {
     <SettingsPageContainer className="pb-16">
       <header className="border-b border-[#2b2d31] pb-6">
         <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('twitchPage.title')}</h1>
-        <HelpText className="mt-1 tracking-widest uppercase">
+        <HelpText className="mt-1">
           {t('twitchPage.subtitle')}
         </HelpText>
         <HelpText className="mt-2 normal-case">
