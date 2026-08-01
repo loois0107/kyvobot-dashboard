@@ -7,6 +7,13 @@ import { useToast } from '@/components/Toast';
 import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
+import {
+  DEFAULT_PANEL_TITLE,
+  DEFAULT_PANEL_DESC,
+  DEFAULT_WELCOME_TITLE,
+  DEFAULT_WELCOME_DESC,
+  DEFAULT_SYSTEM_PROMPT,
+} from '@/lib/ticketAiDefaults';
 
 interface VectorNode {
   id: string;
@@ -50,14 +57,16 @@ export default function TicketAiSettings() {
   const [isSaving, setIsSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
 
-  // 📝 Discord Panel Embed Setup States
-  const [panelTitle, setPanelTitle] = useState('Support Portal & Advanced AI Concierge');
-  const [panelDesc, setPanelDesc] = useState('Click the button below to establish a private secure communication channel...');
-  const [welcomeTitle, setWelcomeTitle] = useState('Context-Aware AI Ticket Active');
-  const [welcomeDesc, setWelcomeDesc] = useState('Welcome. Please state your question or issue description in detail...');
+  // 📝 Discord Panel Embed Setup States - initial values match the bot's own hardcoded fallback
+  // (lib/ticketAiDefaults.ts) so a never-configured guild shows what the bot actually sends, not an
+  // unrelated placeholder that would silently become the "real" saved value the moment Save is hit.
+  const [panelTitle, setPanelTitle] = useState(DEFAULT_PANEL_TITLE);
+  const [panelDesc, setPanelDesc] = useState(DEFAULT_PANEL_DESC);
+  const [welcomeTitle, setWelcomeTitle] = useState(DEFAULT_WELCOME_TITLE);
+  const [welcomeDesc, setWelcomeDesc] = useState(DEFAULT_WELCOME_DESC);
 
   // 🧠 Cognitive AI Prompt State
-  const [systemPrompt, setSystemPrompt] = useState('You are the premium Kyvo AI Smart Support Assistant... Use {context} to reference rules.');
+  const [systemPrompt, setSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPT);
 
   // 🚦 Daily AI answer limits - empty string means "use the bot's default" (400 server / 20 user)
   const [dailyGuildLimit, setDailyGuildLimit] = useState('');
@@ -110,6 +119,17 @@ export default function TicketAiSettings() {
         }
       }
     } catch (err) { console.error(err); }
+  };
+
+  const handleResetToBotDefault = () => {
+    if (!window.confirm(t('ticketSettingsPage.resetToBotDefaultConfirm'))) return;
+    setPanelTitle(DEFAULT_PANEL_TITLE);
+    setPanelDesc(DEFAULT_PANEL_DESC);
+    setWelcomeTitle(DEFAULT_WELCOME_TITLE);
+    setWelcomeDesc(DEFAULT_WELCOME_DESC);
+    setSystemPrompt(DEFAULT_SYSTEM_PROMPT);
+    setIsDirty(true);
+    showToast(t('ticketSettingsPage.resetToBotDefaultDone'), 'info');
   };
 
   const handleSaveMasterConfigs = async (e: React.FormEvent) => {
@@ -244,9 +264,14 @@ export default function TicketAiSettings() {
             <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('ticketSettingsPage.title')}</h1>
             <HelpText className="mt-1 tracking-widest uppercase">{t('ticketSettingsPage.subtitle')}</HelpText>
           </div>
-          <button type="button" onClick={handleSaveMasterConfigs} disabled={isSaving} className="w-full sm:w-auto bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all cursor-pointer">
-            {isSaving ? t('ticketSettingsPage.injecting') : t('ticketSettingsPage.saveButton')}
-          </button>
+          <div className="flex gap-2 w-full sm:w-auto">
+            <button type="button" onClick={handleResetToBotDefault} className="flex-1 sm:flex-none border border-[#4e5058]/40 hover:border-[#4e5058] text-[#b5bac1] hover:text-white text-xs font-black px-4 py-3 rounded-xl tracking-widest transition-all cursor-pointer">
+              {t('ticketSettingsPage.resetToBotDefault')}
+            </button>
+            <button type="button" onClick={handleSaveMasterConfigs} disabled={isSaving} className="flex-1 sm:flex-none bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all cursor-pointer">
+              {isSaving ? t('ticketSettingsPage.injecting') : t('ticketSettingsPage.saveButton')}
+            </button>
+          </div>
         </header>
 
         <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl px-4 sm:px-6 py-4">
@@ -341,6 +366,10 @@ export default function TicketAiSettings() {
             value={knowledgeInput} onChange={(e) => setKnowledgeInput(e.target.value)}
             className="w-full bg-[#111214] border border-[#232428] rounded-xl p-4 text-xs text-white focus:outline-none focus:border-yellow-500"
           />
+
+          {editingNodeId && (vectorNodes.find((node) => node.id === editingNodeId)?.feedback.total ?? 0) > 0 && (
+            <p className="text-[11px] font-bold text-amber-400">{t('ticketSettingsPage.editResetsFeedbackWarning')}</p>
+          )}
 
           <div className="flex gap-2">
             <button type="button" onClick={injectKnowledgeNode} disabled={isInjecting} className="flex-1 bg-yellow-600/10 hover:bg-yellow-600 border border-yellow-500/20 text-yellow-400 hover:text-white text-xs font-black py-3 rounded-xl tracking-widest transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
