@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
+import ChannelSelect from '@/components/ChannelSelect';
 
 export default function VoiceSettingsPage() {
   const params = useParams();
@@ -109,13 +110,11 @@ export default function VoiceSettingsPage() {
 
           <div>
             <label className="text-xs text-gray-400 block mb-1">{t('voicePage.triggerChannelLabel')}</label>
-            <input
-              type="text"
+            <ChannelSelect
+              guildId={guildId || ''}
               value={triggerChannelId}
-              onChange={(e) => setTriggerChannelId(e.target.value)}
-              disabled={loading}
-              placeholder={t('common.egPlaceholderId')}
-              className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-white px-3 py-2 rounded focus:outline-none focus:border-[#5865f2] disabled:opacity-50"
+              onChange={setTriggerChannelId}
+              className="text-sm px-3 py-2"
             />
             <HelpText className="mt-2">
               {t('voicePage.triggerChannelHelp')}

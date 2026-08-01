@@ -13,6 +13,7 @@ import {
 import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
+import ChannelSelect from '@/components/ChannelSelect';
 
 const COLOR_PRESETS = ['#5865F2', '#23A55A', '#FEE75C', '#EB459E', '#ED4245', '#9B59B6', '#00D2D3', '#54A0FF'];
 
@@ -311,12 +312,10 @@ export default function PartySettingsPage() {
 
         <div className="space-y-1.5 pt-2">
           <label className="text-xs font-bold text-[#b5bac1]">{t('partySettingsPage.reportChannelLabel')}</label>
-          <input
-            type="text"
-            placeholder={t('partySettingsPage.reportChannelPlaceholder')}
+          <ChannelSelect
+            guildId={guildId}
             value={weeklyReportChannelId}
-            onChange={(e) => { setWeeklyReportChannelId(e.target.value.replace(/[^0-9]/g, '')); setIsDirty(true); }}
-            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#5865F2]"
+            onChange={(id) => { setWeeklyReportChannelId(id); setIsDirty(true); }}
           />
         </div>
       </div>

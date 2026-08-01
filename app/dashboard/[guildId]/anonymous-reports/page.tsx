@@ -6,6 +6,7 @@ import { useToast } from '@/components/Toast';
 import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
+import ChannelSelect from '@/components/ChannelSelect';
 
 interface PendingReport {
   id: number;
@@ -187,32 +188,25 @@ export default function AnonymousReportsSettingsPage() {
 
           <div>
             <label className="text-xs text-gray-400 block mb-1">{t('anonymousReportsPage.adminChannelLabel')}</label>
-            <input
-              type="text"
+            <ChannelSelect
+              guildId={guildId || ''}
               value={adminChannelId}
-              onChange={(e) => setAdminChannelId(e.target.value)}
-              disabled={loading}
-              placeholder={t('common.egPlaceholderId')}
-              className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-white px-3 py-2 rounded focus:outline-none focus:border-[#5865f2] disabled:opacity-50"
+              onChange={setAdminChannelId}
+              className="text-sm px-3 py-2"
             />
             <HelpText className="mt-2">{t('anonymousReportsPage.adminChannelHelp')}</HelpText>
           </div>
 
           <div>
             <label className="text-xs text-gray-400 block mb-1">{t('anonymousReportsPage.publishChannelLabel')}</label>
-            <input
-              type="text"
+            <ChannelSelect
+              guildId={guildId || ''}
               value={publishChannelId}
-              onChange={(e) => setPublishChannelId(e.target.value)}
-              disabled={loading}
-              placeholder={t('common.egPlaceholderId')}
-              className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-white px-3 py-2 rounded focus:outline-none focus:border-[#5865f2] disabled:opacity-50"
+              onChange={setPublishChannelId}
+              className="text-sm px-3 py-2"
             />
             <HelpText className="mt-2">
               {t('anonymousReportsPage.publishChannelHelp')}
-            </HelpText>
-            <HelpText className="mt-2">
-              {t('anonymousReportsPage.findChannelIdHelp')}
             </HelpText>
           </div>
 

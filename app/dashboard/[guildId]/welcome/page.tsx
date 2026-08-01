@@ -7,6 +7,7 @@ import { useToast } from '@/components/Toast';
 import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
+import ChannelSelect from '@/components/ChannelSelect';
 
 export default function WelcomeSettings() {
   const router = useRouter();
@@ -185,9 +186,11 @@ export default function WelcomeSettings() {
               </div>
               <div className="space-y-1 pt-1 border-t border-[#2b2d31]/40">
                 <label className="text-[10px] font-bold text-[#b5bac1] uppercase block">{t('welcomePage.welcomeChannelLabel')}</label>
-                <input type="text" placeholder={t('common.egPlaceholderId')} value={channelId}
-                  onChange={(e) => { setChannelId(e.target.value.replace(/[^0-9]/g, '')); setIsDirty(true); }}
-                  className="w-full bg-[#1e1f22] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#5865F2]"
+                <ChannelSelect
+                  guildId={guildId}
+                  value={channelId}
+                  onChange={(id) => { setChannelId(id); setIsDirty(true); }}
+                  className="text-xs"
                 />
                 <HelpText className="normal-case">{t('welcomePage.welcomeChannelHelp')}</HelpText>
               </div>
@@ -200,9 +203,11 @@ export default function WelcomeSettings() {
               </div>
               <div className="space-y-1 pt-1 border-t border-[#2b2d31]/40">
                 <label className="text-[10px] font-bold text-[#b5bac1] uppercase block">{t('welcomePage.goodbyeChannelLabel')}</label>
-                <input type="text" placeholder={t('common.egPlaceholderId')} value={goodbyeChannelId}
-                  onChange={(e) => { setGoodbyeChannelId(e.target.value.replace(/[^0-9]/g, '')); setIsDirty(true); }}
-                  className="w-full bg-[#1e1f22] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-red-500"
+                <ChannelSelect
+                  guildId={guildId}
+                  value={goodbyeChannelId}
+                  onChange={(id) => { setGoodbyeChannelId(id); setIsDirty(true); }}
+                  className="text-xs"
                 />
                 <HelpText className="normal-case">{t('welcomePage.goodbyeChannelHelp')}</HelpText>
               </div>

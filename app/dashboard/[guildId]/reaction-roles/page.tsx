@@ -7,6 +7,8 @@ import { parseEmojiDisplay } from '@/lib/reactionRoles';
 import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
+import ChannelSelect from '@/components/ChannelSelect';
+import MessageSelect from '@/components/MessageSelect';
 
 interface RoleOption {
   id: string;
@@ -241,26 +243,22 @@ export default function ReactionRolesPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-[#b5bac1]">{t('reactionRolesPage.channelIdLabel')}</label>
-            <input
-              type="text"
+            <ChannelSelect
+              guildId={guildId}
               value={channelId}
-              onChange={(e) => { setChannelId(e.target.value); setPreview(null); }}
-              placeholder="123456789012345678"
-              className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#5865F2]"
+              onChange={(id) => { setChannelId(id); setMessageId(''); setPreview(null); }}
             />
           </div>
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-[#b5bac1]">{t('reactionRolesPage.messageIdLabel')}</label>
-            <input
-              type="text"
+            <MessageSelect
+              guildId={guildId}
+              channelId={channelId}
               value={messageId}
-              onChange={(e) => { setMessageId(e.target.value); setPreview(null); }}
-              placeholder="123456789012345678"
-              className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#5865F2]"
+              onChange={(id) => { setMessageId(id); setPreview(null); }}
             />
           </div>
         </div>
-        <HelpText>{t('reactionRolesPage.findIdsHelp')}</HelpText>
 
         <button
           type="button"
