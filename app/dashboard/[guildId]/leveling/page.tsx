@@ -7,6 +7,7 @@ import { useToast } from '@/components/Toast';
 import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
+import RoleSelect from '@/components/RoleSelect';
 
 // 🛡️ cogs/economy.py의 /shop add·/shop view·/shop buy는 전부 item['name']을 읽는다 - 예전엔
 // 여기서 'title'로 저장해서 봇이 KeyError로 죽는 실제 크래시가 있었다(대시보드로 만든 아이템은
@@ -15,6 +16,12 @@ interface ShopItem {
   name: string;
   price: number;
   description: string;
+}
+
+interface RoleOption {
+  id: string;
+  name: string;
+  color: number;
 }
 
 export default function LevelingEconomySettings() {
@@ -31,6 +38,7 @@ export default function LevelingEconomySettings() {
   // 🏆 Leveling System States
   const [xpRate, setXpRate] = useState(1);
   const [roleRewards, setRoleRewards] = useState<{ [key: string]: string }>({});
+  const [roles, setRoles] = useState<RoleOption[]>([]);
   const [newLvl, setNewLvl] = useState('');
   const [newRoleId, setNewRoleId] = useState('');
 
@@ -70,6 +78,22 @@ export default function LevelingEconomySettings() {
     }
   }, [params?.guildId]);
 
+  // RoleSelect fetches its own copy of this list internally to render the dropdown - fetched again
+  // here (separately) so the milestone list below can resolve role IDs to names for display.
+  useEffect(() => {
+    if (!guildId) return;
+    let cancelled = false;
+    fetch(`/api/guilds/${guildId}/roles`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (!cancelled && Array.isArray(data)) setRoles(data);
+      })
+      .catch((err) => console.error('[LEVELING] Failed to load role list:', err));
+    return () => {
+      cancelled = true;
+    };
+  }, [guildId]);
+
   const loadSettings = async (id: string) => {
     try {
       const res = await fetch(`/api/level-eco-setting?guild_id=${id}`);
@@ -97,7 +121,9 @@ export default function LevelingEconomySettings() {
   };
 
   const appendMilestone = () => {
-    if (!newLvl.trim() || !newRoleId.trim()) return;
+    if (!newLvl.trim() || !newRoleId.trim()) {
+      showToast(t('levelingPage.missingMilestoneFields'), 'error'); return;
+    }
     if (!/^\d+$/.test(newRoleId) || newRoleId.length < 17) {
       showToast(t('levelingPage.invalidRoleId'), 'error'); return;
     }
@@ -111,7 +137,9 @@ export default function LevelingEconomySettings() {
   };
 
   const injectShopItem = () => {
-    if (!newItemTitle.trim()) return;
+    if (!newItemTitle.trim()) {
+      showToast(t('levelingPage.missingItemTitle'), 'error'); return;
+    }
     const newItem: ShopItem = { name: newItemTitle.trim().replace(/\s+/g, '_'), price: Number(newItemPrice), description: newItemDescription.trim() };
     setShopItems(prev => [...prev, newItem]);
     setNewItemTitle(''); setNewItemPrice(100); setNewItemDescription(''); setIsDirty(true);
@@ -266,14 +294,19 @@ export default function LevelingEconomySettings() {
               <HelpText>{t('levelingPage.milestoneHelp')}</HelpText>
               <div className="flex gap-2">
                 <input type="number" placeholder={t('levelingPage.levelPlaceholder')} value={newLvl} onChange={(e) => setNewLvl(e.target.value)} className="w-1/4 bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none" />
-                <input type="text" placeholder={t('levelingPage.roleIdPlaceholder')} value={newRoleId} onChange={(e) => setNewRoleId(e.target.value.replace(/[^0-9]/g, ''))} className="w-3/4 bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none" />
+                <div className="w-3/4">
+                  <RoleSelect guildId={guildId} value={newRoleId} onChange={setNewRoleId} />
+                </div>
               </div>
               <button type="button" onClick={appendMilestone} className="w-full bg-[#2b2d31] hover:bg-[#35373c] border border-[#4e5058]/30 rounded-lg py-2 text-[11px] font-black tracking-widest text-white transition">{t('levelingPage.appendMilestone')}</button>
               {Object.keys(roleRewards).length > 0 && (
                 <div className="mt-2 p-3 bg-[#111214] rounded-xl border border-[#232428] space-y-2 max-h-32 overflow-y-auto">
-                  {Object.entries(roleRewards).map(([lvl, rId]) => (
-                    <div key={lvl} className="flex justify-between items-center text-xs font-mono bg-[#1e1f22] p-2 rounded border border-[#2b2d31]"><span>{t('levelingPage.milestoneRowLabel', { level: lvl, roleId: rId })}</span><button type="button" onClick={() => removeMilestone(lvl)} className="text-red-400 hover:text-red-600 font-bold px-1">✕</button></div>
-                  ))}
+                  {Object.entries(roleRewards).map(([lvl, rId]) => {
+                    const roleName = roles.find((r) => r.id === rId)?.name || rId;
+                    return (
+                      <div key={lvl} className="flex justify-between items-center text-xs font-mono bg-[#1e1f22] p-2 rounded border border-[#2b2d31]"><span>{t('levelingPage.milestoneRowLabel', { level: lvl, roleName })}</span><button type="button" onClick={() => removeMilestone(lvl)} className="text-red-400 hover:text-red-600 font-bold px-1">✕</button></div>
+                    );
+                  })}
                 </div>
               )}
             </div>
