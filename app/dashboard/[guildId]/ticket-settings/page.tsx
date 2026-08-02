@@ -4,16 +4,10 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useToast } from '@/components/Toast';
-import { useT } from '@/lib/i18n/LanguageContext';
+import { useT, useLanguage } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
-import {
-  DEFAULT_PANEL_TITLE,
-  DEFAULT_PANEL_DESC,
-  DEFAULT_WELCOME_TITLE,
-  DEFAULT_WELCOME_DESC,
-  DEFAULT_SYSTEM_PROMPT,
-} from '@/lib/ticketAiDefaults';
+import { getTicketAiDefaults } from '@/lib/ticketAiDefaults';
 
 interface VectorNode {
   id: string;
@@ -52,6 +46,7 @@ export default function TicketAiSettings() {
   const { data: session, status } = useSession();
   const { showToast } = useToast();
   const t = useT();
+  const { lang } = useLanguage();
 
   const [guildId, setGuildId] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -60,13 +55,17 @@ export default function TicketAiSettings() {
   // 📝 Discord Panel Embed Setup States - initial values match the bot's own hardcoded fallback
   // (lib/ticketAiDefaults.ts) so a never-configured guild shows what the bot actually sends, not an
   // unrelated placeholder that would silently become the "real" saved value the moment Save is hit.
-  const [panelTitle, setPanelTitle] = useState(DEFAULT_PANEL_TITLE);
-  const [panelDesc, setPanelDesc] = useState(DEFAULT_PANEL_DESC);
-  const [welcomeTitle, setWelcomeTitle] = useState(DEFAULT_WELCOME_TITLE);
-  const [welcomeDesc, setWelcomeDesc] = useState(DEFAULT_WELCOME_DESC);
+  // KO는 봇이 실제로 보내는 문구가 아니라 대시보드 뷰어 언어에 맞춘 "시작점" 예시일 뿐이다 -
+  // getTicketAiDefaults 상단 주석 참고. lang은 서버에서 미리 계산돼 첫 렌더부터 정확하므로
+  // useState 초깃값으로 바로 써도 깜빡임/hydration 불일치가 없다.
+  const ticketAiDefaults = getTicketAiDefaults(lang);
+  const [panelTitle, setPanelTitle] = useState(ticketAiDefaults.panelTitle);
+  const [panelDesc, setPanelDesc] = useState(ticketAiDefaults.panelDesc);
+  const [welcomeTitle, setWelcomeTitle] = useState(ticketAiDefaults.welcomeTitle);
+  const [welcomeDesc, setWelcomeDesc] = useState(ticketAiDefaults.welcomeDesc);
 
   // 🧠 Cognitive AI Prompt State
-  const [systemPrompt, setSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPT);
+  const [systemPrompt, setSystemPrompt] = useState(ticketAiDefaults.systemPrompt);
 
   // 🚦 Daily AI answer limits - empty string means "use the bot's default" (400 server / 20 user)
   const [dailyGuildLimit, setDailyGuildLimit] = useState('');
@@ -123,11 +122,12 @@ export default function TicketAiSettings() {
 
   const handleResetToBotDefault = () => {
     if (!window.confirm(t('ticketSettingsPage.resetToBotDefaultConfirm'))) return;
-    setPanelTitle(DEFAULT_PANEL_TITLE);
-    setPanelDesc(DEFAULT_PANEL_DESC);
-    setWelcomeTitle(DEFAULT_WELCOME_TITLE);
-    setWelcomeDesc(DEFAULT_WELCOME_DESC);
-    setSystemPrompt(DEFAULT_SYSTEM_PROMPT);
+    const defaults = getTicketAiDefaults(lang);
+    setPanelTitle(defaults.panelTitle);
+    setPanelDesc(defaults.panelDesc);
+    setWelcomeTitle(defaults.welcomeTitle);
+    setWelcomeDesc(defaults.welcomeDesc);
+    setSystemPrompt(defaults.systemPrompt);
     setIsDirty(true);
     showToast(t('ticketSettingsPage.resetToBotDefaultDone'), 'info');
   };
