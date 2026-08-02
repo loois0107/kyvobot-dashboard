@@ -16,6 +16,87 @@ interface LeaderboardUser {
   points: number;
 }
 
+const PODIUM_STYLE: Record<1 | 2 | 3, {
+  medal: string;
+  borderClass: string;
+  glowClass: string;
+  avatarSize: string;
+  nameSize: string;
+  mobileOrder: string;
+  desktopOrder: string;
+  lift: string;
+}> = {
+  1: {
+    medal: '🥇',
+    borderClass: 'border-[#FFD700]/60',
+    glowClass: 'shadow-[0_0_35px_rgba(255,215,0,0.3)]',
+    avatarSize: 'h-24 w-24 border-4',
+    nameSize: 'text-base',
+    mobileOrder: 'order-1',
+    desktopOrder: 'sm:order-2',
+    lift: 'sm:-mt-6',
+  },
+  2: {
+    medal: '🥈',
+    borderClass: 'border-[#C0C0C0]/50',
+    glowClass: 'shadow-[0_0_20px_rgba(192,192,192,0.2)]',
+    avatarSize: 'h-16 w-16 border-2',
+    nameSize: 'text-sm',
+    mobileOrder: 'order-2',
+    desktopOrder: 'sm:order-1',
+    lift: 'sm:mt-6',
+  },
+  3: {
+    medal: '🥉',
+    borderClass: 'border-[#CD7F32]/50',
+    glowClass: 'shadow-[0_0_20px_rgba(205,127,50,0.2)]',
+    avatarSize: 'h-16 w-16 border-2',
+    nameSize: 'text-sm',
+    mobileOrder: 'order-3',
+    desktopOrder: 'sm:order-3',
+    lift: 'sm:mt-6',
+  },
+};
+
+// 상위 3명 전용 카드 - place=1은 👑을 덧붙이고(기존 🥇 배지는 그대로 유지), 더 크게/가운데로
+// 띄운다. 모바일에서는 order-*가 등수 순(1→2→3 위에서 아래로)으로, sm: 이상에서는 2등-1등-3등
+// 좌우 배치로 바뀐다 - PODIUM_STYLE의 mobileOrder/desktopOrder가 그 전환을 담당한다.
+function PodiumCard({
+  user, place, levelLabel, pointsLabel, formatMetric,
+}: {
+  user: LeaderboardUser;
+  place: 1 | 2 | 3;
+  levelLabel: string;
+  pointsLabel: string;
+  formatMetric: (val: number) => string;
+}) {
+  const style = PODIUM_STYLE[place];
+  return (
+    <div className={`flex flex-col items-center gap-2 p-4 sm:p-5 rounded-2xl border bg-[#161626] ${style.borderClass} ${style.glowClass} ${style.mobileOrder} ${style.desktopOrder} ${style.lift}`}>
+      {place === 1 && <span className="text-2xl leading-none">👑</span>}
+      <div className={`relative rounded-full ${style.avatarSize} ${style.borderClass} overflow-hidden bg-[#383A40] flex-shrink-0`}>
+        {user.avatar_url ? (
+          <img src={user.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
+        ) : (
+          <div className="h-full w-full bg-[#2A1F40] flex items-center justify-center text-xs font-black text-gray-400">KYVO</div>
+        )}
+      </div>
+      <span className="text-lg leading-none">{style.medal}</span>
+      <h3 className={`${style.nameSize} font-bold text-white text-center truncate max-w-[9rem]`}>{user.username}</h3>
+      <div className="flex gap-4 text-center font-mono">
+        <div>
+          <div className="text-[10px] text-[#8b8d98] tracking-wider">{levelLabel}</div>
+          <div className="text-sm font-black text-white">{user.level}</div>
+        </div>
+        <div>
+          <div className="text-[10px] text-[#8b8d98] tracking-wider">{pointsLabel}</div>
+          <div className="text-sm font-black text-[#FFD700]">{formatMetric(user.points)}P</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function GuildLeaderboardTerminal() {
   const router = useRouter();
   const params = useParams();
@@ -137,6 +218,14 @@ export default function GuildLeaderboardTerminal() {
           </span>
         </div>
 
+        {!loading && users.length >= 3 && (
+          <div className="flex flex-col sm:flex-row sm:items-end justify-center gap-3 sm:gap-4 pb-2">
+            <PodiumCard user={users[1]} place={2} levelLabel={t('leaderboardPage.level')} pointsLabel={t('leaderboardPage.points')} formatMetric={formatMetric} />
+            <PodiumCard user={users[0]} place={1} levelLabel={t('leaderboardPage.level')} pointsLabel={t('leaderboardPage.points')} formatMetric={formatMetric} />
+            <PodiumCard user={users[2]} place={3} levelLabel={t('leaderboardPage.level')} pointsLabel={t('leaderboardPage.points')} formatMetric={formatMetric} />
+          </div>
+        )}
+
         <div className="space-y-3">
           {loading ? (
             <div className="text-center py-20 border border-[#2A1F40] bg-[#161626] rounded-xl animate-pulse">
@@ -148,7 +237,11 @@ export default function GuildLeaderboardTerminal() {
               <HelpText className="mt-2 font-sans">{t('leaderboardPage.noUsersSubtitle')}</HelpText>
             </div>
           ) : (
-            users.map((user, index) => {
+            (users.length >= 3 ? users.slice(3) : users).map((user, i) => {
+              // 포디움이 그려질 땐(3명 이상) 상위 3명은 이미 위에 카드로 나왔으니 리스트에서
+              // 제외한다 - 다만 순위 배지(#4, #5...)는 잘려나간 3자리를 감안한 실제 등수를
+              // 반영해야 하므로, 슬라이스로 생긴 새 배열 인덱스가 아니라 원래 등수(index)를 쓴다.
+              const index = users.length >= 3 ? i + 3 : i;
               const style = getRankStyle(index);
               const maxXp = 5 * (user.level ** 2) + 50 * user.level + 100;
               const progress = Math.min(user.xp / maxXp, 1);
