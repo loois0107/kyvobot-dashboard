@@ -2,16 +2,24 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { useT } from '@/lib/i18n/LanguageContext';
+import { useT, useLanguage } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
 
 interface AuditLog {
   id: string;
   user_id: string;
+  username: string | null;
   action: string;
   reason: string;
   created_at: string;
+}
+
+// 브라우저의 타임존은 그대로 두고(실제 가리키는 시각은 안 바뀜) 로케일만 대시보드 언어 설정에
+// 맞춘다 - toLocaleString()을 인자 없이 쓰면 관리자 시스템 로케일을 따라가서 형식이 대시보드
+// 언어 토글과 안 맞을 수 있었다.
+function formatLogTimestamp(iso: string, lang: 'ko' | 'en'): string {
+  return new Date(iso).toLocaleString(lang === 'ko' ? 'ko-KR' : 'en-US');
 }
 
 type LoadStatus = 'loading' | 'loaded' | 'error';
@@ -27,6 +35,7 @@ function actionBadgeColor(action: string): string {
 export default function AuditLogsPage() {
   const params = useParams();
   const t = useT();
+  const { lang } = useLanguage();
   const guildId = (params?.guildId as string) || '';
 
   const [loadStatus, setLoadStatus] = useState<LoadStatus>('loading');
@@ -127,11 +136,11 @@ export default function AuditLogsPage() {
                       {log.action}
                     </span>
                     <span className="text-xs text-[#b5bac1] truncate">
-                      {t('auditLogsPage.targetLabel')} <code className="text-white">{log.user_id}</code>
+                      {t('auditLogsPage.targetLabel')} <code className="text-white">{log.username || log.user_id}</code>
                     </span>
                   </div>
                   <span className="text-xs text-[#8b8d98] shrink-0">
-                    {new Date(log.created_at).toLocaleString()}
+                    {formatLogTimestamp(log.created_at, lang)}
                   </span>
                 </div>
                 {log.reason && <p className="text-xs text-[#949ba4]">{log.reason}</p>}
