@@ -6,6 +6,7 @@ import { MACRO_TRIGGER_MAX_LENGTH, MACRO_RESPONSE_MAX_LENGTH, MACRO_MAX_COUNT } 
 import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
+import { useGuildName } from '@/components/GuildsContext';
 
 // 🛡️ /cc_add role_add·role_remove(봇 전용 관리자 슬래시 커맨드)로 만든 매크로는 문자열이 아니라
 // {type, role_id} 객체로 저장된다(cogs/custom_commands.py의 _normalize_command_entry와 동일한
@@ -29,6 +30,7 @@ export default function SettingsPage() {
   const params = useParams();
   const t = useT();
   const guildId = params?.guildId as string | undefined;
+  const guildName = useGuildName(guildId);
 
   const [commands, setCommands] = useState<{ [key: string]: MacroEntry }>({});
   const [language, setLanguage] = useState('en');
@@ -150,7 +152,7 @@ export default function SettingsPage() {
             <div>
               <label className="text-xs text-gray-400 block mb-1">{t('common.activeContext')}</label>
               <div className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-purple-400 px-3 py-2 rounded font-bold select-none">
-                {t('common.guildLabel')} {guildId ? guildId : t('common.loading')}
+                {guildName || (guildId ? `${t('common.guildLabel')} ${guildId}` : t('common.loading'))}
               </div>
             </div>
             <div>

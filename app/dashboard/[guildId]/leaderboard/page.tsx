@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
+import { useGuildName } from '@/components/GuildsContext';
 
 interface LeaderboardUser {
   user_id: string;
@@ -23,6 +24,7 @@ export default function GuildLeaderboardTerminal() {
 
   // 💡 NEXT.JS MAGIC: 주소창에 박혀있는 현재 서버 ID를 유저의 입력 없이 자동 추출!
   const guildId = params?.guildId as string;
+  const guildName = useGuildName(guildId);
 
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -127,7 +129,7 @@ export default function GuildLeaderboardTerminal() {
           <div>
             <h1 className="text-xl md:text-2xl font-black tracking-wider text-white">{t('leaderboardPage.title')}</h1>
             <HelpText className="mt-1 tracking-wide">
-              {t('leaderboardPage.subtitle')} <code className="text-[#5865F2]">{guildId}</code>
+              {t('leaderboardPage.subtitle')} <code className="text-[#5865F2]">{guildName || guildId}</code>
             </HelpText>
           </div>
           <span className="text-[10px] bg-[#2A1F40] text-[#FFD700] px-3 py-1 rounded font-black tracking-widest hidden sm:inline">

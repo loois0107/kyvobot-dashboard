@@ -7,8 +7,8 @@ import { useT } from '@/lib/i18n/LanguageContext';
 import LanguageToggle from '@/components/LanguageToggle';
 import AccountMenu from '@/components/AccountMenu';
 import BotNotInvitedNotice from '@/components/BotNotInvitedNotice';
+import { GuildsProvider, type ManagedGuild } from '@/components/GuildsContext';
 
-type ManagedGuild = { id: string; name: string };
 type BotStatus = 'checking' | 'present' | 'absent' | 'unknown';
 
 function isValidGuildId(id: unknown): id is string {
@@ -291,7 +291,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <button type="button" onClick={() => router.back()} className="inline-flex items-center gap-2 text-xs font-bold text-[#5865F2] hover:text-white bg-[#5865F2]/10 hover:bg-[#5865F2] border border-[#5865F2]/20 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer shadow-md"><span>◀</span> {t('sidebar.goBack')}</button>
                 </div>
               )}
-              {children}
+              <GuildsProvider guilds={guilds}>{children}</GuildsProvider>
             </>
           )}
         </main>

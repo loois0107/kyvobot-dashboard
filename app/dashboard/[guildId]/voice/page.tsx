@@ -6,11 +6,13 @@ import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
 import ChannelSelect from '@/components/ChannelSelect';
+import { useGuildName } from '@/components/GuildsContext';
 
 export default function VoiceSettingsPage() {
   const params = useParams();
   const t = useT();
   const guildId = params?.guildId as string | undefined;
+  const guildName = useGuildName(guildId);
 
   const [triggerChannelId, setTriggerChannelId] = useState('');
   const [loading, setLoading] = useState(false);
@@ -100,7 +102,7 @@ export default function VoiceSettingsPage() {
           <div>
             <label className="text-xs text-gray-400 block mb-1">{t('common.activeContext')}</label>
             <div className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-purple-400 px-3 py-2 rounded font-bold select-none">
-              {t('common.guildLabel')} {guildId ? guildId : t('common.loading')}
+              {guildName || (guildId ? `${t('common.guildLabel')} ${guildId}` : t('common.loading'))}
             </div>
           </div>
 
