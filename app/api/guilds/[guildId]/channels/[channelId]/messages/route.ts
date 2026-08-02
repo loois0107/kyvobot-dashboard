@@ -1,39 +1,11 @@
 import { NextResponse } from 'next/server';
 import { requireGuildAdministrator } from '@/lib/auth';
-import { verifyChannelBelongsToGuild } from '@/lib/reactionRoles';
+import { verifyChannelBelongsToGuild, extractPreviewText, type DiscordMessage } from '@/lib/reactionRoles';
 
 export const dynamic = 'force-dynamic';
 
 const MESSAGE_LIMIT = 20;
 const PREVIEW_MAX_LENGTH = 150;
-
-interface DiscordEmbed {
-  title?: string;
-  description?: string;
-}
-
-interface DiscordMessage {
-  id: string;
-  author?: { username?: string };
-  content?: string;
-  embeds?: DiscordEmbed[];
-  attachments?: unknown[];
-  timestamp: string;
-}
-
-// 텍스트 콘텐츠가 없는 임베드 전용 메시지(봇 공지, 링크 카드 등)를 목록에서 빈 줄로 보여주지
-// 않도록 embed의 title/description으로 대체한다 - preview 라우트의 '(no text content)'
-// 폴백과 같은 목적이지만, 목록에서는 뭘 고르는지 알아볼 수 있어야 하므로 한 단계 더 나아간다.
-function extractPreviewText(msg: DiscordMessage): string {
-  if (msg.content) return msg.content;
-  const embed = msg.embeds?.[0];
-  if (embed) {
-    const parts = [embed.title, embed.description].filter(Boolean);
-    if (parts.length > 0) return parts.join(' — ');
-  }
-  if (msg.attachments && msg.attachments.length > 0) return `[${msg.attachments.length} attachment(s)]`;
-  return '(no text content)';
-}
 
 /**
  * GET: reaction-roles 메시지 선택 UI용 - 이 채널의 최근 20개 메시지를 봇 토큰으로 가져와

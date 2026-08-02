@@ -72,3 +72,37 @@ export function parseEmojiDisplay(emoji: string): { kind: 'custom'; url: string;
   }
   return { kind: 'unicode', value: emoji };
 }
+
+export interface DiscordEmbed {
+  title?: string;
+  description?: string;
+}
+
+export interface DiscordMessage {
+  id?: string;
+  author?: { username?: string };
+  content?: string;
+  embeds?: DiscordEmbed[];
+  attachments?: unknown[];
+  timestamp?: string;
+}
+
+/**
+ * 텍스트 콘텐츠가 없는 메시지(봇 공지, 링크 카드, 이미지 전용 등)를 미리보기·목록 어디서도 빈
+ * 줄로 보여주지 않도록 대체 텍스트를 고른다 - 우선순위: 실제 content -> 임베드 title/description
+ * -> 첨부파일 개수 -> 마지막 안내 문구. reaction-roles의 메시지 목록(/api/guilds/[guildId]/
+ * channels/[channelId]/messages)과 미리보기(/api/reaction-roles/[guildId]/preview)가 이 함수
+ * 하나를 공유한다 - 예전엔 preview가 이 로직 없이 content만 보고 비어있으면 그냥
+ * "(no text content)"를 보여줘서, 목록에서는 임베드 제목이 잘 보이던 메시지가 미리보기에서는
+ * 빈 것처럼 보이는 불일치가 있었다.
+ */
+export function extractPreviewText(msg: DiscordMessage): string {
+  if (msg.content) return msg.content;
+  const embed = msg.embeds?.[0];
+  if (embed) {
+    const parts = [embed.title, embed.description].filter(Boolean);
+    if (parts.length > 0) return parts.join(' — ');
+  }
+  if (msg.attachments && msg.attachments.length > 0) return `[${msg.attachments.length} attachment(s)]`;
+  return "This message doesn't have any text — just an image or other content.";
+}

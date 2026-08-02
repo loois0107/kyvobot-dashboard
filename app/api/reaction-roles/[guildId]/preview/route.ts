@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { requireGuildAdministrator } from '@/lib/auth';
-import { verifyChannelBelongsToGuild } from '@/lib/reactionRoles';
+import { verifyChannelBelongsToGuild, extractPreviewText } from '@/lib/reactionRoles';
 
 export const dynamic = 'force-dynamic';
 
@@ -57,7 +57,7 @@ export async function GET(request: Request, ctx: { params: Promise<{ guildId: st
     status: 'success',
     message: {
       author: data.author?.username || 'Unknown',
-      content: (data.content || '(no text content)').slice(0, 200),
+      content: extractPreviewText(data).slice(0, 200),
       timestamp: data.timestamp,
       jump_url: `https://discord.com/channels/${guildId}/${channelId}/${messageId}`,
     },
