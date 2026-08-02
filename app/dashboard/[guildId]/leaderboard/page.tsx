@@ -23,6 +23,7 @@ const PODIUM_STYLE: Record<1 | 2 | 3, {
   glowClass: string;
   avatarSize: string;
   nameSize: string;
+  statSize: string;
   mobileOrder: string;
   desktopOrder: string;
   lift: string;
@@ -31,35 +32,38 @@ const PODIUM_STYLE: Record<1 | 2 | 3, {
   1: {
     medal: '🥇',
     borderClass: 'border-[#FFD700]/60',
-    glowClass: 'shadow-[0_0_35px_rgba(255,215,0,0.3)]',
-    avatarSize: 'h-24 w-24 border-4', // 96px
-    nameSize: 'text-base',
+    glowClass: 'shadow-[0_0_50px_rgba(255,215,0,0.35)]',
+    avatarSize: 'h-32 w-32 border-[6px]', // 128px
+    nameSize: 'text-xl',
+    statSize: 'text-xl',
     mobileOrder: 'order-1',
     desktopOrder: 'sm:order-2',
-    lift: 'sm:-mt-6',
-    cardWidth: 'sm:min-w-[230px] sm:max-w-[250px]',
+    lift: 'sm:-mt-10',
+    cardWidth: 'sm:min-w-[260px] sm:max-w-[300px]',
   },
   2: {
     medal: '🥈',
     borderClass: 'border-[#C0C0C0]/50',
     glowClass: 'shadow-[0_0_20px_rgba(192,192,192,0.2)]',
-    avatarSize: 'h-[72px] w-[72px] border-2',
-    nameSize: 'text-base',
+    avatarSize: 'h-24 w-24 border-4', // 96px
+    nameSize: 'text-lg',
+    statSize: 'text-lg',
     mobileOrder: 'order-2',
     desktopOrder: 'sm:order-1',
-    lift: 'sm:mt-6',
-    cardWidth: 'sm:min-w-[190px] sm:max-w-[210px]',
+    lift: 'sm:mt-10',
+    cardWidth: 'sm:min-w-[220px] sm:max-w-[250px]',
   },
   3: {
     medal: '🥉',
     borderClass: 'border-[#CD7F32]/50',
     glowClass: 'shadow-[0_0_20px_rgba(205,127,50,0.2)]',
-    avatarSize: 'h-[72px] w-[72px] border-2',
-    nameSize: 'text-base',
+    avatarSize: 'h-24 w-24 border-4', // 96px
+    nameSize: 'text-lg',
+    statSize: 'text-lg',
     mobileOrder: 'order-3',
     desktopOrder: 'sm:order-3',
-    lift: 'sm:mt-6',
-    cardWidth: 'sm:min-w-[190px] sm:max-w-[210px]',
+    lift: 'sm:mt-10',
+    cardWidth: 'sm:min-w-[220px] sm:max-w-[250px]',
   },
 };
 
@@ -81,8 +85,8 @@ function PodiumCard({
   const progress = Math.min(user.xp / maxXp, 1);
 
   return (
-    <div className={`flex flex-col items-center gap-2 p-4 sm:p-5 rounded-2xl border bg-[#161626] ${style.borderClass} ${style.glowClass} ${style.mobileOrder} ${style.desktopOrder} ${style.lift} ${style.cardWidth}`}>
-      {place === 1 && <span className="text-2xl leading-none">👑</span>}
+    <div className={`flex flex-col items-center gap-2 p-5 sm:p-6 rounded-2xl border bg-[#161626] ${style.borderClass} ${style.glowClass} ${style.mobileOrder} ${style.desktopOrder} ${style.lift} ${style.cardWidth}`}>
+      {place === 1 && <span className="text-4xl leading-none">👑</span>}
       <div className={`relative rounded-full ${style.avatarSize} ${style.borderClass} overflow-hidden bg-[#383A40] flex-shrink-0`}>
         {user.avatar_url ? (
           <img src={user.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
@@ -90,15 +94,15 @@ function PodiumCard({
           <div className="h-full w-full bg-[#2A1F40] flex items-center justify-center text-sm font-black text-gray-400">KYVO</div>
         )}
       </div>
-      <span className="text-lg leading-none">{style.medal}</span>
-      <h3 className={`${style.nameSize} font-bold text-white text-center truncate max-w-[9rem]`}>{user.username}</h3>
+      <span className="text-2xl leading-none">{style.medal}</span>
+      <h3 className={`${style.nameSize} font-bold text-white text-center truncate max-w-[11rem]`}>{user.username}</h3>
 
       <div className="w-full px-1">
-        <div className="flex justify-between text-[9px] font-bold text-gray-400 tracking-tighter mb-0.5">
+        <div className="flex justify-between text-xs font-bold text-gray-400 tracking-tighter mb-0.5">
           <span>{formatMetric(user.xp)} / {formatMetric(maxXp)} XP</span>
           <span className="text-blue-400">{Math.round(progress * 100)}%</span>
         </div>
-        <div className="w-full h-1.5 bg-[#383A40] rounded-full overflow-hidden">
+        <div className="w-full h-2.5 bg-[#383A40] rounded-full overflow-hidden">
           <div className="h-full bg-[#5865F2] transition-all duration-500 ease-out" style={{ width: `${progress * 100}%` }} />
         </div>
       </div>
@@ -106,11 +110,11 @@ function PodiumCard({
       <div className="flex gap-4 text-center font-mono pt-1">
         <div>
           <div className="text-[10px] text-[#8b8d98] tracking-wider">{levelLabel}</div>
-          <div className="text-base font-black text-white">{user.level}</div>
+          <div className={`${style.statSize} font-black text-white`}>{user.level}</div>
         </div>
         <div>
           <div className="text-[10px] text-[#8b8d98] tracking-wider">{pointsLabel}</div>
-          <div className="text-base font-black text-[#FFD700]">{formatMetric(user.points)}P</div>
+          <div className={`${style.statSize} font-black text-[#FFD700]`}>{formatMetric(user.points)}P</div>
         </div>
       </div>
     </div>
@@ -239,7 +243,7 @@ export default function GuildLeaderboardTerminal() {
         </div>
 
         {!loading && users.length >= 3 && (
-          <div className="flex flex-col sm:flex-row sm:items-end justify-center gap-3 sm:gap-4 pb-2">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-center gap-4 sm:gap-6 pb-2">
             <PodiumCard user={users[1]} place={2} levelLabel={t('leaderboardPage.level')} pointsLabel={t('leaderboardPage.points')} formatMetric={formatMetric} />
             <PodiumCard user={users[0]} place={1} levelLabel={t('leaderboardPage.level')} pointsLabel={t('leaderboardPage.points')} formatMetric={formatMetric} />
             <PodiumCard user={users[2]} place={3} levelLabel={t('leaderboardPage.level')} pointsLabel={t('leaderboardPage.points')} formatMetric={formatMetric} />
