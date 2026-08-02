@@ -118,7 +118,7 @@ export default function GiveawaysPage() {
 
   if (loadStatus === 'loading') {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-sm">
+      <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-base">
         {t('giveawaysPage.loadingGiveaways')}
       </div>
     );
@@ -128,8 +128,8 @@ export default function GiveawaysPage() {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
         <p className="text-red-400 font-bold">{t('giveawaysPage.loadFailed')}</p>
-        <p className="text-sm text-[#949ba4]">{loadErrorMsg}</p>
-        <button type="button" onClick={loadGiveaways} className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl">
+        <p className="text-base text-[#949ba4]">{loadErrorMsg}</p>
+        <button type="button" onClick={loadGiveaways} className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl">
           {t('common.retry')}
         </button>
       </div>
@@ -145,26 +145,26 @@ export default function GiveawaysPage() {
             {t('giveawaysPage.subtitle')}
           </HelpText>
         </div>
-        <button type="button" onClick={loadGiveaways} className="text-xs font-bold text-[#5865F2] hover:underline">
+        <button type="button" onClick={loadGiveaways} className="text-sm font-bold text-[#5865F2] hover:underline">
           {t('common.refresh')}
         </button>
       </header>
 
       <div className="bg-[#5865F2]/10 border border-[#5865F2]/30 rounded-2xl p-4 sm:p-5">
-        <p className="text-xs sm:text-sm text-[#c7cdfd] leading-relaxed">{t('giveawaysPage.startGuide')}</p>
+        <p className="text-sm sm:text-base text-[#c7cdfd] leading-relaxed">{t('giveawaysPage.startGuide')}</p>
       </div>
 
       {giveaways.length === 0 ? (
         <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-6 shadow-xl">
-          <p className="text-sm text-[#949ba4] py-4">{t('giveawaysPage.noGiveawaysYet')}</p>
+          <p className="text-base text-[#949ba4] py-4">{t('giveawaysPage.noGiveawaysYet')}</p>
         </div>
       ) : (
         <div className="space-y-4">
           {giveaways.map((g) => (
             <div key={g.id} className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl space-y-3">
               <div className="flex items-center justify-between border-b border-[#2b2d31] pb-2">
-                <h3 className="text-sm font-black text-white">🎁 {g.prize}</h3>
-                <span className="text-xs text-[#8b8d98]">{new Date(g.concluded_at).toLocaleString()}</span>
+                <h3 className="text-base font-black text-white">🎁 {g.prize}</h3>
+                <span className="text-sm text-[#8b8d98]">{new Date(g.concluded_at).toLocaleString()}</span>
               </div>
               <p className="text-[10px] text-[#949ba4]">
                 {g.prize_type === 'points'
@@ -175,7 +175,7 @@ export default function GiveawaysPage() {
                 {g.winners.map((w) => (
                   <div key={w.user_id} className="flex items-center justify-between gap-3 bg-[#111214] rounded-lg px-3 py-2.5">
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-white truncate">
+                      <p className="text-sm font-bold text-white truncate">
                         {w.username || t('giveawaysPage.unknownUser', { id: w.user_id })}
                       </p>
                       {!w.in_server && <p className="text-[10px] text-red-400">{t('giveawaysPage.noLongerInServer')}</p>}
@@ -198,10 +198,10 @@ export default function GiveawaysPage() {
       {replaceTarget && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
           <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
-            <h3 className="text-sm font-black text-white">
+            <h3 className="text-base font-black text-white">
               {t('giveawaysPage.replaceWinnerForPrefix')} <span className="text-[#FFD700]">{replaceTarget.giveaway.prize}</span>?
             </h3>
-            <p className="text-xs text-[#b5bac1]">
+            <p className="text-sm text-[#b5bac1]">
               {t('giveawaysPage.replaceWinnerBody', { winner: replaceTarget.winner.username || replaceTarget.winner.user_id })}
               {replaceTarget.giveaway.prize_type === 'points' && t('giveawaysPage.replaceWinnerPointsNote')}
             </p>
@@ -211,13 +211,13 @@ export default function GiveawaysPage() {
               </div>
             )}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-[#b5bac1]">{t('giveawaysPage.reasonLabel')}</label>
+              <label className="text-sm font-bold text-[#b5bac1]">{t('giveawaysPage.reasonLabel')}</label>
               <textarea
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder={t('giveawaysPage.reasonPlaceholder')}
                 rows={2}
-                className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5865F2]"
+                className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2]"
               />
             </div>
             <div className="flex gap-2 justify-end">
@@ -225,7 +225,7 @@ export default function GiveawaysPage() {
                 type="button"
                 onClick={() => setReplaceTarget(null)}
                 disabled={isReplacing}
-                className="text-xs font-bold text-gray-400 hover:text-white transition px-4 py-2"
+                className="text-sm font-bold text-gray-400 hover:text-white transition px-4 py-2"
               >
                 {t('common.cancel')}
               </button>
@@ -233,7 +233,7 @@ export default function GiveawaysPage() {
                 type="button"
                 onClick={handleConfirmReplace}
                 disabled={isReplacing || !reason.trim()}
-                className="bg-[#ED4245] hover:bg-[#c13537] disabled:opacity-50 text-white text-xs font-black px-5 py-2 rounded-lg"
+                className="bg-[#ED4245] hover:bg-[#c13537] disabled:opacity-50 text-white text-sm font-black px-5 py-2 rounded-lg"
               >
                 {isReplacing ? t('giveawaysPage.replacing') : t('giveawaysPage.confirmReplace')}
               </button>

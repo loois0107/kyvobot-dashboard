@@ -28,7 +28,7 @@ export default function AccountMenu({ profileHref, extraItems = [] }: AccountMen
     return (
       <a
         href="/api/auth/signin"
-        className="border border-[#5865F2]/40 hover:border-[#5865F2] text-[#b5bac1] hover:text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-lg transition-all whitespace-nowrap"
+        className="border border-[#5865F2]/40 hover:border-[#5865F2] text-[#b5bac1] hover:text-white text-sm sm:text-base font-bold px-4 py-2 rounded-lg transition-all whitespace-nowrap"
       >
         {t('landingPage.loginCta')}
       </a>
@@ -46,11 +46,11 @@ export default function AccountMenu({ profileHref, extraItems = [] }: AccountMen
           // eslint-disable-next-line @next/next/no-img-element
           <img src={session.user.image} alt="" className="w-7 h-7 rounded-full" />
         ) : (
-          <span className="w-7 h-7 rounded-full bg-[#5865F2] flex items-center justify-center text-xs font-bold text-white">
+          <span className="w-7 h-7 rounded-full bg-[#5865F2] flex items-center justify-center text-sm font-bold text-white">
             {session.user.name?.[0]?.toUpperCase() ?? '?'}
           </span>
         )}
-        <span className="hidden sm:inline text-xs font-bold text-white max-w-[100px] truncate">
+        <span className="hidden sm:inline text-sm font-bold text-white max-w-[100px] truncate">
           {session.user.name}
         </span>
       </button>
@@ -64,7 +64,7 @@ export default function AccountMenu({ profileHref, extraItems = [] }: AccountMen
                 key={item.href}
                 href={item.href}
                 onClick={() => setMenuOpen(false)}
-                className="block px-4 py-2.5 text-xs font-bold text-[#dbdee1] hover:bg-[#2b2d31] transition-colors"
+                className="block px-4 py-2.5 text-sm font-bold text-[#dbdee1] hover:bg-[#2b2d31] transition-colors"
               >
                 {item.label}
               </Link>
@@ -72,14 +72,14 @@ export default function AccountMenu({ profileHref, extraItems = [] }: AccountMen
             <Link
               href={profileHref}
               onClick={() => setMenuOpen(false)}
-              className="block px-4 py-2.5 text-xs font-bold text-[#dbdee1] hover:bg-[#2b2d31] transition-colors"
+              className="block px-4 py-2.5 text-sm font-bold text-[#dbdee1] hover:bg-[#2b2d31] transition-colors"
             >
               {t('profilePickerPage.title')}
             </Link>
             <button
               type="button"
               onClick={() => signOut({ callbackUrl: '/' })}
-              className="block w-full text-left px-4 py-2.5 text-xs font-bold text-[#f23f42] hover:bg-[#f23f42]/10 transition-colors"
+              className="block w-full text-left px-4 py-2.5 text-sm font-bold text-[#f23f42] hover:bg-[#f23f42]/10 transition-colors"
             >
               {t('sidebar.logout')}
             </button>

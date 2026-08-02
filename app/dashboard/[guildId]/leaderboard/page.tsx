@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
+import SettingsPageContainer from '@/components/SettingsPageContainer';
 import { useGuildName } from '@/components/GuildsContext';
 
 interface LeaderboardUser {
@@ -43,7 +44,7 @@ const PODIUM_STYLE: Record<1 | 2 | 3, {
     borderClass: 'border-[#C0C0C0]/50',
     glowClass: 'shadow-[0_0_20px_rgba(192,192,192,0.2)]',
     avatarSize: 'h-[72px] w-[72px] border-2',
-    nameSize: 'text-sm',
+    nameSize: 'text-base',
     mobileOrder: 'order-2',
     desktopOrder: 'sm:order-1',
     lift: 'sm:mt-6',
@@ -54,7 +55,7 @@ const PODIUM_STYLE: Record<1 | 2 | 3, {
     borderClass: 'border-[#CD7F32]/50',
     glowClass: 'shadow-[0_0_20px_rgba(205,127,50,0.2)]',
     avatarSize: 'h-[72px] w-[72px] border-2',
-    nameSize: 'text-sm',
+    nameSize: 'text-base',
     mobileOrder: 'order-3',
     desktopOrder: 'sm:order-3',
     lift: 'sm:mt-6',
@@ -86,7 +87,7 @@ function PodiumCard({
         {user.avatar_url ? (
           <img src={user.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
         ) : (
-          <div className="h-full w-full bg-[#2A1F40] flex items-center justify-center text-xs font-black text-gray-400">KYVO</div>
+          <div className="h-full w-full bg-[#2A1F40] flex items-center justify-center text-sm font-black text-gray-400">KYVO</div>
         )}
       </div>
       <span className="text-lg leading-none">{style.medal}</span>
@@ -105,11 +106,11 @@ function PodiumCard({
       <div className="flex gap-4 text-center font-mono pt-1">
         <div>
           <div className="text-[10px] text-[#8b8d98] tracking-wider">{levelLabel}</div>
-          <div className="text-sm font-black text-white">{user.level}</div>
+          <div className="text-base font-black text-white">{user.level}</div>
         </div>
         <div>
           <div className="text-[10px] text-[#8b8d98] tracking-wider">{pointsLabel}</div>
-          <div className="text-sm font-black text-[#FFD700]">{formatMetric(user.points)}P</div>
+          <div className="text-base font-black text-[#FFD700]">{formatMetric(user.points)}P</div>
         </div>
       </div>
     </div>
@@ -194,7 +195,7 @@ export default function GuildLeaderboardTerminal() {
   if (status === 'loading' || status === 'unauthenticated') {
     return (
       <div className="text-center space-y-3 border border-red-500/30 bg-[#161626] p-8 rounded-xl max-w-md mx-auto shadow-2xl mt-20">
-        <p className="text-sm text-red-400 font-bold tracking-widest animate-pulse">
+        <p className="text-base text-red-400 font-bold tracking-widest animate-pulse">
           {t('leaderboardPage.accessDenied')}
         </p>
         <HelpText>
@@ -224,7 +225,7 @@ export default function GuildLeaderboardTerminal() {
         .animate-bronze-aura { animation: bronzeGlow 3.5s infinite ease-in-out; }
       `}} />
 
-      <div className="space-y-6">
+      <SettingsPageContainer>
         <div className="flex justify-between items-center border-b border-[#2A1F40] pb-4">
           <div>
             <h1 className="text-xl md:text-2xl font-black tracking-wider text-white">{t('leaderboardPage.title')}</h1>
@@ -248,11 +249,11 @@ export default function GuildLeaderboardTerminal() {
         <div className="space-y-3">
           {loading ? (
             <div className="text-center py-20 border border-[#2A1F40] bg-[#161626] rounded-xl animate-pulse">
-              <p className="text-sm text-[#FFD700] tracking-widest">{t('leaderboardPage.loadingStandings')}</p>
+              <p className="text-base text-[#FFD700] tracking-widest">{t('leaderboardPage.loadingStandings')}</p>
             </div>
           ) : users.length === 0 ? (
             <div className="text-center py-20 border border-red-500/20 bg-[#161626] rounded-xl">
-              <p className="text-sm text-red-400 tracking-wider font-bold">{t('leaderboardPage.noUsersTitle')}</p>
+              <p className="text-base text-red-400 tracking-wider font-bold">{t('leaderboardPage.noUsersTitle')}</p>
               <HelpText className="mt-2 font-sans">{t('leaderboardPage.noUsersSubtitle')}</HelpText>
             </div>
           ) : (
@@ -270,10 +271,10 @@ export default function GuildLeaderboardTerminal() {
                   <div className="flex items-center gap-4 w-full sm:w-auto">
                     <span className={`text-base md:text-lg w-10 text-center ${style.text}`}>{style.badge}</span>
                     <div className="h-12 w-12 rounded-full bg-[#383A40] overflow-hidden flex-shrink-0 border-2 border-[#2A1F40]">
-                      {user.avatar_url ? <img src={user.avatar_url} alt="Avatar" className="h-full w-full object-cover" /> : <div className="h-full w-full bg-[#2A1F40] flex items-center justify-center text-xs font-black text-gray-400">KYVO</div>}
+                      {user.avatar_url ? <img src={user.avatar_url} alt="Avatar" className="h-full w-full object-cover" /> : <div className="h-full w-full bg-[#2A1F40] flex items-center justify-center text-sm font-black text-gray-400">KYVO</div>}
                     </div>
                     <div className="truncate">
-                      <h3 className="text-sm md:text-base font-bold text-white truncate">{user.username}</h3>
+                      <h3 className="text-base md:text-base font-bold text-white truncate">{user.username}</h3>
                       <HelpText className="font-mono mt-0.5">{t('leaderboardPage.nodeIdLabel')} {user.user_id}</HelpText>
                     </div>
                   </div>
@@ -289,12 +290,12 @@ export default function GuildLeaderboardTerminal() {
                     </div>
                     <div className="flex justify-between sm:justify-end gap-6 text-right font-mono min-w-[120px]">
                       <div>
-                        <div className="text-xs text-[#8b8d98] tracking-wider">{t('leaderboardPage.level')}</div>
-                        <div className="text-sm md:text-base font-black text-white">{user.level}</div>
+                        <div className="text-sm text-[#8b8d98] tracking-wider">{t('leaderboardPage.level')}</div>
+                        <div className="text-base md:text-base font-black text-white">{user.level}</div>
                       </div>
                       <div>
-                        <div className="text-xs text-[#8b8d98] tracking-wider">{t('leaderboardPage.points')}</div>
-                        <div className="text-sm md:text-base font-black text-[#FFD700]">{formatMetric(user.points)}P</div>
+                        <div className="text-sm text-[#8b8d98] tracking-wider">{t('leaderboardPage.points')}</div>
+                        <div className="text-base md:text-base font-black text-[#FFD700]">{formatMetric(user.points)}P</div>
                       </div>
                     </div>
                   </div>
@@ -303,7 +304,7 @@ export default function GuildLeaderboardTerminal() {
             })
           )}
         </div>
-      </div>
+      </SettingsPageContainer>
     </div>
   );
 }

@@ -114,7 +114,7 @@ export default function AutomodSettingsPage() {
 
   if (loadStatus === 'loading') {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-sm">
+      <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-base">
         {t('automodPage.loading')}
       </div>
     );
@@ -124,11 +124,11 @@ export default function AutomodSettingsPage() {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
         <p className="text-red-400 font-bold">{t('automodPage.loadFailed')}</p>
-        <p className="text-sm text-[#949ba4]">{loadErrorMsg}</p>
+        <p className="text-base text-[#949ba4]">{loadErrorMsg}</p>
         <button
           type="button"
           onClick={loadData}
-          className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl"
+          className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl"
         >
           {t('common.retry')}
         </button>
@@ -151,19 +151,19 @@ export default function AutomodSettingsPage() {
           type="button"
           onClick={handleSave}
           disabled={isSaving}
-          className="w-full sm:w-auto bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all"
+          className="w-full sm:w-auto bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all"
         >
           {isSaving ? t('common.saving') : t('common.save')}
         </button>
       </header>
 
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
-        <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+        <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
           {t('automodPage.spamDetectionTitle')}
         </h3>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-[#b5bac1]">
+          <label className="text-sm font-bold text-[#b5bac1]">
             {t('automodPage.messageLimitLabel', { min: AUTOMOD_SPAM_LIMIT_MIN, max: AUTOMOD_SPAM_LIMIT_MAX })}
           </label>
           <input
@@ -172,13 +172,13 @@ export default function AutomodSettingsPage() {
             max={AUTOMOD_SPAM_LIMIT_MAX}
             value={spamLimit}
             onChange={(e) => { setSpamLimit(parseInt(e.target.value) || 0); setIsDirty(true); }}
-            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]"
+            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]"
           />
           <HelpText>{t('automodPage.messageLimitHelp')}</HelpText>
         </div>
 
         <div className="space-y-1.5 pt-2">
-          <label className="text-xs font-bold text-[#b5bac1]">
+          <label className="text-sm font-bold text-[#b5bac1]">
             {t('automodPage.timeWindowLabel', { min: AUTOMOD_SPAM_INTERVAL_MIN_SECONDS, max: AUTOMOD_SPAM_INTERVAL_MAX_SECONDS })}
           </label>
           <input
@@ -187,12 +187,12 @@ export default function AutomodSettingsPage() {
             max={AUTOMOD_SPAM_INTERVAL_MAX_SECONDS}
             value={spamIntervalSeconds}
             onChange={(e) => { setSpamIntervalSeconds(parseInt(e.target.value) || 0); setIsDirty(true); }}
-            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]"
+            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]"
           />
         </div>
 
         <div className="space-y-1.5 pt-2">
-          <label className="text-xs font-bold text-[#b5bac1]">
+          <label className="text-sm font-bold text-[#b5bac1]">
             {t('automodPage.timeoutDurationLabel', { min: AUTOMOD_TIMEOUT_MIN_SECONDS, max: AUTOMOD_TIMEOUT_MAX_SECONDS })}
           </label>
           <input
@@ -201,19 +201,19 @@ export default function AutomodSettingsPage() {
             max={AUTOMOD_TIMEOUT_MAX_SECONDS}
             value={timeoutSeconds}
             onChange={(e) => { setTimeoutSeconds(parseInt(e.target.value) || 0); setIsDirty(true); }}
-            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]"
+            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]"
           />
           <HelpText>{t('automodPage.timeoutDurationHelp')}</HelpText>
         </div>
       </div>
 
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
-        <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+        <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
           {t('automodPage.messageShapeTitle')}
         </h3>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-[#b5bac1]">
+          <label className="text-sm font-bold text-[#b5bac1]">
             {t('automodPage.maxCharsLabel', { min: AUTOMOD_MAX_CHARS_MIN, max: AUTOMOD_MAX_CHARS_MAX })}
           </label>
           <input
@@ -222,13 +222,13 @@ export default function AutomodSettingsPage() {
             max={AUTOMOD_MAX_CHARS_MAX}
             value={maxChars}
             onChange={(e) => { setMaxChars(parseInt(e.target.value) || 0); setIsDirty(true); }}
-            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]"
+            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]"
           />
           <HelpText>{t('automodPage.maxCharsHelp')}</HelpText>
         </div>
 
         <div className="space-y-1.5 pt-2">
-          <label className="text-xs font-bold text-[#b5bac1]">
+          <label className="text-sm font-bold text-[#b5bac1]">
             {t('automodPage.maxLinesLabel', { min: AUTOMOD_MAX_LINES_MIN, max: AUTOMOD_MAX_LINES_MAX })}
           </label>
           <input
@@ -237,17 +237,17 @@ export default function AutomodSettingsPage() {
             max={AUTOMOD_MAX_LINES_MAX}
             value={maxLines}
             onChange={(e) => { setMaxLines(parseInt(e.target.value) || 0); setIsDirty(true); }}
-            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]"
+            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]"
           />
           <HelpText>{t('automodPage.maxLinesHelp')}</HelpText>
         </div>
       </div>
 
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-2 shadow-xl">
-        <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+        <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
           {t('automodPage.forbiddenWordsTitle')}
         </h3>
-        <label className="text-xs font-bold text-[#b5bac1] block">
+        <label className="text-sm font-bold text-[#b5bac1] block">
           {t('automodPage.forbiddenWordsLabel', { count: wordCount, max: AUTOMOD_FORBIDDEN_WORDS_MAX_COUNT, maxLen: AUTOMOD_FORBIDDEN_WORD_MAX_LENGTH })}
         </label>
         <textarea
@@ -255,19 +255,19 @@ export default function AutomodSettingsPage() {
           onChange={(e) => { setForbiddenWordsText(e.target.value); setIsDirty(true); }}
           rows={8}
           placeholder={t('automodPage.forbiddenWordsPlaceholder')}
-          className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#5865F2]"
+          className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white font-mono focus:outline-none focus:border-[#5865F2]"
         />
         <HelpText>{t('automodPage.forbiddenWordsHelp')}</HelpText>
       </div>
 
       {isDirty && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1e1f22]/95 border border-[#FFD700]/50 px-6 py-3.5 rounded-xl shadow-2xl flex items-center justify-between gap-8 backdrop-blur-md w-[90%] max-w-xl">
-          <span className="text-xs font-bold text-gray-200">{t('common.unsavedChanges')}</span>
+          <span className="text-sm font-bold text-gray-200">{t('common.unsavedChanges')}</span>
           <div className="flex gap-3">
-            <button type="button" onClick={loadData} className="text-xs font-bold text-gray-400 hover:text-white transition">
+            <button type="button" onClick={loadData} className="text-sm font-bold text-gray-400 hover:text-white transition">
               {t('common.discard')}
             </button>
-            <button type="button" onClick={handleSave} className="bg-[#23A55A] hover:bg-[#1a7f43] text-white text-xs font-black px-5 py-2 rounded-lg">
+            <button type="button" onClick={handleSave} className="bg-[#23A55A] hover:bg-[#1a7f43] text-white text-sm font-black px-5 py-2 rounded-lg">
               {t('common.save')}
             </button>
           </div>

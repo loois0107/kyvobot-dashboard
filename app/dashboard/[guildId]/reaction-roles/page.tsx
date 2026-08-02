@@ -208,7 +208,7 @@ export default function ReactionRolesPage() {
 
   if (loadStatus === 'loading') {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-sm">
+      <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-base">
         {t('reactionRolesPage.loading')}
       </div>
     );
@@ -218,8 +218,8 @@ export default function ReactionRolesPage() {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
         <p className="text-red-400 font-bold">{t('reactionRolesPage.loadFailed')}</p>
-        <p className="text-sm text-[#949ba4]">{loadErrorMsg}</p>
-        <button type="button" onClick={loadData} className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl">
+        <p className="text-base text-[#949ba4]">{loadErrorMsg}</p>
+        <button type="button" onClick={loadData} className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl">
           {t('common.retry')}
         </button>
       </div>
@@ -236,13 +236,13 @@ export default function ReactionRolesPage() {
       </header>
 
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
-        <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+        <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
           {t('reactionRolesPage.addBindingTitle')}
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-[#b5bac1]">{t('reactionRolesPage.channelIdLabel')}</label>
+            <label className="text-sm font-bold text-[#b5bac1]">{t('reactionRolesPage.channelIdLabel')}</label>
             <ChannelSelect
               guildId={guildId}
               value={channelId}
@@ -250,7 +250,7 @@ export default function ReactionRolesPage() {
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-[#b5bac1]">{t('reactionRolesPage.messageIdLabel')}</label>
+            <label className="text-sm font-bold text-[#b5bac1]">{t('reactionRolesPage.messageIdLabel')}</label>
             <MessageSelect
               guildId={guildId}
               channelId={channelId}
@@ -264,17 +264,17 @@ export default function ReactionRolesPage() {
           type="button"
           onClick={handlePreview}
           disabled={!channelId || !messageId || isPreviewing}
-          className="bg-[#5865F2] hover:bg-[#4752C4] disabled:opacity-50 text-white text-xs font-black px-5 py-2.5 rounded-lg"
+          className="bg-[#5865F2] hover:bg-[#4752C4] disabled:opacity-50 text-white text-sm font-black px-5 py-2.5 rounded-lg"
         >
           {isPreviewing ? t('reactionRolesPage.checking') : t('reactionRolesPage.previewMessage')}
         </button>
 
-        {previewError && <p className="text-xs text-red-400">⚠️ {previewError}</p>}
+        {previewError && <p className="text-sm text-red-400">⚠️ {previewError}</p>}
 
         {preview && (
           <div className="bg-[#111214] rounded-lg p-3 border-l-4 border-[#23A55A] space-y-1">
-            <p className="text-xs text-[#949ba4]">{t('reactionRolesPage.foundItBy')} <span className="text-white font-bold">{preview.author}</span></p>
-            <p className="text-xs text-[#b5bac1] italic">&quot;{preview.content}&quot;</p>
+            <p className="text-sm text-[#949ba4]">{t('reactionRolesPage.foundItBy')} <span className="text-white font-bold">{preview.author}</span></p>
+            <p className="text-sm text-[#b5bac1] italic">&quot;{preview.content}&quot;</p>
             <a href={preview.jump_url} target="_blank" rel="noreferrer" className="text-[10px] text-[#5865F2] hover:underline">
               {t('reactionRolesPage.jumpToMessage')}
             </a>
@@ -285,22 +285,22 @@ export default function ReactionRolesPage() {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#b5bac1]">{t('reactionRolesPage.emojiLabel')}</label>
+                <label className="text-sm font-bold text-[#b5bac1]">{t('reactionRolesPage.emojiLabel')}</label>
                 <input
                   type="text"
                   value={emoji}
                   onChange={(e) => setEmoji(e.target.value)}
                   placeholder="🎮"
-                  className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2]"
+                  className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-base text-white focus:outline-none focus:border-[#5865F2]"
                 />
                 <HelpText>{t('reactionRolesPage.emojiHelp')}</HelpText>
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#b5bac1]">{t('reactionRolesPage.roleLabel')}</label>
+                <label className="text-sm font-bold text-[#b5bac1]">{t('reactionRolesPage.roleLabel')}</label>
                 <select
                   value={roleId}
                   onChange={(e) => setRoleId(e.target.value)}
-                  className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5865F2]"
+                  className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2]"
                 >
                   <option value="">{t('reactionRolesPage.selectRolePlaceholder')}</option>
                   {roles.map((r) => (
@@ -315,7 +315,7 @@ export default function ReactionRolesPage() {
               type="button"
               onClick={handleCreateClick}
               disabled={!emoji || !roleId || isSaving}
-              className="bg-[#23A55A] hover:bg-[#1a7f43] disabled:opacity-50 text-white text-xs font-black px-6 py-3 rounded-xl"
+              className="bg-[#23A55A] hover:bg-[#1a7f43] disabled:opacity-50 text-white text-sm font-black px-6 py-3 rounded-xl"
             >
               {isSaving ? t('reactionRolesPage.creatingBinding') : t('reactionRolesPage.createBinding')}
             </button>
@@ -326,18 +326,18 @@ export default function ReactionRolesPage() {
       {confirmDialog && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
           <div className="bg-[#1e1f22] border border-orange-500/50 rounded-2xl p-6 max-w-md w-full space-y-4">
-            <h3 className="text-orange-400 font-black text-sm">{t('reactionRolesPage.dangerousPermTitle')}</h3>
-            <p className="text-xs text-[#b5bac1]">
+            <h3 className="text-orange-400 font-black text-base">{t('reactionRolesPage.dangerousPermTitle')}</h3>
+            <p className="text-sm text-[#b5bac1]">
               {t('reactionRolesPage.dangerousPermBody', { perms: confirmDialog.dangerous.join(', ') })}
             </p>
             <div className="flex gap-3 justify-end">
-              <button type="button" onClick={() => setConfirmDialog(null)} className="text-xs font-bold text-gray-400 hover:text-white px-4 py-2">
+              <button type="button" onClick={() => setConfirmDialog(null)} className="text-sm font-bold text-gray-400 hover:text-white px-4 py-2">
                 {t('common.cancel')}
               </button>
               <button
                 type="button"
                 onClick={() => { setConfirmDialog(null); submitBinding(true); }}
-                className="bg-red-600 hover:bg-red-500 text-white text-xs font-black px-5 py-2 rounded-lg"
+                className="bg-red-600 hover:bg-red-500 text-white text-sm font-black px-5 py-2 rounded-lg"
               >
                 {t('reactionRolesPage.confirmSaveAnyway')}
               </button>
@@ -349,18 +349,18 @@ export default function ReactionRolesPage() {
       {duplicateConfirm && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
           <div className="bg-[#1e1f22] border border-orange-500/50 rounded-2xl p-6 max-w-md w-full space-y-4">
-            <h3 className="text-orange-400 font-black text-sm">{t('reactionRolesPage.duplicateExistsTitle')}</h3>
-            <p className="text-xs text-[#b5bac1]">
+            <h3 className="text-orange-400 font-black text-base">{t('reactionRolesPage.duplicateExistsTitle')}</h3>
+            <p className="text-sm text-[#b5bac1]">
               {t('reactionRolesPage.duplicateExistsBody', { role: duplicateConfirm.existing.role_name })}
             </p>
             <div className="flex gap-3 justify-end">
-              <button type="button" onClick={() => setDuplicateConfirm(null)} className="text-xs font-bold text-gray-400 hover:text-white px-4 py-2">
+              <button type="button" onClick={() => setDuplicateConfirm(null)} className="text-sm font-bold text-gray-400 hover:text-white px-4 py-2">
                 {t('common.cancel')}
               </button>
               <button
                 type="button"
                 onClick={() => { setDuplicateConfirm(null); submitBinding(false); }}
-                className="bg-red-600 hover:bg-red-500 text-white text-xs font-black px-5 py-2 rounded-lg"
+                className="bg-red-600 hover:bg-red-500 text-white text-sm font-black px-5 py-2 rounded-lg"
               >
                 {t('reactionRolesPage.replaceExisting')}
               </button>
@@ -370,11 +370,11 @@ export default function ReactionRolesPage() {
       )}
 
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-3 shadow-xl">
-        <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+        <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
           {t('reactionRolesPage.existingBindingsTitle')}
         </h3>
         {bindings.length === 0 ? (
-          <p className="text-sm text-[#949ba4] py-4">{t('reactionRolesPage.noBindingsYet')}</p>
+          <p className="text-base text-[#949ba4] py-4">{t('reactionRolesPage.noBindingsYet')}</p>
         ) : (
           <div className="space-y-2">
             {bindings.map((b) => {
@@ -383,7 +383,7 @@ export default function ReactionRolesPage() {
                 <div key={key} className="flex items-center justify-between gap-3 bg-[#111214] rounded-lg px-3 py-2.5">
                   <div className="flex items-center gap-3 min-w-0">
                     <EmojiBadge emoji={b.emoji} />
-                    <span className="text-xs font-bold" style={{ color: roleColorHex(b.role_color) }}>{b.role_name}</span>
+                    <span className="text-sm font-bold" style={{ color: roleColorHex(b.role_color) }}>{b.role_name}</span>
                     <a href={b.jump_url} target="_blank" rel="noreferrer" className="text-[10px] text-[#5865F2] hover:underline shrink-0">
                       {t('reactionRolesPage.jump')}
                     </a>

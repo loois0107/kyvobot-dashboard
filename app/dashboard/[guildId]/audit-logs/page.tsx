@@ -82,7 +82,7 @@ export default function AuditLogsPage() {
 
   if (loadStatus === 'loading') {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-sm">
+      <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-base">
         {t('auditLogsPage.loadingLogs')}
       </div>
     );
@@ -92,11 +92,11 @@ export default function AuditLogsPage() {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
         <p className="text-red-400 font-bold">{t('auditLogsPage.loadFailed')}</p>
-        <p className="text-sm text-[#949ba4]">{loadErrorMsg}</p>
+        <p className="text-base text-[#949ba4]">{loadErrorMsg}</p>
         <button
           type="button"
           onClick={() => loadData(false)}
-          className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl"
+          className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl"
         >
           {t('common.retry')}
         </button>
@@ -117,7 +117,7 @@ export default function AuditLogsPage() {
           type="button"
           onClick={() => loadData(true)}
           disabled={isRefreshing}
-          className="w-full sm:w-auto bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all"
+          className="w-full sm:w-auto bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all"
         >
           {isRefreshing ? t('auditLogsPage.refreshing') : t('auditLogsPage.refreshNow')}
         </button>
@@ -125,7 +125,7 @@ export default function AuditLogsPage() {
 
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-3 shadow-xl">
         {logs.length === 0 ? (
-          <p className="text-sm text-[#949ba4] py-4">{t('auditLogsPage.noLogsYet')}</p>
+          <p className="text-base text-[#949ba4] py-4">{t('auditLogsPage.noLogsYet')}</p>
         ) : (
           <div className="space-y-2">
             {logs.map((log) => (
@@ -135,15 +135,15 @@ export default function AuditLogsPage() {
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded border shrink-0 ${actionBadgeColor(log.action)}`}>
                       {log.action}
                     </span>
-                    <span className="text-xs text-[#b5bac1] truncate">
+                    <span className="text-sm text-[#b5bac1] truncate">
                       {t('auditLogsPage.targetLabel')} <code className="text-white">{log.username || log.user_id}</code>
                     </span>
                   </div>
-                  <span className="text-xs text-[#8b8d98] shrink-0">
+                  <span className="text-sm text-[#8b8d98] shrink-0">
                     {formatLogTimestamp(log.created_at, lang)}
                   </span>
                 </div>
-                {log.reason && <p className="text-xs text-[#949ba4]">{log.reason}</p>}
+                {log.reason && <p className="text-sm text-[#949ba4]">{log.reason}</p>}
               </div>
             ))}
           </div>

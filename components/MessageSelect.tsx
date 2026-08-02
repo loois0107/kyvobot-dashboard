@@ -62,10 +62,10 @@ export default function MessageSelect({ guildId, channelId, value, onChange }: M
     };
   }, [guildId, channelId]);
 
-  const inputClassName = 'w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white font-mono focus:outline-none focus:border-[#5865F2]';
+  const inputClassName = 'w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white font-mono focus:outline-none focus:border-[#5865F2]';
 
   if (!channelId) {
-    return <p className="text-xs text-[#6d7178] italic py-2">{t('reactionRolesPage.selectChannelFirstForMessages')}</p>;
+    return <p className="text-sm text-[#6d7178] italic py-2">{t('reactionRolesPage.selectChannelFirstForMessages')}</p>;
   }
 
   if (manualMode || loadStatus === 'error') {
@@ -90,13 +90,13 @@ export default function MessageSelect({ guildId, channelId, value, onChange }: M
   }
 
   if (loadStatus === 'loading') {
-    return <p className="text-xs text-[#6d7178] italic py-2">{t('reactionRolesPage.loadingMessages')}</p>;
+    return <p className="text-sm text-[#6d7178] italic py-2">{t('reactionRolesPage.loadingMessages')}</p>;
   }
 
   return (
     <div className="space-y-1.5">
       {messages.length === 0 ? (
-        <p className="text-xs text-[#6d7178] italic py-2">{t('reactionRolesPage.noRecentMessages')}</p>
+        <p className="text-sm text-[#6d7178] italic py-2">{t('reactionRolesPage.noRecentMessages')}</p>
       ) : (
         <div className="max-h-64 overflow-y-auto space-y-1.5 pr-1">
           {messages.map((m) => {
@@ -111,7 +111,7 @@ export default function MessageSelect({ guildId, channelId, value, onChange }: M
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-bold text-white truncate">{m.author}</span>
+                  <span className="text-sm font-bold text-white truncate">{m.author}</span>
                   <span className="text-[10px] text-[#6d7178] shrink-0">{formatTimestamp(m.timestamp)}</span>
                 </div>
                 <p className="text-[11px] text-[#b5bac1] truncate mt-0.5">{m.preview}</p>

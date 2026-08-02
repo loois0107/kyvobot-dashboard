@@ -80,7 +80,7 @@ export default function PartyStatsPage() {
 
   if (loadStatus === 'loading') {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-sm">
+      <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-base">
         {t('partyStatsPage.loadingStats')}
       </div>
     );
@@ -90,11 +90,11 @@ export default function PartyStatsPage() {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
         <p className="text-red-400 font-bold">{t('partyStatsPage.loadFailed')}</p>
-        <p className="text-sm text-[#949ba4]">{loadErrorMsg}</p>
+        <p className="text-base text-[#949ba4]">{loadErrorMsg}</p>
         <button
           type="button"
           onClick={() => loadData(false)}
-          className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl"
+          className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl"
         >
           {t('common.retry')}
         </button>
@@ -117,7 +117,7 @@ export default function PartyStatsPage() {
           type="button"
           onClick={() => loadData(true)}
           disabled={isRefreshing}
-          className="w-full sm:w-auto bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all"
+          className="w-full sm:w-auto bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all"
         >
           {isRefreshing ? t('auditLogsPage.refreshing') : t('auditLogsPage.refreshNow')}
         </button>
@@ -125,11 +125,11 @@ export default function PartyStatsPage() {
 
       {/* 이번 주 결성 건수 */}
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-3 shadow-xl">
-        <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+        <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
           {t('partyStatsPage.recruitmentsTitle', { days: stats.window_days })}
         </h3>
         {stats.is_empty ? (
-          <p className="text-sm text-[#949ba4] py-4">
+          <p className="text-base text-[#949ba4] py-4">
             {t('partyStatsPage.notEnoughDataDays', { days: stats.window_days })}
           </p>
         ) : (
@@ -146,20 +146,20 @@ export default function PartyStatsPage() {
 
       {/* 인기 큐타입/라인 조합 */}
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-3 shadow-xl">
-        <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+        <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
           {t('partyStatsPage.popularCombosTitle')}
         </h3>
         {stats.top_combos.length === 0 ? (
-          <p className="text-sm text-[#949ba4] py-4">{t('partyStatsPage.notEnoughData')}</p>
+          <p className="text-base text-[#949ba4] py-4">{t('partyStatsPage.notEnoughData')}</p>
         ) : (
           <div className="space-y-2">
             {stats.top_combos.map((combo, i) => (
               <div key={`${combo.queue_type}-${combo.lanes}-${i}`} className="flex items-center justify-between bg-[#111214] rounded-lg px-3 py-2">
-                <span className="text-xs text-white font-medium">
+                <span className="text-sm text-white font-medium">
                   {combo.queue_type}
                   {combo.lanes && <span className="text-[#949ba4]"> · {combo.lanes}</span>}
                 </span>
-                <span className="text-xs font-black text-[#5865F2]">{combo.count}</span>
+                <span className="text-sm font-black text-[#5865F2]">{combo.count}</span>
               </div>
             ))}
           </div>
@@ -171,28 +171,28 @@ export default function PartyStatsPage() {
 
       {/* 티어 분포 */}
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-3 shadow-xl">
-        <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+        <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
           {t('partyStatsPage.tierDistTitle')}
         </h3>
         <HelpText>
           {t('partyStatsPage.tierDistSubtitle', { count: stats.verified_user_count, plural: stats.verified_user_count === 1 ? '' : 's' })}
         </HelpText>
         {stats.tier_distribution.length === 0 ? (
-          <p className="text-sm text-[#949ba4] py-4">{t('partyStatsPage.noVerifiedYet')}</p>
+          <p className="text-base text-[#949ba4] py-4">{t('partyStatsPage.noVerifiedYet')}</p>
         ) : (
           <div className="space-y-1.5">
             {(() => {
               const max = Math.max(...stats.tier_distribution.map((entry) => entry.count));
               return stats.tier_distribution.map((tier) => (
                 <div key={tier.tier} className="flex items-center gap-3">
-                  <span className="text-xs text-[#b5bac1] w-28 shrink-0">{tier.tier}</span>
+                  <span className="text-sm text-[#b5bac1] w-28 shrink-0">{tier.tier}</span>
                   <div className="flex-1 bg-[#111214] rounded-full h-4 overflow-hidden">
                     <div
                       className="h-full bg-[#5865F2] rounded-full"
                       style={{ width: `${Math.max((tier.count / max) * 100, 4)}%` }}
                     />
                   </div>
-                  <span className="text-xs font-black text-white w-6 text-right shrink-0">{tier.count}</span>
+                  <span className="text-sm font-black text-white w-6 text-right shrink-0">{tier.count}</span>
                 </div>
               ));
             })()}

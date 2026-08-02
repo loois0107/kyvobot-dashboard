@@ -9,5 +9,5 @@ type HelpTextProps = {
 // on dark panels. font-medium (500) + #a1a1aa clears 6:1+ against every panel background in use and
 // sits more neutral against the UI's blue-toned dark backgrounds than the previous #8b8d98.
 export default function HelpText({ children, className = '' }: HelpTextProps) {
-  return <p className={`text-xs font-medium text-[#a1a1aa] ${className}`}>{children}</p>;
+  return <p className={`text-sm font-medium text-[#a1a1aa] ${className}`}>{children}</p>;
 }

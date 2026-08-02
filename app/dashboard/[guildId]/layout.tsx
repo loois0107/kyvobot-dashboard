@@ -117,11 +117,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div>
           <div className="mb-6 flex justify-between items-center">
             <div>
-              <label className="block text-xs font-bold text-[#949ba4] uppercase tracking-wider mb-2">{t('sidebar.selectServer')}</label>
+              <label className="block text-sm font-bold text-[#949ba4] uppercase tracking-wider mb-2">{t('sidebar.selectServer')}</label>
               <select
                 value={currentGuildId || ''}
                 onChange={(e) => handleGuildChange(e.target.value)}
-                className="w-44 bg-[#313338] text-white rounded px-3 py-2 border border-[#232428] focus:outline-none focus:border-[#5865f2] cursor-pointer font-medium text-xs"
+                className="w-44 bg-[#313338] text-white rounded px-3 py-2 border border-[#232428] focus:outline-none focus:border-[#5865f2] cursor-pointer font-medium text-sm"
               >
                 {guilds.map((g) => (
                   <option key={g.id} value={g.id}>{g.name}</option>
@@ -140,7 +140,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </Link>
 
             <div className="space-y-1">
-              <label className="block text-xs font-bold text-[#949ba4] uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryCommunity')}</label>
+              <label className="block text-sm font-bold text-[#949ba4] uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryCommunity')}</label>
               <Link
                 href={`/dashboard/${currentGuildId}/automod`}
                 className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/automod') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
@@ -186,7 +186,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
 
             <div className="space-y-1">
-              <label className="block text-xs font-bold text-[#949ba4] uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryPartyGames')}</label>
+              <label className="block text-sm font-bold text-[#949ba4] uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryPartyGames')}</label>
               <Link
                 href={`/dashboard/${currentGuildId}/party-settings`}
                 className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/party-settings') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
@@ -214,7 +214,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
 
             <div className="space-y-1">
-              <label className="block text-xs font-bold text-[#949ba4] uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryEconomy')}</label>
+              <label className="block text-sm font-bold text-[#949ba4] uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryEconomy')}</label>
               <Link
                 href={`/dashboard/${currentGuildId}/leveling`}
                 className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/leveling') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
@@ -236,7 +236,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
 
             <div className="space-y-1">
-              <label className="block text-xs font-bold text-[#949ba4] uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryIntegrationsAI')}</label>
+              <label className="block text-sm font-bold text-[#949ba4] uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryIntegrationsAI')}</label>
               <Link
                 href={`/dashboard/${currentGuildId}/twitch`}
                 className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/twitch') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
@@ -253,7 +253,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </nav>
         </div>
 
-        <div className="pt-4 border-t border-[#2b2d31] text-xs text-[#949ba4]">
+        <div className="pt-4 border-t border-[#2b2d31] text-sm text-[#949ba4]">
           <p>{t('sidebar.currentActiveNode')}</p>
           <code className="text-[#5865f2] block mt-1 truncate">{currentGuildId}</code>
         </div>
@@ -264,7 +264,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <button type="button" onClick={() => setIsMobileMenuOpen(true)} className="text-gray-300 hover:text-white p-1 focus:outline-none">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
-          <span className="text-xs font-black tracking-widest text-[#FFD700] uppercase">{t('sidebar.mobileHeaderTitle')}</span>
+          <span className="text-sm font-black tracking-widest text-[#FFD700] uppercase">{t('sidebar.mobileHeaderTitle')}</span>
           <LanguageToggle />
         </div>
 
@@ -272,7 +272,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <header className="mb-6 pb-4 border-b border-[#2b2d31] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <h1 className="text-xl md:text-2xl font-bold text-white uppercase tracking-wide break-words max-w-full">{t('sidebar.mainHeaderTitle')}</h1>
             <div className="flex items-center gap-3">
-              <div className="bg-[#232428] px-3 py-1 rounded-full text-xs text-[#23a55a] font-semibold flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#23a55a] animate-pulse"></span> {t('sidebar.syncStatus')}</div>
+              <div className="bg-[#232428] px-3 py-1 rounded-full text-sm text-[#23a55a] font-semibold flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#23a55a] animate-pulse"></span> {t('sidebar.syncStatus')}</div>
               <div className="hidden md:block">
                 <LanguageToggle />
               </div>
@@ -281,14 +281,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </header>
 
           {botStatus === 'checking' ? (
-            <div className="flex items-center justify-center py-20 text-sm text-[#6d7178]">{t('botNotInvited.checking')}</div>
+            <div className="flex items-center justify-center py-20 text-base text-[#6d7178]">{t('botNotInvited.checking')}</div>
           ) : botStatus === 'absent' ? (
             <BotNotInvitedNotice onRecheck={() => checkBotStatus(currentGuildId)} />
           ) : (
             <>
               {isSubPage && (
                 <div className="mb-6">
-                  <button type="button" onClick={() => router.back()} className="inline-flex items-center gap-2 text-xs font-bold text-[#5865F2] hover:text-white bg-[#5865F2]/10 hover:bg-[#5865F2] border border-[#5865F2]/20 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer shadow-md"><span>◀</span> {t('sidebar.goBack')}</button>
+                  <button type="button" onClick={() => router.back()} className="inline-flex items-center gap-2 text-sm font-bold text-[#5865F2] hover:text-white bg-[#5865F2]/10 hover:bg-[#5865F2] border border-[#5865F2]/20 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer shadow-md"><span>◀</span> {t('sidebar.goBack')}</button>
                 </div>
               )}
               <GuildsProvider guilds={guilds}>{children}</GuildsProvider>

@@ -150,18 +150,18 @@ export default function SettingsPage() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="text-xs text-gray-400 block mb-1">{t('common.activeContext')}</label>
-              <div className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-purple-400 px-3 py-2 rounded font-bold select-none">
+              <label className="text-sm text-gray-400 block mb-1">{t('common.activeContext')}</label>
+              <div className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-base text-purple-400 px-3 py-2 rounded font-bold select-none">
                 {guildName || (guildId ? `${t('common.guildLabel')} ${guildId}` : t('common.loading'))}
               </div>
             </div>
             <div>
-              <label className="text-xs text-gray-400 block mb-1">{t('settingsPage.serverLanguageLabel')}</label>
+              <label className="text-sm text-gray-400 block mb-1">{t('settingsPage.serverLanguageLabel')}</label>
               <select
                 value={language}
                 onChange={(e) => saveUnifiedSettings(commands, e.target.value)}
                 disabled={loading}
-                className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-white px-3 py-2 rounded focus:border-purple-500 outline-none cursor-pointer font-bold disabled:opacity-50"
+                className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-base text-white px-3 py-2 rounded focus:border-purple-500 outline-none cursor-pointer font-bold disabled:opacity-50"
               >
                 <option value="en">🇺🇸 English (EN)</option>
                 <option value="ko">🇰🇷 한국어 (KO)</option>
@@ -171,14 +171,14 @@ export default function SettingsPage() {
           </div>
 
           {message && (
-            <div className="bg-[#0F0F1A] border border-purple-900/50 text-xs text-center p-3 rounded text-gray-300 break-all whitespace-pre-wrap">
+            <div className="bg-[#0F0F1A] border border-purple-900/50 text-sm text-center p-3 rounded text-gray-300 break-all whitespace-pre-wrap">
               {message}
             </div>
           )}
 
           <div className="border border-[#2A1F40] bg-[#0F0F1A] p-4 rounded-lg">
             <div className="flex items-center justify-between mb-3 border-b border-[#2A1F40] pb-2">
-              <span className="text-xs font-bold text-gray-400">{t('settingsPage.macrosTitle')}</span>
+              <span className="text-sm font-bold text-gray-400">{t('settingsPage.macrosTitle')}</span>
               <button
                 onClick={handleAddCommand}
                 disabled={loading}
@@ -196,7 +196,7 @@ export default function SettingsPage() {
             ) : (
               <div className="flex flex-col gap-2 max-h-40 overflow-y-auto">
                 {Object.entries(commands).map(([trigger, value]) => (
-                  <div key={trigger} className="flex justify-between items-center text-xs bg-[#161626] p-2 rounded border border-[#2A1F40]">
+                  <div key={trigger} className="flex justify-between items-center text-sm bg-[#161626] p-2 rounded border border-[#2A1F40]">
                     <span className="text-green-400 font-bold">/{trigger}</span>
                     {isRoleMacro(value) ? (
                       <span className="text-[10px] font-bold text-amber-400 bg-amber-950/30 border border-amber-500/20 px-2 py-0.5 rounded">

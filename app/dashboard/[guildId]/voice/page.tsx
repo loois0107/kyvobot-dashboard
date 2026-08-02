@@ -100,8 +100,8 @@ export default function VoiceSettingsPage() {
 
         <div className="flex flex-col gap-6 bg-[#161626] border border-[#2A1F40] p-6 rounded-xl shadow-xl">
           <div>
-            <label className="text-xs text-gray-400 block mb-1">{t('common.activeContext')}</label>
-            <div className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-purple-400 px-3 py-2 rounded font-bold select-none">
+            <label className="text-sm text-gray-400 block mb-1">{t('common.activeContext')}</label>
+            <div className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-base text-purple-400 px-3 py-2 rounded font-bold select-none">
               {guildName || (guildId ? `${t('common.guildLabel')} ${guildId}` : t('common.loading'))}
             </div>
           </div>
@@ -111,7 +111,7 @@ export default function VoiceSettingsPage() {
           </div>
 
           <div>
-            <label className="text-xs text-gray-400 block mb-1">{t('voicePage.triggerChannelLabel')}</label>
+            <label className="text-sm text-gray-400 block mb-1">{t('voicePage.triggerChannelLabel')}</label>
             <ChannelSelect
               guildId={guildId || ''}
               value={triggerChannelId}
@@ -124,7 +124,7 @@ export default function VoiceSettingsPage() {
           </div>
 
           {message && (
-            <div className="bg-[#0F0F1A] border border-purple-900/50 text-xs text-center p-3 rounded text-gray-300 break-all whitespace-pre-wrap">
+            <div className="bg-[#0F0F1A] border border-purple-900/50 text-sm text-center p-3 rounded text-gray-300 break-all whitespace-pre-wrap">
               {message}
             </div>
           )}
@@ -132,7 +132,7 @@ export default function VoiceSettingsPage() {
           <button
             onClick={handleSave}
             disabled={loading}
-            className="w-full text-sm bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 text-white px-4 py-2 rounded font-bold"
+            className="w-full text-base bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 text-white px-4 py-2 rounded font-bold"
           >
             {loading ? t('common.saving') : t('common.save')}
           </button>

@@ -178,8 +178,8 @@ export default function AnonymousReportsSettingsPage() {
 
         <div className="flex flex-col gap-6 bg-[#161626] border border-[#2A1F40] p-6 rounded-xl shadow-xl">
           <div>
-            <label className="text-xs text-gray-400 block mb-1">{t('common.activeContext')}</label>
-            <div className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-purple-400 px-3 py-2 rounded font-bold select-none">
+            <label className="text-sm text-gray-400 block mb-1">{t('common.activeContext')}</label>
+            <div className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-base text-purple-400 px-3 py-2 rounded font-bold select-none">
               {guildName || (guildId ? `${t('common.guildLabel')} ${guildId}` : t('common.loading'))}
             </div>
           </div>
@@ -189,23 +189,23 @@ export default function AnonymousReportsSettingsPage() {
           </div>
 
           <div>
-            <label className="text-xs text-gray-400 block mb-1">{t('anonymousReportsPage.adminChannelLabel')}</label>
+            <label className="text-sm text-gray-400 block mb-1">{t('anonymousReportsPage.adminChannelLabel')}</label>
             <ChannelSelect
               guildId={guildId || ''}
               value={adminChannelId}
               onChange={setAdminChannelId}
-              className="text-sm px-3 py-2"
+              className="text-base px-3 py-2"
             />
             <HelpText className="mt-2">{t('anonymousReportsPage.adminChannelHelp')}</HelpText>
           </div>
 
           <div>
-            <label className="text-xs text-gray-400 block mb-1">{t('anonymousReportsPage.publishChannelLabel')}</label>
+            <label className="text-sm text-gray-400 block mb-1">{t('anonymousReportsPage.publishChannelLabel')}</label>
             <ChannelSelect
               guildId={guildId || ''}
               value={publishChannelId}
               onChange={setPublishChannelId}
-              className="text-sm px-3 py-2"
+              className="text-base px-3 py-2"
             />
             <HelpText className="mt-2">
               {t('anonymousReportsPage.publishChannelHelp')}
@@ -213,7 +213,7 @@ export default function AnonymousReportsSettingsPage() {
           </div>
 
           {message && (
-            <div className="bg-[#0F0F1A] border border-purple-900/50 text-xs text-center p-3 rounded text-gray-300 break-all whitespace-pre-wrap">
+            <div className="bg-[#0F0F1A] border border-purple-900/50 text-sm text-center p-3 rounded text-gray-300 break-all whitespace-pre-wrap">
               {message}
             </div>
           )}
@@ -221,7 +221,7 @@ export default function AnonymousReportsSettingsPage() {
           <button
             onClick={handleSave}
             disabled={loading}
-            className="w-full text-sm bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 text-white px-4 py-2 rounded font-bold"
+            className="w-full text-base bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 text-white px-4 py-2 rounded font-bold"
           >
             {loading ? t('common.saving') : t('common.save')}
           </button>
@@ -230,7 +230,7 @@ export default function AnonymousReportsSettingsPage() {
         <div className="mt-8 flex flex-col gap-4 bg-[#161626] border border-[#2A1F40] p-6 rounded-xl shadow-xl">
           <div className="flex items-start justify-between gap-4 border-b border-[#2A1F40] pb-3">
             <div>
-              <h2 className="text-sm font-extrabold text-purple-400">{t('anonymousReportsPage.queueTitle')}</h2>
+              <h2 className="text-base font-extrabold text-purple-400">{t('anonymousReportsPage.queueTitle')}</h2>
               <HelpText className="mt-1">{t('anonymousReportsPage.queueSubtitle')}</HelpText>
             </div>
             <button type="button" onClick={loadQueue} className="shrink-0 text-[10px] font-bold text-purple-400 hover:underline">
@@ -239,25 +239,25 @@ export default function AnonymousReportsSettingsPage() {
           </div>
 
           {queueStatus === 'loading' ? (
-            <p className="text-xs text-gray-400 py-4">{t('anonymousReportsPage.loadingReports')}</p>
+            <p className="text-sm text-gray-400 py-4">{t('anonymousReportsPage.loadingReports')}</p>
           ) : queueStatus === 'error' ? (
             <div className="text-center py-4 space-y-2">
-              <p className="text-xs text-red-400">⚠️ {queueErrorMsg}</p>
-              <button type="button" onClick={loadQueue} className="text-xs font-bold text-purple-400 hover:underline">
+              <p className="text-sm text-red-400">⚠️ {queueErrorMsg}</p>
+              <button type="button" onClick={loadQueue} className="text-sm font-bold text-purple-400 hover:underline">
                 {t('common.retry')}
               </button>
             </div>
           ) : reports.length === 0 ? (
-            <p className="text-xs text-gray-400 py-4">{t('anonymousReportsPage.noPendingReports')}</p>
+            <p className="text-sm text-gray-400 py-4">{t('anonymousReportsPage.noPendingReports')}</p>
           ) : (
             <div className="flex flex-col gap-3">
               {reports.map((report) => {
                 const isDeciding = decidingId === report.id;
                 return (
                   <div key={report.id} className="bg-[#0F0F1A] border border-[#2A1F40] rounded-lg p-4 flex flex-col gap-3">
-                    <p className="text-sm text-white whitespace-pre-wrap break-words">{report.content}</p>
+                    <p className="text-base text-white whitespace-pre-wrap break-words">{report.content}</p>
                     <div className="flex items-center justify-between gap-3">
-                      <span className="text-xs text-[#8b8d98]">{new Date(report.created_at).toLocaleString()}</span>
+                      <span className="text-sm text-[#8b8d98]">{new Date(report.created_at).toLocaleString()}</span>
                       <div className="flex gap-2">
                         <button
                           type="button"

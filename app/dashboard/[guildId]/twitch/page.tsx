@@ -106,7 +106,7 @@ export default function TwitchStreamersSettings() {
 
   if (loadStatus === 'loading') {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-sm">
+      <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-base">
         {t('twitchPage.loading')}
       </div>
     );
@@ -116,11 +116,11 @@ export default function TwitchStreamersSettings() {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
         <p className="text-red-400 font-bold">{t('twitchPage.loadFailed')}</p>
-        <p className="text-sm text-[#949ba4]">{loadErrorMsg}</p>
+        <p className="text-base text-[#949ba4]">{loadErrorMsg}</p>
         <button
           type="button"
           onClick={loadData}
-          className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl"
+          className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl"
         >
           {t('common.retry')}
         </button>
@@ -142,7 +142,7 @@ export default function TwitchStreamersSettings() {
 
       {streamers.length === 0 ? (
         <div className="text-center py-12 border border-dashed border-[#2b2d31] rounded-xl bg-[#1e1f22]">
-          <p className="text-sm text-gray-400">
+          <p className="text-base text-gray-400">
             {t('twitchPage.noStreamersYetPrefix')} <code className="text-[#5865F2]">/twitch_channel_set</code> {t('twitchPage.noStreamersYetSuffix')}
           </p>
         </div>
@@ -154,7 +154,7 @@ export default function TwitchStreamersSettings() {
               <div key={s.broadcaster_id} className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-5 space-y-3 shadow-xl">
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-black text-white">{s.broadcaster_login}</span>
+                    <span className="text-base font-black text-white">{s.broadcaster_login}</span>
                     {s.is_live ? (
                       <span className="text-[10px] font-black text-white bg-red-600 px-2 py-0.5 rounded-full">{t('twitchPage.live')}</span>
                     ) : (
@@ -166,7 +166,7 @@ export default function TwitchStreamersSettings() {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-[#b5bac1]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-[#b5bac1]">
                   <div>
                     <span className="text-[#a1a1aa] uppercase text-[10px] font-bold block">{t('twitchPage.announcementChannel')}</span>
                     {s.announcement_channel_name ? `#${s.announcement_channel_name}` : t('twitchPage.unknownChannel', { id: s.announcement_channel_id })}

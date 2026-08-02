@@ -47,7 +47,7 @@ export default function ChannelSelect({ guildId, value, onChange, className = ''
     };
   }, [guildId]);
 
-  const baseClassName = `w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5865F2] ${className}`;
+  const baseClassName = `w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2] ${className}`;
 
   if (loadStatus === 'error') {
     return (

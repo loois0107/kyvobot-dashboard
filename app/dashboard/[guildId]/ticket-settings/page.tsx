@@ -265,17 +265,17 @@ export default function TicketAiSettings() {
             <HelpText className="mt-1 tracking-widest uppercase">{t('ticketSettingsPage.subtitle')}</HelpText>
           </div>
           <div className="flex gap-2 w-full sm:w-auto">
-            <button type="button" onClick={handleResetToBotDefault} className="flex-1 sm:flex-none border border-[#4e5058]/40 hover:border-[#4e5058] text-[#b5bac1] hover:text-white text-xs font-black px-4 py-3 rounded-xl tracking-widest transition-all cursor-pointer">
+            <button type="button" onClick={handleResetToBotDefault} className="flex-1 sm:flex-none border border-[#4e5058]/40 hover:border-[#4e5058] text-[#b5bac1] hover:text-white text-sm font-black px-4 py-3 rounded-xl tracking-widest transition-all cursor-pointer">
               {t('ticketSettingsPage.resetToBotDefault')}
             </button>
-            <button type="button" onClick={handleSaveMasterConfigs} disabled={isSaving} className="flex-1 sm:flex-none bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all cursor-pointer">
+            <button type="button" onClick={handleSaveMasterConfigs} disabled={isSaving} className="flex-1 sm:flex-none bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all cursor-pointer">
               {isSaving ? t('ticketSettingsPage.injecting') : t('ticketSettingsPage.saveButton')}
             </button>
           </div>
         </header>
 
         <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl px-4 sm:px-6 py-4">
-          <p className="text-xs sm:text-sm text-[#b5bac1] leading-relaxed">
+          <p className="text-sm sm:text-base text-[#b5bac1] leading-relaxed">
             {t('ticketSettingsPage.intro')}
           </p>
         </div>
@@ -283,39 +283,39 @@ export default function TicketAiSettings() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-4 shadow-xl">
-            <h2 className="text-xs font-black tracking-widest text-[#5865F2] uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">{t('ticketSettingsPage.panelSetupTitle')}</h2>
+            <h2 className="text-sm font-black tracking-widest text-[#5865F2] uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">{t('ticketSettingsPage.panelSetupTitle')}</h2>
             <HelpText>{t('ticketSettingsPage.panelSetupDesc')}</HelpText>
             <div className="space-y-1">
               <label className="text-[11px] font-black text-[#b5bac1] uppercase tracking-wider">{t('ticketSettingsPage.panelTitleLabel')}</label>
-              <input type="text" value={panelTitle} onChange={(e) => { setPanelTitle(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]" />
+              <input type="text" value={panelTitle} onChange={(e) => { setPanelTitle(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]" />
             </div>
             <div className="space-y-1">
               <label className="text-[11px] font-black text-[#b5bac1] uppercase tracking-wider">{t('ticketSettingsPage.panelDescLabel')}</label>
-              <textarea rows={3} value={panelDesc} onChange={(e) => { setPanelDesc(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white resize-none focus:outline-none focus:border-[#5865F2]" />
+              <textarea rows={3} value={panelDesc} onChange={(e) => { setPanelDesc(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white resize-none focus:outline-none focus:border-[#5865F2]" />
             </div>
           </div>
 
           <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-4 shadow-xl">
-            <h2 className="text-xs font-black tracking-widest text-green-400 uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">{t('ticketSettingsPage.welcomeEmbedTitle')}</h2>
+            <h2 className="text-sm font-black tracking-widest text-green-400 uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">{t('ticketSettingsPage.welcomeEmbedTitle')}</h2>
             <HelpText>{t('ticketSettingsPage.welcomeEmbedDesc')}</HelpText>
             <div className="space-y-1">
               <label className="text-[11px] font-black text-[#b5bac1] uppercase tracking-wider">{t('ticketSettingsPage.welcomeTitleLabel')}</label>
-              <input type="text" value={welcomeTitle} onChange={(e) => { setWelcomeTitle(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-green-500" />
+              <input type="text" value={welcomeTitle} onChange={(e) => { setWelcomeTitle(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-green-500" />
             </div>
             <div className="space-y-1">
               <label className="text-[11px] font-black text-[#b5bac1] uppercase tracking-wider">{t('ticketSettingsPage.welcomeDescLabel')}</label>
-              <textarea rows={3} value={welcomeDesc} onChange={(e) => { setWelcomeDesc(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white resize-none focus:outline-none focus:border-green-500" />
+              <textarea rows={3} value={welcomeDesc} onChange={(e) => { setWelcomeDesc(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white resize-none focus:outline-none focus:border-green-500" />
             </div>
           </div>
 
         </div>
 
         <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-3 shadow-xl">
-          <h2 className="text-xs font-black tracking-widest text-purple-400 uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">{t('ticketSettingsPage.systemPromptTitle')}</h2>
+          <h2 className="text-sm font-black tracking-widest text-purple-400 uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">{t('ticketSettingsPage.systemPromptTitle')}</h2>
 
-          <span className="text-xs sm:text-sm text-[#b5bac1] leading-relaxed font-medium block">
+          <span className="text-sm sm:text-base text-[#b5bac1] leading-relaxed font-medium block">
             {t('ticketSettingsPage.systemPromptDescPrefix')}{' '}
-            <code className="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-1.5 py-0.5 rounded text-xs font-mono font-bold font-black">
+            <code className="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 px-1.5 py-0.5 rounded text-sm font-mono font-bold font-black">
               {"{context}"}
             </code>{' '}
             {t('ticketSettingsPage.systemPromptDescSuffix')}
@@ -323,48 +323,48 @@ export default function TicketAiSettings() {
 
           <textarea
             rows={5} value={systemPrompt} onChange={(e) => { setSystemPrompt(e.target.value); setIsDirty(true); }}
-            className="w-full bg-[#111214] border border-[#232428] rounded-xl p-4 text-xs sm:text-sm text-white font-mono focus:outline-none focus:border-purple-500"
+            className="w-full bg-[#111214] border border-[#232428] rounded-xl p-4 text-sm sm:text-base text-white font-mono focus:outline-none focus:border-purple-500"
           />
         </div>
 
         <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-3 shadow-xl">
-          <h2 className="text-xs font-black tracking-widest text-orange-400 uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">{t('ticketSettingsPage.dailyLimitsTitle')}</h2>
-          <span className="text-xs sm:text-sm text-[#b5bac1] leading-relaxed font-medium block">
+          <h2 className="text-sm font-black tracking-widest text-orange-400 uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">{t('ticketSettingsPage.dailyLimitsTitle')}</h2>
+          <span className="text-sm sm:text-base text-[#b5bac1] leading-relaxed font-medium block">
             {t('ticketSettingsPage.dailyLimitsDesc')}
           </span>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-[#b5bac1]">{t('ticketSettingsPage.guildLimitLabel')}</label>
+              <label className="text-sm font-bold text-[#b5bac1]">{t('ticketSettingsPage.guildLimitLabel')}</label>
               <input
                 type="number" min={1} placeholder="400"
                 value={dailyGuildLimit}
                 onChange={(e) => { setDailyGuildLimit(e.target.value); setIsDirty(true); }}
-                className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-orange-500"
+                className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-orange-500"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-[#b5bac1]">{t('ticketSettingsPage.userLimitLabel')}</label>
+              <label className="text-sm font-bold text-[#b5bac1]">{t('ticketSettingsPage.userLimitLabel')}</label>
               <input
                 type="number" min={1} placeholder="20"
                 value={dailyUserLimit}
                 onChange={(e) => { setDailyUserLimit(e.target.value); setIsDirty(true); }}
-                className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-orange-500"
+                className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-orange-500"
               />
             </div>
           </div>
         </div>
 
         <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-4 shadow-xl">
-          <h2 className="text-xs font-black tracking-wider text-yellow-500 uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">{t('ticketSettingsPage.knowledgeBaseTitle')}</h2>
+          <h2 className="text-sm font-black tracking-wider text-yellow-500 uppercase border-b border-[#2b2d31] pb-2 flex items-center gap-2">{t('ticketSettingsPage.knowledgeBaseTitle')}</h2>
 
-          <span className="text-xs sm:text-sm text-[#b5bac1] leading-relaxed font-medium block">
+          <span className="text-sm sm:text-base text-[#b5bac1] leading-relaxed font-medium block">
             {t('ticketSettingsPage.knowledgeBaseDesc')}
           </span>
 
           <textarea
             rows={3} placeholder={t('ticketSettingsPage.knowledgePlaceholder')}
             value={knowledgeInput} onChange={(e) => setKnowledgeInput(e.target.value)}
-            className="w-full bg-[#111214] border border-[#232428] rounded-xl p-4 text-xs text-white focus:outline-none focus:border-yellow-500"
+            className="w-full bg-[#111214] border border-[#232428] rounded-xl p-4 text-sm text-white focus:outline-none focus:border-yellow-500"
           />
 
           {editingNodeId && (vectorNodes.find((node) => node.id === editingNodeId)?.feedback.total ?? 0) > 0 && (
@@ -372,13 +372,13 @@ export default function TicketAiSettings() {
           )}
 
           <div className="flex gap-2">
-            <button type="button" onClick={injectKnowledgeNode} disabled={isInjecting} className="flex-1 bg-yellow-600/10 hover:bg-yellow-600 border border-yellow-500/20 text-yellow-400 hover:text-white text-xs font-black py-3 rounded-xl tracking-widest transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+            <button type="button" onClick={injectKnowledgeNode} disabled={isInjecting} className="flex-1 bg-yellow-600/10 hover:bg-yellow-600 border border-yellow-500/20 text-yellow-400 hover:text-white text-sm font-black py-3 rounded-xl tracking-widest transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
               {isInjecting
                 ? (editingNodeId ? t('ticketSettingsPage.reEmbedding') : t('ticketSettingsPage.injectingShort'))
                 : (editingNodeId ? t('ticketSettingsPage.updateEntry') : t('ticketSettingsPage.injectEntry'))}
             </button>
             {editingNodeId && (
-              <button type="button" onClick={cancelEditingNode} className="text-xs font-bold text-gray-400 hover:text-white px-4 py-3 rounded-xl border border-[#232428]">
+              <button type="button" onClick={cancelEditingNode} className="text-sm font-bold text-gray-400 hover:text-white px-4 py-3 rounded-xl border border-[#232428]">
                 {t('common.cancel')}
               </button>
             )}
@@ -394,7 +394,7 @@ export default function TicketAiSettings() {
                     </span>
                     <FeedbackBadge feedback={node.feedback} />
                   </div>
-                  <p className="text-xs sm:text-sm text-gray-200 font-medium pt-1 break-all">{node.content}</p>
+                  <p className="text-sm sm:text-base text-gray-200 font-medium pt-1 break-all">{node.content}</p>
                 </div>
                 <div className="flex gap-2 flex-shrink-0">
                   <button type="button" onClick={() => startEditingNode(node)} className="text-yellow-400 hover:text-white bg-yellow-950/20 hover:bg-yellow-600 text-[10px] font-black px-3 py-1.5 rounded-lg border border-yellow-500/10 transition-all cursor-pointer">
@@ -413,10 +413,10 @@ export default function TicketAiSettings() {
 
       {isDirty && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1e1f22]/95 border border-[#FFD700]/50 px-6 py-3.5 rounded-xl shadow-2xl flex items-center justify-between gap-8 backdrop-blur-md w-[90%] max-w-xl">
-          <span className="text-xs font-bold text-gray-200">{t('ticketSettingsPage.unsavedWarning')}</span>
+          <span className="text-sm font-bold text-gray-200">{t('ticketSettingsPage.unsavedWarning')}</span>
           <div className="flex gap-3">
-            <button type="button" onClick={() => { loadTicketSettings(guildId); setIsDirty(false); }} className="text-xs font-bold text-gray-400 hover:text-white transition">{t('common.discard')}</button>
-            <button type="button" onClick={handleSaveMasterConfigs} className="bg-[#23A55A] hover:bg-[#1a7f43] text-white text-xs font-black px-5 py-2 rounded-lg">{t('ticketSettingsPage.commitBrain')}</button>
+            <button type="button" onClick={() => { loadTicketSettings(guildId); setIsDirty(false); }} className="text-sm font-bold text-gray-400 hover:text-white transition">{t('common.discard')}</button>
+            <button type="button" onClick={handleSaveMasterConfigs} className="bg-[#23A55A] hover:bg-[#1a7f43] text-white text-sm font-black px-5 py-2 rounded-lg">{t('ticketSettingsPage.commitBrain')}</button>
           </div>
         </div>
       )}

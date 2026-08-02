@@ -25,12 +25,12 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       
       {/* 🔮 사이버 네온 스타일의 실시간 토스트 팝업 UI */}
       {toast && (
-        <div className={`fixed bottom-6 right-6 z-[9999] px-5 py-3.5 rounded-xl border font-mono text-xs shadow-2xl flex items-center gap-3 backdrop-blur-md transition-all duration-300 ${
+        <div className={`fixed bottom-6 right-6 z-[9999] px-5 py-3.5 rounded-xl border font-mono text-sm shadow-2xl flex items-center gap-3 backdrop-blur-md transition-all duration-300 ${
           toast.type === 'success' ? 'bg-[#0A1A12]/90 border-green-500/50 text-green-400 shadow-green-500/10' :
           toast.type === 'error' ? 'bg-[#1A0A0A]/90 border-red-500/50 text-red-400 shadow-red-500/10' :
           'bg-[#0A0A1A]/90 border-[#5865F2]/50 text-blue-400 shadow-[#5865F2]/10'
         }`}>
-          <span className="animate-pulse text-sm">
+          <span className="animate-pulse text-base">
             {toast.type === 'success' ? '⚡' : toast.type === 'error' ? '🚨' : '📡'}
           </span>
           <span className="tracking-wider uppercase">{toast.message}</span>

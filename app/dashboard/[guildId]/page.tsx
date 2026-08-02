@@ -33,12 +33,12 @@ function ChecklistRow({ done, label, href }: { done: boolean; label: string; hre
         done ? 'border-[#23A55A]/20 bg-[#23A55A]/5' : 'border-[#232428] bg-[#111214] hover:border-[#5865F2]/40'
       }`}
     >
-      <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0 ${
+      <span className={`w-5 h-5 rounded-full flex items-center justify-center text-sm shrink-0 ${
         done ? 'bg-[#23A55A] text-white' : 'border border-[#4e5058] text-transparent'
       }`}>
         {done ? '✓' : ''}
       </span>
-      <span className={`text-xs font-bold flex-1 ${done ? 'text-[#23A55A] line-through decoration-2' : 'text-[#dbdee1]'}`}>
+      <span className={`text-sm font-bold flex-1 ${done ? 'text-[#23A55A] line-through decoration-2' : 'text-[#dbdee1]'}`}>
         {label}
       </span>
       {!done && <span className="text-[10px] text-[#5865F2] font-bold shrink-0">{t('dashboardHome.setUpArrow')}</span>}
@@ -196,13 +196,13 @@ export default function DashboardHome() {
   if (status === 'loading') return null;
 
   return (
-    <div className="max-w-[1300px] mx-auto w-full space-y-10 p-2 md:p-4 animate-in fade-in duration-300">
+    <div className="max-w-7xl mx-auto w-full space-y-10 p-2 md:p-4 animate-in fade-in duration-300">
 
       {onboarding?.show_banner && (
         <div className="bg-[#1e1f22] border border-[#5865F2]/30 rounded-2xl p-6 shadow-xl space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-black text-white">{t('dashboardHome.quickStartTitle')}</h3>
+              <h3 className="text-base font-black text-white">{t('dashboardHome.quickStartTitle')}</h3>
               <p className="text-[10px] text-[#949ba4] mt-1">{t('dashboardHome.quickStartSubtitle')}</p>
             </div>
             <button
@@ -230,7 +230,7 @@ export default function DashboardHome() {
           <div className="flex items-center justify-between pb-4 border-b border-[#2b2d31]">
             <div className="flex items-center gap-2">
               <span className={`w-2.5 h-2.5 rounded-full ${isConnectionFailed ? 'bg-red-500 animate-ping' : isDataEmpty ? 'bg-gray-500' : 'bg-[#23a55a] animate-pulse'}`}></span>
-              <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase">{t('dashboardHome.systemStatus')}</h3>
+              <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase">{t('dashboardHome.systemStatus')}</h3>
             </div>
 
             {isConnectionFailed && (
@@ -244,16 +244,16 @@ export default function DashboardHome() {
               </span>
             )}
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-6 font-mono text-sm">
-            <div className="space-y-1"><span className="text-gray-500 block text-xs">{t('dashboardHome.coreAlias')}</span><strong className="text-white text-base tracking-wide">KYVOBOT AI</strong></div>
-            <div className="space-y-1"><span className="text-gray-500 block text-xs">{t('dashboardHome.matrixVer')}</span><strong className="text-yellow-400 text-base tracking-wide">v2.4.0-pro</strong></div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-6 font-mono text-base">
+            <div className="space-y-1"><span className="text-gray-500 block text-sm">{t('dashboardHome.coreAlias')}</span><strong className="text-white text-base tracking-wide">KYVOBOT AI</strong></div>
+            <div className="space-y-1"><span className="text-gray-500 block text-sm">{t('dashboardHome.matrixVer')}</span><strong className="text-yellow-400 text-base tracking-wide">v2.4.0-pro</strong></div>
             <div className="space-y-1">
-              <span className="text-gray-500 block text-xs">{t('dashboardHome.activeContext')}</span>
+              <span className="text-gray-500 block text-sm">{t('dashboardHome.activeContext')}</span>
               <strong className="text-[#5865F2] text-base tracking-wide truncate max-w-[180px]">
                 {t('dashboardHome.activeContextValue', { id: guildId.slice(0, 6) })}
               </strong>
             </div>
-            <div className="space-y-1"><span className="text-gray-500 block text-xs">{t('dashboardHome.latencyTick')}</span><strong className="text-[#23a55a] text-base tracking-wide">{t('dashboardHome.latencyValue')}</strong></div>
+            <div className="space-y-1"><span className="text-gray-500 block text-sm">{t('dashboardHome.latencyTick')}</span><strong className="text-[#23a55a] text-base tracking-wide">{t('dashboardHome.latencyValue')}</strong></div>
           </div>
         </div>
       </div>
@@ -268,10 +268,10 @@ export default function DashboardHome() {
           href={`/dashboard/${guildId}/settings`}
           className="bg-[#111214] border border-[#232428] hover:border-[#5865F2]/40 rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center transition-all duration-200 group"
         >
-          <span className="text-xs font-black text-gray-500 uppercase tracking-wider block">{t('dashboardHome.customCommandsLabel')}</span>
+          <span className="text-sm font-black text-gray-500 uppercase tracking-wider block">{t('dashboardHome.customCommandsLabel')}</span>
           <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.customCommands === 0 ? 'text-gray-600' : 'text-[#5865F2]'}`}>
             {isLoadingStats ? '...' : telemetry.customCommands.toLocaleString()}
-            <span className="text-xs text-[#5865F2]/60 font-sans ml-1">{t('dashboardHome.customCommandsUnit')}</span>
+            <span className="text-sm text-[#5865F2]/60 font-sans ml-1">{t('dashboardHome.customCommandsUnit')}</span>
           </span>
           <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase pt-1 group-hover:text-[#5865F2] transition-colors text-left">
             {t('dashboardHome.manageArrow')}
@@ -279,24 +279,24 @@ export default function DashboardHome() {
         </Link>
 
         <div className="bg-[#111214] border border-[#232428] rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center">
-          <span className="text-xs font-black text-gray-500 uppercase tracking-wider block">{t('dashboardHome.ragVectorsLabel')}</span>
+          <span className="text-sm font-black text-gray-500 uppercase tracking-wider block">{t('dashboardHome.ragVectorsLabel')}</span>
           <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.ragSynapses === 0 ? 'text-gray-600' : 'text-purple-400'}`}>
             {isLoadingStats ? '...' : telemetry.ragSynapses.toLocaleString()}
-            <span className="text-xs text-purple-600 font-sans ml-1">{t('dashboardHome.ragVectorsUnit')}</span>
+            <span className="text-sm text-purple-600 font-sans ml-1">{t('dashboardHome.ragVectorsUnit')}</span>
           </span>
         </div>
         <div className="bg-[#111214] border border-[#232428] rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center">
-          <span className="text-xs font-black text-gray-500 uppercase tracking-wider block">{t('dashboardHome.activeTicketsLabel')}</span>
+          <span className="text-sm font-black text-gray-500 uppercase tracking-wider block">{t('dashboardHome.activeTicketsLabel')}</span>
           <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.activeTickets === 0 ? 'text-gray-600' : 'text-yellow-500'}`}>
             {isLoadingStats ? '...' : telemetry.activeTickets}
-            <span className="text-xs text-yellow-600 font-sans ml-1">{t('dashboardHome.activeTicketsUnit')}</span>
+            <span className="text-sm text-yellow-600 font-sans ml-1">{t('dashboardHome.activeTicketsUnit')}</span>
           </span>
         </div>
         <div className="bg-[#111214] border border-[#232428] rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center">
-          <span className="text-xs font-black text-gray-500 uppercase tracking-wider block">{t('dashboardHome.automodLogsLabel')}</span>
+          <span className="text-sm font-black text-gray-500 uppercase tracking-wider block">{t('dashboardHome.automodLogsLabel')}</span>
           <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.automodLogs === 0 ? 'text-gray-600' : 'text-white'}`}>
             {isLoadingStats ? '...' : telemetry.automodLogs.toLocaleString()}
-            <span className="text-xs text-red-600 font-sans ml-1">{t('dashboardHome.automodLogsUnit')}</span>
+            <span className="text-sm text-red-600 font-sans ml-1">{t('dashboardHome.automodLogsUnit')}</span>
           </span>
         </div>
       </div>
@@ -305,18 +305,18 @@ export default function DashboardHome() {
           [SECTION 3: ⚡ CORE MODULE QUICK DISPATCH]
          ========================================== */}
       <div className="space-y-4">
-        <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase px-1">{t('dashboardHome.quickDispatchTitle')}</h3>
+        <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase px-1">{t('dashboardHome.quickDispatchTitle')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Link href={`/dashboard/${guildId}/leveling`} className="bg-[#1e1f22] hover:bg-[#232428] border border-[#2b2d31] hover:border-[#5865F2]/40 rounded-2xl p-8 shadow-md transition-all duration-200 group cursor-pointer text-left flex flex-col justify-between min-h-[210px]">
-            <div><span className="text-3xl block mb-3">✨</span><h4 className="text-sm font-black text-white group-hover:text-[#5865F2] uppercase tracking-wider">{t('dashboardHome.levelingEcoTitle')}</h4><p className="text-xs text-gray-400 mt-2 leading-relaxed">{t('dashboardHome.levelingEcoDesc')}</p></div>
+            <div><span className="text-3xl block mb-3">✨</span><h4 className="text-base font-black text-white group-hover:text-[#5865F2] uppercase tracking-wider">{t('dashboardHome.levelingEcoTitle')}</h4><p className="text-sm text-gray-400 mt-2 leading-relaxed">{t('dashboardHome.levelingEcoDesc')}</p></div>
             <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase mt-4 block group-hover:text-white transition-colors">{t('dashboardHome.dispatchArrow')}</span>
           </Link>
           <Link href={`/dashboard/${guildId}/welcome`} className="bg-[#1e1f22] hover:bg-[#232428] border border-[#2b2d31] hover:border-green-500/40 rounded-2xl p-8 shadow-md transition-all duration-200 group cursor-pointer text-left flex flex-col justify-between min-h-[210px]">
-            <div><span className="text-3xl block mb-3">📥</span><h4 className="text-sm font-black text-white group-hover:text-green-400 uppercase tracking-wider">{t('dashboardHome.welcomeTitle')}</h4><p className="text-xs text-gray-400 mt-2 leading-relaxed">{t('dashboardHome.welcomeDesc')}</p></div>
+            <div><span className="text-3xl block mb-3">📥</span><h4 className="text-base font-black text-white group-hover:text-green-400 uppercase tracking-wider">{t('dashboardHome.welcomeTitle')}</h4><p className="text-sm text-gray-400 mt-2 leading-relaxed">{t('dashboardHome.welcomeDesc')}</p></div>
             <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase mt-4 block group-hover:text-white transition-colors">{t('dashboardHome.dispatchArrow')}</span>
           </Link>
           <Link href={`/dashboard/${guildId}/ticket-settings`} className="bg-[#1e1f22] hover:bg-[#232428] border border-[#2b2d31] hover:border-purple-500/40 rounded-2xl p-8 shadow-md transition-all duration-200 group cursor-pointer text-left flex flex-col justify-between min-h-[210px]">
-            <div><span className="text-3xl block mb-3">🎫</span><h4 className="text-sm font-black text-white group-hover:text-purple-400 uppercase tracking-wider">{t('dashboardHome.ticketTitle')}</h4><p className="text-xs text-gray-400 mt-2 leading-relaxed">{t('dashboardHome.ticketDesc')}</p></div>
+            <div><span className="text-3xl block mb-3">🎫</span><h4 className="text-base font-black text-white group-hover:text-purple-400 uppercase tracking-wider">{t('dashboardHome.ticketTitle')}</h4><p className="text-sm text-gray-400 mt-2 leading-relaxed">{t('dashboardHome.ticketDesc')}</p></div>
             <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase mt-4 block group-hover:text-white transition-colors">{t('dashboardHome.dispatchArrow')}</span>
           </Link>
         </div>
@@ -331,7 +331,7 @@ export default function DashboardHome() {
             <div className="w-3 h-3 bg-red-500 rounded-full"></div>
             <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-xs font-black font-mono text-gray-500 tracking-widest uppercase ml-2">{t('dashboardHome.terminalHeader')}</span>
+            <span className="text-sm font-black font-mono text-gray-500 tracking-widest uppercase ml-2">{t('dashboardHome.terminalHeader')}</span>
           </div>
 
           <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
@@ -361,16 +361,16 @@ export default function DashboardHome() {
           </div>
         </div>
 
-        <div className="font-mono text-xs sm:text-sm p-2 space-y-2.5 min-h-[380px] max-h-[450px] overflow-y-auto select-text scrollbar-thin scrollbar-thumb-gray-800">
+        <div className="font-mono text-sm sm:text-base p-2 space-y-2.5 min-h-[380px] max-h-[450px] overflow-y-auto select-text scrollbar-thin scrollbar-thumb-gray-800">
           {isLoadingLogs ? (
-            <div className="text-center py-20 text-gray-500 text-xs font-semibold">{t('dashboardHome.syncingLogs')}</div>
+            <div className="text-center py-20 text-gray-500 text-sm font-semibold">{t('dashboardHome.syncingLogs')}</div>
           ) : filteredLogs.length === 0 ? (
-            <div className="text-center py-20 text-gray-600 text-xs font-semibold">{t('dashboardHome.noLogsMatch')}</div>
+            <div className="text-center py-20 text-gray-600 text-sm font-semibold">{t('dashboardHome.noLogsMatch')}</div>
           ) : (
             filteredLogs.map((log, i) => (
               <div key={`${log.timestamp}-${log.type}-${log.message}-${i}`} className="flex gap-4 items-start leading-relaxed animate-in fade-in slide-in-from-left-1 duration-150">
                 <span className="text-gray-600">[{log.timestamp}]</span>
-                <span className={`font-black tracking-wider text-center w-16 flex-shrink-0 text-xs ${
+                <span className={`font-black tracking-wider text-center w-16 flex-shrink-0 text-sm ${
                   log.type === 'SYSTEM' ? 'text-purple-400' :
                   log.type === 'SUCCESS' ? 'text-green-400' :
                   log.type === 'WARN' ? 'text-yellow-400' : 'text-blue-400'

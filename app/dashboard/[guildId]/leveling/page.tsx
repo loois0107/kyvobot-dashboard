@@ -192,13 +192,13 @@ export default function LevelingEconomySettings() {
             <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('levelingPage.title')}</h1>
             <HelpText className="mt-1 tracking-widest uppercase">{t('levelingPage.subtitle')}</HelpText>
           </div>
-          <button type="button" onClick={handleSaveAll} disabled={isSaving} className="w-full sm:w-auto bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all cursor-pointer">
+          <button type="button" onClick={handleSaveAll} disabled={isSaving} className="w-full sm:w-auto bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all cursor-pointer">
             {isSaving ? t('levelingPage.committing') : t('levelingPage.saveButton')}
           </button>
         </header>
 
         <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl px-4 sm:px-6 py-4">
-          <p className="text-xs sm:text-sm text-[#b5bac1] leading-relaxed">
+          <p className="text-sm sm:text-base text-[#b5bac1] leading-relaxed">
             {t('levelingPage.intro')}
           </p>
         </div>
@@ -207,7 +207,7 @@ export default function LevelingEconomySettings() {
             [SECTION 1: VISUAL DESIGN CLUSTER] -> 성격 맞는 애들끼리 최상단에 묶음!
            ========================================== */}
         <div className="space-y-4 bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl">
-          <h3 className="text-xs font-black tracking-widest text-[#949ba4] border-b border-[#2b2d31] pb-2">{t('levelingPage.cardPreviewTitle')}</h3>
+          <h3 className="text-sm font-black tracking-widest text-[#949ba4] border-b border-[#2b2d31] pb-2">{t('levelingPage.cardPreviewTitle')}</h3>
 
           {/* Card Preview Canvas */}
           <div
@@ -224,11 +224,11 @@ export default function LevelingEconomySettings() {
                   <div className="w-full h-[24px] bg-[#2b2d31] rounded-xl mt-6 border border-[#232428] overflow-hidden">
                     <div className="h-full rounded-xl transition-all duration-300" style={{ width: '65%', backgroundColor: cardColor }} />
                   </div>
-                  <span className="text-xs font-bold text-[#b5bac1] mt-2 ml-1 font-sans">485,172 / 1,500 XP</span>
+                  <span className="text-sm font-bold text-[#b5bac1] mt-2 ml-1 font-sans">485,172 / 1,500 XP</span>
                 </div>
                 <div className="absolute right-0 top-2 flex items-baseline gap-4 font-black">
-                  <div className="flex items-baseline gap-1 font-sans text-xs text-[#b5bac1]"><span>RANK</span><span className="text-2xl font-black text-white font-mono">#1</span></div>
-                  <div className="flex items-baseline gap-1 font-sans text-xs text-[#b5bac1]"><span>LEVEL</span><span className="text-3xl font-black font-mono" style={{ color: cardColor }}>15</span></div>
+                  <div className="flex items-baseline gap-1 font-sans text-sm text-[#b5bac1]"><span>RANK</span><span className="text-2xl font-black text-white font-mono">#1</span></div>
+                  <div className="flex items-baseline gap-1 font-sans text-sm text-[#b5bac1]"><span>LEVEL</span><span className="text-3xl font-black font-mono" style={{ color: cardColor }}>15</span></div>
                 </div>
               </div>
             </div>
@@ -236,28 +236,28 @@ export default function LevelingEconomySettings() {
 
           {/* Graphical Modifiers Panel (바로 붙여서 스크롤 낭비 차단) */}
           <div className="pt-4 space-y-4">
-            <h2 className="text-xs font-black tracking-widest text-purple-400 uppercase border-b border-[#2b2d31] pb-2">{t('levelingPage.graphicalModifiers')}</h2>
+            <h2 className="text-sm font-black tracking-widest text-purple-400 uppercase border-b border-[#2b2d31] pb-2">{t('levelingPage.graphicalModifiers')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#b5bac1]">{t('levelingPage.accentColorLabel')}</label>
+                <label className="text-sm font-bold text-[#b5bac1]">{t('levelingPage.accentColorLabel')}</label>
                 <div className="flex flex-wrap gap-1.5">{colorPresets.map((p) => (<button key={p} type="button" onClick={() => { setCardColor(p); setIsDirty(true); }} className={`w-5 h-5 rounded-full border ${cardColor.toLowerCase() === p.toLowerCase() ? 'border-white scale-110' : 'border-transparent opacity-60'}`} style={{ backgroundColor: p }} />))}</div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#b5bac1]">{t('levelingPage.solidBgLabel')}</label>
+                <label className="text-sm font-bold text-[#b5bac1]">{t('levelingPage.solidBgLabel')}</label>
                 <div className="flex flex-wrap gap-1.5">{bgColorPresets.map((p) => (<button key={p} type="button" onClick={() => { setCardBgColor(p); setIsDirty(true); }} className={`w-5 h-5 rounded-full border ${cardBgColor.toLowerCase() === p.toLowerCase() ? 'border-white scale-110' : 'border-transparent opacity-60'}`} style={{ backgroundColor: p }} />))}</div>
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#b5bac1]">{t('levelingPage.overlayOpacityLabel')} <span className="text-[#5865F2] font-mono">{Math.round(overlayOpacity*100)}%</span></label>
+                <label className="text-sm font-bold text-[#b5bac1]">{t('levelingPage.overlayOpacityLabel')} <span className="text-[#5865F2] font-mono">{Math.round(overlayOpacity*100)}%</span></label>
                 <input type="range" min="0.0" max="1.0" step="0.05" value={overlayOpacity} onChange={(e) => { setOverlayOpacity(parseFloat(e.target.value)); setIsDirty(true); }} className="w-full h-1 bg-[#232428] rounded-lg cursor-pointer accent-[#5865F2]" />
                 <HelpText>{t('levelingPage.overlayOpacityHelp')}</HelpText>
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#b5bac1]">
+                <label className="text-sm font-bold text-[#b5bac1]">
                   {t('levelingPage.fontLabel')} <span className="text-amber-400 font-normal">{t('levelingPage.comingSoon')}</span>
                 </label>
-                <select value={fontPreference} disabled className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-gray-500 cursor-not-allowed opacity-50 focus:outline-none">
+                <select value={fontPreference} disabled className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-gray-500 cursor-not-allowed opacity-50 focus:outline-none">
                   <option value="font-mono">👾 Cyber Monospace (Default)</option>
                   <option value="font-sans">📱 Clean Sans-Serif</option>
                   <option value="font-serif">🏛️ Elegant Serif</option>
@@ -266,7 +266,7 @@ export default function LevelingEconomySettings() {
               </div>
             </div>
             <div className="space-y-2 pt-2">
-              <label className="text-xs font-bold text-[#b5bac1]">{t('levelingPage.wallpaperLabel')}</label>
+              <label className="text-sm font-bold text-[#b5bac1]">{t('levelingPage.wallpaperLabel')}</label>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
                 {premiumPresets.map((preset, i) => (
                   <div key={i} onClick={() => { setBackgroundUrl(preset.url); setIsDirty(true); }} className={`aspect-[2.6/1] rounded-xl bg-cover bg-center cursor-pointer border relative group transition-all ${backgroundUrl === preset.url ? 'border-[#5865F2] scale-105 shadow-md' : 'border-[#2b2d31] opacity-40 hover:opacity-80'}`} style={{ backgroundImage: `url(${preset.url})` }}><div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity"><span className="text-[9px] text-white font-black uppercase tracking-wider">{preset.name}</span></div></div>
@@ -283,17 +283,17 @@ export default function LevelingEconomySettings() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* LEVELING PROTOCOL SETTINGS */}
           <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-5 shadow-xl">
-            <h2 className="text-xs font-black tracking-widest text-[#5865F2] uppercase border-b border-[#2b2d31] pb-2">{t('levelingPage.levelingSectionTitle')}</h2>
+            <h2 className="text-sm font-black tracking-widest text-[#5865F2] uppercase border-b border-[#2b2d31] pb-2">{t('levelingPage.levelingSectionTitle')}</h2>
             <div className="space-y-1.5">
               <label className="text-[11px] font-black text-[#b5bac1] tracking-wider uppercase">{t('levelingPage.xpRateLabel')}</label>
-              <input type="number" min="0.1" max="10" step="0.1" value={xpRate} onChange={(e) => { setXpRate(parseFloat(e.target.value)); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-[#5865F2]" />
+              <input type="number" min="0.1" max="10" step="0.1" value={xpRate} onChange={(e) => { setXpRate(parseFloat(e.target.value)); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]" />
               <HelpText>{t('levelingPage.xpRateHelp')}</HelpText>
             </div>
             <div className="space-y-3 pt-2">
               <label className="text-[11px] font-black text-[#b5bac1] tracking-wider uppercase block">{t('levelingPage.milestoneLabel')}</label>
               <HelpText>{t('levelingPage.milestoneHelp')}</HelpText>
               <div className="flex gap-2">
-                <input type="number" placeholder={t('levelingPage.levelPlaceholder')} value={newLvl} onChange={(e) => setNewLvl(e.target.value)} className="w-1/4 bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none" />
+                <input type="number" placeholder={t('levelingPage.levelPlaceholder')} value={newLvl} onChange={(e) => setNewLvl(e.target.value)} className="w-1/4 bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none" />
                 <div className="w-3/4">
                   <RoleSelect guildId={guildId} value={newRoleId} onChange={setNewRoleId} />
                 </div>
@@ -304,7 +304,7 @@ export default function LevelingEconomySettings() {
                   {Object.entries(roleRewards).map(([lvl, rId]) => {
                     const roleName = roles.find((r) => r.id === rId)?.name || rId;
                     return (
-                      <div key={lvl} className="flex justify-between items-center text-xs font-mono bg-[#1e1f22] p-2 rounded border border-[#2b2d31]"><span>{t('levelingPage.milestoneRowLabel', { level: lvl, roleName })}</span><button type="button" onClick={() => removeMilestone(lvl)} className="text-red-400 hover:text-red-600 font-bold px-1">✕</button></div>
+                      <div key={lvl} className="flex justify-between items-center text-sm font-mono bg-[#1e1f22] p-2 rounded border border-[#2b2d31]"><span>{t('levelingPage.milestoneRowLabel', { level: lvl, roleName })}</span><button type="button" onClick={() => removeMilestone(lvl)} className="text-red-400 hover:text-red-600 font-bold px-1">✕</button></div>
                     );
                   })}
                 </div>
@@ -314,15 +314,15 @@ export default function LevelingEconomySettings() {
 
           {/* SERVER CURRENCY MATRIX */}
           <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-5 shadow-xl">
-            <h2 className="text-xs font-black tracking-widest text-green-400 uppercase border-b border-[#2b2d31] pb-2">{t('levelingPage.currencySectionTitle')}</h2>
+            <h2 className="text-sm font-black tracking-widest text-green-400 uppercase border-b border-[#2b2d31] pb-2">{t('levelingPage.currencySectionTitle')}</h2>
             <div className="space-y-1.5">
               <label className="text-[11px] font-black text-[#b5bac1] tracking-wider uppercase">{t('levelingPage.currencyNameLabel')}</label>
-              <input type="text" value={currencyName} onChange={(e) => { setCurrencyName(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-green-500" />
+              <input type="text" value={currencyName} onChange={(e) => { setCurrencyName(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-green-500" />
               <HelpText>{t('levelingPage.currencyNameHelp')}</HelpText>
             </div>
             <div className="space-y-1.5 pt-2">
               <label className="text-[11px] font-black text-[#b5bac1] tracking-wider uppercase">{t('levelingPage.minBetLabel')}</label>
-              <input type="number" min="1" max="5000" value={minBet} onChange={(e) => { setMinBet(parseInt(e.target.value) || 0); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-green-500" />
+              <input type="number" min="1" max="5000" value={minBet} onChange={(e) => { setMinBet(parseInt(e.target.value) || 0); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-green-500" />
               <HelpText>{t('levelingPage.minBetHelp')}</HelpText>
             </div>
           </div>
@@ -332,27 +332,27 @@ export default function LevelingEconomySettings() {
             [SECTION 3: AUTOMATED COMMERCE REGISTRY]
            ========================================== */}
         <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-5 shadow-xl">
-          <h2 className="text-xs font-black tracking-wider text-yellow-500 uppercase border-b border-[#2b2d31] pb-2">{t('levelingPage.shopSectionTitle')}</h2>
+          <h2 className="text-sm font-black tracking-wider text-yellow-500 uppercase border-b border-[#2b2d31] pb-2">{t('levelingPage.shopSectionTitle')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="space-y-1">
               <label className="text-[10px] font-bold text-gray-400">{t('levelingPage.itemTitleLabel')}</label>
-              <input type="text" placeholder="e.g. VIP_Pass" value={newItemTitle} onChange={(e) => setNewItemTitle(e.target.value)} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-yellow-500" />
+              <input type="text" placeholder="e.g. VIP_Pass" value={newItemTitle} onChange={(e) => setNewItemTitle(e.target.value)} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-yellow-500" />
               <HelpText>{t('levelingPage.itemTitleHelp')}</HelpText>
             </div>
-            <div className="space-y-1"><label className="text-[10px] font-bold text-gray-400">{t('levelingPage.itemPriceLabel')}</label><input type="number" min="0" value={newItemPrice} onChange={(e) => setNewItemPrice(parseInt(e.target.value) || 0)} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-yellow-500" /></div>
-            <div className="space-y-1"><label className="text-[10px] font-bold text-gray-400">{t('levelingPage.itemDescLabel')}</label><input type="text" placeholder={t('levelingPage.itemDescPlaceholder')} value={newItemDescription} onChange={(e) => setNewItemDescription(e.target.value)} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-xs text-white focus:outline-none focus:border-yellow-500" /></div>
+            <div className="space-y-1"><label className="text-[10px] font-bold text-gray-400">{t('levelingPage.itemPriceLabel')}</label><input type="number" min="0" value={newItemPrice} onChange={(e) => setNewItemPrice(parseInt(e.target.value) || 0)} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-yellow-500" /></div>
+            <div className="space-y-1"><label className="text-[10px] font-bold text-gray-400">{t('levelingPage.itemDescLabel')}</label><input type="text" placeholder={t('levelingPage.itemDescPlaceholder')} value={newItemDescription} onChange={(e) => setNewItemDescription(e.target.value)} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-yellow-500" /></div>
           </div>
-          <button type="button" onClick={injectShopItem} className="w-full bg-yellow-600/10 hover:bg-yellow-600 border border-yellow-500/20 text-yellow-400 hover:text-white text-xs font-black py-3 rounded-xl tracking-widest transition-all cursor-pointer">{t('levelingPage.injectItem')}</button>
+          <button type="button" onClick={injectShopItem} className="w-full bg-yellow-600/10 hover:bg-yellow-600 border border-yellow-500/20 text-yellow-400 hover:text-white text-sm font-black py-3 rounded-xl tracking-widest transition-all cursor-pointer">{t('levelingPage.injectItem')}</button>
           <div className="pt-4 border-t border-[#2b2d31] space-y-3">
             <h3 className="text-[11px] font-black text-[#949ba4] tracking-widest uppercase">{t('levelingPage.activeItemsLabel', { count: shopItems.length })}</h3>
             {shopItems.length === 0 ? (
-              <div className="text-center py-6 border border-dashed border-[#4e5058]/30 rounded-xl bg-[#111214]/50"><p className="text-xs text-gray-500">{t('levelingPage.noItemsYet')}</p></div>
+              <div className="text-center py-6 border border-dashed border-[#4e5058]/30 rounded-xl bg-[#111214]/50"><p className="text-sm text-gray-500">{t('levelingPage.noItemsYet')}</p></div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {shopItems.map((item, idx) => (
                   <div key={idx} className="bg-[#111214] border border-[#232428] rounded-xl p-4 flex flex-col justify-between gap-3 shadow-md">
                     <div className="space-y-1">
-                      <div className="flex justify-between items-start"><h4 className="text-xs font-black text-white font-mono truncate max-w-[65%]">📦 {item.name}</h4><span className="text-[10px] font-bold text-green-400 bg-green-950/40 border border-green-500/20 px-2 py-0.5 rounded-full">{item.price.toLocaleString()} {currencyName}</span></div>
+                      <div className="flex justify-between items-start"><h4 className="text-sm font-black text-white font-mono truncate max-w-[65%]">📦 {item.name}</h4><span className="text-[10px] font-bold text-green-400 bg-green-950/40 border border-green-500/20 px-2 py-0.5 rounded-full">{item.price.toLocaleString()} {currencyName}</span></div>
                       <p className="text-[11px] text-gray-400 line-clamp-2">{item.description}</p>
                     </div>
                     <button type="button" onClick={() => purgeShopItem(idx)} className="w-full bg-red-950/30 hover:bg-red-600 text-red-400 hover:text-white text-[10px] font-black py-1.5 rounded-lg border border-red-500/10 transition-all">{t('levelingPage.purgeItem')}</button>
@@ -368,8 +368,8 @@ export default function LevelingEconomySettings() {
       {/* Floating Status Warning Alert */}
       {isDirty && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1e1f22]/95 border border-[#FFD700]/50 px-6 py-3.5 rounded-xl shadow-2xl flex items-center justify-between gap-8 backdrop-blur-md w-[90%] max-w-xl">
-          <span className="text-xs font-bold text-gray-200">{t('levelingPage.unsavedWarning')}</span>
-          <div className="flex gap-3"><button type="button" onClick={() => { loadSettings(guildId); setIsDirty(false); }} className="text-xs font-bold text-gray-400 hover:text-white transition">{t('common.discard')}</button><button type="button" onClick={handleSaveAll} className="bg-[#23A55A] hover:bg-[#1a7f43] text-white text-xs font-black px-5 py-2 rounded-lg">{t('levelingPage.commitAll')}</button></div>
+          <span className="text-sm font-bold text-gray-200">{t('levelingPage.unsavedWarning')}</span>
+          <div className="flex gap-3"><button type="button" onClick={() => { loadSettings(guildId); setIsDirty(false); }} className="text-sm font-bold text-gray-400 hover:text-white transition">{t('common.discard')}</button><button type="button" onClick={handleSaveAll} className="bg-[#23A55A] hover:bg-[#1a7f43] text-white text-sm font-black px-5 py-2 rounded-lg">{t('levelingPage.commitAll')}</button></div>
         </div>
       )}
     </div>
