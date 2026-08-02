@@ -162,48 +162,50 @@ export default function AutomodSettingsPage() {
           {t('automodPage.spamDetectionTitle')}
         </h3>
 
-        <div className="space-y-1.5">
-          <label className="text-sm font-bold text-[#b5bac1]">
-            {t('automodPage.messageLimitLabel', { min: AUTOMOD_SPAM_LIMIT_MIN, max: AUTOMOD_SPAM_LIMIT_MAX })}
-          </label>
-          <input
-            type="number"
-            min={AUTOMOD_SPAM_LIMIT_MIN}
-            max={AUTOMOD_SPAM_LIMIT_MAX}
-            value={spamLimit}
-            onChange={(e) => { setSpamLimit(parseInt(e.target.value) || 0); setIsDirty(true); }}
-            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]"
-          />
-          <HelpText>{t('automodPage.messageLimitHelp')}</HelpText>
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-1.5">
+            <label className="text-sm font-bold text-[#b5bac1]">
+              {t('automodPage.messageLimitLabel', { min: AUTOMOD_SPAM_LIMIT_MIN, max: AUTOMOD_SPAM_LIMIT_MAX })}
+            </label>
+            <input
+              type="number"
+              min={AUTOMOD_SPAM_LIMIT_MIN}
+              max={AUTOMOD_SPAM_LIMIT_MAX}
+              value={spamLimit}
+              onChange={(e) => { setSpamLimit(parseInt(e.target.value) || 0); setIsDirty(true); }}
+              className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]"
+            />
+            <HelpText>{t('automodPage.messageLimitHelp')}</HelpText>
+          </div>
 
-        <div className="space-y-1.5 pt-2">
-          <label className="text-sm font-bold text-[#b5bac1]">
-            {t('automodPage.timeWindowLabel', { min: AUTOMOD_SPAM_INTERVAL_MIN_SECONDS, max: AUTOMOD_SPAM_INTERVAL_MAX_SECONDS })}
-          </label>
-          <input
-            type="number"
-            min={AUTOMOD_SPAM_INTERVAL_MIN_SECONDS}
-            max={AUTOMOD_SPAM_INTERVAL_MAX_SECONDS}
-            value={spamIntervalSeconds}
-            onChange={(e) => { setSpamIntervalSeconds(parseInt(e.target.value) || 0); setIsDirty(true); }}
-            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]"
-          />
-        </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-bold text-[#b5bac1]">
+              {t('automodPage.timeWindowLabel', { min: AUTOMOD_SPAM_INTERVAL_MIN_SECONDS, max: AUTOMOD_SPAM_INTERVAL_MAX_SECONDS })}
+            </label>
+            <input
+              type="number"
+              min={AUTOMOD_SPAM_INTERVAL_MIN_SECONDS}
+              max={AUTOMOD_SPAM_INTERVAL_MAX_SECONDS}
+              value={spamIntervalSeconds}
+              onChange={(e) => { setSpamIntervalSeconds(parseInt(e.target.value) || 0); setIsDirty(true); }}
+              className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]"
+            />
+          </div>
 
-        <div className="space-y-1.5 pt-2">
-          <label className="text-sm font-bold text-[#b5bac1]">
-            {t('automodPage.timeoutDurationLabel', { min: AUTOMOD_TIMEOUT_MIN_SECONDS, max: AUTOMOD_TIMEOUT_MAX_SECONDS })}
-          </label>
-          <input
-            type="number"
-            min={AUTOMOD_TIMEOUT_MIN_SECONDS}
-            max={AUTOMOD_TIMEOUT_MAX_SECONDS}
-            value={timeoutSeconds}
-            onChange={(e) => { setTimeoutSeconds(parseInt(e.target.value) || 0); setIsDirty(true); }}
-            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]"
-          />
-          <HelpText>{t('automodPage.timeoutDurationHelp')}</HelpText>
+          <div className="space-y-1.5">
+            <label className="text-sm font-bold text-[#b5bac1]">
+              {t('automodPage.timeoutDurationLabel', { min: AUTOMOD_TIMEOUT_MIN_SECONDS, max: AUTOMOD_TIMEOUT_MAX_SECONDS })}
+            </label>
+            <input
+              type="number"
+              min={AUTOMOD_TIMEOUT_MIN_SECONDS}
+              max={AUTOMOD_TIMEOUT_MAX_SECONDS}
+              value={timeoutSeconds}
+              onChange={(e) => { setTimeoutSeconds(parseInt(e.target.value) || 0); setIsDirty(true); }}
+              className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]"
+            />
+            <HelpText>{t('automodPage.timeoutDurationHelp')}</HelpText>
+          </div>
         </div>
       </div>
 
@@ -212,34 +214,36 @@ export default function AutomodSettingsPage() {
           {t('automodPage.messageShapeTitle')}
         </h3>
 
-        <div className="space-y-1.5">
-          <label className="text-sm font-bold text-[#b5bac1]">
-            {t('automodPage.maxCharsLabel', { min: AUTOMOD_MAX_CHARS_MIN, max: AUTOMOD_MAX_CHARS_MAX })}
-          </label>
-          <input
-            type="number"
-            min={AUTOMOD_MAX_CHARS_MIN}
-            max={AUTOMOD_MAX_CHARS_MAX}
-            value={maxChars}
-            onChange={(e) => { setMaxChars(parseInt(e.target.value) || 0); setIsDirty(true); }}
-            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]"
-          />
-          <HelpText>{t('automodPage.maxCharsHelp')}</HelpText>
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label className="text-sm font-bold text-[#b5bac1]">
+              {t('automodPage.maxCharsLabel', { min: AUTOMOD_MAX_CHARS_MIN, max: AUTOMOD_MAX_CHARS_MAX })}
+            </label>
+            <input
+              type="number"
+              min={AUTOMOD_MAX_CHARS_MIN}
+              max={AUTOMOD_MAX_CHARS_MAX}
+              value={maxChars}
+              onChange={(e) => { setMaxChars(parseInt(e.target.value) || 0); setIsDirty(true); }}
+              className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]"
+            />
+            <HelpText>{t('automodPage.maxCharsHelp')}</HelpText>
+          </div>
 
-        <div className="space-y-1.5 pt-2">
-          <label className="text-sm font-bold text-[#b5bac1]">
-            {t('automodPage.maxLinesLabel', { min: AUTOMOD_MAX_LINES_MIN, max: AUTOMOD_MAX_LINES_MAX })}
-          </label>
-          <input
-            type="number"
-            min={AUTOMOD_MAX_LINES_MIN}
-            max={AUTOMOD_MAX_LINES_MAX}
-            value={maxLines}
-            onChange={(e) => { setMaxLines(parseInt(e.target.value) || 0); setIsDirty(true); }}
-            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]"
-          />
-          <HelpText>{t('automodPage.maxLinesHelp')}</HelpText>
+          <div className="space-y-1.5">
+            <label className="text-sm font-bold text-[#b5bac1]">
+              {t('automodPage.maxLinesLabel', { min: AUTOMOD_MAX_LINES_MIN, max: AUTOMOD_MAX_LINES_MAX })}
+            </label>
+            <input
+              type="number"
+              min={AUTOMOD_MAX_LINES_MIN}
+              max={AUTOMOD_MAX_LINES_MAX}
+              value={maxLines}
+              onChange={(e) => { setMaxLines(parseInt(e.target.value) || 0); setIsDirty(true); }}
+              className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]"
+            />
+            <HelpText>{t('automodPage.maxLinesHelp')}</HelpText>
+          </div>
         </div>
       </div>
 

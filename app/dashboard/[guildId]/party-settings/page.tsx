@@ -262,6 +262,7 @@ export default function PartySettingsPage() {
           {t('partySettingsPage.timersTitle')}
         </h3>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <label className="text-sm font-bold text-[#b5bac1]">
             {t('partySettingsPage.cardAutoCloseLabel', { min: PARTY_CARD_LIFETIME_MIN_MINUTES, max: PARTY_CARD_LIFETIME_MAX_MINUTES })}
@@ -276,7 +277,7 @@ export default function PartySettingsPage() {
           />
         </div>
 
-        <div className="space-y-1.5 pt-2">
+        <div className="space-y-1.5">
           <label className="text-sm font-bold text-[#b5bac1]">
             {t('partySettingsPage.channelAutoDeleteLabel', { min: PARTY_CHANNEL_LIFETIME_MIN_HOURS, max: PARTY_CHANNEL_LIFETIME_MAX_HOURS })}
           </label>
@@ -288,6 +289,7 @@ export default function PartySettingsPage() {
             onChange={(e) => { setChannelLifetimeHours(parseInt(e.target.value) || 0); setIsDirty(true); }}
             className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]"
           />
+        </div>
         </div>
       </div>
 
