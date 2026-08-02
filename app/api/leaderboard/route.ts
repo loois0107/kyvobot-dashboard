@@ -42,10 +42,15 @@ export async function GET(request: NextRequest) {
     // username/avatar_url은 실제 컬럼이 아니어서(42703로 확인됨) select에서 제거 - 실제 닉네임/
     // 아바타는 아래에서 Discord 멤버 목록으로 채우고, 서버를 나갔거나 못 찾은 유저만
     // Operator-XXXX 폴백으로 떨어진다.
+    // level을 1차 정렬 기준으로 쓴다 - xp는 레벨업할 때마다 남은 진행도만큼으로 리셋되는 값이라
+    // (leveling.py의 new_xp -= xp_needed) level과 상관관계가 없고, xp만으로 정렬하면 방금
+    // 레벨업해서 xp가 낮은 고레벨 유저가 레벨업 직전이라 xp가 쌓인 저레벨 유저보다 아래로 밀리는
+    // 역전이 실제로 발생했다. level이 같을 때만 xp(다음 레벨까지의 진행도)로 세부 순위를 가른다.
     const { data, error } = await supabase
       .from("users")
       .select("user_id, xp, level, points")
       .eq("guild_id", guildId)
+      .order("level", { ascending: false })
       .order("xp", { ascending: false })
       .limit(100);
 
