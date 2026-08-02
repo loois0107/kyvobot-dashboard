@@ -7,7 +7,7 @@ import { useToast } from '@/components/Toast';
 import { useT, useLanguage } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
-import { getTicketAiDefaults } from '@/lib/ticketAiDefaults';
+import { getTicketAiPlaceholders } from '@/lib/ticketAiDefaults';
 
 interface VectorNode {
   id: string;
@@ -52,20 +52,19 @@ export default function TicketAiSettings() {
   const [isSaving, setIsSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
 
-  // 📝 Discord Panel Embed Setup States - initial values match the bot's own hardcoded fallback
-  // (lib/ticketAiDefaults.ts) so a never-configured guild shows what the bot actually sends, not an
-  // unrelated placeholder that would silently become the "real" saved value the moment Save is hit.
-  // KO는 봇이 실제로 보내는 문구가 아니라 대시보드 뷰어 언어에 맞춘 "시작점" 예시일 뿐이다 -
-  // getTicketAiDefaults 상단 주석 참고. lang은 서버에서 미리 계산돼 첫 렌더부터 정확하므로
-  // useState 초깃값으로 바로 써도 깜빡임/hydration 불일치가 없다.
-  const ticketAiDefaults = getTicketAiDefaults(lang);
-  const [panelTitle, setPanelTitle] = useState(ticketAiDefaults.panelTitle);
-  const [panelDesc, setPanelDesc] = useState(ticketAiDefaults.panelDesc);
-  const [welcomeTitle, setWelcomeTitle] = useState(ticketAiDefaults.welcomeTitle);
-  const [welcomeDesc, setWelcomeDesc] = useState(ticketAiDefaults.welcomeDesc);
+  // 📝 Discord Panel Embed Setup States - start fully empty. The bot's own hardcoded fallback
+  // (cogs/ticket_ai.py) already kicks in automatically whenever the saved value is empty/falsy, so
+  // an admin who never touches these fields is not leaving anything broken - see
+  // lib/ticketAiDefaults.ts's header comment. ticketAiPlaceholders below supplies short example
+  // hints via the input's `placeholder` prop only - never a real value, never saved.
+  const ticketAiPlaceholders = getTicketAiPlaceholders(lang);
+  const [panelTitle, setPanelTitle] = useState('');
+  const [panelDesc, setPanelDesc] = useState('');
+  const [welcomeTitle, setWelcomeTitle] = useState('');
+  const [welcomeDesc, setWelcomeDesc] = useState('');
 
   // 🧠 Cognitive AI Prompt State
-  const [systemPrompt, setSystemPrompt] = useState(ticketAiDefaults.systemPrompt);
+  const [systemPrompt, setSystemPrompt] = useState('');
 
   // 🚦 Daily AI answer limits - empty string means "use the bot's default" (400 server / 20 user)
   const [dailyGuildLimit, setDailyGuildLimit] = useState('');
@@ -122,12 +121,11 @@ export default function TicketAiSettings() {
 
   const handleResetToBotDefault = () => {
     if (!window.confirm(t('ticketSettingsPage.resetToBotDefaultConfirm'))) return;
-    const defaults = getTicketAiDefaults(lang);
-    setPanelTitle(defaults.panelTitle);
-    setPanelDesc(defaults.panelDesc);
-    setWelcomeTitle(defaults.welcomeTitle);
-    setWelcomeDesc(defaults.welcomeDesc);
-    setSystemPrompt(defaults.systemPrompt);
+    setPanelTitle('');
+    setPanelDesc('');
+    setWelcomeTitle('');
+    setWelcomeDesc('');
+    setSystemPrompt('');
     setIsDirty(true);
     showToast(t('ticketSettingsPage.resetToBotDefaultDone'), 'info');
   };
@@ -136,8 +134,12 @@ export default function TicketAiSettings() {
     if (e) e.preventDefault();
     if (!guildId || guildId === '[guildId]') return;
 
-    // 🛡️ CRITICAL AI GUARD: 프롬프트에 {context} 변수가 누락되었는지 확인하여 봇이 바보가 되는 현상 차단
-    if (!systemPrompt.includes('{context}')) {
+    // 🛡️ CRITICAL AI GUARD: 프롬프트에 {context} 변수가 누락되었는지 확인하여 봇이 바보가 되는 현상 차단.
+    // 완전히 비어있으면 검증 대상에서 제외한다 - 봇은 system_prompt가 falsy면 자기 하드코딩된
+    // 안전한 기본 프롬프트(역할 설정 + {context} 삽입 + TRIGGER_STAFF_ALERT 로직 포함)를 그대로
+    // 쓰므로(cogs/ticket_ai.py) 빈 값 저장은 실제로 안전하다. 여기서 막으면 오히려 "완전히 비우기"
+    // 자체가 불가능해진다.
+    if (systemPrompt.trim() && !systemPrompt.includes('{context}')) {
       showToast(t('ticketSettingsPage.missingContextToken'), 'error');
       return;
     }
@@ -287,11 +289,11 @@ export default function TicketAiSettings() {
             <HelpText>{t('ticketSettingsPage.panelSetupDesc')}</HelpText>
             <div className="space-y-1">
               <label className="text-[11px] font-black text-[#b5bac1] uppercase tracking-wider">{t('ticketSettingsPage.panelTitleLabel')}</label>
-              <input type="text" value={panelTitle} onChange={(e) => { setPanelTitle(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]" />
+              <input type="text" value={panelTitle} onChange={(e) => { setPanelTitle(e.target.value); setIsDirty(true); }} placeholder={ticketAiPlaceholders.panelTitle} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]" />
             </div>
             <div className="space-y-1">
               <label className="text-[11px] font-black text-[#b5bac1] uppercase tracking-wider">{t('ticketSettingsPage.panelDescLabel')}</label>
-              <textarea rows={3} value={panelDesc} onChange={(e) => { setPanelDesc(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white resize-none focus:outline-none focus:border-[#5865F2]" />
+              <textarea rows={3} value={panelDesc} onChange={(e) => { setPanelDesc(e.target.value); setIsDirty(true); }} placeholder={ticketAiPlaceholders.panelDesc} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white resize-none focus:outline-none focus:border-[#5865F2]" />
             </div>
           </div>
 
@@ -300,11 +302,11 @@ export default function TicketAiSettings() {
             <HelpText>{t('ticketSettingsPage.welcomeEmbedDesc')}</HelpText>
             <div className="space-y-1">
               <label className="text-[11px] font-black text-[#b5bac1] uppercase tracking-wider">{t('ticketSettingsPage.welcomeTitleLabel')}</label>
-              <input type="text" value={welcomeTitle} onChange={(e) => { setWelcomeTitle(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-green-500" />
+              <input type="text" value={welcomeTitle} onChange={(e) => { setWelcomeTitle(e.target.value); setIsDirty(true); }} placeholder={ticketAiPlaceholders.welcomeTitle} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-green-500" />
             </div>
             <div className="space-y-1">
               <label className="text-[11px] font-black text-[#b5bac1] uppercase tracking-wider">{t('ticketSettingsPage.welcomeDescLabel')}</label>
-              <textarea rows={3} value={welcomeDesc} onChange={(e) => { setWelcomeDesc(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white resize-none focus:outline-none focus:border-green-500" />
+              <textarea rows={3} value={welcomeDesc} onChange={(e) => { setWelcomeDesc(e.target.value); setIsDirty(true); }} placeholder={ticketAiPlaceholders.welcomeDesc} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white resize-none focus:outline-none focus:border-green-500" />
             </div>
           </div>
 
@@ -323,6 +325,7 @@ export default function TicketAiSettings() {
 
           <textarea
             rows={5} value={systemPrompt} onChange={(e) => { setSystemPrompt(e.target.value); setIsDirty(true); }}
+            placeholder={ticketAiPlaceholders.systemPrompt}
             className="w-full bg-[#111214] border border-[#232428] rounded-xl p-4 text-sm sm:text-base text-white font-mono focus:outline-none focus:border-purple-500"
           />
         </div>
