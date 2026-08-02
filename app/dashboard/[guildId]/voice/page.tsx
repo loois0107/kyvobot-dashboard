@@ -116,7 +116,7 @@ export default function VoiceSettingsPage() {
               guildId={guildId || ''}
               value={triggerChannelId}
               onChange={setTriggerChannelId}
-              className="text-sm px-3 py-2"
+              className="px-3 py-2"
             />
             <HelpText className="mt-2">
               {t('voicePage.triggerChannelHelp')}

@@ -175,8 +175,8 @@ export default function WelcomeSettings() {
           </div>
         </div>
 
-        <form id="welcome-form" onSubmit={handleSave} className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-5 shadow-xl md:col-span-1">
+        <form id="welcome-form" onSubmit={handleSave} className="grid grid-cols-1 md:grid-cols-5 gap-6">
+          <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-5 shadow-xl md:col-span-2">
             <h2 className="text-xs font-black tracking-widest text-[#5865F2] uppercase border-b border-[#2b2d31] pb-2">{t('welcomePage.protocolsTitle')}</h2>
 
             <div className="space-y-3 p-3.5 bg-[#111214] rounded-xl border border-[#232428]">
@@ -185,7 +185,7 @@ export default function WelcomeSettings() {
                 <input id="enable-toggle" type="checkbox" checked={enabled} onChange={(e) => { setEnabled(e.target.checked); setIsDirty(true); }} className="w-4 h-4 accent-[#5865F2] cursor-pointer" />
               </div>
               <div className="space-y-1 pt-1 border-t border-[#2b2d31]/40">
-                <label className="text-[10px] font-bold text-[#b5bac1] uppercase block">{t('welcomePage.welcomeChannelLabel')}</label>
+                <label className="text-xs font-bold text-[#b5bac1] uppercase block">{t('welcomePage.welcomeChannelLabel')}</label>
                 <ChannelSelect
                   guildId={guildId}
                   value={channelId}
@@ -202,7 +202,7 @@ export default function WelcomeSettings() {
                 <input id="goodbye-toggle" type="checkbox" checked={goodbyeEnabled} onChange={(e) => { setGoodbyeEnabled(e.target.checked); setIsDirty(true); }} className="w-4 h-4 accent-red-500 cursor-pointer" />
               </div>
               <div className="space-y-1 pt-1 border-t border-[#2b2d31]/40">
-                <label className="text-[10px] font-bold text-[#b5bac1] uppercase block">{t('welcomePage.goodbyeChannelLabel')}</label>
+                <label className="text-xs font-bold text-[#b5bac1] uppercase block">{t('welcomePage.goodbyeChannelLabel')}</label>
                 <ChannelSelect
                   guildId={guildId}
                   value={goodbyeChannelId}
@@ -212,7 +212,7 @@ export default function WelcomeSettings() {
                 <HelpText className="normal-case">{t('welcomePage.goodbyeChannelHelp')}</HelpText>
               </div>
               <div className="space-y-1 pt-1 border-t border-[#2b2d31]/40">
-                <label className="text-[10px] font-bold text-[#b5bac1] uppercase block">{t('welcomePage.goodbyeMessageLabel')}</label>
+                <label className="text-xs font-bold text-[#b5bac1] uppercase block">{t('welcomePage.goodbyeMessageLabel')}</label>
                 <textarea
                   value={goodbyeMessage}
                   onChange={(e) => { setGoodbyeMessage(e.target.value); setIsDirty(true); }}
@@ -227,7 +227,7 @@ export default function WelcomeSettings() {
             </div>
           </div>
 
-          <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-4 shadow-xl md:col-span-2">
+          <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-4 shadow-xl md:col-span-3">
             <h2 className="text-xs font-black tracking-widest text-green-400 uppercase border-b border-[#2b2d31] pb-2">{t('welcomePage.aestheticTitle')}</h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
