@@ -432,7 +432,7 @@ const en = {
     welcomeDescLabel: '💬 TICKET ROOM WELCOME DESCRIPTION',
     systemPromptTitle: '🤖 COGNITIVE SYSTEM PROMPT (AI CORE ROLE)',
     systemPromptDescPrefix: '⚠️ Warning: Never delete the',
-    systemPromptDescSuffix: "token in the prompt! Your server rules and knowledge base entries (registered below) get inserted automatically at that exact spot. (💡 Not sure what to write? The default prompt works perfectly as-is!)",
+    systemPromptDescSuffix: "token in the prompt! Your server rules and knowledge base entries (registered below) get inserted automatically at that exact spot. (💡 Think of the default prompt as a starting point - make it your own!)",
     missingContextToken: 'Configuration Rejected: Your Cognitive System Prompt MUST contain the exact text token `{context}` so the RAG pipeline can inject knowledge base vectors!',
     resetToBotDefault: '🔄 Reset to Bot Default',
     resetToBotDefaultConfirm: "Reset the panel/welcome text and system prompt back to the bot's defaults? Everything you've typed here will be replaced (nothing is saved until you hit Save).",

@@ -434,7 +434,7 @@ const ko: typeof en = {
     welcomeDescLabel: '💬 티켓방 환영 설명',
     systemPromptTitle: '🤖 AI 시스템 프롬프트',
     systemPromptDescPrefix: '⚠️ 주의: 문장 안의',
-    systemPromptDescSuffix: '단어는 절대 지우지 마세요! 이 위치에 아래 등록하신 서버 규칙과 지식이 자동으로 들어갑니다. (💡 잘 모르시겠다면 기본으로 제공된 문구를 그대로 사용하셔도 완벽하게 작동합니다!)',
+    systemPromptDescSuffix: '단어는 절대 지우지 마세요! 이 위치에 아래 등록하신 서버 규칙과 지식이 자동으로 들어갑니다. (💡 기본 프롬프트는 그냥 시작점이에요 - 자유롭게 다듬어서 우리 서버만의 색을 입혀보세요!)',
     missingContextToken: '설정 거부됨: AI 시스템 프롬프트에 정확히 `{context}` 토큰이 포함돼야 RAG 파이프라인이 지식 베이스를 삽입할 수 있습니다!',
     resetToBotDefault: '🔄 봇 기본값으로 초기화',
     resetToBotDefaultConfirm: '패널/웰컴 문구와 시스템 프롬프트를 봇의 기본값으로 되돌릴까요? 지금까지 입력한 내용은 사라집니다(저장 전까지는 취소할 수 있어요).',
