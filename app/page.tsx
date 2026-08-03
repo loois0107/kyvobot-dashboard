@@ -62,6 +62,39 @@ const FEATURES = [
   },
 ] as const;
 
+// 🛡️ 아래 Feature Grid의 party/automod/ticket/leveling 항목과 아이콘/색을 그대로 맞춰서, 스크롤을
+// 내렸을 때 "이 고민 -> 저 기능"으로 자연스럽게 이어져 보이게 한다(우연이 아니라 의도적 연결).
+const PAIN_POINTS = [
+  {
+    problemKey: 'painPointPartyProblem',
+    solutionKey: 'painPointPartySolution',
+    icon: '🎮',
+    badgeBg: 'bg-[#5865F2]/15',
+    accentText: 'text-[#5865F2]',
+  },
+  {
+    problemKey: 'painPointAutomodProblem',
+    solutionKey: 'painPointAutomodSolution',
+    icon: '🛡️',
+    badgeBg: 'bg-red-500/15',
+    accentText: 'text-red-400',
+  },
+  {
+    problemKey: 'painPointTicketProblem',
+    solutionKey: 'painPointTicketSolution',
+    icon: '🤖',
+    badgeBg: 'bg-purple-500/15',
+    accentText: 'text-purple-400',
+  },
+  {
+    problemKey: 'painPointLevelingProblem',
+    solutionKey: 'painPointLevelingSolution',
+    icon: '📊',
+    badgeBg: 'bg-green-500/15',
+    accentText: 'text-green-400',
+  },
+] as const;
+
 const SCREENSHOTS = [
   {
     titleKey: 'screenshotPartyTitle',
@@ -188,6 +221,28 @@ export default async function RootPage() {
           )}
         </div>
       </main>
+
+      <section className="relative max-w-5xl mx-auto w-full px-4 pb-20">
+        <RevealOnScroll className="mb-10">
+          <h2 className="text-center text-xs font-black tracking-widest text-[#FFD700] uppercase">
+            {t.landingPage.painPointsTitle}
+          </h2>
+        </RevealOnScroll>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {PAIN_POINTS.map((item, i) => (
+            <RevealOnScroll key={item.problemKey} delayMs={i * 120}>
+              <div className="h-full bg-[#161626] border border-[#2A1F40] rounded-2xl p-6 space-y-4">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${item.badgeBg}`}>
+                  {item.icon}
+                </div>
+                <p className="text-sm text-[#949ba4] leading-relaxed">😩 {t.landingPage[item.problemKey]}</p>
+                <div className="h-px bg-[#2A1F40]" />
+                <p className={`text-sm font-bold leading-relaxed ${item.accentText}`}>✅ {t.landingPage[item.solutionKey]}</p>
+              </div>
+            </RevealOnScroll>
+          ))}
+        </div>
+      </section>
 
       <section className="relative max-w-4xl mx-auto w-full px-4 pb-20">
         <RevealOnScroll className="flex flex-col items-center gap-5">
