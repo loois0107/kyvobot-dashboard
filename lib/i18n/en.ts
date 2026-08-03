@@ -632,6 +632,9 @@ const en = {
     noServersFound: 'No servers found where both you and Kyvo are present. Join a server that has Kyvo, then come back here.',
   },
   profileCardPage: {
+    loginRequiredTitle: '🔒 Login Required',
+    loginRequiredDesc: "Sign in with Discord to view and customize your rank card, shop, and party history for this server.",
+    loginButton: 'Login with Discord',
     title: '🎨 My Rank Card',
     personalStyleActive: 'Personal style active for this server',
     usingServerDefault: "Currently using this server's default style",

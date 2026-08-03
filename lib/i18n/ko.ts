@@ -634,6 +634,9 @@ const ko: typeof en = {
     noServersFound: '나와 Kyvo가 함께 있는 서버를 찾을 수 없습니다. Kyvo가 있는 서버에 참여한 후 다시 와주세요.',
   },
   profileCardPage: {
+    loginRequiredTitle: '🔒 로그인이 필요합니다',
+    loginRequiredDesc: '이 서버의 랭크 카드, 상점, 파티 기록을 보고 꾸미려면 디스코드로 로그인해주세요.',
+    loginButton: 'Discord로 로그인',
     title: '🎨 내 랭크 카드',
     personalStyleActive: '이 서버에서 개인 스타일이 적용 중입니다',
     usingServerDefault: '현재 이 서버의 기본 스타일을 사용 중입니다',

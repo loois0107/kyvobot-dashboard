@@ -307,6 +307,29 @@ export default function PersonalCardSettings() {
     }
   };
 
+  // 🛡️ status가 'unauthenticated'면(로딩 중이 아니라 세션이 없다고 확정된 상태) 아래 loading
+  // 가드보다 먼저 걸러야 한다 - loadSettings() 등은 status==='authenticated'일 때만 호출되므로
+  // (78~84행 useEffect), unauthenticated에서는 loading이 초기값 true에서 영원히 안 바뀌어
+  // 아래 가드에 걸려 빈 화면만 무한히 보여주게 된다(디스코드 인앱 브라우저에서 별도 로그인 세션이
+  // 없을 때 실제로 재현됨). callbackUrl로 지금 보려던 이 guildId 프로필로 로그인 후 자동 복귀시킨다.
+  if (status === 'unauthenticated') {
+    const callbackUrl = guildId ? `/profile/${guildId}` : '/profile';
+    return (
+      <div className="min-h-screen bg-[#111214] flex items-center justify-center p-4">
+        <div className="text-center space-y-4 border border-[#2b2d31] bg-[#1e1f22] p-8 rounded-2xl shadow-2xl max-w-md w-full">
+          <h1 className="text-xl font-black text-[#FFD700]">{t('profileCardPage.loginRequiredTitle')}</h1>
+          <p className="text-sm text-[#a1a1aa]">{t('profileCardPage.loginRequiredDesc')}</p>
+          <a
+            href={`/api/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`}
+            className="inline-block bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all"
+          >
+            {t('profileCardPage.loginButton')}
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   if (status === 'loading' || loading) return <div className="min-h-screen bg-[#111214]" />;
 
   return (
