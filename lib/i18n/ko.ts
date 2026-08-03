@@ -637,6 +637,14 @@ const ko: typeof en = {
   profileTabs: {
     rankCard: '🎨 랭크 카드',
     activity: '🎮 활동',
+    leaderboard: '🏆 리더보드',
+  },
+  profileLeaderboardPage: {
+    title: '🏆 서버 리더보드',
+    subtitle: '이 서버에서 내 순위를 확인하세요:',
+    yourRank: '당신은 {rank}등입니다!',
+    outsideTop100: 'TOP 100 순위 밖입니다 - 경험치를 더 쌓아 순위를 올려보세요.',
+    youBadge: '나',
   },
   profileCardPage: {
     loginRequiredTitle: '🔒 로그인이 필요합니다',

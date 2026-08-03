@@ -41,9 +41,11 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
   if (status === 'loading') return <div className="min-h-screen bg-[#111214]" />;
 
   const isActivityTab = pathname?.endsWith('/activity');
+  const isLeaderboardTab = pathname?.endsWith('/leaderboard');
   const tabs = [
-    { href: `/profile/${guildId}`, label: t('profileTabs.rankCard'), active: !isActivityTab },
+    { href: `/profile/${guildId}`, label: t('profileTabs.rankCard'), active: !isActivityTab && !isLeaderboardTab },
     { href: `/profile/${guildId}/activity`, label: t('profileTabs.activity'), active: Boolean(isActivityTab) },
+    { href: `/profile/${guildId}/leaderboard`, label: t('profileTabs.leaderboard'), active: Boolean(isLeaderboardTab) },
   ];
 
   return (

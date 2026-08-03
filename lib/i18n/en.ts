@@ -635,6 +635,14 @@ const en = {
   profileTabs: {
     rankCard: '🎨 Rank Card',
     activity: '🎮 Activity',
+    leaderboard: '🏆 Leaderboard',
+  },
+  profileLeaderboardPage: {
+    title: '🏆 Server Leaderboard',
+    subtitle: 'See where you rank against everyone else in',
+    yourRank: 'You are ranked #{rank}!',
+    outsideTop100: "You're outside the Top 100 - keep earning XP to climb the board.",
+    youBadge: 'YOU',
   },
   profileCardPage: {
     loginRequiredTitle: '🔒 Login Required',
