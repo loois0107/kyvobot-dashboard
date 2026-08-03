@@ -574,6 +574,7 @@ const en = {
     networkDrop: 'Network Drop: {message}',
   },
   landingPage: {
+    navFeatures: 'Features',
     guildListFailed: '⚠️ Failed to load your Discord server list. Please re-authenticate your session.',
     controlHubTitle: '🛡️ Kyvo Control Hub',
     noManagedServers: 'No Discord servers found where you have management permissions.',
