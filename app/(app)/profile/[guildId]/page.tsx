@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import type { ChangeEvent } from 'react';
 import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useToast } from '@/components/Toast';
@@ -10,6 +11,8 @@ import SettingsPageContainer from '@/components/SettingsPageContainer';
 
 const COLOR_PRESETS = ['#5865F2', '#23A55A', '#FEE75C', '#EB459E', '#ED4245', '#9B59B6', '#00D2D3', '#54A0FF', '#FF6B6B', '#FFFFFF'];
 const BG_COLOR_PRESETS = ['#1E1F22', '#2B2D31', '#313338', '#111214', '#0F0F1A', '#161626'];
+const ALLOWED_BG_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+const MAX_BG_FILE_SIZE = 5 * 1024 * 1024; // 5MB - must match app/api/profile/[guildId]/card/background/route.ts
 
 export default function PersonalCardSettings() {
   const params = useParams();
@@ -33,6 +36,7 @@ export default function PersonalCardSettings() {
   const [cardBgColor, setCardBgColor] = useState('#1E1F22');
   const [overlayOpacity, setOverlayOpacity] = useState(0.6);
   const [backgroundUrl, setBackgroundUrl] = useState('');
+  const [isUploadingBg, setIsUploadingBg] = useState(false);
 
   useEffect(() => {
     if (status !== 'authenticated' || !guildId) return;
@@ -126,6 +130,45 @@ export default function PersonalCardSettings() {
       showToast(t('profileCardPage.resetNetworkError'), 'error');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  // 🛡️ 서버(app/api/profile/[guildId]/card/background/route.ts)도 형식/크기를 다시 검증하지만,
+  // 여기서 먼저 걸러내면 업로드 왕복 없이 즉시 피드백을 줄 수 있다 - 진짜 방어선은 서버 쪽이다.
+  const handleBackgroundFileSelect = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // 같은 파일을 다시 선택해도 onChange가 또 발생하게 리셋
+    if (!file) return;
+
+    if (!ALLOWED_BG_TYPES.includes(file.type)) {
+      showToast(t('profileCardPage.bgImageInvalidType'), 'error');
+      return;
+    }
+    if (file.size > MAX_BG_FILE_SIZE) {
+      showToast(t('profileCardPage.bgImageTooLarge'), 'error');
+      return;
+    }
+
+    setIsUploadingBg(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch(`/api/profile/${guildId}/card/background`, {
+        method: 'POST',
+        body: formData,
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setBackgroundUrl(data.url);
+        setIsDirty(true);
+      } else {
+        showToast(await extractErrorMessage(res), 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast(t('profileCardPage.bgImageUploadNetworkError'), 'error');
+    } finally {
+      setIsUploadingBg(false);
     }
   };
 
@@ -245,14 +288,33 @@ export default function PersonalCardSettings() {
             </div>
 
             <div className="space-y-2 pt-2">
-              <label className="text-xs font-bold text-[#b5bac1]">{t('profileCardPage.bgImageUrlLabel')}</label>
-              <input
-                type="text"
-                value={backgroundUrl}
-                onChange={(e) => { setBackgroundUrl(e.target.value); setIsDirty(true); }}
-                placeholder={t('profileCardPage.bgImageUrlPlaceholder')}
-                className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-[10px] text-white focus:outline-none focus:border-[#5865F2]"
-              />
+              <label className="text-xs font-bold text-[#b5bac1]">{t('profileCardPage.bgImageLabel')}</label>
+              <div className="flex items-center gap-3">
+                <label className={`inline-block bg-[#2b2d31] hover:bg-[#35373c] text-white text-xs font-black px-4 py-2.5 rounded-lg transition-all ${isUploadingBg ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+                  {isUploadingBg
+                    ? t('profileCardPage.uploading')
+                    : backgroundUrl
+                      ? t('profileCardPage.bgImageChangeButton')
+                      : t('profileCardPage.bgImageUploadButton')}
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/gif,image/webp"
+                    className="hidden"
+                    onChange={handleBackgroundFileSelect}
+                    disabled={isUploadingBg}
+                  />
+                </label>
+                {backgroundUrl && !isUploadingBg && (
+                  <button
+                    type="button"
+                    onClick={() => { setBackgroundUrl(''); setIsDirty(true); }}
+                    className="text-xs font-bold text-red-400 hover:underline"
+                  >
+                    {t('profileCardPage.bgImageRemoveButton')}
+                  </button>
+                )}
+              </div>
+              <HelpText>{t('profileCardPage.bgImageHint')}</HelpText>
             </div>
           </div>
         </div>
