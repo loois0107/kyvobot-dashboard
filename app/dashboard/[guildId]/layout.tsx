@@ -139,6 +139,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               {t('sidebar.controlHubHome')}
             </Link>
 
+            <Link
+              href={`/profile/${currentGuildId}`}
+              className="flex items-center px-3 py-2 rounded font-medium transition hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]"
+            >
+              {t('sidebar.myPage')}
+            </Link>
+
             <div className="space-y-1">
               <label className="block text-sm font-bold text-[#949ba4] uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryCommunity')}</label>
               <Link

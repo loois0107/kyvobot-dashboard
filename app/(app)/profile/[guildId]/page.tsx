@@ -11,34 +11,11 @@ import SettingsPageContainer from '@/components/SettingsPageContainer';
 const COLOR_PRESETS = ['#5865F2', '#23A55A', '#FEE75C', '#EB459E', '#ED4245', '#9B59B6', '#00D2D3', '#54A0FF', '#FF6B6B', '#FFFFFF'];
 const BG_COLOR_PRESETS = ['#1E1F22', '#2B2D31', '#313338', '#111214', '#0F0F1A', '#161626'];
 
-interface PartyHistoryEntry {
-  id: number;
-  queue_type: string;
-  lanes: string | null;
-  selected_game: string | null;
-  status: string;
-  created_at: string;
-  role: 'leader' | 'participant';
-}
-
-interface ShopItem {
-  name: string;
-  price: number | null;
-  description: string;
-}
-
 export default function PersonalCardSettings() {
   const params = useParams();
   const { status } = useSession();
   const { showToast } = useToast();
   const t = useT();
-
-  const STATUS_BADGE: Record<string, { label: string; className: string }> = {
-    recruiting: { label: t('profileCardPage.statusRecruiting'), className: 'border-[#5865F2] text-[#5865F2] bg-[#5865F2]/10' },
-    full: { label: t('profileCardPage.statusFull'), className: 'border-[#23A55A] text-[#23A55A] bg-[#23A55A]/10' },
-    closed: { label: t('profileCardPage.statusClosed'), className: 'border-[#949ba4] text-[#949ba4] bg-[#949ba4]/10' },
-    expired: { label: t('profileCardPage.statusExpired'), className: 'border-[#949ba4] text-[#949ba4] bg-[#949ba4]/10' },
-  };
 
   const rawGuildId = params?.guildId as string | undefined;
   // 🛡️ Next.js가 하이드레이션 완료 전 잠깐 리터럴 "[guildId]" 플레이스홀더를 그대로 넘길 때가
@@ -57,30 +34,9 @@ export default function PersonalCardSettings() {
   const [overlayOpacity, setOverlayOpacity] = useState(0.6);
   const [backgroundUrl, setBackgroundUrl] = useState('');
 
-  const [historyLoading, setHistoryLoading] = useState(true);
-  const [historyError, setHistoryError] = useState('');
-  const [history, setHistory] = useState<PartyHistoryEntry[]>([]);
-
-  const [shopLoading, setShopLoading] = useState(true);
-  const [shopError, setShopError] = useState('');
-  const [points, setPoints] = useState(0);
-  const [currencyName, setCurrencyName] = useState('Points');
-  const [shopItems, setShopItems] = useState<ShopItem[]>([]);
-  const [purchasingItem, setPurchasingItem] = useState('');
-
-  const [favoriteGameLoading, setFavoriteGameLoading] = useState(true);
-  const [favoriteGameError, setFavoriteGameError] = useState('');
-  const [favoriteGame, setFavoriteGame] = useState<string | null>(null);
-  const [gamePresets, setGamePresets] = useState<string[]>([]);
-  const [selectedGameDraft, setSelectedGameDraft] = useState('');
-  const [isSavingFavoriteGame, setIsSavingFavoriteGame] = useState(false);
-
   useEffect(() => {
     if (status !== 'authenticated' || !guildId) return;
     loadSettings();
-    loadHistory();
-    loadShop();
-    loadFavoriteGame();
   }, [status, guildId]);
 
   // API가 { error: "..." } / { status, message } 어느 모양으로 응답하든 사람이 읽을 문구를 뽑아낸다.
@@ -92,140 +48,6 @@ export default function PersonalCardSettings() {
       return data.message || data.error || t('common.requestFailed', { status: res.status });
     } catch {
       return t('common.requestFailed', { status: res.status });
-    }
-  };
-
-  const loadHistory = async () => {
-    setHistoryLoading(true);
-    setHistoryError('');
-    try {
-      const res = await fetch(`/api/profile/${guildId}/party-history`);
-      if (res.ok) {
-        const data = await res.json();
-        setHistory(data.history || []);
-      } else {
-        setHistoryError(await extractErrorMessage(res));
-      }
-    } catch (err) {
-      console.error(err);
-      setHistoryError(t('profileCardPage.historyNetworkError'));
-    } finally {
-      setHistoryLoading(false);
-    }
-  };
-
-  const loadShop = async () => {
-    setShopLoading(true);
-    setShopError('');
-    try {
-      const res = await fetch(`/api/profile/${guildId}/shop`);
-      if (res.ok) {
-        const data = await res.json();
-        setPoints(data.points ?? 0);
-        setCurrencyName(data.currency_name || 'Points');
-        setShopItems(data.shop_items || []);
-      } else {
-        setShopError(await extractErrorMessage(res));
-      }
-    } catch (err) {
-      console.error(err);
-      setShopError(t('profileCardPage.shopNetworkError'));
-    } finally {
-      setShopLoading(false);
-    }
-  };
-
-  // 🛡️ 구매 처리는 봇의 buy_item 커맨드와 동일한 내부 웹훅으로 위임된다(cogs/economy.py의
-  // _process_purchase) - 대시보드는 포인트/인벤토리를 직접 건드리지 않는다. active_transactions
-  // 락 덕분에 이 버튼을 더블클릭해도, 또는 같은 유저가 동시에 /shop buy 커맨드를 쳐도 하나만
-  // 통과한다(나머지는 "locked" 사유로 거부됨).
-  const handleBuy = async (itemName: string) => {
-    if (purchasingItem) return;
-    setPurchasingItem(itemName);
-    try {
-      const res = await fetch(`/api/profile/${guildId}/shop/buy`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ item_name: itemName }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) {
-        showToast(t('profileCardPage.purchasedSuccess', { item: data.item_name, price: data.price?.toLocaleString() || '0', currency: data.currency_name }), 'success');
-        setPoints(data.remaining_points ?? points);
-      } else {
-        showToast(data.message || t('profileCardPage.purchaseFailed', { status: res.status }), 'error');
-      }
-    } catch (err) {
-      console.error(err);
-      showToast(t('profileCardPage.purchaseNetworkError'), 'error');
-    } finally {
-      setPurchasingItem('');
-    }
-  };
-
-  const loadFavoriteGame = async () => {
-    setFavoriteGameLoading(true);
-    setFavoriteGameError('');
-    try {
-      const res = await fetch(`/api/profile/${guildId}/favorite-game`);
-      if (res.ok) {
-        const data = await res.json();
-        setFavoriteGame(data.favorite_game_name || null);
-        setGamePresets(data.presets || []);
-        setSelectedGameDraft(data.favorite_game_name || '');
-      } else {
-        setFavoriteGameError(await extractErrorMessage(res));
-      }
-    } catch (err) {
-      console.error(err);
-      setFavoriteGameError(t('profileCardPage.favoriteGameLoadNetworkError'));
-    } finally {
-      setFavoriteGameLoading(false);
-    }
-  };
-
-  // 🛡️ /party_recruit이 game 파라미터를 생략했을 때 여기서 저장한 값을 자동으로 대신 쓴다
-  // (cogs/party.py의 resolve_effective_game) - Discord 슬래시 커맨드는 유저별 기본값을 UI
-  // 레벨에서 지원하지 않아서, 이게 실질적인 "기본값 자동 채움" 구현이다.
-  const handleSaveFavoriteGame = async () => {
-    if (!selectedGameDraft) return;
-    setIsSavingFavoriteGame(true);
-    try {
-      const res = await fetch(`/api/profile/${guildId}/favorite-game`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ game_name: selectedGameDraft }),
-      });
-      if (res.ok) {
-        setFavoriteGame(selectedGameDraft);
-        showToast(t('profileCardPage.favoriteGameSetSuccess', { game: selectedGameDraft }), 'success');
-      } else {
-        showToast(await extractErrorMessage(res), 'error');
-      }
-    } catch (err) {
-      console.error(err);
-      showToast(t('profileCardPage.favoriteGameSaveNetworkError'), 'error');
-    } finally {
-      setIsSavingFavoriteGame(false);
-    }
-  };
-
-  const handleClearFavoriteGame = async () => {
-    setIsSavingFavoriteGame(true);
-    try {
-      const res = await fetch(`/api/profile/${guildId}/favorite-game`, { method: 'DELETE' });
-      if (res.ok) {
-        setFavoriteGame(null);
-        setSelectedGameDraft('');
-        showToast(t('profileCardPage.favoriteGameClearedSuccess'), 'success');
-      } else {
-        showToast(await extractErrorMessage(res), 'error');
-      }
-    } catch (err) {
-      console.error(err);
-      showToast(t('profileCardPage.favoriteGameClearNetworkError'), 'error');
-    } finally {
-      setIsSavingFavoriteGame(false);
     }
   };
 
@@ -306,29 +128,6 @@ export default function PersonalCardSettings() {
       setIsSaving(false);
     }
   };
-
-  // 🛡️ status가 'unauthenticated'면(로딩 중이 아니라 세션이 없다고 확정된 상태) 아래 loading
-  // 가드보다 먼저 걸러야 한다 - loadSettings() 등은 status==='authenticated'일 때만 호출되므로
-  // (78~84행 useEffect), unauthenticated에서는 loading이 초기값 true에서 영원히 안 바뀌어
-  // 아래 가드에 걸려 빈 화면만 무한히 보여주게 된다(디스코드 인앱 브라우저에서 별도 로그인 세션이
-  // 없을 때 실제로 재현됨). callbackUrl로 지금 보려던 이 guildId 프로필로 로그인 후 자동 복귀시킨다.
-  if (status === 'unauthenticated') {
-    const callbackUrl = guildId ? `/profile/${guildId}` : '/profile';
-    return (
-      <div className="min-h-screen bg-[#111214] flex items-center justify-center p-4">
-        <div className="text-center space-y-4 border border-[#2b2d31] bg-[#1e1f22] p-8 rounded-2xl shadow-2xl max-w-md w-full">
-          <h1 className="text-xl font-black text-[#FFD700]">{t('profileCardPage.loginRequiredTitle')}</h1>
-          <p className="text-sm text-[#a1a1aa]">{t('profileCardPage.loginRequiredDesc')}</p>
-          <a
-            href={`/api/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`}
-            className="inline-block bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all"
-          >
-            {t('profileCardPage.loginButton')}
-          </a>
-        </div>
-      </div>
-    );
-  }
 
   if (status === 'loading' || loading) return <div className="min-h-screen bg-[#111214]" />;
 
@@ -456,158 +255,6 @@ export default function PersonalCardSettings() {
               />
             </div>
           </div>
-        </div>
-
-        <div className="space-y-4 bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl">
-          <div className="flex items-center justify-between border-b border-[#2b2d31] pb-2">
-            <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase">
-              {t('profileCardPage.shopTitle')}
-            </h3>
-            {!shopLoading && !shopError && (
-              <span className="text-xs font-bold text-[#FFD700]">🪙 {points.toLocaleString()} {currencyName}</span>
-            )}
-          </div>
-
-          {shopLoading ? (
-            <p className="text-sm text-[#949ba4] py-4">{t('profileCardPage.loadingShop')}</p>
-          ) : shopError ? (
-            <div className="text-center py-4 space-y-2">
-              <p className="text-sm text-red-400">⚠️ {shopError}</p>
-              <button type="button" onClick={loadShop} className="text-xs font-bold text-[#5865F2] hover:underline">
-                {t('common.retry')}
-              </button>
-            </div>
-          ) : shopItems.length === 0 ? (
-            <p className="text-sm text-[#949ba4] py-4">{t('profileCardPage.shopEmpty')}</p>
-          ) : (
-            <div className="space-y-2">
-              {shopItems.map((item) => {
-                const affordable = item.price !== null && points >= item.price;
-                const isPurchasing = purchasingItem === item.name;
-                return (
-                  <div key={item.name} className="flex items-center justify-between gap-3 bg-[#111214] rounded-lg px-3 py-2.5">
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-white truncate">{item.name}</p>
-                      {item.description && <HelpText className="truncate">{item.description}</HelpText>}
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-[10px] font-bold text-[#FFD700]">
-                        {item.price !== null ? `${item.price.toLocaleString()} ${currencyName}` : 'N/A'}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleBuy(item.name)}
-                        disabled={item.price === null || !affordable || Boolean(purchasingItem)}
-                        className="bg-[#23A55A] hover:bg-[#1a7f43] disabled:bg-[#2b2d31] disabled:text-[#57576F] disabled:cursor-not-allowed text-white text-[10px] font-black px-3 py-1.5 rounded-lg transition-all"
-                      >
-                        {isPurchasing ? t('profileCardPage.buying') : item.price === null ? t('profileCardPage.unavailable') : affordable ? t('profileCardPage.buy') : t('profileCardPage.notEnough')}
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        <div className="space-y-4 bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl">
-          <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
-            {t('profileCardPage.favoriteGameTitle')}
-          </h3>
-          <HelpText>
-            {t('profileCardPage.favoriteGameDesc')}
-          </HelpText>
-
-          {favoriteGameLoading ? (
-            <p className="text-sm text-[#949ba4] py-2">{t('profileCardPage.loadingShort')}</p>
-          ) : favoriteGameError ? (
-            <div className="py-2 space-y-2">
-              <p className="text-sm text-red-400">⚠️ {favoriteGameError}</p>
-              <button type="button" onClick={loadFavoriteGame} className="text-xs font-bold text-[#5865F2] hover:underline">
-                {t('common.retry')}
-              </button>
-            </div>
-          ) : gamePresets.length === 0 ? (
-            <p className="text-sm text-[#949ba4] py-2">{t('profileCardPage.noPresetsYet')}</p>
-          ) : (
-            <div className="flex flex-col sm:flex-row gap-2">
-              <select
-                value={selectedGameDraft}
-                onChange={(e) => setSelectedGameDraft(e.target.value)}
-                className="flex-1 bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5865F2]"
-              >
-                <option value="" disabled>{t('profileCardPage.selectGamePlaceholder')}</option>
-                {gamePresets.map((name) => (
-                  <option key={name} value={name}>{name}</option>
-                ))}
-              </select>
-              <button
-                type="button"
-                onClick={handleSaveFavoriteGame}
-                disabled={isSavingFavoriteGame || !selectedGameDraft || selectedGameDraft === favoriteGame}
-                className="bg-[#5865F2] hover:bg-[#4752C4] disabled:opacity-50 text-white text-xs font-black px-4 py-2 rounded-lg transition-all"
-              >
-                {isSavingFavoriteGame ? t('common.saving') : t('common.save')}
-              </button>
-              {favoriteGame && (
-                <button
-                  type="button"
-                  onClick={handleClearFavoriteGame}
-                  disabled={isSavingFavoriteGame}
-                  className="bg-[#2b2d31] hover:bg-[#35373c] disabled:opacity-50 text-white text-xs font-black px-4 py-2 rounded-lg transition-all"
-                >
-                  {t('profileCardPage.clear')}
-                </button>
-              )}
-            </div>
-          )}
-          {favoriteGame && !favoriteGameLoading && (
-            <p className="text-[10px] text-[#23A55A]">{t('profileCardPage.currentlySetTo', { game: favoriteGame })}</p>
-          )}
-        </div>
-
-        <div className="space-y-4 bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl">
-          <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
-            {t('profileCardPage.partyHistoryTitle')}
-          </h3>
-
-          {historyLoading ? (
-            <p className="text-sm text-[#949ba4] py-4">{t('profileCardPage.loadingHistory')}</p>
-          ) : historyError ? (
-            <div className="text-center py-4 space-y-2">
-              <p className="text-sm text-red-400">⚠️ {historyError}</p>
-              <button type="button" onClick={loadHistory} className="text-xs font-bold text-[#5865F2] hover:underline">
-                {t('common.retry')}
-              </button>
-            </div>
-          ) : history.length === 0 ? (
-            <p className="text-sm text-[#949ba4] py-4">{t('profileCardPage.noHistoryYet')}</p>
-          ) : (
-            <div className="space-y-2">
-              {history.map((entry) => {
-                const badge = STATUS_BADGE[entry.status] || { label: entry.status, className: 'border-[#949ba4] text-[#949ba4] bg-[#949ba4]/10' };
-                return (
-                  <div key={entry.id} className="flex items-center justify-between gap-3 bg-[#111214] rounded-lg px-3 py-2.5">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <span className="text-[10px] shrink-0" title={entry.role === 'leader' ? t('profileCardPage.ledRecruitment') : t('profileCardPage.joinedRecruitment')}>
-                        {entry.role === 'leader' ? '👑' : '🙋'}
-                      </span>
-                      <div className="min-w-0">
-                        <p className="text-xs font-bold text-white truncate">
-                          {entry.selected_game || entry.queue_type}
-                          {entry.lanes && <span className="text-[#949ba4] font-normal"> · {entry.lanes}</span>}
-                        </p>
-                        <HelpText>{new Date(entry.created_at).toLocaleString()}</HelpText>
-                      </div>
-                    </div>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded border shrink-0 ${badge.className}`}>
-                      {badge.label}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          )}
         </div>
       </SettingsPageContainer>
 

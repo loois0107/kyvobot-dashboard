@@ -13,6 +13,7 @@ const en = {
     categoryEconomy: 'Economy & Engagement',
     categoryIntegrationsAI: 'Integrations & AI Support',
     controlHubHome: '🎛️ Control Hub Home',
+    myPage: '🙋 My Page',
     automod: '🛡️ AutoMod',
     levelingEconomy: '✨ Leveling & Economy',
     welcomeSettings: '📥 Welcome Settings',
@@ -631,6 +632,10 @@ const en = {
     subtitle: 'Pick a server to customize your personal rank card',
     noServersFound: 'No servers found where both you and Kyvo are present. Join a server that has Kyvo, then come back here.',
   },
+  profileTabs: {
+    rankCard: '🎨 Rank Card',
+    activity: '🎮 Activity',
+  },
   profileCardPage: {
     loginRequiredTitle: '🔒 Login Required',
     loginRequiredDesc: "Sign in with Discord to view and customize your rank card, shop, and party history for this server.",
@@ -666,6 +671,7 @@ const en = {
     noHistoryYet: '📭 No party recruitments yet in this server - join one or start your own with /party_recruit.',
     ledRecruitment: 'You led this recruitment',
     joinedRecruitment: 'You joined this recruitment',
+    showMoreHistory: 'Show More ({count})',
     statusRecruiting: 'Recruiting',
     statusFull: 'Full',
     statusClosed: 'Closed',

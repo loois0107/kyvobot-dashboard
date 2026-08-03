@@ -15,6 +15,7 @@ const ko: typeof en = {
     categoryEconomy: '경제 & 참여도',
     categoryIntegrationsAI: '연동 & AI 지원',
     controlHubHome: '🎛️ 컨트롤 허브 홈',
+    myPage: '🙋 내 마이페이지',
     automod: '🛡️ 자동 관리',
     levelingEconomy: '✨ 레벨링 & 이코노미',
     welcomeSettings: '📥 환영 메시지 설정',
@@ -633,6 +634,10 @@ const ko: typeof en = {
     subtitle: '개인 랭크 카드를 커스터마이징할 서버를 선택하세요',
     noServersFound: '나와 Kyvo가 함께 있는 서버를 찾을 수 없습니다. Kyvo가 있는 서버에 참여한 후 다시 와주세요.',
   },
+  profileTabs: {
+    rankCard: '🎨 랭크 카드',
+    activity: '🎮 활동',
+  },
   profileCardPage: {
     loginRequiredTitle: '🔒 로그인이 필요합니다',
     loginRequiredDesc: '이 서버의 랭크 카드, 상점, 파티 기록을 보고 꾸미려면 디스코드로 로그인해주세요.',
@@ -668,6 +673,7 @@ const ko: typeof en = {
     noHistoryYet: '📭 이 서버에서 아직 파티 모집 기록이 없어요 - 참여하거나 /party_recruit으로 직접 만들어보세요.',
     ledRecruitment: '이 모집을 주최했습니다',
     joinedRecruitment: '이 모집에 참여했습니다',
+    showMoreHistory: '더보기 ({count}개)',
     statusRecruiting: '모집 중',
     statusFull: '정원 마감',
     statusClosed: '종료됨',
