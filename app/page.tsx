@@ -184,7 +184,7 @@ export default async function RootPage() {
 
       <LandingHeader dashboardHref={dashboardHref} />
 
-      <main className="relative flex-1 flex flex-col items-center justify-center text-center px-4 pt-4 pb-16 gap-6">
+      <main className="relative min-h-screen flex flex-col items-center justify-center text-center px-4 pt-4 pb-16 gap-6">
         <h1 className="text-4xl md:text-6xl font-black tracking-wide">
           <span className="bg-gradient-to-r from-white via-[#c7cdfd] to-[#5865F2] bg-clip-text text-transparent">
             {t.landingPage.heroTitle}
@@ -231,7 +231,7 @@ export default async function RootPage() {
         </div>
       </main>
 
-      <section className="relative max-w-5xl mx-auto w-full px-4 pb-32">
+      <section className="relative min-h-[85vh] flex flex-col justify-center max-w-5xl mx-auto w-full px-4 pb-32">
         <RevealOnScroll className="mb-10 text-center">
           <p className="text-xs font-black tracking-widest text-[#FFD700] uppercase mb-3">
             {t.landingPage.painPointsTitle}
@@ -256,7 +256,7 @@ export default async function RootPage() {
         </div>
       </section>
 
-      <section id="features" className="relative max-w-7xl mx-auto w-full px-4 pb-32">
+      <section id="features" className="relative min-h-[85vh] flex flex-col justify-center max-w-7xl mx-auto w-full px-4 pb-32">
         <RevealOnScroll className="mb-10 text-center">
           <p className="text-xs font-black tracking-widest text-[#FFD700] uppercase mb-3">
             {t.landingPage.featuresTitle}
@@ -291,7 +291,7 @@ export default async function RootPage() {
         </RevealOnScroll>
       </section>
 
-      <section className="relative max-w-7xl mx-auto w-full px-4 pb-32">
+      <section className="relative min-h-[85vh] flex flex-col justify-center max-w-7xl mx-auto w-full px-4 pb-32">
         <RevealOnScroll>
           <DashboardShowcase
             eyebrow={t.landingPage.dashboardShowcaseEyebrow}
@@ -326,7 +326,7 @@ export default async function RootPage() {
         ))}
       </section>
 
-      <section className="relative max-w-7xl mx-auto w-full px-4 pb-32">
+      <section className="relative min-h-[85vh] flex flex-col justify-center max-w-7xl mx-auto w-full px-4 pb-32">
         <RevealOnScroll className="mb-10 text-center">
           <p className="text-xs font-black tracking-widest text-[#FFD700] uppercase mb-3">
             {t.landingPage.customizationTitle}
