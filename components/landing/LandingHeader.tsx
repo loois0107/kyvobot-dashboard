@@ -13,7 +13,7 @@ export default function LandingHeader({ dashboardHref }: LandingHeaderProps) {
   const t = useT();
 
   return (
-    <header className="relative z-20 flex items-center justify-between gap-3 px-4 sm:px-6 py-4">
+    <header className="relative z-20 mt-6 mx-4 sm:mx-6 lg:max-w-7xl lg:mx-auto rounded-2xl border border-[#2A1F40] bg-[#161626] flex items-center justify-between gap-3 px-6 sm:px-8 py-4 sm:py-5">
       <div className="flex items-center gap-6">
         <Link href="/" className="flex items-center gap-2 text-lg font-black tracking-wide">
           <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#5865F2] to-[#4752C4] flex items-center justify-center text-sm text-white">

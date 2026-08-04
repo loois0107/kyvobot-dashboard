@@ -336,11 +336,11 @@ export default async function RootPage() {
         </RevealOnScroll>
       </section>
 
-      <footer className="relative border-t border-[#2A1F40] py-6 px-4 flex flex-col sm:flex-row items-center justify-center gap-3 text-xs text-[#57576F]">
+      <footer className="relative bg-[#0A0A12] border-t border-[#2A1F40] py-8 px-4 flex flex-col sm:flex-row items-center justify-center gap-3 text-xs text-[#57576F]">
         <span>{t.landingPage.footerTagline}</span>
-        <span className="hidden sm:inline">·</span>
+        <span className="hidden sm:block w-px h-4 bg-[#2A1F40]" />
         <Link href="/privacy" className="hover:text-[#5865F2] hover:underline">{t.landingPage.footerPrivacy}</Link>
-        <span>·</span>
+        <span className="hidden sm:block w-px h-4 bg-[#2A1F40]" />
         <Link href="/terms" className="hover:text-[#5865F2] hover:underline">{t.landingPage.footerTerms}</Link>
       </footer>
     </div>
