@@ -11,31 +11,10 @@ import PartyPresetMockup from '@/components/landing/PartyPresetMockup';
 import AiKnowledgeMockup from '@/components/landing/AiKnowledgeMockup';
 import { BOT_INVITE_URL } from '@/lib/botInvite';
 
+// 🛡️ 파티/AI티켓/랭크카드(레벨링)는 아래 SCREENSHOTS의 "대표 3+1" 행으로 승격되어 여기서 빠졌다 -
+// 같은 내용을 아이콘 카드로 또 보여주면 중복이라 제거함. 여기 남은 3개는 상대적으로 소소해서
+// 아이콘 카드 한 줄로 충분한 기능들이다.
 const FEATURES = [
-  {
-    titleKey: 'featurePartyTitle',
-    descKey: 'featurePartyDesc',
-    icon: '🎮',
-    badgeBg: 'bg-[#5865F2]/15',
-    border: 'hover:border-[#5865F2]/50',
-    shadow: 'hover:shadow-[0_0_25px_rgba(88,101,242,0.25)]',
-  },
-  {
-    titleKey: 'featureTicketTitle',
-    descKey: 'featureTicketDesc',
-    icon: '🤖',
-    badgeBg: 'bg-purple-500/15',
-    border: 'hover:border-purple-500/50',
-    shadow: 'hover:shadow-[0_0_25px_rgba(168,85,247,0.25)]',
-  },
-  {
-    titleKey: 'featureLevelingTitle',
-    descKey: 'featureLevelingDesc',
-    icon: '📊',
-    badgeBg: 'bg-green-500/15',
-    border: 'hover:border-green-500/50',
-    shadow: 'hover:shadow-[0_0_25px_rgba(34,197,94,0.25)]',
-  },
   {
     titleKey: 'featureAutomodTitle',
     descKey: 'featureAutomodDesc',
@@ -62,8 +41,9 @@ const FEATURES = [
   },
 ] as const;
 
-// 🛡️ 아래 Feature Grid의 party/automod/ticket/leveling 항목과 아이콘/색을 그대로 맞춰서, 스크롤을
-// 내렸을 때 "이 고민 -> 저 기능"으로 자연스럽게 이어져 보이게 한다(우연이 아니라 의도적 연결).
+// 🛡️ 아이콘/색은 아래에서 이 주제를 이어받는 섹션과 맞춰뒀다 - party/ticket/leveling은 SCREENSHOTS의
+// 대표 행과, automod는 FEATURES 카드와 - 스크롤을 내렸을 때 "이 고민 -> 저 기능"으로 자연스럽게
+// 이어져 보이게 한다(우연이 아니라 의도적 연결).
 const PAIN_POINTS = [
   {
     problemKey: 'painPointPartyProblem',
@@ -95,18 +75,24 @@ const PAIN_POINTS = [
   },
 ] as const;
 
+// 🛡️ 4개 중 3개는 봇 실행 결과물(파티/AI티켓/랭크카드), 1개는 관리자 대시보드 설정 화면 자체
+// (레벨링&이코노미 페이지) - "이 봇은 웹 대시보드로 관리된다"는 걸 텍스트가 아니라 실제 화면으로
+// 보여준다. 대시보드 항목을 맨 앞에 둬서 이 섹션에 들어오자마자 그 메시지부터 각인시킨다.
+// 랭크카드/대시보드 스크린샷은 실제 캡처본(imageSrc) - 파티/AI티켓은 디스코드 클라이언트 UI라
+// CDP로 캡처할 수 없어서 기존 placeholder(futureImageSrc)를 그대로 유지한다.
 const SCREENSHOTS = [
+  {
+    titleKey: 'screenshotDashboardTitle',
+    descKey: 'screenshotDashboardDesc',
+    icon: '🎛️',
+    futureImageSrc: '/images/features/leveling-dashboard.png',
+    imageSrc: '/images/features/leveling-dashboard.png',
+  },
   {
     titleKey: 'screenshotPartyTitle',
     descKey: 'screenshotPartyDesc',
     icon: '🎮',
     futureImageSrc: '/images/features/party-recruit.png',
-  },
-  {
-    titleKey: 'screenshotBalancerTitle',
-    descKey: 'screenshotBalancerDesc',
-    icon: '⚖️',
-    futureImageSrc: '/images/features/team-balancer.png',
   },
   {
     titleKey: 'screenshotAiTicketTitle',
@@ -119,6 +105,7 @@ const SCREENSHOTS = [
     descKey: 'screenshotRankCardDesc',
     icon: '🎨',
     futureImageSrc: '/images/features/rank-card.png',
+    imageSrc: '/images/features/rank-card.png',
   },
 ] as const;
 
@@ -303,6 +290,7 @@ export default async function RootPage() {
               icon={item.icon}
               comingSoonLabel={t.landingPage.screenshotComingSoon}
               futureImageSrc={item.futureImageSrc}
+              imageSrc={'imageSrc' in item ? item.imageSrc : undefined}
               reverse={i % 2 === 1}
             />
           </RevealOnScroll>
