@@ -181,20 +181,20 @@ export default async function RootPage() {
             {t.landingPage.heroTitle}
           </span>
         </h1>
-        <p className="max-w-xl text-sm md:text-base text-[#b5bac1] leading-relaxed">{t.landingPage.heroTagline}</p>
+        <p className="max-w-xl text-base md:text-lg text-[#b5bac1] leading-relaxed">{t.landingPage.heroTagline}</p>
 
         <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
           {!session?.user ? (
             <>
               <a
                 href={BOT_INVITE_URL}
-                className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-8 py-3.5 rounded-xl shadow-[0_0_30px_rgba(88,101,242,0.45)] hover:shadow-[0_0_45px_rgba(88,101,242,0.65)] transition-all"
+                className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-base font-black px-10 py-4 rounded-xl shadow-[0_0_30px_rgba(88,101,242,0.45)] hover:shadow-[0_0_45px_rgba(88,101,242,0.65)] transition-all"
               >
                 🤖 {t.landingPage.addBotCta}
               </a>
               <a
                 href="/api/auth/signin"
-                className="border border-[#5865F2]/40 hover:border-[#5865F2] text-[#b5bac1] hover:text-white text-sm font-bold px-8 py-3.5 rounded-xl transition-all"
+                className="border border-[#5865F2]/40 hover:border-[#5865F2] text-[#b5bac1] hover:text-white text-base font-bold px-10 py-4 rounded-xl transition-all"
               >
                 {t.landingPage.loginCta}
               </a>
@@ -202,7 +202,7 @@ export default async function RootPage() {
           ) : dashboardHref ? (
             <Link
               href={dashboardHref}
-              className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-8 py-3.5 rounded-xl shadow-[0_0_30px_rgba(88,101,242,0.45)] hover:shadow-[0_0_45px_rgba(88,101,242,0.65)] transition-all"
+              className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-base font-black px-10 py-4 rounded-xl shadow-[0_0_30px_rgba(88,101,242,0.45)] hover:shadow-[0_0_45px_rgba(88,101,242,0.65)] transition-all"
             >
               🎛️ {t.landingPage.goToDashboardCta}
             </Link>
@@ -213,7 +213,7 @@ export default async function RootPage() {
               <p className="text-sm text-[#949ba4]">{t.landingPage.noManagedServers}</p>
               <Link
                 href="/profile"
-                className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-8 py-3.5 rounded-xl shadow-[0_0_30px_rgba(88,101,242,0.45)] hover:shadow-[0_0_45px_rgba(88,101,242,0.65)] transition-all"
+                className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-base font-black px-10 py-4 rounded-xl shadow-[0_0_30px_rgba(88,101,242,0.45)] hover:shadow-[0_0_45px_rgba(88,101,242,0.65)] transition-all"
               >
                 {t.profilePickerPage.title}
               </Link>
@@ -222,17 +222,20 @@ export default async function RootPage() {
         </div>
       </main>
 
-      <section className="relative max-w-5xl mx-auto w-full px-4 pb-20">
-        <RevealOnScroll className="mb-10">
-          <h2 className="text-center text-xs font-black tracking-widest text-[#FFD700] uppercase">
+      <section className="relative max-w-5xl mx-auto w-full px-4 pb-32">
+        <RevealOnScroll className="mb-10 text-center">
+          <p className="text-xs font-black tracking-widest text-[#FFD700] uppercase mb-3">
+            {t.landingPage.painPointsTitle}
+          </p>
+          <h2 className="text-3xl md:text-4xl font-black text-white">
             {t.landingPage.painPointsTitle}
           </h2>
         </RevealOnScroll>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {PAIN_POINTS.map((item, i) => (
             <RevealOnScroll key={item.problemKey} delayMs={i * 120}>
-              <div className="h-full bg-[#161626] border border-[#2A1F40] rounded-2xl p-6 space-y-4">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${item.badgeBg}`}>
+              <div className="h-full bg-[#161626] border border-[#2A1F40] rounded-2xl p-8 space-y-4">
+                <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl ${item.badgeBg}`}>
                   {item.icon}
                 </div>
                 <p className="text-sm text-[#949ba4] leading-relaxed">😩 {t.landingPage[item.problemKey]}</p>
@@ -244,11 +247,8 @@ export default async function RootPage() {
         </div>
       </section>
 
-      <section className="relative max-w-4xl mx-auto w-full px-4 pb-20">
+      <section className="relative max-w-4xl mx-auto w-full px-4 pb-32">
         <RevealOnScroll className="flex flex-col items-center gap-5">
-          <span className="font-mono text-[10px] uppercase tracking-widest text-[#5865F2] font-black">
-            {t.landingPage.previewLabel}
-          </span>
           <PartyPreviewCard
             title={t.landingPage.previewCardTitle}
             hostLabel={t.landingPage.previewCardHostLabel}
@@ -259,31 +259,39 @@ export default async function RootPage() {
         </RevealOnScroll>
       </section>
 
-      <section id="features" className="relative max-w-5xl mx-auto w-full px-4 pb-20">
-        <RevealOnScroll>
-          <h2 className="text-center text-xs font-black tracking-widest text-[#FFD700] uppercase mb-10">
+      <section id="features" className="relative max-w-6xl mx-auto w-full px-4 pb-32">
+        <RevealOnScroll className="mb-10 text-center">
+          <p className="text-xs font-black tracking-widest text-[#FFD700] uppercase mb-3">
+            {t.landingPage.featuresTitle}
+          </p>
+          <h2 className="text-3xl md:text-4xl font-black text-white">
             {t.landingPage.featuresTitle}
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        </RevealOnScroll>
+        <RevealOnScroll>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {FEATURES.map((feature) => (
               <div
                 key={feature.titleKey}
-                className={`bg-[#161626] border border-[#2A1F40] rounded-2xl p-6 space-y-3 transition-all duration-200 hover:-translate-y-1 ${feature.border} ${feature.shadow}`}
+                className={`bg-[#161626] border border-[#2A1F40] rounded-2xl p-8 space-y-3 transition-all duration-200 hover:-translate-y-1 ${feature.border} ${feature.shadow}`}
               >
-                <div className={`w-14 h-14 rounded-full flex items-center justify-center text-3xl ${feature.badgeBg}`}>
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center text-4xl ${feature.badgeBg}`}>
                   {feature.icon}
                 </div>
-                <h3 className="text-sm font-bold text-white">{t.landingPage[feature.titleKey]}</h3>
-                <p className="text-xs text-[#949ba4] leading-relaxed">{t.landingPage[feature.descKey]}</p>
+                <h3 className="text-lg font-bold text-white">{t.landingPage[feature.titleKey]}</h3>
+                <p className="text-sm text-[#949ba4] leading-relaxed">{t.landingPage[feature.descKey]}</p>
               </div>
             ))}
           </div>
         </RevealOnScroll>
       </section>
 
-      <section className="relative max-w-6xl mx-auto w-full px-4 pb-20 space-y-16">
-        <RevealOnScroll>
-          <h2 className="text-center text-xs font-black tracking-widest text-[#FFD700] uppercase">
+      <section className="relative max-w-6xl mx-auto w-full px-4 pb-32 space-y-16">
+        <RevealOnScroll className="text-center">
+          <p className="text-xs font-black tracking-widest text-[#FFD700] uppercase mb-3">
+            {t.landingPage.screenshotsTitle}
+          </p>
+          <h2 className="text-3xl md:text-4xl font-black text-white">
             {t.landingPage.screenshotsTitle}
           </h2>
         </RevealOnScroll>
@@ -301,28 +309,33 @@ export default async function RootPage() {
         ))}
       </section>
 
-      <section className="relative max-w-5xl mx-auto w-full px-4 pb-20">
-        <RevealOnScroll>
-          <h2 className="text-center text-xs font-black tracking-widest text-[#FFD700] uppercase mb-10">
+      <section className="relative max-w-6xl mx-auto w-full px-4 pb-32">
+        <RevealOnScroll className="mb-10 text-center">
+          <p className="text-xs font-black tracking-widest text-[#FFD700] uppercase mb-3">
+            {t.landingPage.customizationTitle}
+          </p>
+          <h2 className="text-3xl md:text-4xl font-black text-white">
             {t.landingPage.customizationTitle}
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-            <div className="bg-[#161626] border border-[#2A1F40] rounded-2xl p-6 space-y-4">
-              <h3 className="text-sm font-bold text-white">{t.landingPage.customRankCardTitle}</h3>
-              <p className="text-xs text-[#949ba4] leading-relaxed">{t.landingPage.customRankCardDesc}</p>
+        </RevealOnScroll>
+        <RevealOnScroll>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="bg-[#161626] border border-[#2A1F40] rounded-2xl p-8 space-y-4">
+              <h3 className="text-lg font-bold text-white">{t.landingPage.customRankCardTitle}</h3>
+              <p className="text-sm text-[#949ba4] leading-relaxed">{t.landingPage.customRankCardDesc}</p>
               <RankCardMockup name={t.landingPage.previewCardHostName} />
             </div>
-            <div className="bg-[#161626] border border-[#2A1F40] rounded-2xl p-6 space-y-4">
-              <h3 className="text-sm font-bold text-white">{t.landingPage.customPartyPresetTitle}</h3>
-              <p className="text-xs text-[#949ba4] leading-relaxed">{t.landingPage.customPartyPresetDesc}</p>
+            <div className="bg-[#161626] border border-[#2A1F40] rounded-2xl p-8 space-y-4">
+              <h3 className="text-lg font-bold text-white">{t.landingPage.customPartyPresetTitle}</h3>
+              <p className="text-sm text-[#949ba4] leading-relaxed">{t.landingPage.customPartyPresetDesc}</p>
               <PartyPresetMockup
                 preset1={t.landingPage.customPartyPresetExample1}
                 preset2={t.landingPage.customPartyPresetExample2}
               />
             </div>
-            <div className="bg-[#161626] border border-[#2A1F40] rounded-2xl p-6 space-y-4">
-              <h3 className="text-sm font-bold text-white">{t.landingPage.customAiKnowledgeTitle}</h3>
-              <p className="text-xs text-[#949ba4] leading-relaxed">{t.landingPage.customAiKnowledgeDesc}</p>
+            <div className="bg-[#161626] border border-[#2A1F40] rounded-2xl p-8 space-y-4">
+              <h3 className="text-lg font-bold text-white">{t.landingPage.customAiKnowledgeTitle}</h3>
+              <p className="text-sm text-[#949ba4] leading-relaxed">{t.landingPage.customAiKnowledgeDesc}</p>
               <AiKnowledgeMockup
                 question={t.landingPage.customAiKnowledgeQuestion}
                 answer={t.landingPage.customAiKnowledgeAnswer}

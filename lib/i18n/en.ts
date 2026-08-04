@@ -591,7 +591,6 @@ const en = {
     painPointTicketSolution: 'An AI trained on your own server docs answers first, 24/7.',
     painPointLevelingProblem: 'New members go quiet and drift away within days.',
     painPointLevelingSolution: 'XP, role rewards, and a server shop give them a reason to stay.',
-    previewLabel: 'Live From the Dashboard',
     previewCardTitle: '🎮 Valorant Ranked Party',
     previewCardHostLabel: 'Host',
     previewCardHostName: 'PlayerOne',

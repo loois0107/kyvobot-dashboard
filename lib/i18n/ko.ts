@@ -593,7 +593,6 @@ const ko: typeof en = {
     painPointTicketSolution: '서버 지식베이스 기반 AI가 24/7 먼저 답변합니다.',
     painPointLevelingProblem: '신규 멤버가 며칠 있다가 조용히 나가요.',
     painPointLevelingSolution: 'XP·보상·서버 상점으로 계속 남을 이유를 만듭니다.',
-    previewLabel: '대시보드로 이렇게 실시간 관리돼요',
     previewCardTitle: '🎮 발로란트 랭크 파티',
     previewCardHostLabel: '모집자',
     previewCardHostName: 'PlayerOne',
