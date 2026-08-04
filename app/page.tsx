@@ -6,9 +6,6 @@ import LandingHeader from '@/components/landing/LandingHeader';
 import RevealOnScroll from '@/components/landing/RevealOnScroll';
 import FeatureScreenshotRow from '@/components/landing/FeatureScreenshotRow';
 import DashboardShowcase from '@/components/landing/DashboardShowcase';
-import RankCardMockup from '@/components/landing/RankCardMockup';
-import PartyPresetMockup from '@/components/landing/PartyPresetMockup';
-import AiKnowledgeMockup from '@/components/landing/AiKnowledgeMockup';
 import { BOT_INVITE_URL } from '@/lib/botInvite';
 
 // 🛡️ hasDetail: true인 3개(파티/AI티켓/레벨링)는 SEE IT IN ACTION에 대응하는 스크린샷 행이
@@ -326,40 +323,16 @@ export default async function RootPage() {
         ))}
       </section>
 
-      <section className="relative min-h-[85vh] flex flex-col justify-center max-w-7xl mx-auto w-full px-4 pb-32">
-        <RevealOnScroll className="mb-10 text-center">
-          <p className="text-xs font-black tracking-widest text-[#FFD700] uppercase mb-3">
-            {t.landingPage.customizationTitle}
-          </p>
-          <h2 className="text-3xl md:text-4xl font-black text-white">
-            {t.landingPage.customizationTitle}
-          </h2>
-        </RevealOnScroll>
-        <RevealOnScroll>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div className="bg-[#161626] border border-[#2A1F40] rounded-2xl p-8 space-y-4">
-              <h3 className="text-lg font-bold text-white">{t.landingPage.customRankCardTitle}</h3>
-              <p className="text-sm text-[#949ba4] leading-relaxed">{t.landingPage.customRankCardDesc}</p>
-              <RankCardMockup name={t.landingPage.previewCardHostName} />
-            </div>
-            <div className="bg-[#161626] border border-[#2A1F40] rounded-2xl p-8 space-y-4">
-              <h3 className="text-lg font-bold text-white">{t.landingPage.customPartyPresetTitle}</h3>
-              <p className="text-sm text-[#949ba4] leading-relaxed">{t.landingPage.customPartyPresetDesc}</p>
-              <PartyPresetMockup
-                preset1={t.landingPage.customPartyPresetExample1}
-                preset2={t.landingPage.customPartyPresetExample2}
-              />
-            </div>
-            <div className="bg-[#161626] border border-[#2A1F40] rounded-2xl p-8 space-y-4">
-              <h3 className="text-lg font-bold text-white">{t.landingPage.customAiKnowledgeTitle}</h3>
-              <p className="text-sm text-[#949ba4] leading-relaxed">{t.landingPage.customAiKnowledgeDesc}</p>
-              <AiKnowledgeMockup
-                question={t.landingPage.customAiKnowledgeQuestion}
-                answer={t.landingPage.customAiKnowledgeAnswer}
-                tag={t.landingPage.customAiKnowledgeTag}
-              />
-            </div>
-          </div>
+      <section className="relative min-h-[85vh] flex flex-col justify-center items-center max-w-3xl mx-auto w-full px-4 pb-32 text-center">
+        <RevealOnScroll className="flex flex-col items-center gap-6">
+          <h2 className="text-3xl md:text-4xl font-black text-white">{t.landingPage.finalCtaTitle}</h2>
+          <p className="max-w-xl text-base md:text-lg text-[#b5bac1] leading-relaxed">{t.landingPage.finalCtaDesc}</p>
+          <a
+            href={BOT_INVITE_URL}
+            className="mt-2 bg-[#5865F2] hover:bg-[#4752C4] text-white text-base font-black px-10 py-4 rounded-xl shadow-[0_0_30px_rgba(88,101,242,0.45)] hover:shadow-[0_0_45px_rgba(88,101,242,0.65)] transition-all"
+          >
+            🤖 {t.landingPage.addBotCta}
+          </a>
         </RevealOnScroll>
       </section>
 

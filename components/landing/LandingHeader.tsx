@@ -15,7 +15,10 @@ export default function LandingHeader({ dashboardHref }: LandingHeaderProps) {
   return (
     <header className="relative z-20 flex items-center justify-between gap-3 px-4 sm:px-6 py-4">
       <div className="flex items-center gap-6">
-        <Link href="/" className="text-lg font-black tracking-wide">
+        <Link href="/" className="flex items-center gap-2 text-lg font-black tracking-wide">
+          <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#5865F2] to-[#4752C4] flex items-center justify-center text-sm text-white">
+            K
+          </span>
           <span className="bg-gradient-to-r from-white via-[#c7cdfd] to-[#5865F2] bg-clip-text text-transparent">
             {t('landingPage.heroTitle')}
           </span>
