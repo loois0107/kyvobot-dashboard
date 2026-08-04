@@ -4,17 +4,44 @@ import { auth } from '@/auth';
 import { COOKIE_NAME, dictionaries, resolveInitialLanguage } from '@/lib/i18n';
 import LandingHeader from '@/components/landing/LandingHeader';
 import RevealOnScroll from '@/components/landing/RevealOnScroll';
-import PartyPreviewCard from '@/components/landing/PartyPreviewCard';
 import FeatureScreenshotRow from '@/components/landing/FeatureScreenshotRow';
+import DashboardShowcase from '@/components/landing/DashboardShowcase';
 import RankCardMockup from '@/components/landing/RankCardMockup';
 import PartyPresetMockup from '@/components/landing/PartyPresetMockup';
 import AiKnowledgeMockup from '@/components/landing/AiKnowledgeMockup';
 import { BOT_INVITE_URL } from '@/lib/botInvite';
 
-// 🛡️ 파티/AI티켓/랭크카드(레벨링)는 아래 SCREENSHOTS의 "대표 3+1" 행으로 승격되어 여기서 빠졌다 -
-// 같은 내용을 아이콘 카드로 또 보여주면 중복이라 제거함. 여기 남은 3개는 상대적으로 소소해서
-// 아이콘 카드 한 줄로 충분한 기능들이다.
+// 🛡️ hasDetail: true인 3개(파티/AI티켓/레벨링)는 SEE IT IN ACTION에 대응하는 스크린샷 행이
+// 있어서 카드 하단에 "자세히 보기" 링크를 붙인다(#see-it-in-action으로 스크롤). 나머지 3개는
+// 대응 스크린샷이 없어서 힌트 없이 아이콘 카드로만 충분하다.
 const FEATURES = [
+  {
+    titleKey: 'featurePartyTitle',
+    descKey: 'featurePartyDesc',
+    icon: '🎮',
+    badgeBg: 'bg-[#5865F2]/15',
+    border: 'hover:border-[#5865F2]/50',
+    shadow: 'hover:shadow-[0_0_25px_rgba(88,101,242,0.25)]',
+    hasDetail: true,
+  },
+  {
+    titleKey: 'featureTicketTitle',
+    descKey: 'featureTicketDesc',
+    icon: '🤖',
+    badgeBg: 'bg-purple-500/15',
+    border: 'hover:border-purple-500/50',
+    shadow: 'hover:shadow-[0_0_25px_rgba(168,85,247,0.25)]',
+    hasDetail: true,
+  },
+  {
+    titleKey: 'featureLevelingTitle',
+    descKey: 'featureLevelingDesc',
+    icon: '📊',
+    badgeBg: 'bg-green-500/15',
+    border: 'hover:border-green-500/50',
+    shadow: 'hover:shadow-[0_0_25px_rgba(34,197,94,0.25)]',
+    hasDetail: true,
+  },
   {
     titleKey: 'featureAutomodTitle',
     descKey: 'featureAutomodDesc',
@@ -22,6 +49,7 @@ const FEATURES = [
     badgeBg: 'bg-red-500/15',
     border: 'hover:border-red-500/50',
     shadow: 'hover:shadow-[0_0_25px_rgba(239,68,68,0.25)]',
+    hasDetail: false,
   },
   {
     titleKey: 'featureReactionRolesTitle',
@@ -30,6 +58,7 @@ const FEATURES = [
     badgeBg: 'bg-[#FFD700]/15',
     border: 'hover:border-[#FFD700]/50',
     shadow: 'hover:shadow-[0_0_25px_rgba(255,215,0,0.25)]',
+    hasDetail: false,
   },
   {
     titleKey: 'featureTwitchTitle',
@@ -38,6 +67,7 @@ const FEATURES = [
     badgeBg: 'bg-[#9146FF]/15',
     border: 'hover:border-[#9146FF]/50',
     shadow: 'hover:shadow-[0_0_25px_rgba(145,70,255,0.25)]',
+    hasDetail: false,
   },
 ] as const;
 
@@ -75,19 +105,11 @@ const PAIN_POINTS = [
   },
 ] as const;
 
-// 🛡️ 4개 중 3개는 봇 실행 결과물(파티/AI티켓/랭크카드), 1개는 관리자 대시보드 설정 화면 자체
-// (레벨링&이코노미 페이지) - "이 봇은 웹 대시보드로 관리된다"는 걸 텍스트가 아니라 실제 화면으로
-// 보여준다. 대시보드 항목을 맨 앞에 둬서 이 섹션에 들어오자마자 그 메시지부터 각인시킨다.
-// 랭크카드/대시보드 스크린샷은 실제 캡처본(imageSrc) - 파티/AI티켓은 디스코드 클라이언트 UI라
-// CDP로 캡처할 수 없어서 기존 placeholder(futureImageSrc)를 그대로 유지한다.
+// 🛡️ 대시보드 설정 화면은 이제 별도의 DashboardShowcase 섹션에서 크게 보여주므로 여기서 뺐다 -
+// 이 3개는 순수하게 "봇을 실행하면 이렇게 나온다"는 결과물 중심. 랭크카드는 실제 캡처본
+// (imageSrc) - 파티/AI티켓은 디스코드 클라이언트 UI라 CDP로 캡처할 수 없어서 기존
+// placeholder(futureImageSrc)를 그대로 유지한다.
 const SCREENSHOTS = [
-  {
-    titleKey: 'screenshotDashboardTitle',
-    descKey: 'screenshotDashboardDesc',
-    icon: '🎛️',
-    futureImageSrc: '/images/features/leveling-dashboard.png',
-    imageSrc: '/images/features/leveling-dashboard.png',
-  },
   {
     titleKey: 'screenshotPartyTitle',
     descKey: 'screenshotPartyDesc',
@@ -234,19 +256,7 @@ export default async function RootPage() {
         </div>
       </section>
 
-      <section className="relative max-w-4xl mx-auto w-full px-4 pb-32">
-        <RevealOnScroll className="flex flex-col items-center gap-5">
-          <PartyPreviewCard
-            title={t.landingPage.previewCardTitle}
-            hostLabel={t.landingPage.previewCardHostLabel}
-            hostName={t.landingPage.previewCardHostName}
-            slotsLabel={t.landingPage.previewCardSlotsLabel}
-            joinCta={t.landingPage.previewCardJoinCta}
-          />
-        </RevealOnScroll>
-      </section>
-
-      <section id="features" className="relative max-w-6xl mx-auto w-full px-4 pb-32">
+      <section id="features" className="relative max-w-7xl mx-auto w-full px-4 pb-32">
         <RevealOnScroll className="mb-10 text-center">
           <p className="text-xs font-black tracking-widest text-[#FFD700] uppercase mb-3">
             {t.landingPage.featuresTitle}
@@ -267,13 +277,32 @@ export default async function RootPage() {
                 </div>
                 <h3 className="text-lg font-bold text-white">{t.landingPage[feature.titleKey]}</h3>
                 <p className="text-sm text-[#949ba4] leading-relaxed">{t.landingPage[feature.descKey]}</p>
+                {feature.hasDetail && (
+                  <a
+                    href="#see-it-in-action"
+                    className="inline-block text-xs font-bold text-[#5865F2] hover:text-white transition-colors pt-1"
+                  >
+                    {t.landingPage.featureDetailHint}
+                  </a>
+                )}
               </div>
             ))}
           </div>
         </RevealOnScroll>
       </section>
 
-      <section className="relative max-w-6xl mx-auto w-full px-4 pb-32 space-y-16">
+      <section className="relative max-w-7xl mx-auto w-full px-4 pb-32">
+        <RevealOnScroll>
+          <DashboardShowcase
+            eyebrow={t.landingPage.dashboardShowcaseEyebrow}
+            title={t.landingPage.dashboardShowcaseTitle}
+            description={t.landingPage.dashboardShowcaseDesc}
+            imageSrc="/images/features/leveling-dashboard.png"
+          />
+        </RevealOnScroll>
+      </section>
+
+      <section id="see-it-in-action" className="relative max-w-7xl mx-auto w-full px-4 pb-32 space-y-16">
         <RevealOnScroll className="text-center">
           <p className="text-xs font-black tracking-widest text-[#FFD700] uppercase mb-3">
             {t.landingPage.screenshotsTitle}
@@ -297,7 +326,7 @@ export default async function RootPage() {
         ))}
       </section>
 
-      <section className="relative max-w-6xl mx-auto w-full px-4 pb-32">
+      <section className="relative max-w-7xl mx-auto w-full px-4 pb-32">
         <RevealOnScroll className="mb-10 text-center">
           <p className="text-xs font-black tracking-widest text-[#FFD700] uppercase mb-3">
             {t.landingPage.customizationTitle}
