@@ -620,6 +620,8 @@ const en = {
     screenshotRankCardTitle: '🎨 A Card Every Member Can Call Their Own',
     screenshotRankCardDesc: "/level renders a personalized card with each member's own accent color, background, and progress - configured entirely from the dashboard.",
     footerTagline: 'A free, independently-operated Discord bot.',
+    footerQuickLinksHeader: 'Quick Links',
+    footerLegalHeader: 'Legal',
     footerPrivacy: 'Privacy Policy',
     footerTerms: 'Terms of Service',
   },

@@ -323,25 +323,61 @@ export default async function RootPage() {
         ))}
       </section>
 
-      <section className="relative min-h-[85vh] flex flex-col justify-center items-center max-w-3xl mx-auto w-full px-4 pb-32 text-center">
+      <section className="relative min-h-[85vh] flex flex-col justify-center items-center max-w-3xl mx-auto w-full px-4 pb-32 text-center bg-[#0A0A0F]">
         <RevealOnScroll className="flex flex-col items-center gap-6">
           <h2 className="text-3xl md:text-4xl font-black text-white">{t.landingPage.finalCtaTitle}</h2>
           <p className="max-w-xl text-base md:text-lg text-[#b5bac1] leading-relaxed">{t.landingPage.finalCtaDesc}</p>
-          <a
-            href={BOT_INVITE_URL}
-            className="mt-2 bg-[#5865F2] hover:bg-[#4752C4] text-white text-base font-black px-10 py-4 rounded-xl shadow-[0_0_30px_rgba(88,101,242,0.45)] hover:shadow-[0_0_45px_rgba(88,101,242,0.65)] transition-all"
-          >
-            🤖 {t.landingPage.addBotCta}
-          </a>
+          <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
+            <a
+              href={BOT_INVITE_URL}
+              className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-base font-black px-10 py-4 rounded-full shadow-[0_0_30px_rgba(88,101,242,0.45)] hover:shadow-[0_0_45px_rgba(88,101,242,0.65)] transition-all"
+            >
+              🤖 {t.landingPage.addBotCta}
+            </a>
+            <a
+              href="/api/auth/signin"
+              className="border border-white/20 hover:border-white/40 text-[#b5bac1] hover:text-white text-base font-bold px-10 py-4 rounded-full transition-all"
+            >
+              {t.landingPage.loginCta}
+            </a>
+          </div>
         </RevealOnScroll>
       </section>
 
-      <footer className="relative bg-[#0A0A12] border-t border-[#2A1F40] py-8 px-4 flex flex-col sm:flex-row items-center justify-center gap-3 text-xs text-[#57576F]">
-        <span>{t.landingPage.footerTagline}</span>
-        <span className="hidden sm:block w-px h-4 bg-[#2A1F40]" />
-        <Link href="/privacy" className="hover:text-[#5865F2] hover:underline">{t.landingPage.footerPrivacy}</Link>
-        <span className="hidden sm:block w-px h-4 bg-[#2A1F40]" />
-        <Link href="/terms" className="hover:text-[#5865F2] hover:underline">{t.landingPage.footerTerms}</Link>
+      <footer className="relative bg-[#0A0A0F] border-t border-white/10 py-16 px-4">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-10">
+          <div className="space-y-3 text-center sm:text-left">
+            <div className="flex items-center justify-center sm:justify-start gap-2">
+              <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#5865F2] to-[#4752C4] flex items-center justify-center text-xs font-black text-white">
+                K
+              </span>
+              <span className="text-base font-black text-white">{t.landingPage.heroTitle}</span>
+            </div>
+            <p className="text-xs text-[#71717a]">{t.landingPage.footerTagline}</p>
+          </div>
+          <div className="space-y-3 text-center sm:text-left">
+            <h4 className="text-sm font-bold text-white">{t.landingPage.footerQuickLinksHeader}</h4>
+            <div className="flex flex-col gap-2">
+              <a href="#features" className="text-xs text-[#71717a] hover:text-white transition-colors">
+                {t.landingPage.navFeatures}
+              </a>
+              <a href="#see-it-in-action" className="text-xs text-[#71717a] hover:text-white transition-colors">
+                {t.landingPage.screenshotsTitle}
+              </a>
+            </div>
+          </div>
+          <div className="space-y-3 text-center sm:text-left">
+            <h4 className="text-sm font-bold text-white">{t.landingPage.footerLegalHeader}</h4>
+            <div className="flex flex-col gap-2">
+              <Link href="/privacy" className="text-xs text-[#71717a] hover:text-white transition-colors">
+                {t.landingPage.footerPrivacy}
+              </Link>
+              <Link href="/terms" className="text-xs text-[#71717a] hover:text-white transition-colors">
+                {t.landingPage.footerTerms}
+              </Link>
+            </div>
+          </div>
+        </div>
       </footer>
     </div>
   );

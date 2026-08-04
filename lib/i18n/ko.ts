@@ -622,6 +622,8 @@ const ko: typeof en = {
     screenshotRankCardTitle: '🎨 나만의 색으로 꾸미는 랭크카드',
     screenshotRankCardDesc: '/level 명령어로 멤버마다 직접 고른 강조색·배경·진행률이 반영된 카드가 떠요 — 전부 대시보드에서 설정해요.',
     footerTagline: '무료로 운영되는 개인 프로젝트 디스코드 봇입니다.',
+    footerQuickLinksHeader: '바로가기',
+    footerLegalHeader: '법적 고지',
     footerPrivacy: '개인정보 처리방침',
     footerTerms: '이용약관',
   },
