@@ -323,8 +323,8 @@ export default async function RootPage() {
         ))}
       </section>
 
-      <section className="relative min-h-[85vh] flex flex-col justify-center items-center max-w-3xl mx-auto w-full px-4 pb-32 text-center bg-[#0A0A0F]">
-        <RevealOnScroll className="flex flex-col items-center gap-6">
+      <section className="relative min-h-[85vh] flex flex-col justify-center items-center w-full px-4 pb-32 text-center bg-[#050508] border-t-4 border-[#2A1F40]">
+        <RevealOnScroll className="flex flex-col items-center gap-6 max-w-3xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-black text-white">{t.landingPage.finalCtaTitle}</h2>
           <p className="max-w-xl text-base md:text-lg text-[#b5bac1] leading-relaxed">{t.landingPage.finalCtaDesc}</p>
           <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
@@ -344,7 +344,7 @@ export default async function RootPage() {
         </RevealOnScroll>
       </section>
 
-      <footer className="relative bg-[#0A0A0F] border-t border-white/10 py-16 px-4">
+      <footer className="relative bg-[#050508] border-t border-white/10 py-16 px-4">
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-10">
           <div className="space-y-3 text-center sm:text-left">
             <div className="flex items-center justify-center sm:justify-start gap-2">
