@@ -23,13 +23,18 @@ export default function LandingHeader({ dashboardHref }: LandingHeaderProps) {
             {t('landingPage.heroTitle')}
           </span>
         </Link>
-        {/* 🛡️ 로고는 모바일에서도 계속 보이지만, 메뉴가 "기능" 하나뿐이라 모바일에선 nav만
+        {/* 🛡️ 로고는 모바일에서도 계속 보이지만, 메뉴가 2개뿐이라 모바일에선 nav만
             숨긴다 - 헤더 오른쪽(언어토글+계정)은 여전히 존재하니 justify-between이 모바일에서도
-            안전하다(로고가 왼쪽에 항상 있어서 한쪽만 비어 정렬이 깨지는 일이 없다). */}
+            안전하다(로고가 왼쪽에 항상 있어서 한쪽만 비어 정렬이 깨지는 일이 없다).
+            "기능"은 /guide 등 다른 페이지에서도 눌릴 수 있어 Link href="/#features"로 - 랜딩
+            페이지로 이동 후 해당 섹션까지 스크롤된다. */}
         <nav className="hidden md:flex items-center gap-6">
-          <a href="#features" className="text-sm font-bold text-[#b5bac1] hover:text-white transition-colors">
+          <Link href="/#features" className="text-sm font-bold text-[#b5bac1] hover:text-white transition-colors">
             {t('landingPage.navFeatures')}
-          </a>
+          </Link>
+          <Link href="/guide" className="text-sm font-bold text-[#b5bac1] hover:text-white transition-colors">
+            {t('landingPage.navGuide')}
+          </Link>
         </nav>
       </div>
       <div className="flex items-center gap-3">
