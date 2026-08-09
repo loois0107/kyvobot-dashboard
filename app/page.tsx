@@ -7,6 +7,7 @@ import RevealOnScroll from '@/components/landing/RevealOnScroll';
 import FeatureScreenshotRow from '@/components/landing/FeatureScreenshotRow';
 import DashboardShowcase from '@/components/landing/DashboardShowcase';
 import { BOT_INVITE_URL } from '@/lib/botInvite';
+import { resolveLocalizedImage } from '@/lib/resolveLocalizedImage';
 
 // 🛡️ hasDetail: true인 3개(파티/AI티켓/레벨링)는 SEE IT IN ACTION에 대응하는 스크린샷 행이
 // 있어서 카드 하단에 "자세히 보기" 링크를 붙인다(#see-it-in-action으로 스크롤). 나머지 3개는
@@ -112,18 +113,26 @@ const SCREENSHOTS = [
     descKey: 'screenshotPartyDesc',
     icon: '🎮',
     futureImageSrc: '/images/features/party-recruit.png',
+    // 🛡️ lang 기반 -ko/-en 파일로 분리 - 아직 둘 다 없으니 resolveLocalizedImage가
+    // undefined를 돌려줘서 지금처럼 "Coming Soon"이 그대로 유지된다. 나중에 파일만
+    // 추가하면(예: party-recruit-ko.png) 코드 변경 없이 자동으로 노출된다.
+    localizedBaseName: 'party-recruit',
   },
   {
     titleKey: 'screenshotAiTicketTitle',
     descKey: 'screenshotAiTicketDesc',
     icon: '🤖',
     futureImageSrc: '/images/features/ai-ticket.png',
+    // 🛡️ 언어 분기 없이 단일 파일 유지 - 캡처본이 준비됐으므로 imageSrc를 직접 채워 넣는다.
+    imageSrc: '/images/features/ai-ticket.png',
   },
   {
     titleKey: 'screenshotRankCardTitle',
     descKey: 'screenshotRankCardDesc',
     icon: '🎨',
     futureImageSrc: '/images/features/rank-card.png',
+    // 🛡️ 봇이 그리는 랭크카드는 LEVEL/RANK 라벨이 하드코딩된 영어라 대시보드 언어를 안 타므로
+    // 언어 분기 없이 단일 파일 그대로 유지.
     imageSrc: '/images/features/rank-card.png',
   },
 ] as const;
@@ -294,7 +303,10 @@ export default async function RootPage() {
             eyebrow={t.landingPage.dashboardShowcaseEyebrow}
             title={t.landingPage.dashboardShowcaseTitle}
             description={t.landingPage.dashboardShowcaseDesc}
-            imageSrc="/images/features/leveling-dashboard.png"
+            // 🛡️ 실제 관리자 UI 캡처라 언어에 따라 그림이 달라짐 - lang 버전이 아직 없으면
+            // resolveLocalizedImage가 반대 언어 파일로 폴백하므로 깨진 이미지가 뜰 일이 없다.
+            // 최종 ?? 은 두 언어 파일이 전부 사라지는(배포 사고급) 극단적 상황에 대비한 타입 안전용.
+            imageSrc={resolveLocalizedImage('leveling-dashboard', lang) ?? '/images/features/leveling-dashboard-en.png'}
           />
         </RevealOnScroll>
       </section>
@@ -308,19 +320,30 @@ export default async function RootPage() {
             {t.landingPage.screenshotsTitle}
           </h2>
         </RevealOnScroll>
-        {SCREENSHOTS.map((item, i) => (
-          <RevealOnScroll key={item.titleKey} delayMs={i * 120}>
-            <FeatureScreenshotRow
-              title={t.landingPage[item.titleKey]}
-              description={t.landingPage[item.descKey]}
-              icon={item.icon}
-              comingSoonLabel={t.landingPage.screenshotComingSoon}
-              futureImageSrc={item.futureImageSrc}
-              imageSrc={'imageSrc' in item ? item.imageSrc : undefined}
-              reverse={i % 2 === 1}
-            />
-          </RevealOnScroll>
-        ))}
+        {SCREENSHOTS.map((item, i) => {
+          // 🛡️ localizedBaseName이 있는 항목(party-recruit)만 lang 기반 -ko/-en 폴백 조회를
+          // 거친다 - 둘 다 없으면 undefined가 나와서 기존처럼 "Coming Soon"이 뜬다. 나머지는
+          // 정적 imageSrc(있으면) 그대로 사용.
+          const resolvedImageSrc =
+            'localizedBaseName' in item
+              ? resolveLocalizedImage(item.localizedBaseName, lang)
+              : 'imageSrc' in item
+                ? item.imageSrc
+                : undefined;
+          return (
+            <RevealOnScroll key={item.titleKey} delayMs={i * 120}>
+              <FeatureScreenshotRow
+                title={t.landingPage[item.titleKey]}
+                description={t.landingPage[item.descKey]}
+                icon={item.icon}
+                comingSoonLabel={t.landingPage.screenshotComingSoon}
+                futureImageSrc={item.futureImageSrc}
+                imageSrc={resolvedImageSrc}
+                reverse={i % 2 === 1}
+              />
+            </RevealOnScroll>
+          );
+        })}
       </section>
 
       <section className="relative min-h-[85vh] flex flex-col justify-center items-center w-full px-4 pb-32 text-center bg-[#050508] border-t-4 border-[#2A1F40]">
