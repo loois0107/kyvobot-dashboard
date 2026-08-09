@@ -129,10 +129,14 @@ const SCREENSHOTS = [
     descKey: 'screenshotAiTicketDesc',
     icon: '🤖',
     futureImageSrc: '/images/features/ai-ticket.png',
-    // 🛡️ 언어 분기 없이 단일 파일 유지 - 캡처본이 준비됐으므로 imageSrc를 직접 채워 넣는다.
-    imageSrc: '/images/features/ai-ticket.png',
-    imageWidth: 777,
-    imageHeight: 476,
+    // 🛡️ party-recruit와 동일한 lang 기반 -ko/-en 폴백 구조로 전환 - ai-ticket-en.png가
+    // 추가되면서 더 이상 언어 분기 없는 단일 파일이 아니게 됐다. 기존 ai-ticket.png는
+    // ai-ticket-ko.png로 리네임됨(실제 한국어 캡처였음).
+    localizedBaseName: 'ai-ticket',
+    // 🛡️ ai-ticket-en.png(715x483)/-ko.png(777x476) 실측 비율 - party-recruit와 동일한 이유로
+    // 근사치면 충분(실제 렌더는 w-full h-auto가 로드된 파일 크기를 그대로 따라감).
+    imageWidth: 746,
+    imageHeight: 480,
   },
 ] as const;
 
@@ -355,15 +359,9 @@ export default async function RootPage() {
           </h2>
         </RevealOnScroll>
         {SCREENSHOTS.map((item, i) => {
-          // 🛡️ localizedBaseName이 있는 항목(party-recruit)만 lang 기반 -ko/-en 폴백 조회를
-          // 거친다 - 둘 다 없으면 undefined가 나와서 기존처럼 "Coming Soon"이 뜬다. 나머지는
-          // 정적 imageSrc(있으면) 그대로 사용.
-          const resolvedImageSrc =
-            'localizedBaseName' in item
-              ? resolveLocalizedImage(item.localizedBaseName, lang)
-              : 'imageSrc' in item
-                ? item.imageSrc
-                : undefined;
+          // 🛡️ 이제 이 배열의 모든 항목(party-recruit, ai-ticket)이 lang 기반 -ko/-en 폴백
+          // 조회를 거친다 - 둘 다 없으면 undefined가 나와서 "Coming Soon"이 뜬다.
+          const resolvedImageSrc = resolveLocalizedImage(item.localizedBaseName, lang);
           return (
             <RevealOnScroll key={item.titleKey} delayMs={i * 120}>
               <FeatureScreenshotRow
