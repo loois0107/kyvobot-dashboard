@@ -113,10 +113,14 @@ const SCREENSHOTS = [
     descKey: 'screenshotPartyDesc',
     icon: '🎮',
     futureImageSrc: '/images/features/party-recruit.png',
-    // 🛡️ lang 기반 -ko/-en 파일로 분리 - 아직 둘 다 없으니 resolveLocalizedImage가
-    // undefined를 돌려줘서 지금처럼 "Coming Soon"이 그대로 유지된다. 나중에 파일만
-    // 추가하면(예: party-recruit-ko.png) 코드 변경 없이 자동으로 노출된다.
+    // 🛡️ lang 기반 -ko/-en 파일로 분리 - 둘 다 없으면 resolveLocalizedImage가 undefined를
+    // 돌려줘서 "Coming Soon"이 뜬다. 파일만 추가하면 코드 변경 없이 자동으로 노출된다.
     localizedBaseName: 'party-recruit',
+    // 🛡️ party-recruit-en.png(502x368)/-ko.png(468x384) 실측 비율 - 둘이 정확히 같진 않지만
+    // w-full h-auto가 실제 로드된 파일 크기를 그대로 따라가므로 여기 값은 레이아웃 예약용
+    // 근사치면 충분하다(잘리거나 찌그러지지 않음).
+    imageWidth: 490,
+    imageHeight: 376,
   },
   {
     titleKey: 'screenshotAiTicketTitle',
@@ -125,6 +129,8 @@ const SCREENSHOTS = [
     futureImageSrc: '/images/features/ai-ticket.png',
     // 🛡️ 언어 분기 없이 단일 파일 유지 - 캡처본이 준비됐으므로 imageSrc를 직접 채워 넣는다.
     imageSrc: '/images/features/ai-ticket.png',
+    imageWidth: 777,
+    imageHeight: 476,
   },
   {
     titleKey: 'screenshotRankCardTitle',
@@ -134,6 +140,8 @@ const SCREENSHOTS = [
     // 🛡️ 봇이 그리는 랭크카드는 LEVEL/RANK 라벨이 하드코딩된 영어라 대시보드 언어를 안 타므로
     // 언어 분기 없이 단일 파일 그대로 유지.
     imageSrc: '/images/features/rank-card.png',
+    imageWidth: 920,
+    imageHeight: 240,
   },
 ] as const;
 
@@ -307,6 +315,11 @@ export default async function RootPage() {
             // resolveLocalizedImage가 반대 언어 파일로 폴백하므로 깨진 이미지가 뜰 일이 없다.
             // 최종 ?? 은 두 언어 파일이 전부 사라지는(배포 사고급) 극단적 상황에 대비한 타입 안전용.
             imageSrc={resolveLocalizedImage('leveling-dashboard', lang) ?? '/images/features/leveling-dashboard-en.png'}
+            // 🛡️ leveling-dashboard-en.png(2880x1800) 실측 비율 - ko 버전(1477x854)과 정확히
+            // 같진 않지만 레이아웃 예약용 근사치면 충분하다(실제 렌더는 w-full h-auto가 로드된
+            // 파일 크기를 그대로 따라감).
+            imageWidth={2880}
+            imageHeight={1800}
           />
         </RevealOnScroll>
       </section>
@@ -339,6 +352,8 @@ export default async function RootPage() {
                 comingSoonLabel={t.landingPage.screenshotComingSoon}
                 futureImageSrc={item.futureImageSrc}
                 imageSrc={resolvedImageSrc}
+                imageWidth={item.imageWidth}
+                imageHeight={item.imageHeight}
                 reverse={i % 2 === 1}
               />
             </RevealOnScroll>
