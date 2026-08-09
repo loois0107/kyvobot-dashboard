@@ -140,17 +140,24 @@ const SCREENSHOTS = [
   },
 ] as const;
 
-// 🛡️ DashboardShowcase 바로 아래 단독 배치되는 랭크카드 실사 행 - "대시보드에서 이렇게
-// 설정한다 -> 실제로 이런 카드가 나온다"는 흐름의 마지막 조각. rank-card.png는 LEVEL/RANK
-// 라벨이 하드코딩된 영어라 대시보드 언어를 안 타므로 언어 분기 없이 단일 파일 그대로 쓴다.
+// 🛡️ "SEE IT IN ACTION" 섹션의 마지막 항목 - "설정 화면 -> 실제 카드" 2단 구성이라 SCREENSHOTS
+// 배열(항목당 이미지 1장)과 별도로 둔다. 결과물(rank-card-result.png)은 LEVEL/RANK 라벨이
+// 하드코딩된 영어라 언어 분기 없이 단일 파일 - 반면 설정 화면(rank-card-setup-{lang}.png)은
+// 실제 대시보드 UI 캡처라 party-recruit/ai-ticket과 동일하게 언어별 폴백을 탄다.
 const RANK_CARD_SHOWCASE = {
   titleKey: 'screenshotRankCardTitle',
   descKey: 'screenshotRankCardDesc',
   icon: '🎨',
-  futureImageSrc: '/images/features/rank-card.png',
-  imageSrc: '/images/features/rank-card.png',
+  futureImageSrc: '/images/features/rank-card-result.png',
+  imageSrc: '/images/features/rank-card-result.png',
   imageWidth: 920,
   imageHeight: 240,
+  setupLocalizedBaseName: 'rank-card-setup',
+  setupFutureImageSrc: '/images/features/rank-card-setup.png',
+  // 🛡️ 아직 실측 못 함(파일 미준비) - 일반적인 대시보드 설정 패널 비율로 근사치를 잡아둔다.
+  // 실제 파일이 들어오면 다른 슬롯들처럼 w-full h-auto가 로드된 진짜 크기를 그대로 따라간다.
+  setupImageWidth: 1200,
+  setupImageHeight: 800,
 } as const;
 
 interface DiscordGuild {
@@ -256,7 +263,7 @@ export default async function RootPage() {
       <section className="relative min-h-[85vh] flex flex-col justify-center max-w-5xl mx-auto w-full px-4 pb-32">
         <RevealOnScroll className="mb-10 text-center">
           <p className="text-xs font-black tracking-widest text-[#FFD700] uppercase mb-3">
-            {t.landingPage.painPointsTitle}
+            {t.landingPage.painPointsEyebrow}
           </p>
           <h2 className="text-3xl md:text-4xl font-black text-white">
             {t.landingPage.painPointsTitle}
@@ -281,7 +288,7 @@ export default async function RootPage() {
       <section id="features" className="relative min-h-[85vh] flex flex-col justify-center max-w-7xl mx-auto w-full px-4 pb-32">
         <RevealOnScroll className="mb-10 text-center">
           <p className="text-xs font-black tracking-widest text-[#FFD700] uppercase mb-3">
-            {t.landingPage.featuresTitle}
+            {t.landingPage.featuresEyebrow}
           </p>
           <h2 className="text-3xl md:text-4xl font-black text-white">
             {t.landingPage.featuresTitle}
@@ -332,27 +339,10 @@ export default async function RootPage() {
         </RevealOnScroll>
       </section>
 
-      {/* 🛡️ "대시보드로 이렇게 설정한다 -> 실제로 이런 카드가 나온다" 흐름을 만들기 위해
-          DashboardShowcase 바로 아래, "SEE IT IN ACTION" 라벨 밖에 단독으로 배치한다. */}
-      <section className="relative max-w-7xl mx-auto w-full px-4 pb-32">
-        <RevealOnScroll>
-          <FeatureScreenshotRow
-            title={t.landingPage[RANK_CARD_SHOWCASE.titleKey]}
-            description={t.landingPage[RANK_CARD_SHOWCASE.descKey]}
-            icon={RANK_CARD_SHOWCASE.icon}
-            comingSoonLabel={t.landingPage.screenshotComingSoon}
-            futureImageSrc={RANK_CARD_SHOWCASE.futureImageSrc}
-            imageSrc={RANK_CARD_SHOWCASE.imageSrc}
-            imageWidth={RANK_CARD_SHOWCASE.imageWidth}
-            imageHeight={RANK_CARD_SHOWCASE.imageHeight}
-          />
-        </RevealOnScroll>
-      </section>
-
       <section id="see-it-in-action" className="relative max-w-7xl mx-auto w-full px-4 pb-32 space-y-16">
         <RevealOnScroll className="text-center">
           <p className="text-xs font-black tracking-widest text-[#FFD700] uppercase mb-3">
-            {t.landingPage.screenshotsTitle}
+            {t.landingPage.screenshotsEyebrow}
           </p>
           <h2 className="text-3xl md:text-4xl font-black text-white">
             {t.landingPage.screenshotsTitle}
@@ -378,6 +368,25 @@ export default async function RootPage() {
             </RevealOnScroll>
           );
         })}
+        {/* 🛡️ "대시보드로 이렇게 설정한다 -> 실제로 이런 카드가 나온다" 흐름의 마지막 항목 -
+            파티모집/AI티켓과 같은 SEE IT IN ACTION 섹션 안, 맨 마지막 자리로 옮겼다. */}
+        <RevealOnScroll delayMs={SCREENSHOTS.length * 120}>
+          <FeatureScreenshotRow
+            title={t.landingPage[RANK_CARD_SHOWCASE.titleKey]}
+            description={t.landingPage[RANK_CARD_SHOWCASE.descKey]}
+            icon={RANK_CARD_SHOWCASE.icon}
+            comingSoonLabel={t.landingPage.screenshotComingSoon}
+            futureImageSrc={RANK_CARD_SHOWCASE.futureImageSrc}
+            imageSrc={RANK_CARD_SHOWCASE.imageSrc}
+            imageWidth={RANK_CARD_SHOWCASE.imageWidth}
+            imageHeight={RANK_CARD_SHOWCASE.imageHeight}
+            setupImageSrc={resolveLocalizedImage(RANK_CARD_SHOWCASE.setupLocalizedBaseName, lang)}
+            setupFutureImageSrc={RANK_CARD_SHOWCASE.setupFutureImageSrc}
+            setupImageWidth={RANK_CARD_SHOWCASE.setupImageWidth}
+            setupImageHeight={RANK_CARD_SHOWCASE.setupImageHeight}
+            reverse={SCREENSHOTS.length % 2 === 1}
+          />
+        </RevealOnScroll>
       </section>
 
       <section className="relative min-h-[85vh] flex flex-col justify-center items-center w-full px-4 pb-32 text-center bg-[#050508] border-t-4 border-[#2A1F40]">
