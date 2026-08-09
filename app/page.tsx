@@ -107,6 +107,8 @@ const PAIN_POINTS = [
 // 이 3개는 순수하게 "봇을 실행하면 이렇게 나온다"는 결과물 중심. 랭크카드는 실제 캡처본
 // (imageSrc) - 파티/AI티켓은 디스코드 클라이언트 UI라 CDP로 캡처할 수 없어서 기존
 // placeholder(futureImageSrc)를 그대로 유지한다.
+// 🛡️ 랭크카드(rank-card.png)는 이 배열에서 빠졌다 - "대시보드로 설정 -> 실제 카드 결과"
+// 흐름을 만들기 위해 DashboardShowcase 섹션 바로 아래로 옮겼다(RANK_CARD_SHOWCASE 참고).
 const SCREENSHOTS = [
   {
     titleKey: 'screenshotPartyTitle',
@@ -132,18 +134,20 @@ const SCREENSHOTS = [
     imageWidth: 777,
     imageHeight: 476,
   },
-  {
-    titleKey: 'screenshotRankCardTitle',
-    descKey: 'screenshotRankCardDesc',
-    icon: '🎨',
-    futureImageSrc: '/images/features/rank-card.png',
-    // 🛡️ 봇이 그리는 랭크카드는 LEVEL/RANK 라벨이 하드코딩된 영어라 대시보드 언어를 안 타므로
-    // 언어 분기 없이 단일 파일 그대로 유지.
-    imageSrc: '/images/features/rank-card.png',
-    imageWidth: 920,
-    imageHeight: 240,
-  },
 ] as const;
+
+// 🛡️ DashboardShowcase 바로 아래 단독 배치되는 랭크카드 실사 행 - "대시보드에서 이렇게
+// 설정한다 -> 실제로 이런 카드가 나온다"는 흐름의 마지막 조각. rank-card.png는 LEVEL/RANK
+// 라벨이 하드코딩된 영어라 대시보드 언어를 안 타므로 언어 분기 없이 단일 파일 그대로 쓴다.
+const RANK_CARD_SHOWCASE = {
+  titleKey: 'screenshotRankCardTitle',
+  descKey: 'screenshotRankCardDesc',
+  icon: '🎨',
+  futureImageSrc: '/images/features/rank-card.png',
+  imageSrc: '/images/features/rank-card.png',
+  imageWidth: 920,
+  imageHeight: 240,
+} as const;
 
 interface DiscordGuild {
   id: string;
@@ -320,6 +324,23 @@ export default async function RootPage() {
             // 파일 크기를 그대로 따라감).
             imageWidth={2880}
             imageHeight={1800}
+          />
+        </RevealOnScroll>
+      </section>
+
+      {/* 🛡️ "대시보드로 이렇게 설정한다 -> 실제로 이런 카드가 나온다" 흐름을 만들기 위해
+          DashboardShowcase 바로 아래, "SEE IT IN ACTION" 라벨 밖에 단독으로 배치한다. */}
+      <section className="relative max-w-7xl mx-auto w-full px-4 pb-32">
+        <RevealOnScroll>
+          <FeatureScreenshotRow
+            title={t.landingPage[RANK_CARD_SHOWCASE.titleKey]}
+            description={t.landingPage[RANK_CARD_SHOWCASE.descKey]}
+            icon={RANK_CARD_SHOWCASE.icon}
+            comingSoonLabel={t.landingPage.screenshotComingSoon}
+            futureImageSrc={RANK_CARD_SHOWCASE.futureImageSrc}
+            imageSrc={RANK_CARD_SHOWCASE.imageSrc}
+            imageWidth={RANK_CARD_SHOWCASE.imageWidth}
+            imageHeight={RANK_CARD_SHOWCASE.imageHeight}
           />
         </RevealOnScroll>
       </section>
