@@ -8,6 +8,7 @@ import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
 import RoleSelect from '@/components/RoleSelect';
+import { SHOP_ITEM_PRICE_MAX, SHOP_ITEM_NAME_MAX_LENGTH, SHOP_ITEM_DESCRIPTION_MAX_LENGTH } from '@/lib/levelingEconomySettings';
 
 // 🛡️ cogs/economy.py의 /shop add·/shop view·/shop buy는 전부 item['name']을 읽는다 - 예전엔
 // 여기서 'title'로 저장해서 봇이 KeyError로 죽는 실제 크래시가 있었다(대시보드로 만든 아이템은
@@ -136,11 +137,30 @@ export default function LevelingEconomySettings() {
     setIsDirty(true);
   };
 
+  // cogs/economy.py shop_add()의 4개 규칙을 그대로 재현 - "전체 저장" 버튼을 눌러야 비로소
+  // level-eco-setting POST의 서버 검증(같은 규칙, authoritative)에 걸리는 게 아니라, /shop add
+  // 명령어처럼 이 버튼을 누르는 즉시 에러가 뜨게 한다. 서버 검증은 이 클라이언트 체크를 우회한
+  // 요청까지 막는 최후 방어선으로 남겨둔다.
   const injectShopItem = () => {
     if (!newItemTitle.trim()) {
       showToast(t('levelingPage.missingItemTitle'), 'error'); return;
     }
-    const newItem: ShopItem = { name: newItemTitle.trim().replace(/\s+/g, '_'), price: Number(newItemPrice), description: newItemDescription.trim() };
+    const price = Number(newItemPrice);
+    if (!Number.isFinite(price) || price <= 0) {
+      showToast(t('levelingPage.itemErrInvalidPrice'), 'error'); return;
+    }
+    if (price > SHOP_ITEM_PRICE_MAX) {
+      showToast(t('levelingPage.itemErrPriceTooHigh'), 'error'); return;
+    }
+    const computedName = newItemTitle.trim().replace(/\s+/g, '_');
+    const description = newItemDescription.trim();
+    if (computedName.length > SHOP_ITEM_NAME_MAX_LENGTH || description.length > SHOP_ITEM_DESCRIPTION_MAX_LENGTH) {
+      showToast(t('levelingPage.itemErrBoundsOverflow'), 'error'); return;
+    }
+    if (shopItems.some((item) => item.name.toLowerCase() === computedName.toLowerCase())) {
+      showToast(t('levelingPage.itemErrDuplicate'), 'error'); return;
+    }
+    const newItem: ShopItem = { name: computedName, price, description };
     setShopItems(prev => [...prev, newItem]);
     setNewItemTitle(''); setNewItemPrice(100); setNewItemDescription(''); setIsDirty(true);
   };
