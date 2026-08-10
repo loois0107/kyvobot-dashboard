@@ -6,6 +6,24 @@ import { useToast } from '@/components/Toast';
 import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
+import ChannelSelect from '@/components/ChannelSelect';
+import RoleSelect from '@/components/RoleSelect';
+import MemberSelect from '@/components/MemberSelect';
+import type { TranslationKey } from '@/lib/i18n';
+
+// 봇의 /internal/twitch/set 응답 status를 그대로 통과시킨 code -> 로컬라이즈된 문구 매핑.
+// unreachable/server_config/discord_fetch_failed/missing_fields/role_not_found/unknown 등은
+// 여기 없는 게 의도적 - 그런 케이스는 서버가 이미 사람이 읽을 영어 message를 내려주고, 이 페이지는
+// 다른 라우트들과 동일하게 그 raw message를 그대로 보여준다(reaction-roles/tier-roles와 동일 관례).
+const ADD_ERROR_CODE_KEY: Record<string, TranslationKey> = {
+  role_needs_member: 'twitchPage.errRoleNeedsMember',
+  channel_permission_denied: 'twitchPage.errChannelPermissionDenied',
+  role_is_admin: 'twitchPage.errRoleIsAdmin',
+  bot_missing_manage_roles: 'twitchPage.errBotMissingManageRoles',
+  role_hierarchy_blocked: 'twitchPage.errRoleHierarchyBlocked',
+  subscription_failed: 'twitchPage.errSubscriptionFailed',
+  save_failed: 'twitchPage.errSaveFailed',
+};
 
 interface StreamerRow {
   broadcaster_id: string;
@@ -43,6 +61,14 @@ export default function TwitchStreamersSettings() {
   const [streamers, setStreamers] = useState<StreamerRow[]>([]);
   const [removingId, setRemovingId] = useState<string | null>(null);
 
+  const [streamerLogin, setStreamerLogin] = useState('');
+  const [channelId, setChannelId] = useState('');
+  const [memberId, setMemberId] = useState('');
+  const [memberLabel, setMemberLabel] = useState('');
+  const [roleId, setRoleId] = useState('');
+  const [isAdding, setIsAdding] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState<{ dangerous: string[] } | null>(null);
+
   useEffect(() => {
     if (!guildId) return;
     loadData();
@@ -75,6 +101,86 @@ export default function TwitchStreamersSettings() {
       setLoadErrorMsg(t('twitchPage.loadNetworkError'));
       setLoadStatus('error');
     }
+  };
+
+  const resetAddForm = () => {
+    setStreamerLogin('');
+    setChannelId('');
+    setMemberId('');
+    setMemberLabel('');
+    setRoleId('');
+    setConfirmDialog(null);
+  };
+
+  // 봇 웹훅의 status(code)를 그대로 넘겨받아 이 페이지에서 아는 코드는 로컬라이즈하고, 모르는
+  // 코드(네트워크/서버 설정 오류 등)는 다른 라우트들과 동일하게 서버가 내려준 영어 message를
+  // 그대로 보여준다.
+  const extractAddErrorMessage = async (res: Response): Promise<string> => {
+    try {
+      const data = await res.json();
+      if (data.code === 'streamer_not_found') {
+        return t('twitchPage.errStreamerNotFound', { streamer: data.streamer || streamerLogin });
+      }
+      const key = ADD_ERROR_CODE_KEY[data.code];
+      if (key) return t(key);
+      return data.message || t('twitchPage.errGeneric');
+    } catch {
+      return t('twitchPage.errGeneric');
+    }
+  };
+
+  const submitAdd = async (confirmedDangerous: boolean) => {
+    setIsAdding(true);
+    try {
+      const res = await fetch(`/api/twitch/${guildId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          streamer: streamerLogin.trim(),
+          channel_id: channelId,
+          member_id: memberId || null,
+          role_id: roleId || null,
+          confirmedDangerous,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json().catch(() => null);
+        const login = (data?.streamer || streamerLogin.trim()).toLowerCase();
+        resetAddForm();
+        // 토스트에 넣을 역할/멤버 "이름"은 이 시점엔 ID밖에 없다 - 목록을 다시 불러와서 그 응답이
+        // 채워주는 표시명(member_display_name/live_role_name)을 그대로 재사용한다.
+        const listRes = await fetch(`/api/twitch/${guildId}`);
+        if (listRes.ok) {
+          const listData = await listRes.json();
+          const freshStreamers: StreamerRow[] = listData.streamers || [];
+          setStreamers(freshStreamers);
+          const added = freshStreamers.find((s) => s.broadcaster_login.toLowerCase() === login);
+          if (added && added.member_display_name && added.live_role_name) {
+            showToast(t('twitchPage.addSuccessWithRole', { streamer: added.broadcaster_login, member: added.member_display_name, role: added.live_role_name }), 'success');
+          } else {
+            showToast(t('twitchPage.addSuccessNoRole', { streamer: added?.broadcaster_login || login }), 'success');
+          }
+        } else {
+          showToast(t('twitchPage.addSuccessNoRole', { streamer: login }), 'success');
+        }
+        return;
+      }
+      if (res.status === 409) {
+        const data = await res.json();
+        setConfirmDialog({ dangerous: data.dangerous_permissions || [] });
+        return;
+      }
+      showToast(await extractAddErrorMessage(res), 'error');
+    } catch (err) {
+      console.error(err);
+      showToast(t('twitchPage.addNetworkError'), 'error');
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  const handleAddClick = () => {
+    submitAdd(false);
   };
 
   const handleRemove = async (streamer: StreamerRow) => {
@@ -140,10 +246,83 @@ export default function TwitchStreamersSettings() {
         </HelpText>
       </header>
 
+      <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
+        <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+          {t('twitchPage.addSectionTitle')}
+        </h3>
+
+        <div className="space-y-1.5">
+          <label className="text-sm font-bold text-[#b5bac1]">{t('twitchPage.streamerLoginLabel')}</label>
+          <input
+            type="text"
+            value={streamerLogin}
+            onChange={(e) => setStreamerLogin(e.target.value)}
+            placeholder={t('twitchPage.streamerLoginPlaceholder')}
+            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2]"
+          />
+          <HelpText>{t('twitchPage.streamerLoginHelp')}</HelpText>
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-sm font-bold text-[#b5bac1]">{t('twitchPage.announcementChannel')}</label>
+          <ChannelSelect guildId={guildId} value={channelId} onChange={setChannelId} />
+          <HelpText>{t('twitchPage.announcementChannelHelp')}</HelpText>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <label className="text-sm font-bold text-[#b5bac1]">{t('twitchPage.linkedMember')}</label>
+            <MemberSelect
+              guildId={guildId}
+              value={memberId}
+              onChange={(id, displayName) => { setMemberId(id); setMemberLabel(displayName || ''); }}
+            />
+            <HelpText>{t('twitchPage.linkedMemberHelp')}</HelpText>
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-bold text-[#b5bac1]">{t('twitchPage.liveRole')}</label>
+            <RoleSelect guildId={guildId} value={roleId} onChange={setRoleId} />
+            <HelpText>{t('twitchPage.liveRoleHelp')}</HelpText>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleAddClick}
+          disabled={!streamerLogin.trim() || !channelId || isAdding}
+          className="bg-[#23A55A] hover:bg-[#1a7f43] disabled:opacity-50 text-white text-sm font-black px-6 py-3 rounded-xl"
+        >
+          {isAdding ? t('twitchPage.adding') : t('twitchPage.addButton')}
+        </button>
+      </div>
+
+      {confirmDialog && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#1e1f22] border border-orange-500/50 rounded-2xl p-6 max-w-md w-full space-y-4">
+            <h3 className="text-orange-400 font-black text-base">{t('twitchPage.dangerousPermTitle')}</h3>
+            <p className="text-sm text-[#b5bac1]">
+              {t('twitchPage.dangerousPermBody', { perms: confirmDialog.dangerous.join(', '), member: memberLabel || memberId })}
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button type="button" onClick={() => setConfirmDialog(null)} className="text-sm font-bold text-gray-400 hover:text-white px-4 py-2">
+                {t('common.cancel')}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setConfirmDialog(null); submitAdd(true); }}
+                className="bg-red-600 hover:bg-red-500 text-white text-sm font-black px-5 py-2 rounded-lg"
+              >
+                {t('common.confirm')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {streamers.length === 0 ? (
         <div className="text-center py-12 border border-dashed border-[#2b2d31] rounded-xl bg-[#1e1f22]">
           <p className="text-base text-gray-400">
-            {t('twitchPage.noStreamersYetPrefix')} <code className="text-[#5865F2]">/twitch_channel_set</code> {t('twitchPage.noStreamersYetSuffix')}
+            {t('twitchPage.noStreamersYet')}
           </p>
         </div>
       ) : (

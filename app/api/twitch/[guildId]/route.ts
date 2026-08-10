@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { requireGuildAdministrator } from '@/lib/auth';
 import { computePollHealth, computeRoleGrantStatus } from '@/lib/twitchStatus';
+import { ADMINISTRATOR, DANGEROUS_PERMS, computeBotHierarchy, type DiscordRole } from '@/lib/tierRoles';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,6 +46,45 @@ async function fetchMemberDisplayName(guildId: string, userId: string): Promise<
   if (!res.ok) return null;
   const data = await res.json();
   return data.nick || data.user?.global_name || data.user?.username || null;
+}
+
+// POST 전용 헬퍼 3종 - reaction-roles/[guildId]/route.ts와 동일한 패턴(위험 권한 평가를 위해
+// permissions/position/managed까지 포함한 "완전한" 역할 목록이 필요하다). 위의 fetchGuildRoles는
+// GET에서 표시명만 필요해 {id,name}으로 충분하지만, 여긴 별도로 둔다 - 세션 전반의 관례대로
+// 라우트마다 자기 완결적으로 복제.
+async function fetchGuildRolesWithPermissions(guildId: string): Promise<DiscordRole[] | null> {
+  const botToken = process.env.DISCORD_BOT_TOKEN;
+  if (!botToken) return null;
+  const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/roles`, {
+    headers: { Authorization: `Bot ${botToken}` },
+    next: { revalidate: 30 },
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+async function fetchBotUserId(): Promise<string | null> {
+  const botToken = process.env.DISCORD_BOT_TOKEN;
+  if (!botToken) return null;
+  const res = await fetch('https://discord.com/api/v10/users/@me', {
+    headers: { Authorization: `Bot ${botToken}` },
+    next: { revalidate: 3600 },
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data.id as string;
+}
+
+async function fetchBotMemberRoleIds(guildId: string, botUserId: string): Promise<string[] | null> {
+  const botToken = process.env.DISCORD_BOT_TOKEN;
+  if (!botToken) return null;
+  const res = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${botUserId}`, {
+    headers: { Authorization: `Bot ${botToken}` },
+    next: { revalidate: 30 },
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data.roles as string[];
 }
 
 /**
@@ -115,6 +155,125 @@ export async function GET(request: Request, ctx: { params: Promise<{ guildId: st
   );
 
   return NextResponse.json({ status: 'success', streamers: result });
+}
+
+/**
+ * POST: 새 스트리머를 등록한다(대시보드판 /twitch_channel_set). role_needs_member/channel 권한/
+ * 트위치 존재 여부 등 "봇이 아니면 확인 불가능한" 검증은 여기서 하지 않고 그대로 봇의
+ * /internal/twitch/set 웹훅에 위임한다 - reaction-roles POST와 동일한 정신(웹훅 실패 시 유령
+ * 등록이 생기는 걸 막기 위해 여기서 DB에 직접 쓰지 않음). 다만 위험 권한 2단계 확인만은 역할
+ * 데이터를 미리 당겨와 웹훅 호출 전에 여기서 판정한다 - confirmedDangerous 없이 게이트 없는
+ * 웹훅을 호출하면 확인 UI 자체가 뜰 기회가 없기 때문(reaction-roles POST와 동일한 이유).
+ */
+export async function POST(request: Request, ctx: { params: Promise<{ guildId: string }> }) {
+  const { guildId } = await ctx.params;
+  const blocked = await requireGuildAdministrator(guildId);
+  if (blocked) return blocked;
+
+  let body: any;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ status: 'error', message: 'Invalid request body.' }, { status: 400 });
+  }
+
+  const { streamer, channel_id, member_id, role_id, confirmedDangerous } = body || {};
+  if (!streamer || !channel_id) {
+    return NextResponse.json({ status: 'error', message: 'streamer and channel_id are required.', code: 'missing_fields' }, { status: 400 });
+  }
+  if (role_id && !member_id) {
+    return NextResponse.json({ status: 'error', message: 'A live role requires a linked member too.', code: 'role_needs_member' }, { status: 400 });
+  }
+
+  if (role_id) {
+    const [roles, botUserId] = await Promise.all([fetchGuildRolesWithPermissions(guildId), fetchBotUserId()]);
+    if (!roles || !botUserId) {
+      return NextResponse.json({ status: 'error', message: 'Failed to fetch role/bot data from Discord.', code: 'discord_fetch_failed' }, { status: 502 });
+    }
+    const botRoleIds = await fetchBotMemberRoleIds(guildId, botUserId);
+    if (!botRoleIds) {
+      return NextResponse.json({ status: 'error', message: "Failed to fetch the bot's own roles from Discord.", code: 'discord_fetch_failed' }, { status: 502 });
+    }
+
+    const role = roles.find((r) => r.id === role_id);
+    if (!role) {
+      return NextResponse.json({ status: 'error', message: 'That role no longer exists.', code: 'role_not_found' }, { status: 400 });
+    }
+
+    const perms = BigInt(role.permissions);
+    const { topPosition, hasManageRoles } = computeBotHierarchy(guildId, roles, botRoleIds);
+
+    if ((perms & ADMINISTRATOR) === ADMINISTRATOR) {
+      return NextResponse.json({ status: 'error', message: 'This role has Administrator permissions and can never be used here.', code: 'role_is_admin' }, { status: 400 });
+    }
+    if (!hasManageRoles) {
+      return NextResponse.json({ status: 'error', message: "Kyvo doesn't have the Manage Roles permission in this server.", code: 'bot_missing_manage_roles' }, { status: 400 });
+    }
+    if (role.position >= topPosition) {
+      return NextResponse.json({ status: 'error', message: "This role is positioned above (or equal to) Kyvo's own role.", code: 'role_hierarchy_blocked' }, { status: 400 });
+    }
+
+    const dangerous = Object.entries(DANGEROUS_PERMS)
+      .filter(([, bit]) => (perms & bit) === bit)
+      .map(([name]) => name);
+    if (dangerous.length > 0 && !confirmedDangerous) {
+      return NextResponse.json({ status: 'needs_confirmation', dangerous_permissions: dangerous }, { status: 409 });
+    }
+  }
+
+  const baseUrl = process.env.KYVOBOT_BASE_URL;
+  const secret = process.env.INTERNAL_API_SECRET;
+  if (!baseUrl || !secret) {
+    return NextResponse.json(
+      { status: 'error', message: 'Server configuration error (KYVOBOT_BASE_URL/INTERNAL_API_SECRET not set).', code: 'server_config' },
+      { status: 500 }
+    );
+  }
+
+  let setRes: Response;
+  try {
+    setRes = await fetch(`${baseUrl}/internal/twitch/set`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Internal-Secret': secret },
+      body: JSON.stringify({
+        guild_id: guildId,
+        channel_id,
+        streamer,
+        member_id: member_id || null,
+        role_id: role_id || null,
+        created_by: 'dashboard',
+      }),
+      signal: AbortSignal.timeout(15000),
+    });
+  } catch (err) {
+    console.error('[TWITCH_ADMIN][ERROR] Set webhook call failed:', err);
+    return NextResponse.json({ status: 'error', message: 'Could not reach Kyvo to add this streamer. Is it online?', code: 'unreachable' }, { status: 502 });
+  }
+
+  let setBody: any = null;
+  try {
+    setBody = await setRes.json();
+  } catch {
+    // no body
+  }
+
+  if (!setRes.ok) {
+    const code = setBody?.status || 'unknown';
+    const reasonMap: Record<string, string> = {
+      role_needs_member: 'A live role requires a linked member too.',
+      channel_permission_denied: "Kyvo can't send messages/embeds in that channel.",
+      role_is_admin: 'This role has Administrator permissions and can never be used here.',
+      bot_missing_manage_roles: "Kyvo doesn't have the Manage Roles permission in this server.",
+      role_hierarchy_blocked: "This role is positioned above (or equal to) Kyvo's own role.",
+      streamer_not_found: `No Twitch channel found for "${setBody?.streamer || streamer}". Double-check the spelling.`,
+      subscription_failed: 'Failed to set up Twitch notifications right now. Please try again later.',
+      save_failed: 'Failed to save. Please try again.',
+    };
+    const message = reasonMap[code] || `Kyvo returned an unexpected error (${setRes.status}).`;
+    return NextResponse.json({ status: 'error', message, code, streamer: setBody?.streamer || streamer }, { status: setRes.status });
+  }
+
+  return NextResponse.json({ status: 'success', streamer: setBody?.streamer || streamer });
 }
 
 /**
