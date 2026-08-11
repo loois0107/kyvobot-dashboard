@@ -8,7 +8,9 @@ import { BOT_INVITE_URL } from '@/lib/botInvite';
 
 // 🛡️ 대시보드 사이드바와 동일한 4개 카테고리(app/dashboard/[guildId]/layout.tsx 기준)로
 // 묶었다 - "밀접한 커맨드는 하나로 묶는다" 원칙에 따라 카지노 게임 6개 -> 1개 항목 등으로
-// 압축, 원본 명령어 22~24개가 아래 23개 항목 안에 전부 들어간다(사용자에게 별도 체크리스트로 보고).
+// 압축, 원본 명령어 41개(리프 기준)가 아래 24개 항목 안에 전부 들어간다(사용자에게 별도 체크리스트로 보고).
+// /help는 특정 기능이 아니라 "이 항목들을 디스코드 안에서 훑어보는 도구"라 /dashboard와 성격이
+// 같다 - 그래서 별도 카테고리를 새로 만들지 않고 /dashboard 바로 앞, 같은 연동&AI지원 카테고리에 둔다.
 const GUIDE_CATEGORIES = [
   {
     categoryKey: 'categoryCommunity',
@@ -50,6 +52,7 @@ const GUIDE_CATEGORIES = [
     items: [
       { titleKey: 'guideTwitchTitle', descKey: 'guideTwitchDesc' },
       { titleKey: 'guideAiTicketTitle', descKey: 'guideAiTicketDesc' },
+      { titleKey: 'guideHelpTitle', descKey: 'guideHelpDesc' },
       { titleKey: 'guideDashboardTitle', descKey: 'guideDashboardDesc' },
     ],
   },

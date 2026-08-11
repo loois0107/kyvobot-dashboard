@@ -907,6 +907,8 @@ const ko: typeof en = {
     guideTwitchDesc: '/twitch_channel_set으로 트위치 채널을 연동하면, 방송을 시작하는 순간 서버에 실시간 알림(과 선택적 역할)이 전송됩니다. /twitch_channel_remove로 연동을 해제할 수 있습니다.',
     guideAiTicketTitle: '🤖 AI 고객지원 티켓',
     guideAiTicketDesc: '/ticket-setup은 멤버마다 개인 티켓 채널을 열어주는 지원 패널을 게시합니다. 서버 고유의 규칙과 FAQ로 학습된 AI(/ticket-admin add-knowledge로 추가)가 24시간 즉시 답변합니다.',
+    guideHelpTitle: '📋 디스코드 안 명령어 안내',
+    guideHelpDesc: '언제든 /help를 실행하면 디스코드 안에서 바로 Kyvo가 할 수 있는 일들을 카테고리별로 확인할 수 있어요. 관리자에게는 관리자 전용 명령어까지 보이고, 일반 유저에게는 사용 가능한 것만 보여줍니다 — 더 자세한 내용을 보려면 이 대시보드로 바로 이어지는 링크도 함께 제공돼요.',
     guideDashboardTitle: '🎛️ 웹 대시보드',
     guideDashboardDesc: '이 페이지의 모든 설정 — 그리고 위에서 소개한 모든 기능 — 은 명령어를 외울 필요 없이 실제 웹 대시보드에서 설정합니다. 언제든 /dashboard로 서버 관리 패널 링크를 바로 받을 수 있습니다.',
   },

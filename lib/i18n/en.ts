@@ -905,6 +905,8 @@ const en = {
     guideTwitchDesc: 'Links a Twitch channel with /twitch_channel_set so the server gets a live announcement (and an optional role) the moment they go live. /twitch_channel_remove stops it.',
     guideAiTicketTitle: '🤖 AI Support Ticket',
     guideAiTicketDesc: "/ticket-setup posts a support panel that opens a private ticket channel for each member. An AI trained on your own server's rules and FAQs (added via /ticket-admin add-knowledge) answers instantly, 24/7.",
+    guideHelpTitle: '📋 In-Discord Command Guide',
+    guideHelpDesc: 'Run /help anytime for a categorized rundown of what Kyvo can do, right inside Discord. Admins see admin-only commands too; everyone else sees just what they can use - with a link back to this dashboard for the full picture.',
     guideDashboardTitle: '🎛️ Web Dashboard',
     guideDashboardDesc: "Every setting on this page - and everything above - is configured from a real web dashboard, not memorized commands. Run /dashboard anytime for a direct link to your server's admin panel.",
   },
