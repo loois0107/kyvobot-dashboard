@@ -14,8 +14,10 @@ export interface ValidationResult {
 /**
  * 레거시 문자열 형태({trigger: "응답"})와 신규 dict 형태({trigger: {type, content?, role_id?}})가
  * 섞여 있을 수 있다 (cogs/custom_commands.py의 _normalize_command_entry와 동일한 스키마).
- * text 타입(또는 레거시 문자열)만 응답 길이를 검사한다 - role_add/role_remove는 대시보드에서
- * 만들 수 없고(생성 UI가 없음) 검사할 "응답 텍스트" 자체가 없다.
+ * text 타입(또는 레거시 문자열)만 응답 길이를 검사한다 - role_add/role_remove는 검사할
+ * "응답 텍스트" 자체가 없다(역할 위험 권한/위계 검증은 /api/settings/[guildId]/role-macro
+ * 라우트가 별도로 담당 - 이 함수가 받는 벌크 저장 경로에는 role_id의 유효성까지 검증할
+ * Discord 역할 데이터가 없다).
  */
 function extractTextContent(value: unknown): string | null {
   if (typeof value === 'string') return value;

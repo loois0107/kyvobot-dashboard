@@ -146,6 +146,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               {t('sidebar.myPage')}
             </Link>
 
+            <Link
+              href={`/dashboard/${currentGuildId}/general`}
+              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/general') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
+            >
+              {t('sidebar.generalSettings')}
+            </Link>
+
             <div className="space-y-1">
               <label className="block text-sm font-bold text-[#949ba4] uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryCommunity')}</label>
               <Link

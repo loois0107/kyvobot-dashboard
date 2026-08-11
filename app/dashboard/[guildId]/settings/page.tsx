@@ -4,16 +4,16 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { MACRO_TRIGGER_MAX_LENGTH, MACRO_RESPONSE_MAX_LENGTH, MACRO_MAX_COUNT } from '@/lib/customCommandsSettings';
 import { useT } from '@/lib/i18n/LanguageContext';
+import { useToast } from '@/components/Toast';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
+import RoleSelect from '@/components/RoleSelect';
 import { useGuildName } from '@/components/GuildsContext';
+import type { TranslationKey } from '@/lib/i18n';
 
-// 🛡️ /cc_add role_add·role_remove(봇 전용 관리자 슬래시 커맨드)로 만든 매크로는 문자열이 아니라
+// 🛡️ /cc_add role_add·role_remove(봇 슬래시 커맨드)로 만든 매크로는 문자열이 아니라
 // {type, role_id} 객체로 저장된다(cogs/custom_commands.py의 _normalize_command_entry와 동일한
-// 스키마). 예전엔 이 상태를 가정 안 하고 <span>{response}</span>로 그냥 렌더링해서, 역할 매크로가
-// 하나라도 있는 서버는 이 페이지를 열면 React가 "Objects are not valid as a React child"로
-// 그대로 크래시났다. 이제 값 형태를 먼저 판별해서 role_add/role_remove는 읽기 전용 배지로 안전하게
-// 보여주고, 텍스트 매크로만 이 페이지에서 만들고 지울 수 있게 한다.
+// 스키마) - 이젠 이 대시보드에서도 같은 형태로 직접 만들 수 있다(role-macro API 라우트 경유).
 export type MacroEntry = string | { type: 'text'; content: string } | { type: 'role_add' | 'role_remove'; role_id: string };
 
 export function isRoleMacro(value: MacroEntry): value is { type: 'role_add' | 'role_remove'; role_id: string } {
@@ -26,115 +26,199 @@ export function macroResponseText(value: MacroEntry): string {
   return '';
 }
 
+type MacroType = 'text' | 'role_add' | 'role_remove';
+
+// /api/settings/{guildId}/role-macro가 내려주는 code -> 로컬라이즈된 문구 매핑. role_not_found/
+// discord_fetch_failed/invalid_* 등은 giveaways 페이지와 동일한 이유로 일부러 여기 없다 - 서버가
+// 이미 사람이 읽을 영어 message를 내려주고 그걸 그대로 보여준다.
+const ROLE_MACRO_ERROR_CODE_KEY: Record<string, TranslationKey> = {
+  name_required: 'settingsPage.errNameRequired',
+  role_required: 'settingsPage.errRoleRequired',
+  role_is_admin: 'settingsPage.errRoleIsAdmin',
+  bot_missing_manage_roles: 'settingsPage.errBotMissingManageRoles',
+  role_hierarchy_blocked: 'settingsPage.errRoleHierarchyBlocked',
+  save_failed: 'settingsPage.errSaveFailed',
+};
+
+// cc_add_group._resolve_cmd_name과 동일한 정규화: strip → lower → "/" 접두어 제거 → "!" 접두어
+// 제거 (Python removeprefix와 동일하게 순서대로 한 번씩만 벗긴다).
+function normalizeMacroName(raw: string): string {
+  let n = raw.trim().toLowerCase();
+  if (n.startsWith('/')) n = n.slice(1);
+  if (n.startsWith('!')) n = n.slice(1);
+  return n;
+}
+
 export default function SettingsPage() {
   const params = useParams();
   const t = useT();
+  const { showToast } = useToast();
   const guildId = params?.guildId as string | undefined;
   const guildName = useGuildName(guildId);
 
   const [commands, setCommands] = useState<{ [key: string]: MacroEntry }>({});
-  const [language, setLanguage] = useState('en');
+  const [roles, setRoles] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
 
-  // 📡 1. 서버 통합 매트릭스 로드
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [macroType, setMacroType] = useState<MacroType>('text');
+  const [macroName, setMacroName] = useState('');
+  const [macroResponse, setMacroResponse] = useState('');
+  const [macroRoleId, setMacroRoleId] = useState('');
+  const [isSavingMacro, setIsSavingMacro] = useState(false);
+  const [dangerousConfirm, setDangerousConfirm] = useState<{ dangerous: string[] } | null>(null);
+
+  // 📡 매크로 목록 로드 (언어는 이제 general/page.tsx가 담당 - 이 페이지는 매크로 전용)
   const fetchAllSettings = () => {
     if (!guildId || guildId === '[guildId]') return;
     setLoading(true);
-    setMessage('');
 
     fetch(`/api/settings/${guildId}`)
       .then(async (res) => {
         const resData = await res.json();
         if (res.ok && resData.ok && resData.settings) {
-          setLanguage(resData.settings.language || 'en');
           setCommands(resData.settings.custom_commands || {});
-          setMessage(t('settingsPage.loadSuccess'));
         } else {
-          setMessage(`${t('settingsPage.loadFailedPrefix')} [${res.status}]: ${resData.error || resData.message || t('settingsPage.unknownConfigState')}`);
+          showToast(`${t('settingsPage.loadFailedPrefix')} [${res.status}]: ${resData.error || resData.message || t('settingsPage.unknownConfigState')}`, 'error');
         }
         setLoading(false);
       })
       .catch((err) => {
         console.error(err);
-        setMessage(t('settingsPage.fetchFailed'));
+        showToast(t('settingsPage.fetchFailed'), 'error');
         setLoading(false);
       });
   };
 
   useEffect(() => {
     fetchAllSettings();
+    if (!guildId || guildId === '[guildId]') return;
+    let cancelled = false;
+    fetch(`/api/guilds/${guildId}/roles`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) => {
+        if (!cancelled && Array.isArray(data)) setRoles(data);
+      })
+      .catch((err) => console.error('[SETTINGS] Failed to load role list:', err));
+    return () => {
+      cancelled = true;
+    };
   }, [guildId]);
 
-  // 🌐 2. 통합 백엔드 저장 처리 파이프라인
-  const saveUnifiedSettings = async (nextCommands?: Record<string, MacroEntry>, nextLang?: string) => {
-    if (!guildId || guildId === '[guildId]') return;
+  const roleName = (roleId: string) => roles.find((r) => r.id === roleId)?.name || roleId;
+
+  // 🌐 텍스트 매크로 추가/삭제 전용 (역할 매크로는 /api/settings/{guildId}/role-macro가 담당) -
+  // custom_commands 전체를 통째로 교체하는 방식은 그대로 유지(role-macro 라우트가 만든 항목도
+  // 이 객체 안에 같이 들어있으므로 부분 필드만 보낸다).
+  const saveUnifiedSettings = async (nextCommands: Record<string, MacroEntry>): Promise<boolean> => {
+    if (!guildId || guildId === '[guildId]') return false;
     setLoading(true);
-
-    const targetCommands = nextCommands !== undefined ? nextCommands : commands;
-    const targetLang = nextLang !== undefined ? nextLang : language;
-
     try {
       const res = await fetch(`/api/settings/${guildId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          language: targetLang,
-          custom_commands: targetCommands
-        }),
+        body: JSON.stringify({ custom_commands: nextCommands }),
       });
-
       const data = await res.json();
-
       if (res.ok && data.ok) {
-        setMessage(t('settingsPage.saveSuccess'));
-        if (nextCommands !== undefined) setCommands(nextCommands);
-        if (nextLang !== undefined) setLanguage(nextLang);
-      } else {
-        setMessage(`${t('settingsPage.saveFailedPrefix')} [${res.status}]: ${data.error || data.message || t('settingsPage.unknownException')}`);
+        setCommands(nextCommands);
+        showToast(t('common.saveSuccess'), 'success');
+        return true;
       }
+      showToast(data.error || data.message || t('settingsPage.errGeneric'), 'error');
+      return false;
     } catch (err) {
       console.error(err);
-      setMessage(t('settingsPage.handshakeBlocked'));
+      showToast(t('settingsPage.handshakeBlocked'), 'error');
+      return false;
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAddCommand = () => {
-    if (Object.keys(commands).length >= MACRO_MAX_COUNT) {
-      setMessage(t('settingsPage.rejectedMaxMacros', { max: MACRO_MAX_COUNT }));
-      return;
-    }
-
-    const name = prompt(t('settingsPage.promptCommandName'))?.trim().toLowerCase();
-    const response = prompt(t('settingsPage.promptResponseText'));
-    if (!name || !response) return;
-
-    if (name.length > MACRO_TRIGGER_MAX_LENGTH) {
-      setMessage(t('settingsPage.rejectedTriggerLength', { max: MACRO_TRIGGER_MAX_LENGTH }));
-      return;
-    }
-    if (response.length > MACRO_RESPONSE_MAX_LENGTH) {
-      setMessage(t('settingsPage.rejectedResponseLength', { length: response.length, max: MACRO_RESPONSE_MAX_LENGTH }));
-      return;
-    }
-    if (isRoleMacro(commands[name])) {
-      setMessage(t('settingsPage.rejectedRoleMacro', { name }));
-      return;
-    }
-
-    const updated = { ...commands, [name]: response };
-    saveUnifiedSettings(updated, language);
+  const resetAddModal = () => {
+    setShowAddModal(false);
+    setMacroType('text');
+    setMacroName('');
+    setMacroResponse('');
+    setMacroRoleId('');
+    setDangerousConfirm(null);
   };
 
-  const handleDeleteCommand = (name: string) => {
-    if (!confirm(t('settingsPage.confirmDelete', { name }))) return;
+  const extractRoleMacroErrorMessage = async (res: Response, cmdName: string): Promise<string> => {
+    try {
+      const data = await res.json();
+      if (data.code === 'trigger_too_long') return t('settingsPage.errTriggerTooLong', { max: MACRO_TRIGGER_MAX_LENGTH });
+      if (data.code === 'max_macros') return t('settingsPage.errMaxMacros', { max: MACRO_MAX_COUNT });
+      if (data.code === 'name_conflict') return t('settingsPage.errNameConflict', { name: cmdName });
+      const key = ROLE_MACRO_ERROR_CODE_KEY[data.code];
+      if (key) return t(key);
+      return data.error || t('settingsPage.errGeneric');
+    } catch {
+      return t('settingsPage.errGeneric');
+    }
+  };
 
+  const submitTextMacro = async () => {
+    const cmdName = normalizeMacroName(macroName);
+    if (!cmdName) { showToast(t('settingsPage.errNameRequired'), 'error'); return; }
+    if (cmdName.length > MACRO_TRIGGER_MAX_LENGTH) { showToast(t('settingsPage.errTriggerTooLong', { max: MACRO_TRIGGER_MAX_LENGTH }), 'error'); return; }
+    if (!macroResponse.trim()) { showToast(t('settingsPage.errResponseRequired'), 'error'); return; }
+    if (macroResponse.length > MACRO_RESPONSE_MAX_LENGTH) { showToast(t('settingsPage.errResponseTooLong', { length: macroResponse.length, max: MACRO_RESPONSE_MAX_LENGTH }), 'error'); return; }
+    if (isRoleMacro(commands[cmdName])) { showToast(t('settingsPage.errNameConflict', { name: cmdName }), 'error'); return; }
+    if (!(cmdName in commands) && Object.keys(commands).length >= MACRO_MAX_COUNT) { showToast(t('settingsPage.errMaxMacros', { max: MACRO_MAX_COUNT }), 'error'); return; }
+
+    setIsSavingMacro(true);
+    const ok = await saveUnifiedSettings({ ...commands, [cmdName]: macroResponse });
+    setIsSavingMacro(false);
+    if (ok) resetAddModal();
+  };
+
+  const submitRoleMacro = async (confirmedDangerous: boolean) => {
+    const cmdName = normalizeMacroName(macroName);
+    if (!cmdName) { showToast(t('settingsPage.errNameRequired'), 'error'); return; }
+    if (!macroRoleId) { showToast(t('settingsPage.errRoleRequired'), 'error'); return; }
+
+    setIsSavingMacro(true);
+    try {
+      const res = await fetch(`/api/settings/${guildId}/role-macro`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: cmdName, action: macroType, role_id: macroRoleId, confirmedDangerous }),
+      });
+      if (res.ok) {
+        showToast(t('common.saveSuccess'), 'success');
+        resetAddModal();
+        fetchAllSettings();
+        return;
+      }
+      if (res.status === 409) {
+        const data = await res.json();
+        setDangerousConfirm({ dangerous: data.dangerous_permissions || [] });
+        return;
+      }
+      showToast(await extractRoleMacroErrorMessage(res, cmdName), 'error');
+    } catch (err) {
+      console.error(err);
+      showToast(t('settingsPage.handshakeBlocked'), 'error');
+    } finally {
+      setIsSavingMacro(false);
+    }
+  };
+
+  const handleSubmitMacro = () => {
+    if (macroType === 'text') submitTextMacro();
+    else submitRoleMacro(false);
+  };
+
+  const handleDeleteCommand = async (name: string) => {
+    if (!confirm(t('settingsPage.confirmDelete', { name }))) return;
     const updated = { ...commands };
     delete updated[name];
-    saveUnifiedSettings(updated, language);
+    await saveUnifiedSettings(updated);
   };
+
+  const macroCount = Object.keys(commands).length;
 
   return (
     <div className="min-h-screen bg-[#0F0F1A] text-white p-6 font-mono selection:bg-[#2A1F40]">
@@ -148,70 +232,55 @@ export default function SettingsPage() {
 
         <div className="flex flex-col gap-6 bg-[#161626] border border-[#2A1F40] p-6 rounded-xl shadow-xl">
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label className="text-sm text-gray-400 block mb-1">{t('common.activeContext')}</label>
-              <div className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-base text-purple-400 px-3 py-2 rounded font-bold select-none">
-                {guildName || (guildId ? `${t('common.guildLabel')} ${guildId}` : t('common.loading'))}
-              </div>
-            </div>
-            <div>
-              <label className="text-sm text-gray-400 block mb-1">{t('settingsPage.serverLanguageLabel')}</label>
-              <select
-                value={language}
-                onChange={(e) => saveUnifiedSettings(commands, e.target.value)}
-                disabled={loading}
-                className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-base text-white px-3 py-2 rounded focus:border-purple-500 outline-none cursor-pointer font-bold disabled:opacity-50"
-              >
-                <option value="en">🇺🇸 English (EN)</option>
-                <option value="ko">🇰🇷 한국어 (KO)</option>
-              </select>
-              <HelpText className="mt-1">{t('settingsPage.serverLanguageHelp')}</HelpText>
+          <div>
+            <label className="text-sm text-gray-400 block mb-1">{t('common.activeContext')}</label>
+            <div className="w-full sm:w-1/2 bg-[#0F0F1A] border border-[#2A1F40] text-base text-purple-400 px-3 py-2 rounded font-bold select-none">
+              {guildName || (guildId ? `${t('common.guildLabel')} ${guildId}` : t('common.loading'))}
             </div>
           </div>
-
-          {message && (
-            <div className="bg-[#0F0F1A] border border-purple-900/50 text-sm text-center p-3 rounded text-gray-300 break-all whitespace-pre-wrap">
-              {message}
-            </div>
-          )}
 
           <div className="border border-[#2A1F40] bg-[#0F0F1A] p-4 rounded-lg">
             <div className="flex items-center justify-between mb-3 border-b border-[#2A1F40] pb-2">
               <span className="text-sm font-bold text-gray-400">{t('settingsPage.macrosTitle')}</span>
               <button
-                onClick={handleAddCommand}
+                onClick={() => setShowAddModal(true)}
                 disabled={loading}
                 className="text-[11px] bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 text-white px-2 py-1 rounded font-bold"
               >
                 {t('settingsPage.addNew')}
               </button>
             </div>
-            <HelpText className="mb-3">
-              {t('settingsPage.macrosHelp', { max: MACRO_RESPONSE_MAX_LENGTH.toLocaleString() })}
-            </HelpText>
+            <div className="text-[11px] text-gray-500 mb-3 space-y-0.5">
+              <p>{t('settingsPage.macrosHelpBullet1')}</p>
+              <p>{t('settingsPage.macrosHelpBullet2')}</p>
+              <p>{t('settingsPage.macrosHelpBullet3', { max: MACRO_RESPONSE_MAX_LENGTH.toLocaleString() })}</p>
+            </div>
 
-            {Object.keys(commands).length === 0 ? (
-              <HelpText className="text-center py-4">{t('settingsPage.noMacros')}</HelpText>
+            {macroCount === 0 ? (
+              <div className="text-center py-10 border border-dashed border-[#2A1F40] rounded-xl bg-[#161626]">
+                <p className="text-4xl mb-2">📭</p>
+                <p className="text-sm text-gray-400">{t('settingsPage.noMacros')}</p>
+                <p className="text-xs text-gray-600 mt-1">{t('settingsPage.noMacrosHint')}</p>
+              </div>
             ) : (
-              <div className="flex flex-col gap-2 max-h-40 overflow-y-auto">
+              <div className="flex flex-col gap-2 max-h-64 overflow-y-auto">
                 {Object.entries(commands).map(([trigger, value]) => (
-                  <div key={trigger} className="flex justify-between items-center text-sm bg-[#161626] p-2 rounded border border-[#2A1F40]">
-                    <span className="text-green-400 font-bold">/{trigger}</span>
+                  <div key={trigger} className="flex justify-between items-center gap-2 text-sm bg-[#161626] p-2 rounded border border-[#2A1F40]">
+                    <span className="text-green-400 font-bold shrink-0">/{trigger}</span>
                     {isRoleMacro(value) ? (
-                      <span className="text-[10px] font-bold text-amber-400 bg-amber-950/30 border border-amber-500/20 px-2 py-0.5 rounded">
+                      <span className="text-[10px] font-bold text-amber-400 bg-amber-950/30 border border-amber-500/20 px-2 py-0.5 rounded truncate">
                         {t('settingsPage.roleMacroBadge', {
                           action: value.type === 'role_add' ? t('settingsPage.grants') : t('settingsPage.removes'),
-                          roleId: value.role_id,
+                          roleName: roleName(value.role_id),
                         })}
                       </span>
                     ) : (
-                      <span className="text-gray-400 truncate max-w-[200px]">{macroResponseText(value)}</span>
+                      <span className="text-gray-400 truncate flex-1">{macroResponseText(value)}</span>
                     )}
                     <button
                       onClick={() => handleDeleteCommand(trigger)}
                       disabled={loading}
-                      className="text-red-400 hover:text-red-500 font-bold disabled:opacity-50"
+                      className="text-red-400 hover:text-red-500 font-bold disabled:opacity-50 shrink-0"
                     >
                       {t('settingsPage.deleteButton')}
                     </button>
@@ -221,6 +290,100 @@ export default function SettingsPage() {
             )}
           </div>
         </div>
+
+        {showAddModal && (
+          <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+            <div className="bg-[#161626] border border-[#2A1F40] rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
+              <h3 className="text-purple-400 font-black text-base">{t('settingsPage.addModalTitle')}</h3>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-gray-400">{t('settingsPage.macroNameLabel')}</label>
+                <input
+                  type="text"
+                  value={macroName}
+                  onChange={(e) => setMacroName(e.target.value)}
+                  placeholder={t('settingsPage.macroNamePlaceholder')}
+                  maxLength={MACRO_TRIGGER_MAX_LENGTH}
+                  className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-white px-3 py-2 rounded focus:border-purple-500 outline-none"
+                />
+                <HelpText>{t('settingsPage.macroNameHelp')}</HelpText>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-gray-400">{t('settingsPage.macroTypeLabel')}</label>
+                <div className="flex gap-2">
+                  {(['text', 'role_add', 'role_remove'] as MacroType[]).map((tp) => (
+                    <button
+                      key={tp}
+                      type="button"
+                      onClick={() => setMacroType(tp)}
+                      className={`flex-1 text-[11px] font-bold py-2 rounded-lg border transition-all ${macroType === tp ? 'bg-purple-600 border-purple-600 text-white' : 'bg-[#0F0F1A] border-[#2A1F40] text-gray-400'}`}
+                    >
+                      {tp === 'text' ? t('settingsPage.macroTypeText') : tp === 'role_add' ? t('settingsPage.macroTypeRoleAdd') : t('settingsPage.macroTypeRoleRemove')}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {macroType === 'text' ? (
+                <div className="space-y-1.5">
+                  <label className="text-sm font-bold text-gray-400">{t('settingsPage.macroResponseLabel')}</label>
+                  <textarea
+                    value={macroResponse}
+                    onChange={(e) => setMacroResponse(e.target.value)}
+                    placeholder={t('settingsPage.macroResponsePlaceholder')}
+                    maxLength={MACRO_RESPONSE_MAX_LENGTH}
+                    rows={3}
+                    className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-white px-3 py-2 rounded focus:border-purple-500 outline-none resize-none"
+                  />
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  <label className="text-sm font-bold text-gray-400">{t('settingsPage.macroRoleLabel')}</label>
+                  <RoleSelect guildId={guildId || ''} value={macroRoleId} onChange={setMacroRoleId} />
+                  <HelpText>{macroType === 'role_add' ? t('settingsPage.macroRoleAddHelp') : t('settingsPage.macroRoleRemoveHelp')}</HelpText>
+                </div>
+              )}
+
+              <div className="flex gap-3 justify-end pt-2">
+                <button type="button" onClick={resetAddModal} disabled={isSavingMacro} className="text-sm font-bold text-gray-400 hover:text-white px-4 py-2">
+                  {t('common.cancel')}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSubmitMacro}
+                  disabled={isSavingMacro || !macroName.trim() || (macroType === 'text' ? !macroResponse.trim() : !macroRoleId)}
+                  className="bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white text-sm font-black px-5 py-2 rounded-lg"
+                >
+                  {isSavingMacro ? t('settingsPage.savingMacro') : t('settingsPage.saveMacroButton')}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {dangerousConfirm && (
+          <div className="fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4">
+            <div className="bg-[#161626] border border-orange-500/50 rounded-2xl p-6 max-w-md w-full space-y-4">
+              <h3 className="text-orange-400 font-black text-base">{t('settingsPage.dangerousPermTitle')}</h3>
+              <p className="text-sm text-gray-400">
+                {t('settingsPage.dangerousPermBody', { perms: dangerousConfirm.dangerous.join(', ') })}
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button type="button" onClick={() => setDangerousConfirm(null)} className="text-sm font-bold text-gray-400 hover:text-white px-4 py-2">
+                  {t('common.cancel')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setDangerousConfirm(null); submitRoleMacro(true); }}
+                  className="bg-red-600 hover:bg-red-500 text-white text-sm font-black px-5 py-2 rounded-lg"
+                >
+                  {t('common.confirm')}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </SettingsPageContainer>
     </div>
   );
