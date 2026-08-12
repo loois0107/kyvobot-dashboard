@@ -65,6 +65,8 @@ export default function GuildLeaderboardTerminal() {
   return (
     <div className="font-mono text-white selection:bg-[#2A1F40]">
       <SettingsPageContainer>
+        {/* 🛡️ [정직성 정리] "ALL PREMIUM BYPASS ACTIVE" 배지가 있었지만, 이 봇엔 애초에 프리미엄
+            등급 자체가 없다 - 아무 상태와도 연결되지 않은 채 항상 떠 있던 문구라 그냥 없앤다. */}
         <div className="flex justify-between items-center border-b border-[#2A1F40] pb-4">
           <div>
             <h1 className="text-xl md:text-2xl font-black tracking-wider text-white">{t('leaderboardPage.title')}</h1>
@@ -72,9 +74,6 @@ export default function GuildLeaderboardTerminal() {
               {t('leaderboardPage.subtitle')} <code className="text-[#5865F2]">{guildName || guildId}</code>
             </HelpText>
           </div>
-          <span className="text-[10px] bg-[#2A1F40] text-[#FFD700] px-3 py-1 rounded font-black tracking-widest hidden sm:inline">
-            {t('leaderboardPage.premiumBadge')}
-          </span>
         </div>
 
         <LeaderboardBoard users={users} loading={loading} />

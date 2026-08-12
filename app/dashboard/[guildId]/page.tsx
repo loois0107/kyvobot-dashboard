@@ -244,16 +244,18 @@ export default function DashboardHome() {
               </span>
             )}
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-6 font-mono text-base">
-            <div className="space-y-1"><span className="text-gray-500 block text-sm">{t('dashboardHome.coreAlias')}</span><strong className="text-white text-base tracking-wide">KYVOBOT AI</strong></div>
-            <div className="space-y-1"><span className="text-gray-500 block text-sm">{t('dashboardHome.matrixVer')}</span><strong className="text-yellow-400 text-base tracking-wide">v2.4.0-pro</strong></div>
+          {/* 🛡️ [정직성 정리] 예전엔 여기 "MATRIX VER: v2.4.0-pro"/"LATENCY TICK: 20ms Stable"처럼
+              실제로 어디에서도 안 나오는 값을 하드코딩해서 마치 실시간 측정치인 것처럼 보여줬다 -
+              진짜 값이 없으면 아예 안 보여주는 게 맞다(가짜 문구로 순화하지 않음). 실제 값을 가진
+              두 항목(봇 이름, 이 서버 ID)만 남긴다. */}
+          <div className="grid grid-cols-2 gap-6 pt-6 font-mono text-base">
+            <div className="space-y-1"><span className="text-gray-500 block text-sm">{t('dashboardHome.coreAlias')}</span><strong className="text-white text-base tracking-wide">Kyvo</strong></div>
             <div className="space-y-1">
               <span className="text-gray-500 block text-sm">{t('dashboardHome.activeContext')}</span>
               <strong className="text-[#5865F2] text-base tracking-wide truncate max-w-[180px]">
                 {t('dashboardHome.activeContextValue', { id: guildId.slice(0, 6) })}
               </strong>
             </div>
-            <div className="space-y-1"><span className="text-gray-500 block text-sm">{t('dashboardHome.latencyTick')}</span><strong className="text-[#23a55a] text-base tracking-wide">{t('dashboardHome.latencyValue')}</strong></div>
           </div>
         </div>
       </div>
