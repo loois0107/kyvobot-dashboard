@@ -199,7 +199,10 @@ export default async function RootPage() {
       const managed = guilds.filter(
         (g) => g.owner || (BigInt(g.permissions) & BigInt(0x20)) === BigInt(0x20)
       );
-      dashboardHref = managed[0] ? `/dashboard/${managed[0].id}` : null;
+      // 🛡️ 어떤 서버로 보낼지(managed[0] 추측)는 더 이상 여기서 결정하지 않는다 - /dashboard
+      // 피커 페이지가 목록을 다시 불러와 봇 참여 여부까지 확인한 뒤, 서버가 1개뿐이면 자동으로
+      // 넘어가고 여러 개면 직접 고르게 한다. 여기서는 "관리 서버가 있는지"만 판단하면 된다.
+      dashboardHref = managed.length > 0 ? '/dashboard' : null;
     }
   }
 
