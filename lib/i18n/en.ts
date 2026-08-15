@@ -434,6 +434,8 @@ const en = {
     subtitle: "Server-wide settings that aren't tied to a specific feature.",
     serverLanguageLabel: 'SERVER LANGUAGE',
     serverLanguageHelp: 'A global setting that determines the language of every message the bot sends (embeds, notices, error messages, all of it).',
+    inviterDmLabel: 'DM the person who invited Kyvo',
+    inviterDmHelp: "When on, we'll also DM the onboarding guide to whoever added Kyvo to this server. Off by default.",
   },
   settingsPage: {
     title: '⚙️ Custom Commands',

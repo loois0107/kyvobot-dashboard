@@ -20,6 +20,7 @@ export default function GeneralSettingsPage() {
   const guildName = useGuildName(guildId);
 
   const [language, setLanguage] = useState('en');
+  const [inviterDmEnabled, setInviterDmEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -30,6 +31,9 @@ export default function GeneralSettingsPage() {
         const data = await res.json();
         if (res.ok && data.ok && data.settings) {
           setLanguage(data.settings.language || 'en');
+          // 🛡️ settings jsonb에 이 키가 아예 없는 기존 서버도 안전하게 꺼진 상태로 뜨도록 - API가
+          // 이미 ?? false로 병합해서 내려주지만, 여기서도 한 번 더 방어적으로 처리한다.
+          setInviterDmEnabled(Boolean(data.settings.inviter_dm_enabled));
         } else {
           showToast(data.error || data.message || t('common.networkError'), 'error');
         }
@@ -54,6 +58,30 @@ export default function GeneralSettingsPage() {
       const data = await res.json();
       if (res.ok && data.ok) {
         setLanguage(nextLang);
+        showToast(t('common.saveSuccess'), 'success');
+      } else {
+        showToast(data.error || data.message || t('common.networkError'), 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast(t('common.networkError'), 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInviterDmToggle = async (checked: boolean) => {
+    if (!guildId || guildId === '[guildId]') return;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/settings/${guildId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ inviter_dm_enabled: checked }),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        setInviterDmEnabled(checked);
         showToast(t('common.saveSuccess'), 'success');
       } else {
         showToast(data.error || data.message || t('common.networkError'), 'error');
@@ -95,6 +123,23 @@ export default function GeneralSettingsPage() {
               </select>
               <HelpText className="mt-1">{t('generalSettingsPage.serverLanguageHelp')}</HelpText>
             </div>
+          </div>
+
+          <div className="pt-2 border-t border-[#2A1F40]">
+            <div className="flex items-center gap-2">
+              <input
+                id="inviter-dm-toggle"
+                type="checkbox"
+                checked={inviterDmEnabled}
+                onChange={(e) => handleInviterDmToggle(e.target.checked)}
+                disabled={loading}
+                className="w-4 h-4 accent-[#5865F2] cursor-pointer disabled:opacity-50"
+              />
+              <label htmlFor="inviter-dm-toggle" className="text-sm font-black text-white cursor-pointer">
+                {t('generalSettingsPage.inviterDmLabel')}
+              </label>
+            </div>
+            <HelpText className="mt-1">{t('generalSettingsPage.inviterDmHelp')}</HelpText>
           </div>
         </div>
       </SettingsPageContainer>

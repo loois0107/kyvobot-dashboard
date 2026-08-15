@@ -436,6 +436,8 @@ const ko: typeof en = {
     subtitle: '특정 기능에 속하지 않는, 서버 전체에 적용되는 설정입니다.',
     serverLanguageLabel: '서버 언어',
     serverLanguageHelp: '봇이 보내는 모든 메시지(임베드·안내문·에러 메시지 전부)의 언어를 결정하는 전역 설정이에요.',
+    inviterDmLabel: '봇 초대자에게 안내 DM 보내기',
+    inviterDmHelp: '켜두면 이 서버에 Kyvo를 초대한 사람에게 온보딩 안내를 DM으로도 보내드려요. 기본값은 꺼짐이에요.',
   },
   settingsPage: {
     title: '⚙️ 커스텀 명령어',

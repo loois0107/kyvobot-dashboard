@@ -22,11 +22,18 @@ const getSupabaseClient = () => {
  * 실제 컬럼으로 존재하는 줄 알고 여기 올라와 있었지만, 직접 조회로 그런 컬럼이 없는 걸 확인했다
  * (welcome_settings/moderator_id 때와 같은 패턴). 이 필드들을 보내는 UI가 아직 없어서 지금까지는
  * 조용히 무해했지만, 실제 컬럼이 생기기 전까지는 화이트리스트에 다시 올리지 말 것.
+ *
+ * 🛡️ inviter_dm_enabled는 language/custom_commands와 달리 최상위 컬럼이 아니라 settings jsonb
+ * 안에 중첩된 필드다(goodbye_enabled와 동일한 부류) - POST 핸들러가 이 셋을 서로 다른 방식으로
+ * 저장하므로 화이트리스트에는 같이 두되 처리 로직은 분리돼 있다.
  */
 const ALLOWED_FIELDS = [
   "language",
   "custom_commands", // Redis 캐시 무임승차를 위해 커스텀 명령어 객체 필드 유지
+  "inviter_dm_enabled", // settings jsonb 중첩 필드 - 최상위 컬럼 아님(아래 POST 참고)
 ] as const;
+
+const TOP_LEVEL_FIELDS = ["language", "custom_commands"] as const;
 
 /** Extracts only whitelisted fields from the request body to prevent Mass Assignment attacks. */
 function sanitizeBody(body: Record<string, unknown>): Record<string, unknown> {
@@ -70,8 +77,14 @@ export async function GET(
     }
 
     const safeData = data || { language: 'en', custom_commands: {} };
+    // 🛡️ inviter_dm_enabled는 settings jsonb 안에 중첩돼 있다(위 ALLOWED_FIELDS 주석 참고) -
+    // 이 키가 아예 없는(모든 기존 행 포함) 경우 안전한 기본값 false로 병합해서 내려준다.
+    const responseSettings = {
+      ...safeData,
+      inviter_dm_enabled: (safeData as any)?.settings?.inviter_dm_enabled ?? false,
+    };
 
-    return NextResponse.json({ ok: true, settings: safeData });
+    return NextResponse.json({ ok: true, settings: responseSettings });
   } catch (err) {
     console.error("[SETTINGS][GET][FATAL] Unexpected infrastructure crash:", err);
     return NextResponse.json({ error: "Internal server error." }, { status: 500 });
@@ -110,9 +123,43 @@ export async function POST(
     }
 
     const supabase = getSupabaseClient();
+
+    // 🛡️ language/custom_commands는 최상위 컬럼이라 그대로 upsert하면 되지만, inviter_dm_enabled는
+    // settings jsonb 안에 중첩된 필드다(위 ALLOWED_FIELDS 주석 참고) - 같은 방식으로 upsert하면
+    // "inviter_dm_enabled"라는 존재하지 않는 컬럼에 쓰려다 실패한다. level-eco-setting 라우트와
+    // 동일한 패턴(기존 settings를 먼저 읽어와 병합 후 그 필드만 덮어써서 다시 저장)으로 분리 처리한다.
+    const topLevelUpdate: Record<string, unknown> = {};
+    for (const field of TOP_LEVEL_FIELDS) {
+      if (field in settings) topLevelUpdate[field] = settings[field];
+    }
+
+    let mergedSettings: Record<string, unknown> | undefined;
+    if ("inviter_dm_enabled" in settings) {
+      const { data: currentData } = await supabase
+        .from("guild_settings")
+        .select("settings")
+        .eq("guild_id", guildId)
+        .maybeSingle();
+      const currentSettings = (currentData as any)?.settings || {};
+      mergedSettings = {
+        ...currentSettings,
+        // boolean이라 `||`를 쓰면 false를 못 보낸다 - undefined 여부로 판별(goodbye_enabled와 동일 관용구).
+        inviter_dm_enabled: settings.inviter_dm_enabled !== undefined
+          ? Boolean(settings.inviter_dm_enabled)
+          : (currentSettings.inviter_dm_enabled ?? false),
+      };
+    }
+
     const { error } = await supabase
       .from("guild_settings")
-      .upsert({ guild_id: guildId, ...settings }, { onConflict: "guild_id" });
+      .upsert(
+        {
+          guild_id: guildId,
+          ...topLevelUpdate,
+          ...(mergedSettings ? { settings: mergedSettings } : {}),
+        },
+        { onConflict: "guild_id" }
+      );
 
     if (error) {
       console.error("[SETTINGS][ERROR] Supabase upsert failed:", error);
