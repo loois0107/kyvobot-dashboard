@@ -5,6 +5,12 @@ type FeatureScreenshotRowProps = {
   description: string;
   icon: string;
   comingSoonLabel: string;
+  // 🛡️ [alt ≠ title] 예전엔 이미지 alt를 title 그대로 재사용했다 - 화면에 보이는 제목과 스크린
+  // 리더가 읽는 이미지 설명이 완전히 같은 문자열이었다는 뜻. alt는 "이 이미지가 실제로 뭘
+  // 보여주는지"를 설명해야 하므로 별도 문구를 받는다. setupAlt가 없으면 alt로 폴백 -
+  // 설정 화면 슬롯이 없는 항목(파티모집/AI티켓)은 이 prop 자체를 안 넘기므로 자동으로 안전하다.
+  alt: string;
+  setupAlt?: string;
   reverse?: boolean;
   // Final path this placeholder will be swapped for once the real capture lands, e.g.
   // "/images/features/party-recruit.png" - kept here only as a pointer for that future edit.
@@ -80,6 +86,8 @@ export default function FeatureScreenshotRow({
   description,
   icon,
   comingSoonLabel,
+  alt,
+  setupAlt,
   reverse = false,
   futureImageSrc,
   imageSrc,
@@ -102,7 +110,7 @@ export default function FeatureScreenshotRow({
               future={setupFutureImageSrc!}
               width={setupImageWidth}
               height={setupImageHeight}
-              alt={title}
+              alt={setupAlt ?? alt}
               icon={icon}
               comingSoonLabel={comingSoonLabel}
             />
@@ -114,7 +122,7 @@ export default function FeatureScreenshotRow({
           future={futureImageSrc}
           width={imageWidth}
           height={imageHeight}
-          alt={title}
+          alt={alt}
           icon={icon}
           comingSoonLabel={comingSoonLabel}
         />

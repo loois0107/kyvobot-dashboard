@@ -126,6 +126,7 @@ const SCREENSHOTS = [
   {
     titleKey: 'screenshotPartyTitle',
     descKey: 'screenshotPartyDesc',
+    altKey: 'screenshotPartyAlt',
     icon: '🎮',
     futureImageSrc: '/images/features/party-recruit.png',
     // 🛡️ lang 기반 -ko/-en 파일로 분리 - 둘 다 없으면 resolveLocalizedImage가 undefined를
@@ -140,6 +141,7 @@ const SCREENSHOTS = [
   {
     titleKey: 'screenshotAiTicketTitle',
     descKey: 'screenshotAiTicketDesc',
+    altKey: 'screenshotAiTicketAlt',
     icon: '🤖',
     futureImageSrc: '/images/features/ai-ticket.png',
     // 🛡️ party-recruit와 동일한 lang 기반 -ko/-en 폴백 구조로 전환 - ai-ticket-en.png가
@@ -160,6 +162,8 @@ const SCREENSHOTS = [
 const RANK_CARD_SHOWCASE = {
   titleKey: 'screenshotRankCardTitle',
   descKey: 'screenshotRankCardDesc',
+  altKey: 'screenshotRankCardAlt',
+  setupAltKey: 'screenshotRankCardSetupAlt',
   icon: '🎨',
   futureImageSrc: '/images/features/rank-card-result.png',
   imageSrc: '/images/features/rank-card-result.png',
@@ -349,7 +353,11 @@ export default async function RootPage() {
                     isEmphasized ? 'p-10 border-[#3d3157] space-y-4' : 'p-8 border-[#2A1F40] space-y-3'
                   }`}
                 >
+                  {/* 🛡️ 제목 텍스트에서 같은 이모지를 뺐으니(featurePartyTitle 등) 이 배지는 이제
+                      순수 장식이다 - aria-hidden 없이 두면 스크린리더가 "게임패드, 파티모집"처럼
+                      이모지 이름과 제목을 중복으로 읽는다. */}
                   <div
+                    aria-hidden="true"
                     className={`rounded-full flex items-center justify-center ${feature.badgeBg} ${
                       isEmphasized ? 'w-20 h-20 text-5xl' : 'w-16 h-16 text-4xl'
                     }`}
@@ -410,6 +418,7 @@ export default async function RootPage() {
               <FeatureScreenshotRow
                 title={t.landingPage[item.titleKey]}
                 description={t.landingPage[item.descKey]}
+                alt={t.landingPage[item.altKey]}
                 icon={item.icon}
                 comingSoonLabel={t.landingPage.screenshotComingSoon}
                 futureImageSrc={item.futureImageSrc}
@@ -427,6 +436,8 @@ export default async function RootPage() {
           <FeatureScreenshotRow
             title={t.landingPage[RANK_CARD_SHOWCASE.titleKey]}
             description={t.landingPage[RANK_CARD_SHOWCASE.descKey]}
+            alt={t.landingPage[RANK_CARD_SHOWCASE.altKey]}
+            setupAlt={t.landingPage[RANK_CARD_SHOWCASE.setupAltKey]}
             icon={RANK_CARD_SHOWCASE.icon}
             comingSoonLabel={t.landingPage.screenshotComingSoon}
             futureImageSrc={RANK_CARD_SHOWCASE.futureImageSrc}
