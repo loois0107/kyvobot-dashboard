@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useToast } from '@/components/Toast';
 import { useT } from '@/lib/i18n/LanguageContext';
+import { dictionaries, type Lang } from '@/lib/i18n';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
 import ChannelSelect from '@/components/ChannelSelect';
@@ -34,6 +35,14 @@ export default function WelcomeSettings() {
   const [cardBgColor, setCardBgColor] = useState('#1E1F22');
   const [overlayOpacity, setOverlayOpacity] = useState(0.4);
   const [backgroundUrl, setBackgroundUrl] = useState('');
+
+  // 🛡️ [미리보기 = 실제 봇 언어] 이 페이지의 나머지 UI(버튼/라벨)는 관리자 본인이 보고 있는
+  // 대시보드 화면 언어(useT())를 따르지만, 카드 미리보기 안의 두 줄(welcomeToServer/memberNumber)만은
+  // 그 서버의 실제 봇 언어(guild_settings.language)를 따라야 한다 - 이 둘은 서로 독립된 설정이라
+  // 관리자가 영어로 대시보드를 보면서 서버 봇 언어는 한국어로 설정해둔 경우가 흔히 있을 수 있고,
+  // 그때 미리보기가 화면 언어를 따르면 실제 신규 멤버가 받을 카드와 다른 걸 보여주게 된다.
+  // 기본값 'en'은 봇 쪽 폴백 기본값과 동일하게 맞춘다.
+  const [guildLanguage, setGuildLanguage] = useState<Lang>('en');
 
   const colorPresets = ['#5865F2', '#23A55A', '#FEE75C', '#EB459E', '#ED4245', '#9B59B6', '#00D2D3', '#54A0FF', '#FF6B6B', '#FFFFFF'];
   const bgColorPresets = ['#1E1F22', '#2B2D31', '#313338', '#111214', '#0F0F1A', '#161626'];
@@ -76,6 +85,19 @@ export default function WelcomeSettings() {
           setBackgroundUrl(w.background_url ?? '');
           setIsDirty(false);
         }
+      }
+    } catch (err) { console.error(err); }
+
+    // 🛡️ level-eco-setting 응답엔 language가 없다(leveling/economy/welcome 전용 엔드포인트) -
+    // General Settings 페이지가 쓰는 것과 같은 /api/settings/{guildId}를 별도로 한 번 더 불러
+    // guild_settings.language만 꺼내 쓴다. 이 호출이 실패해도 위 welcome/goodbye 설정 로딩과는
+    // 완전히 무관하니 별도 try/catch로 분리 - 실패 시 그냥 기본값 'en' 미리보기로 남는다.
+    try {
+      const langRes = await fetch(`/api/settings/${id}`);
+      if (langRes.ok) {
+        const langData = await langRes.json();
+        const lang = langData?.settings?.language;
+        if (lang === 'ko' || lang === 'en') setGuildLanguage(lang);
       }
     } catch (err) { console.error(err); }
   };
@@ -159,6 +181,8 @@ export default function WelcomeSettings() {
             </span>
           </div>
 
+          <HelpText className="normal-case">{t('welcomePage.previewLangNote')}</HelpText>
+
           <div className="w-full aspect-[920/240] rounded-xl relative flex items-center bg-cover bg-center overflow-hidden border border-[#232428]"
             style={{ backgroundImage: backgroundUrl ? `url(${backgroundUrl})` : 'none', backgroundColor: backgroundUrl ? 'transparent' : cardBgColor }}
           >
@@ -166,9 +190,13 @@ export default function WelcomeSettings() {
               <div className="flex items-center gap-6 w-full">
                 <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#313338] border-[3px] flex-shrink-0" style={{ borderColor: cardColor }} />
                 <div className="flex-1 font-mono">
-                  <span className="text-sm font-bold text-[#b5bac1] tracking-wider block">{t('welcomePage.welcomeToServer')}</span>
+                  {/* 🛡️ 이 두 줄만 관리자의 대시보드 화면 언어(t)가 아니라 서버의 실제 봇 언어
+                      (guildLanguage)를 따른다 - 실제로 신규 멤버가 받는 카드와 미리보기가 어긋나지
+                      않게 하기 위함. kyvobot/locales/{en,ko}.json의 welcome_card_title/
+                      welcome_card_count와 문구가 반드시 같아야 한다 - 봇 쪽을 고치면 여기도 확인. */}
+                  <span className="text-sm font-bold text-[#b5bac1] tracking-wider block">{dictionaries[guildLanguage].welcomePage.welcomeToServer}</span>
                   <span className="text-base sm:text-2xl font-black text-white block mt-0.5" style={{ color: cardColor }}>NewOperative#0001</span>
-                  <span className="text-sm font-semibold text-gray-300 block mt-1">{t('welcomePage.memberNumber')}</span>
+                  <span className="text-sm font-semibold text-gray-300 block mt-1">{dictionaries[guildLanguage].welcomePage.memberNumber}</span>
                 </div>
               </div>
             </div>

@@ -635,8 +635,12 @@ const en = {
     syncing: 'Saving...',
     saveButton: 'Save Changes',
     previewTitle: 'Live Preview',
+    previewLangNote: "This preview follows the server's bot language, not your own dashboard display language.",
     cardActive: 'Card Active',
     cardOffline: 'Card Off',
+    // 🛡️ [봇과 문구 동기화 필수] 이 두 값은 kyvobot/locales/en.json의 welcome_card_title/
+    // welcome_card_count와 반드시 같아야 한다 - 실제 봇이 카드 이미지에 그리는 문구 그대로다.
+    // 봇 쪽 문구를 고치면 이 두 줄도 같이 확인/수정할 것(자동 동기화 없음, 수동 확인 필요).
     welcomeToServer: 'WELCOME TO THE SERVER',
     memberNumber: 'Member #1,234',
     protocolsTitle: '⚙️ Settings',

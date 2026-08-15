@@ -637,8 +637,12 @@ const ko: typeof en = {
     syncing: '저장 중...',
     saveButton: '설정 저장',
     previewTitle: '실시간 배너 미리보기',
+    previewLangNote: '이 미리보기는 대시보드 화면 언어가 아니라, 실제 서버의 봇 언어 설정을 따라요.',
     cardActive: '환영 카드 활성화됨',
     cardOffline: '환영 카드 꺼짐',
+    // 🛡️ [봇과 문구 동기화 필수] 이 두 값은 kyvobot/locales/ko.json의 welcome_card_title/
+    // welcome_card_count와 반드시 같아야 한다 - 실제 봇이 카드 이미지에 그리는 문구 그대로다.
+    // 봇 쪽 문구를 고치면 이 두 줄도 같이 확인/수정할 것(자동 동기화 없음, 수동 확인 필요).
     welcomeToServer: '서버에 오신 것을 환영합니다',
     memberNumber: '멤버 #1,234',
     protocolsTitle: '⚙️ 기본 설정',
