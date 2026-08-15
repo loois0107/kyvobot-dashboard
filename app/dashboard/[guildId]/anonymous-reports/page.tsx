@@ -8,6 +8,7 @@ import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
 import ChannelSelect from '@/components/ChannelSelect';
 import { useGuildName } from '@/components/GuildsContext';
+import ConfiguredBadge from '@/components/ConfiguredBadge';
 
 interface PendingReport {
   id: number;
@@ -163,17 +164,7 @@ export default function AnonymousReportsSettingsPage() {
               {t('anonymousReportsPage.subtitle')}
             </HelpText>
           </div>
-          {hasLoaded && (
-            <span
-              className={`shrink-0 text-[10px] font-bold px-3 py-1.5 rounded-full whitespace-nowrap ${
-                isConfigured
-                  ? 'bg-green-950/40 text-green-400 border border-green-500/30'
-                  : 'bg-amber-950/40 text-amber-400 border border-amber-500/30'
-              }`}
-            >
-              {isConfigured ? t('anonymousReportsPage.active') : t('anonymousReportsPage.notConfigured')}
-            </span>
-          )}
+          {hasLoaded && <ConfiguredBadge configured={isConfigured} />}
         </header>
 
         <div className="flex flex-col gap-6 bg-[#161626] border border-[#2A1F40] p-6 rounded-xl shadow-xl">

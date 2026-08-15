@@ -230,7 +230,7 @@ export default function DashboardHome() {
           <div className="flex items-center justify-between pb-4 border-b border-[#2b2d31]">
             <div className="flex items-center gap-2">
               <span className={`w-2.5 h-2.5 rounded-full ${isConnectionFailed ? 'bg-red-500 animate-ping' : isDataEmpty ? 'bg-gray-500' : 'bg-[#23a55a] animate-pulse'}`}></span>
-              <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase">{t('dashboardHome.systemStatus')}</h3>
+              <h3 className="text-sm font-black tracking-widest text-[#949ba4]">{t('dashboardHome.systemStatus')}</h3>
             </div>
 
             {isConnectionFailed && (
