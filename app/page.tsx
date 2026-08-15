@@ -74,34 +74,47 @@ const FEATURES = [
 // 이어져 보이게 한다(우연이 아니라 의도적 연결).
 const PAIN_POINTS = [
   {
-    problemKey: 'painPointPartyProblem',
-    solutionKey: 'painPointPartySolution',
+    descriptionKey: 'painPointPartyDescription',
     icon: '🎮',
     badgeBg: 'bg-[#5865F2]/15',
     accentText: 'text-[#5865F2]',
   },
   {
-    problemKey: 'painPointAutomodProblem',
-    solutionKey: 'painPointAutomodSolution',
+    descriptionKey: 'painPointAutomodDescription',
     icon: '🛡️',
     badgeBg: 'bg-red-500/15',
     accentText: 'text-red-400',
   },
   {
-    problemKey: 'painPointTicketProblem',
-    solutionKey: 'painPointTicketSolution',
+    descriptionKey: 'painPointTicketDescription',
     icon: '🤖',
     badgeBg: 'bg-purple-500/15',
     accentText: 'text-purple-400',
   },
   {
-    problemKey: 'painPointLevelingProblem',
-    solutionKey: 'painPointLevelingSolution',
+    descriptionKey: 'painPointLevelingDescription',
     icon: '📊',
     badgeBg: 'bg-green-500/15',
     accentText: 'text-green-400',
   },
 ] as const;
+
+// 🛡️ [부분 강조] painPoint*Description 문자열 안에 **이렇게** 감싼 구간만 강조색으로 렌더링한다 -
+// "문제/해결" 두 필드로 나뉘어 있던 걸 하나의 자연스러운 문단으로 합치면서, 그중 핵심 해결책
+// 구절만 골라 색을 입히고 싶어서 만든 경량 마커 문법(마크다운 볼드와 동일 표기, 별도 파서 없이
+// split만으로 충분). 번역할 때도 **...**의 위치만 그 언어 문장에 맞게 옮기면 되니 en/ko 양쪽에서
+// 그대로 재사용 가능하다.
+function renderHighlightedText(text: string, highlightClass: string): React.ReactNode {
+  return text.split(/\*\*(.+?)\*\*/g).map((part, i) =>
+    i % 2 === 1 ? (
+      <span key={i} className={`font-bold ${highlightClass}`}>
+        {part}
+      </span>
+    ) : (
+      part
+    )
+  );
+}
 
 // 🛡️ 대시보드 설정 화면은 이제 별도의 DashboardShowcase 섹션에서 크게 보여주므로 여기서 뺐다 -
 // 이 3개는 순수하게 "봇을 실행하면 이렇게 나온다"는 결과물 중심. 랭크카드는 실제 캡처본
@@ -282,30 +295,27 @@ export default async function RootPage() {
             const isHero = i === 0;
             return (
               <RevealOnScroll
-                key={item.problemKey}
+                key={item.descriptionKey}
                 delayMs={i * 120}
                 className={isHero ? 'sm:col-span-6' : 'sm:col-span-2'}
               >
                 {isHero ? (
-                  <div className="h-full bg-[#161626] border border-[#2A1F40] rounded-2xl p-8 sm:p-10 flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-8">
-                    <div className="flex items-start gap-4 sm:gap-6 flex-1">
-                      <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-full flex items-center justify-center text-2xl sm:text-4xl shrink-0 ${item.badgeBg}`}>
-                        {item.icon}
-                      </div>
-                      <p className="text-sm sm:text-base text-[#949ba4] leading-relaxed">😩 {t.landingPage[item.problemKey]}</p>
-                    </div>
-                    <div className="h-px sm:hidden bg-[#2A1F40]" />
-                    <div className="hidden sm:block w-px self-stretch bg-[#2A1F40]" />
-                    <p className={`flex-1 text-sm sm:text-base font-bold leading-relaxed ${item.accentText}`}>✅ {t.landingPage[item.solutionKey]}</p>
-                  </div>
-                ) : (
-                  <div className="h-full bg-[#161626] border border-[#2A1F40] rounded-2xl p-8 space-y-4">
-                    <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl ${item.badgeBg}`}>
+                  <div className="h-full bg-[#161626] border border-[#2A1F40] rounded-2xl p-8 sm:p-10 flex items-start gap-4 sm:gap-6">
+                    <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-full flex items-center justify-center text-2xl sm:text-4xl shrink-0 ${item.badgeBg}`}>
                       {item.icon}
                     </div>
-                    <p className="text-sm text-[#949ba4] leading-relaxed">😩 {t.landingPage[item.problemKey]}</p>
-                    <div className="h-px bg-[#2A1F40]" />
-                    <p className={`text-sm font-bold leading-relaxed ${item.accentText}`}>✅ {t.landingPage[item.solutionKey]}</p>
+                    <p className="text-sm sm:text-base text-[#949ba4] leading-relaxed">
+                      {renderHighlightedText(t.landingPage[item.descriptionKey], item.accentText)}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="h-full bg-[#161626] border border-[#2A1F40] rounded-2xl p-8 flex items-start gap-4">
+                    <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl shrink-0 ${item.badgeBg}`}>
+                      {item.icon}
+                    </div>
+                    <p className="text-sm text-[#949ba4] leading-relaxed">
+                      {renderHighlightedText(t.landingPage[item.descriptionKey], item.accentText)}
+                    </p>
                   </div>
                 )}
               </RevealOnScroll>
