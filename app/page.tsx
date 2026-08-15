@@ -272,19 +272,45 @@ export default async function RootPage() {
             {t.landingPage.painPointsTitle}
           </h2>
         </RevealOnScroll>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {PAIN_POINTS.map((item, i) => (
-            <RevealOnScroll key={item.problemKey} delayMs={i * 120}>
-              <div className="h-full bg-[#161626] border border-[#2A1F40] rounded-2xl p-8 space-y-4">
-                <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl ${item.badgeBg}`}>
-                  {item.icon}
-                </div>
-                <p className="text-sm text-[#949ba4] leading-relaxed">😩 {t.landingPage[item.problemKey]}</p>
-                <div className="h-px bg-[#2A1F40]" />
-                <p className={`text-sm font-bold leading-relaxed ${item.accentText}`}>✅ {t.landingPage[item.solutionKey]}</p>
-              </div>
-            </RevealOnScroll>
-          ))}
+        {/* 🛡️ [비대칭 레이아웃] 완벽한 2x2 격자 대신 6컬럼 기준 벤토 배치 - 첫 항목(공감도가
+            가장 높은 파티모집 문제)만 한 줄 전체(col-span-6)를 차지하는 "히어로" 카드, 나머지
+            3개는 그 아래 한 줄에 균등 분할(col-span-2씩)로 나란히 - 6÷1, 6÷3 둘 다 딱 맞아떨어져
+            빈 셀이 안 생긴다. 모바일은 sm: 접두사가 전부 안 걸려서 기존처럼 1열로 쌓이고, 배열
+            순서상 히어로가 이미 맨 앞이라 모바일에서도 강조 카드가 자연히 가장 먼저 나온다. */}
+        <div className="grid grid-cols-1 sm:grid-cols-6 gap-6">
+          {PAIN_POINTS.map((item, i) => {
+            const isHero = i === 0;
+            return (
+              <RevealOnScroll
+                key={item.problemKey}
+                delayMs={i * 120}
+                className={isHero ? 'sm:col-span-6' : 'sm:col-span-2'}
+              >
+                {isHero ? (
+                  <div className="h-full bg-[#161626] border border-[#2A1F40] rounded-2xl p-8 sm:p-10 flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-8">
+                    <div className="flex items-start gap-4 sm:gap-6 flex-1">
+                      <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-full flex items-center justify-center text-2xl sm:text-4xl shrink-0 ${item.badgeBg}`}>
+                        {item.icon}
+                      </div>
+                      <p className="text-sm sm:text-base text-[#949ba4] leading-relaxed">😩 {t.landingPage[item.problemKey]}</p>
+                    </div>
+                    <div className="h-px sm:hidden bg-[#2A1F40]" />
+                    <div className="hidden sm:block w-px self-stretch bg-[#2A1F40]" />
+                    <p className={`flex-1 text-sm sm:text-base font-bold leading-relaxed ${item.accentText}`}>✅ {t.landingPage[item.solutionKey]}</p>
+                  </div>
+                ) : (
+                  <div className="h-full bg-[#161626] border border-[#2A1F40] rounded-2xl p-8 space-y-4">
+                    <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl ${item.badgeBg}`}>
+                      {item.icon}
+                    </div>
+                    <p className="text-sm text-[#949ba4] leading-relaxed">😩 {t.landingPage[item.problemKey]}</p>
+                    <div className="h-px bg-[#2A1F40]" />
+                    <p className={`text-sm font-bold leading-relaxed ${item.accentText}`}>✅ {t.landingPage[item.solutionKey]}</p>
+                  </div>
+                )}
+              </RevealOnScroll>
+            );
+          })}
         </div>
       </section>
 
@@ -298,27 +324,41 @@ export default async function RootPage() {
           </h2>
         </RevealOnScroll>
         <RevealOnScroll>
+          {/* 🛡️ [비대칭 레이아웃] 3열 폭 자체는 그대로 균등 유지(억지로 폭을 다르게 주면 한 줄에
+              3개가 어색해짐) - 대신 hasDetail(자세히 보기 링크가 있는 party/ticket/leveling, 배열상
+              이미 1행)만 패딩·아이콘·제목을 키워서 콘텐츠가 더 커지게 한다. Grid는 각 행 높이를
+              그 행의 가장 큰 셀에 맞춰 자동으로 정하므로, row-span 없이도 1행 전체가 2행보다
+              자연히 더 높아진다. */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {FEATURES.map((feature) => (
-              <div
-                key={feature.titleKey}
-                className={`bg-[#161626] border border-[#2A1F40] rounded-2xl p-8 space-y-3 transition-all duration-200 hover:-translate-y-1 ${feature.border} ${feature.shadow}`}
-              >
-                <div className={`w-16 h-16 rounded-full flex items-center justify-center text-4xl ${feature.badgeBg}`}>
-                  {feature.icon}
-                </div>
-                <h3 className="text-lg font-bold text-white">{t.landingPage[feature.titleKey]}</h3>
-                <p className="text-sm text-[#949ba4] leading-relaxed">{t.landingPage[feature.descKey]}</p>
-                {feature.hasDetail && (
-                  <a
-                    href="#see-it-in-action"
-                    className="inline-block text-xs font-bold text-[#5865F2] hover:text-white transition-colors pt-1"
+            {FEATURES.map((feature) => {
+              const isEmphasized = feature.hasDetail;
+              return (
+                <div
+                  key={feature.titleKey}
+                  className={`bg-[#161626] border rounded-2xl transition-all duration-200 hover:-translate-y-1 ${feature.border} ${feature.shadow} ${
+                    isEmphasized ? 'p-10 border-[#3d3157] space-y-4' : 'p-8 border-[#2A1F40] space-y-3'
+                  }`}
+                >
+                  <div
+                    className={`rounded-full flex items-center justify-center ${feature.badgeBg} ${
+                      isEmphasized ? 'w-20 h-20 text-5xl' : 'w-16 h-16 text-4xl'
+                    }`}
                   >
-                    {t.landingPage.featureDetailHint}
-                  </a>
-                )}
-              </div>
-            ))}
+                    {feature.icon}
+                  </div>
+                  <h3 className={`font-bold text-white ${isEmphasized ? 'text-xl' : 'text-lg'}`}>{t.landingPage[feature.titleKey]}</h3>
+                  <p className="text-sm text-[#949ba4] leading-relaxed">{t.landingPage[feature.descKey]}</p>
+                  {feature.hasDetail && (
+                    <a
+                      href="#see-it-in-action"
+                      className="inline-block text-xs font-bold text-[#5865F2] hover:text-white transition-colors pt-1"
+                    >
+                      {t.landingPage.featureDetailHint}
+                    </a>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </RevealOnScroll>
       </section>
