@@ -228,7 +228,7 @@ export default async function RootPage() {
       {/* Decorative background glow, spans hero through the preview section so there's no dead space between them */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-[#5865F2]/25 rounded-full blur-[130px]" />
-        <div className="absolute top-64 -right-32 w-[500px] h-[500px] bg-[#FFD700]/10 rounded-full blur-[130px]" />
+        <div className="absolute top-64 -right-32 w-[500px] h-[500px] bg-[#2DD4BF]/10 rounded-full blur-[130px]" />
       </div>
 
       <LandingHeader dashboardHref={dashboardHref} />

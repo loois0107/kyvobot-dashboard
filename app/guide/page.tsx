@@ -72,7 +72,7 @@ export default async function GuidePage() {
     <div className="min-h-screen bg-[#0F0F1A] text-[#dbdee1] flex flex-col relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-[#5865F2]/25 rounded-full blur-[130px]" />
-        <div className="absolute top-64 -right-32 w-[500px] h-[500px] bg-[#FFD700]/10 rounded-full blur-[130px]" />
+        <div className="absolute top-64 -right-32 w-[500px] h-[500px] bg-[#2DD4BF]/10 rounded-full blur-[130px]" />
       </div>
 
       {/* 🛡️ 문서 페이지라 실제 관리 서버 조회가 불필요 - dashboardHref=null로 헤더의 Discord API 호출을 건너뛴다. */}
