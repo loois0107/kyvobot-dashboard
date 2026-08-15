@@ -54,7 +54,7 @@ const en = {
     checklistAutomod: 'Configure AutoMod',
     checklistWelcome: 'Configure Welcome messages',
     checklistPresets: 'Add a game preset (for Party Recruitment)',
-    setUpArrow: 'SET UP →',
+    setUpArrow: 'Set up →',
 
     systemStatus: 'STATUS',
     statsUnreachable: '⚠️ Stats unavailable',
@@ -65,7 +65,7 @@ const en = {
 
     customCommandsLabel: 'Custom Commands',
     customCommandsUnit: 'Commands',
-    manageArrow: 'MANAGE ➔',
+    manageArrow: 'Manage →',
     ragVectorsLabel: 'AI Knowledge Base',
     ragVectorsUnit: 'Entries',
     activeTicketsLabel: 'Active Tickets',
@@ -74,13 +74,15 @@ const en = {
     automodLogsUnit: 'Incidents',
 
     quickDispatchTitle: '⚡ Quick Links',
-    dispatchArrow: 'Configure ➔',
     levelingEcoTitle: 'Leveling & Eco',
     levelingEcoDesc: 'Configure XP rates, role rewards, and the server shop.',
+    levelingCta: 'Open leveling settings →',
     welcomeTitle: 'Welcome Messages',
     welcomeDesc: 'Set up welcome/goodbye messages and the join banner card.',
+    welcomeCta: 'Open welcome settings →',
     ticketTitle: 'AI Support Tickets',
     ticketDesc: 'Set up the AI ticket panel and what it knows.',
+    ticketCta: 'Open ticket settings →',
 
     terminalHeader: 'Recent Activity',
     filterAll: '🔍 All',

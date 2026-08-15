@@ -67,7 +67,7 @@ const ko: typeof en = {
 
     customCommandsLabel: '커스텀 명령어',
     customCommandsUnit: '개',
-    manageArrow: '관리하기 ➔',
+    manageArrow: '관리하기 →',
     ragVectorsLabel: 'AI 지식 베이스',
     ragVectorsUnit: '개',
     activeTicketsLabel: '진행 중인 티켓',
@@ -76,13 +76,15 @@ const ko: typeof en = {
     automodLogsUnit: '건',
 
     quickDispatchTitle: '⚡ 바로가기',
-    dispatchArrow: '설정하기 ➔',
     levelingEcoTitle: '레벨링 & 이코노미',
     levelingEcoDesc: 'XP 배율, 역할 보상, 서버 상점을 설정합니다.',
+    levelingCta: '레벨링 설정 열기 →',
     welcomeTitle: '환영 메시지',
     welcomeDesc: '환영/퇴장 메시지와 입장 배너 카드를 설정합니다.',
+    welcomeCta: '웰컴 설정 열기 →',
     ticketTitle: 'AI 지원 티켓',
     ticketDesc: 'AI 티켓 패널과 AI가 답변할 때 참고할 내용을 설정합니다.',
+    ticketCta: '티켓 설정 열기 →',
 
     terminalHeader: '최근 활동',
     filterAll: '🔍 전체',

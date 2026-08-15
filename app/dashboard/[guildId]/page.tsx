@@ -265,7 +265,11 @@ export default function DashboardHome() {
          ========================================== */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         
-        {/* 🌐 [교체 완료] 단순 div에서 클릭 시 설정창(/settings)으로 바로 연동되는 Link 컴포넌트로 인터페이스 업그레이드! */}
+        {/* 🛡️ [4개 전부 클릭 가능] 예전엔 Custom Commands만 Link였고 나머지 3개는 그냥 div였다 -
+            /api/stats/route.ts를 직접 확인해서 각 숫자가 실제로 뭘 세는지 검증한 뒤(AI Knowledge
+            Base/Active Tickets는 ticket-settings가 관리하는 guild_knowledge/guild_ticket_settings
+            테이블, Automod Logs는 audit-logs 페이지가 보여주는 automod_logs 테이블), 전부 실제로
+            갈 곳이 있다는 걸 확인하고 나머지도 동일한 Link 패턴으로 맞췄다. */}
         <Link
           href={`/dashboard/${guildId}/settings`}
           className="bg-[#111214] border border-[#232428] hover:border-[#5865F2]/40 rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center transition-all duration-200 group"
@@ -275,32 +279,50 @@ export default function DashboardHome() {
             {isLoadingStats ? '...' : telemetry.customCommands.toLocaleString()}
             <span className="text-sm text-[#5865F2]/60 font-sans ml-1">{t('dashboardHome.customCommandsUnit')}</span>
           </span>
-          <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase pt-1 group-hover:text-[#5865F2] transition-colors text-left">
+          <span className="text-[10px] text-gray-500 font-bold tracking-widest pt-1 group-hover:text-[#5865F2] transition-colors text-left">
             {t('dashboardHome.manageArrow')}
           </span>
         </Link>
 
-        <div className="bg-[#111214] border border-[#232428] rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center">
+        <Link
+          href={`/dashboard/${guildId}/ticket-settings`}
+          className="bg-[#111214] border border-[#232428] hover:border-purple-500/40 rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center transition-all duration-200 group"
+        >
           <span className="text-sm font-black text-gray-500 uppercase tracking-wider block">{t('dashboardHome.ragVectorsLabel')}</span>
           <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.ragSynapses === 0 ? 'text-gray-600' : 'text-purple-400'}`}>
             {isLoadingStats ? '...' : telemetry.ragSynapses.toLocaleString()}
             <span className="text-sm text-purple-600 font-sans ml-1">{t('dashboardHome.ragVectorsUnit')}</span>
           </span>
-        </div>
-        <div className="bg-[#111214] border border-[#232428] rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center">
+          <span className="text-[10px] text-gray-500 font-bold tracking-widest pt-1 group-hover:text-purple-400 transition-colors text-left">
+            {t('dashboardHome.manageArrow')}
+          </span>
+        </Link>
+        <Link
+          href={`/dashboard/${guildId}/ticket-settings`}
+          className="bg-[#111214] border border-[#232428] hover:border-yellow-500/40 rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center transition-all duration-200 group"
+        >
           <span className="text-sm font-black text-gray-500 uppercase tracking-wider block">{t('dashboardHome.activeTicketsLabel')}</span>
           <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.activeTickets === 0 ? 'text-gray-600' : 'text-yellow-500'}`}>
             {isLoadingStats ? '...' : telemetry.activeTickets}
             <span className="text-sm text-yellow-600 font-sans ml-1">{t('dashboardHome.activeTicketsUnit')}</span>
           </span>
-        </div>
-        <div className="bg-[#111214] border border-[#232428] rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center">
+          <span className="text-[10px] text-gray-500 font-bold tracking-widest pt-1 group-hover:text-yellow-500 transition-colors text-left">
+            {t('dashboardHome.manageArrow')}
+          </span>
+        </Link>
+        <Link
+          href={`/dashboard/${guildId}/audit-logs`}
+          className="bg-[#111214] border border-[#232428] hover:border-white/40 rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center transition-all duration-200 group"
+        >
           <span className="text-sm font-black text-gray-500 uppercase tracking-wider block">{t('dashboardHome.automodLogsLabel')}</span>
           <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.automodLogs === 0 ? 'text-gray-600' : 'text-white'}`}>
             {isLoadingStats ? '...' : telemetry.automodLogs.toLocaleString()}
             <span className="text-sm text-red-600 font-sans ml-1">{t('dashboardHome.automodLogsUnit')}</span>
           </span>
-        </div>
+          <span className="text-[10px] text-gray-500 font-bold tracking-widest pt-1 group-hover:text-white transition-colors text-left">
+            {t('dashboardHome.manageArrow')}
+          </span>
+        </Link>
       </div>
 
       {/* ==========================================
@@ -311,15 +333,15 @@ export default function DashboardHome() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Link href={`/dashboard/${guildId}/leveling`} className="bg-[#1e1f22] hover:bg-[#232428] border border-[#2b2d31] hover:border-[#5865F2]/40 rounded-2xl p-8 shadow-md transition-all duration-200 group cursor-pointer text-left flex flex-col justify-between min-h-[210px]">
             <div><span className="text-3xl block mb-3">✨</span><h4 className="text-base font-black text-white group-hover:text-[#5865F2] uppercase tracking-wider">{t('dashboardHome.levelingEcoTitle')}</h4><p className="text-sm text-gray-400 mt-2 leading-relaxed">{t('dashboardHome.levelingEcoDesc')}</p></div>
-            <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase mt-4 block group-hover:text-white transition-colors">{t('dashboardHome.dispatchArrow')}</span>
+            <span className="text-[10px] text-gray-500 font-bold tracking-widest mt-4 block group-hover:text-white transition-colors">{t('dashboardHome.levelingCta')}</span>
           </Link>
           <Link href={`/dashboard/${guildId}/welcome`} className="bg-[#1e1f22] hover:bg-[#232428] border border-[#2b2d31] hover:border-green-500/40 rounded-2xl p-8 shadow-md transition-all duration-200 group cursor-pointer text-left flex flex-col justify-between min-h-[210px]">
             <div><span className="text-3xl block mb-3">📥</span><h4 className="text-base font-black text-white group-hover:text-green-400 uppercase tracking-wider">{t('dashboardHome.welcomeTitle')}</h4><p className="text-sm text-gray-400 mt-2 leading-relaxed">{t('dashboardHome.welcomeDesc')}</p></div>
-            <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase mt-4 block group-hover:text-white transition-colors">{t('dashboardHome.dispatchArrow')}</span>
+            <span className="text-[10px] text-gray-500 font-bold tracking-widest mt-4 block group-hover:text-white transition-colors">{t('dashboardHome.welcomeCta')}</span>
           </Link>
           <Link href={`/dashboard/${guildId}/ticket-settings`} className="bg-[#1e1f22] hover:bg-[#232428] border border-[#2b2d31] hover:border-purple-500/40 rounded-2xl p-8 shadow-md transition-all duration-200 group cursor-pointer text-left flex flex-col justify-between min-h-[210px]">
             <div><span className="text-3xl block mb-3">🎫</span><h4 className="text-base font-black text-white group-hover:text-purple-400 uppercase tracking-wider">{t('dashboardHome.ticketTitle')}</h4><p className="text-sm text-gray-400 mt-2 leading-relaxed">{t('dashboardHome.ticketDesc')}</p></div>
-            <span className="text-[10px] text-gray-500 font-bold tracking-widest uppercase mt-4 block group-hover:text-white transition-colors">{t('dashboardHome.dispatchArrow')}</span>
+            <span className="text-[10px] text-gray-500 font-bold tracking-widest mt-4 block group-hover:text-white transition-colors">{t('dashboardHome.ticketCta')}</span>
           </Link>
         </div>
       </div>
