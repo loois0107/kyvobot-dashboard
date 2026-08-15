@@ -326,7 +326,7 @@ const en = {
     gameNameLabel: "Game Name (this is what shows up in /party_recruit's autocomplete)",
     gameNamePlaceholder: 'e.g. League of Legends',
     renameHelp: 'Rename by deleting this preset and creating a new one.',
-    duplicateWarning: '대소문자까지 정확히 일치해야 같은 프리셋으로 인식돼요 - 자동완성 목록에서 골라 쓰는 걸 권장해요.',
+    duplicateWarning: 'Must match exactly, including capitalization, to count as the same preset - pick it from the autocomplete list instead of retyping it.',
     colorLabel: 'Card Accent Color',
     descLabel: 'Recruitment Card Message (optional)',
     thumbnailLabel: 'Card Thumbnail Image URL (optional)',
