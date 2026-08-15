@@ -205,7 +205,7 @@ export default function WelcomeSettings() {
 
         <form id="welcome-form" onSubmit={handleSave} className="grid grid-cols-1 md:grid-cols-5 gap-6">
           <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-5 shadow-xl md:col-span-2">
-            <h2 className="text-sm font-black tracking-widest text-[#5865F2] uppercase border-b border-[#2b2d31] pb-2">{t('welcomePage.protocolsTitle')}</h2>
+            <h2 className="text-sm font-black tracking-widest text-[#5865F2] uppercase border-b border-[#2b2d31] pb-2">{t('welcomePage.settingsSectionTitle')}</h2>
 
             <div className="space-y-3 p-3.5 bg-[#111214] rounded-xl border border-[#232428]">
               <div className="flex items-center justify-between">
@@ -305,7 +305,7 @@ export default function WelcomeSettings() {
           <span className="text-sm font-bold text-gray-200">{t('welcomePage.unsavedWarning')}</span>
           <div className="flex gap-3">
             <button type="button" onClick={() => { loadSettings(guildId); setIsDirty(false); }} className="text-sm font-bold text-gray-400 hover:text-white transition">{t('welcomePage.reset')}</button>
-            <button type="submit" form="welcome-form" disabled={isSaving} className="bg-[#23A55A] hover:bg-[#1a7f43] text-white text-sm font-black px-5 py-2 rounded-lg">{t('welcomePage.saveProtocol')}</button>
+            <button type="submit" form="welcome-form" disabled={isSaving} className="bg-[#23A55A] hover:bg-[#1a7f43] text-white text-sm font-black px-5 py-2 rounded-lg">{t('welcomePage.stickyBarSaveButton')}</button>
           </div>
         </div>
       )}

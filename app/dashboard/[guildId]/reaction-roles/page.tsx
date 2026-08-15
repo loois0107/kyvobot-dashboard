@@ -236,7 +236,7 @@ export default function ReactionRolesPage() {
       </header>
 
       <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
-        <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+        <h3 className="text-sm font-black tracking-widest text-[#949ba4] border-b border-[#2b2d31] pb-2">
           {t('reactionRolesPage.addBindingTitle')}
         </h3>
 

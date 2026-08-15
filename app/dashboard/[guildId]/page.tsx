@@ -288,10 +288,10 @@ export default function DashboardHome() {
           href={`/dashboard/${guildId}/ticket-settings`}
           className="bg-[#111214] border border-[#232428] hover:border-purple-500/40 rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center transition-all duration-200 group"
         >
-          <span className="text-sm font-black text-gray-500 uppercase tracking-wider block">{t('dashboardHome.ragVectorsLabel')}</span>
+          <span className="text-sm font-black text-gray-500 uppercase tracking-wider block">{t('dashboardHome.aiKnowledgeLabel')}</span>
           <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.ragSynapses === 0 ? 'text-gray-600' : 'text-purple-400'}`}>
             {isLoadingStats ? '...' : telemetry.ragSynapses.toLocaleString()}
-            <span className="text-sm text-purple-600 font-sans ml-1">{t('dashboardHome.ragVectorsUnit')}</span>
+            <span className="text-sm text-purple-600 font-sans ml-1">{t('dashboardHome.aiKnowledgeUnit')}</span>
           </span>
           <span className="text-[10px] text-gray-500 font-bold tracking-widest pt-1 group-hover:text-purple-400 transition-colors text-left">
             {t('dashboardHome.manageArrow')}
@@ -329,7 +329,7 @@ export default function DashboardHome() {
           [SECTION 3: ⚡ CORE MODULE QUICK DISPATCH]
          ========================================== */}
       <div className="space-y-4">
-        <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase px-1">{t('dashboardHome.quickDispatchTitle')}</h3>
+        <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase px-1">{t('dashboardHome.quickLinksTitle')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Link href={`/dashboard/${guildId}/leveling`} className="bg-[#1e1f22] hover:bg-[#232428] border border-[#2b2d31] hover:border-[#5865F2]/40 rounded-2xl p-8 shadow-md transition-all duration-200 group cursor-pointer text-left flex flex-col justify-between min-h-[210px]">
             <div><span className="text-3xl block mb-3">✨</span><h4 className="text-base font-black text-white group-hover:text-[#5865F2] uppercase tracking-wider">{t('dashboardHome.levelingEcoTitle')}</h4><p className="text-sm text-gray-400 mt-2 leading-relaxed">{t('dashboardHome.levelingEcoDesc')}</p></div>
@@ -355,7 +355,7 @@ export default function DashboardHome() {
             <div className="w-3 h-3 bg-red-500 rounded-full"></div>
             <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-sm font-black font-mono text-gray-500 tracking-widest uppercase ml-2">{t('dashboardHome.terminalHeader')}</span>
+            <span className="text-sm font-black font-mono text-gray-500 tracking-widest uppercase ml-2">{t('dashboardHome.activityLogHeader')}</span>
           </div>
 
           <div className="flex items-center gap-3 w-full sm:w-auto justify-end">

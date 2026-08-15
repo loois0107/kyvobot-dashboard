@@ -268,7 +268,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         <div className="pt-4 border-t border-[#2b2d31] text-sm text-[#949ba4]">
-          <p>{t('sidebar.currentActiveNode')}</p>
+          <p>{t('sidebar.activeServerLabel')}</p>
           <code className="text-[#5865f2] block mt-1 truncate">{currentGuildId}</code>
         </div>
       </aside>
