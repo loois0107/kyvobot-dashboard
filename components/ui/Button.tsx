@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes } from 'react';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -17,6 +17,10 @@ const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   secondary: 'bg-transparent border border-border-default hover:border-border-hover text-text-primary',
   // 배경/보더 없이 텍스트만 - 가장 눈에 덜 띄어야 하는 액션(더보기, 닫기 등)에 사용.
   ghost: 'bg-transparent text-text-secondary hover:text-text-primary',
+  // 위험 배경 + 흰 텍스트 - 삭제 등 되돌리기 어려운 파괴적 액션에 사용.
+  danger: 'bg-danger hover:opacity-90 text-white',
+  // 성공 배경 + 흰 텍스트 - 변경 사항 일괄 저장 등 긍정적 확정 액션에 사용.
+  success: 'bg-success hover:opacity-90 text-white',
 };
 
 export default function Button({ variant = 'primary', className = '', ...props }: ButtonProps) {

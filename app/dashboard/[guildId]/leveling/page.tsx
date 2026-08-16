@@ -8,6 +8,8 @@ import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
 import RoleSelect from '@/components/RoleSelect';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
 import { SHOP_ITEM_PRICE_MAX, SHOP_ITEM_NAME_MAX_LENGTH, SHOP_ITEM_DESCRIPTION_MAX_LENGTH } from '@/lib/levelingEconomySettings';
 
 // 🛡️ cogs/economy.py의 /shop add·/shop view·/shop buy는 전부 item['name']을 읽는다 - 예전엔
@@ -207,27 +209,27 @@ export default function LevelingEconomySettings() {
         {/* ==========================================
             [SECTION 0: HEADER PROTOCOL]
            ========================================== */}
-        <header className="border-b border-[#2b2d31] pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <header className="border-b border-border-default pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('levelingPage.title')}</h1>
+            <h1 className="text-xl md:text-2xl font-black tracking-wider text-brand">{t('levelingPage.title')}</h1>
             <HelpText className="mt-1 tracking-widest uppercase">{t('levelingPage.subtitle')}</HelpText>
           </div>
-          <button type="button" onClick={handleSaveAll} disabled={isSaving} className="w-full sm:w-auto bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all cursor-pointer">
+          <Button type="button" variant="primary" onClick={handleSaveAll} disabled={isSaving} className="w-full sm:w-auto">
             {isSaving ? t('levelingPage.committing') : t('levelingPage.saveButton')}
-          </button>
+          </Button>
         </header>
 
-        <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl px-4 sm:px-6 py-4">
-          <p className="text-sm sm:text-base text-[#b5bac1] leading-relaxed">
+        <Card>
+          <p className="text-sm sm:text-base text-text-secondary leading-relaxed">
             {t('levelingPage.intro')}
           </p>
-        </div>
+        </Card>
 
         {/* ==========================================
             [SECTION 1: VISUAL DESIGN CLUSTER] -> 성격 맞는 애들끼리 최상단에 묶음!
            ========================================== */}
-        <div className="space-y-4 bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl">
-          <h3 className="text-sm font-black tracking-widest text-[#949ba4] border-b border-[#2b2d31] pb-2">{t('levelingPage.cardPreviewTitle')}</h3>
+        <Card className="space-y-4">
+          <h3 className="text-sm font-black tracking-widest text-text-secondary border-b border-border-default pb-2">{t('levelingPage.cardPreviewTitle')}</h3>
 
           {/* Card Preview Canvas */}
           <div
@@ -256,28 +258,28 @@ export default function LevelingEconomySettings() {
 
           {/* Graphical Modifiers Panel (바로 붙여서 스크롤 낭비 차단) */}
           <div className="pt-4 space-y-4">
-            <h2 className="text-sm font-black tracking-widest text-purple-400 uppercase border-b border-[#2b2d31] pb-2">{t('levelingPage.graphicalModifiers')}</h2>
+            <h2 className="text-sm font-semibold tracking-widest text-text-primary uppercase border-b border-border-default pb-2">{t('levelingPage.graphicalModifiers')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-[#b5bac1]">{t('levelingPage.accentColorLabel')}</label>
+                <label className="text-sm font-bold text-text-secondary">{t('levelingPage.accentColorLabel')}</label>
                 <div className="flex flex-wrap gap-1.5">{colorPresets.map((p) => (<button key={p} type="button" onClick={() => { setCardColor(p); setIsDirty(true); }} className={`w-5 h-5 rounded-full border ${cardColor.toLowerCase() === p.toLowerCase() ? 'border-white scale-110' : 'border-transparent opacity-60'}`} style={{ backgroundColor: p }} />))}</div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-[#b5bac1]">{t('levelingPage.solidBgLabel')}</label>
+                <label className="text-sm font-bold text-text-secondary">{t('levelingPage.solidBgLabel')}</label>
                 <div className="flex flex-wrap gap-1.5">{bgColorPresets.map((p) => (<button key={p} type="button" onClick={() => { setCardBgColor(p); setIsDirty(true); }} className={`w-5 h-5 rounded-full border ${cardBgColor.toLowerCase() === p.toLowerCase() ? 'border-white scale-110' : 'border-transparent opacity-60'}`} style={{ backgroundColor: p }} />))}</div>
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-[#b5bac1]">{t('levelingPage.overlayOpacityLabel')} <span className="text-[#5865F2] font-mono">{Math.round(overlayOpacity*100)}%</span></label>
-                <input type="range" min="0.0" max="1.0" step="0.05" value={overlayOpacity} onChange={(e) => { setOverlayOpacity(parseFloat(e.target.value)); setIsDirty(true); }} className="w-full h-1 bg-[#232428] rounded-lg cursor-pointer accent-[#5865F2]" />
+                <label className="text-sm font-bold text-text-secondary">{t('levelingPage.overlayOpacityLabel')} <span className="text-brand font-mono">{Math.round(overlayOpacity*100)}%</span></label>
+                <input type="range" min="0.0" max="1.0" step="0.05" value={overlayOpacity} onChange={(e) => { setOverlayOpacity(parseFloat(e.target.value)); setIsDirty(true); }} className="w-full h-1 bg-bg-elevated rounded-lg cursor-pointer accent-brand" />
                 <HelpText>{t('levelingPage.overlayOpacityHelp')}</HelpText>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-[#b5bac1]">
+                <label className="text-sm font-bold text-text-secondary">
                   {t('levelingPage.fontLabel')} <span className="text-amber-400 font-normal">{t('levelingPage.comingSoon')}</span>
                 </label>
-                <select value={fontPreference} disabled className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-gray-500 cursor-not-allowed opacity-50 focus:outline-none">
+                <select value={fontPreference} disabled className="w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-gray-500 cursor-not-allowed opacity-50 focus:outline-none">
                   <option value="font-mono">👾 Cyber Monospace (Default)</option>
                   <option value="font-sans">📱 Clean Sans-Serif</option>
                   <option value="font-serif">🏛️ Elegant Serif</option>
@@ -286,110 +288,113 @@ export default function LevelingEconomySettings() {
               </div>
             </div>
             <div className="space-y-2 pt-2">
-              <label className="text-sm font-bold text-[#b5bac1]">{t('levelingPage.wallpaperLabel')}</label>
+              <label className="text-sm font-bold text-text-secondary">{t('levelingPage.wallpaperLabel')}</label>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
                 {premiumPresets.map((preset, i) => (
-                  <div key={i} onClick={() => { setBackgroundUrl(preset.url); setIsDirty(true); }} className={`aspect-[2.6/1] rounded-xl bg-cover bg-center cursor-pointer border relative group transition-all ${backgroundUrl === preset.url ? 'border-[#5865F2] scale-105 shadow-md' : 'border-[#2b2d31] opacity-40 hover:opacity-80'}`} style={{ backgroundImage: `url(${preset.url})` }}><div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity"><span className="text-[9px] text-white font-black uppercase tracking-wider">{preset.name}</span></div></div>
+                  <div key={i} onClick={() => { setBackgroundUrl(preset.url); setIsDirty(true); }} className={`aspect-[2.6/1] rounded-xl bg-cover bg-center cursor-pointer border relative group transition-all ${backgroundUrl === preset.url ? 'border-brand scale-105 shadow-md' : 'border-border-default opacity-40 hover:opacity-80'}`} style={{ backgroundImage: `url(${preset.url})` }}><div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity"><span className="text-[9px] text-white font-black uppercase tracking-wider">{preset.name}</span></div></div>
                 ))}
               </div>
-              <input type="text" value={backgroundUrl} onChange={(e) => { setBackgroundUrl(e.target.value); setIsDirty(true); }} placeholder={t('levelingPage.wallpaperUrlPlaceholder')} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-[10px] text-white focus:outline-none focus:border-[#5865F2]" />
+              <input type="text" value={backgroundUrl} onChange={(e) => { setBackgroundUrl(e.target.value); setIsDirty(true); }} placeholder={t('levelingPage.wallpaperUrlPlaceholder')} className="w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-[10px] text-text-primary focus:outline-none focus:border-brand" />
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* ==========================================
             [SECTION 2: CORE SYSTEM MATRIX GRID] -> 하단으로 전면 이동
            ========================================== */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* LEVELING PROTOCOL SETTINGS */}
-          <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-5 shadow-xl">
-            <h2 className="text-sm font-black tracking-widest text-[#5865F2] uppercase border-b border-[#2b2d31] pb-2">{t('levelingPage.levelingSectionTitle')}</h2>
+          <Card className="space-y-5">
+            <h2 className="text-sm font-semibold tracking-widest text-text-primary uppercase border-b border-border-default pb-2">{t('levelingPage.levelingSectionTitle')}</h2>
             <div className="space-y-1.5">
-              <label className="text-[11px] font-black text-[#b5bac1] tracking-wider uppercase">{t('levelingPage.xpRateLabel')}</label>
-              <input type="number" min="0.1" max="10" step="0.1" value={xpRate} onChange={(e) => { setXpRate(parseFloat(e.target.value)); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]" />
+              <label className="text-[11px] font-black text-text-secondary tracking-wider uppercase">{t('levelingPage.xpRateLabel')}</label>
+              <input type="number" min="0.1" max="10" step="0.1" value={xpRate} onChange={(e) => { setXpRate(parseFloat(e.target.value)); setIsDirty(true); }} className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-brand" />
               <HelpText>{t('levelingPage.xpRateHelp')}</HelpText>
             </div>
             <div className="space-y-3 pt-2">
-              <label className="text-[11px] font-black text-[#b5bac1] tracking-wider uppercase block">{t('levelingPage.milestoneLabel')}</label>
+              <label className="text-[11px] font-black text-text-secondary tracking-wider uppercase block">{t('levelingPage.milestoneLabel')}</label>
               <HelpText>{t('levelingPage.milestoneHelp')}</HelpText>
               <div className="flex gap-2">
-                <input type="number" placeholder={t('levelingPage.levelPlaceholder')} value={newLvl} onChange={(e) => setNewLvl(e.target.value)} className="w-1/4 bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none" />
+                <input type="number" placeholder={t('levelingPage.levelPlaceholder')} value={newLvl} onChange={(e) => setNewLvl(e.target.value)} className="w-1/4 bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-text-primary focus:outline-none" />
                 <div className="w-3/4">
                   <RoleSelect guildId={guildId} value={newRoleId} onChange={setNewRoleId} />
                 </div>
               </div>
-              <button type="button" onClick={appendMilestone} className="w-full bg-[#2b2d31] hover:bg-[#35373c] border border-[#4e5058]/30 rounded-lg py-2 text-[11px] font-black tracking-widest text-white transition">{t('levelingPage.appendMilestone')}</button>
+              <Button type="button" variant="secondary" onClick={appendMilestone} className="w-full !py-2 text-[11px] tracking-widest">{t('levelingPage.appendMilestone')}</Button>
               {Object.keys(roleRewards).length > 0 && (
-                <div className="mt-2 p-3 bg-[#111214] rounded-xl border border-[#232428] space-y-2 max-h-32 overflow-y-auto">
+                <Card elevated className="mt-2 !p-3 space-y-2 max-h-32 overflow-y-auto">
                   {Object.entries(roleRewards).map(([lvl, rId]) => {
                     const roleName = roles.find((r) => r.id === rId)?.name || rId;
                     return (
-                      <div key={lvl} className="flex justify-between items-center text-sm font-mono bg-[#1e1f22] p-2 rounded border border-[#2b2d31]"><span>{t('levelingPage.milestoneRowLabel', { level: lvl, roleName })}</span><button type="button" onClick={() => removeMilestone(lvl)} className="text-red-400 hover:text-red-600 font-bold px-1">✕</button></div>
+                      <div key={lvl} className="flex justify-between items-center text-sm font-mono bg-bg-surface p-2 rounded border border-border-default"><span>{t('levelingPage.milestoneRowLabel', { level: lvl, roleName })}</span><Button type="button" variant="danger" onClick={() => removeMilestone(lvl)} className="!px-2 !py-1 text-xs">✕</Button></div>
                     );
                   })}
-                </div>
+                </Card>
               )}
             </div>
-          </div>
+          </Card>
 
           {/* SERVER CURRENCY MATRIX */}
-          <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-5 shadow-xl">
-            <h2 className="text-sm font-black tracking-widest text-green-400 uppercase border-b border-[#2b2d31] pb-2">{t('levelingPage.currencySectionTitle')}</h2>
+          <Card className="space-y-5">
+            <h2 className="text-sm font-semibold tracking-widest text-text-primary uppercase border-b border-border-default pb-2">{t('levelingPage.currencySectionTitle')}</h2>
             <div className="space-y-1.5">
-              <label className="text-[11px] font-black text-[#b5bac1] tracking-wider uppercase">{t('levelingPage.currencyNameLabel')}</label>
-              <input type="text" value={currencyName} onChange={(e) => { setCurrencyName(e.target.value); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-green-500" />
+              <label className="text-[11px] font-black text-text-secondary tracking-wider uppercase">{t('levelingPage.currencyNameLabel')}</label>
+              <input type="text" value={currencyName} onChange={(e) => { setCurrencyName(e.target.value); setIsDirty(true); }} className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-green-500" />
               <HelpText>{t('levelingPage.currencyNameHelp')}</HelpText>
             </div>
             <div className="space-y-1.5 pt-2">
-              <label className="text-[11px] font-black text-[#b5bac1] tracking-wider uppercase">{t('levelingPage.minBetLabel')}</label>
-              <input type="number" min="1" max="5000" value={minBet} onChange={(e) => { setMinBet(parseInt(e.target.value) || 0); setIsDirty(true); }} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-green-500" />
+              <label className="text-[11px] font-black text-text-secondary tracking-wider uppercase">{t('levelingPage.minBetLabel')}</label>
+              <input type="number" min="1" max="5000" value={minBet} onChange={(e) => { setMinBet(parseInt(e.target.value) || 0); setIsDirty(true); }} className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-green-500" />
               <HelpText>{t('levelingPage.minBetHelp')}</HelpText>
             </div>
-          </div>
+          </Card>
         </div>
 
         {/* ==========================================
             [SECTION 3: AUTOMATED COMMERCE REGISTRY]
            ========================================== */}
-        <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-5 shadow-xl">
-          <h2 className="text-sm font-black tracking-wider text-yellow-500 uppercase border-b border-[#2b2d31] pb-2">{t('levelingPage.shopSectionTitle')}</h2>
+        <Card className="space-y-5">
+          <h2 className="text-sm font-semibold tracking-wider text-text-primary uppercase border-b border-border-default pb-2">{t('levelingPage.shopSectionTitle')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="space-y-1">
-              <label className="text-[10px] font-bold text-gray-400">{t('levelingPage.itemTitleLabel')}</label>
-              <input type="text" placeholder="e.g. VIP_Pass" value={newItemTitle} onChange={(e) => setNewItemTitle(e.target.value)} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-yellow-500" />
+              <label className="text-[10px] font-bold text-text-secondary">{t('levelingPage.itemTitleLabel')}</label>
+              <input type="text" placeholder="e.g. VIP_Pass" value={newItemTitle} onChange={(e) => setNewItemTitle(e.target.value)} className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-yellow-500" />
               <HelpText>{t('levelingPage.itemTitleHelp')}</HelpText>
             </div>
-            <div className="space-y-1"><label className="text-[10px] font-bold text-gray-400">{t('levelingPage.itemPriceLabel')}</label><input type="number" min="0" value={newItemPrice} onChange={(e) => setNewItemPrice(parseInt(e.target.value) || 0)} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-yellow-500" /></div>
-            <div className="space-y-1"><label className="text-[10px] font-bold text-gray-400">{t('levelingPage.itemDescLabel')}</label><input type="text" placeholder={t('levelingPage.itemDescPlaceholder')} value={newItemDescription} onChange={(e) => setNewItemDescription(e.target.value)} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-yellow-500" /></div>
+            <div className="space-y-1"><label className="text-[10px] font-bold text-text-secondary">{t('levelingPage.itemPriceLabel')}</label><input type="number" min="0" value={newItemPrice} onChange={(e) => setNewItemPrice(parseInt(e.target.value) || 0)} className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-yellow-500" /></div>
+            <div className="space-y-1"><label className="text-[10px] font-bold text-text-secondary">{t('levelingPage.itemDescLabel')}</label><input type="text" placeholder={t('levelingPage.itemDescPlaceholder')} value={newItemDescription} onChange={(e) => setNewItemDescription(e.target.value)} className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-yellow-500" /></div>
           </div>
-          <button type="button" onClick={injectShopItem} className="w-full bg-yellow-600/10 hover:bg-yellow-600 border border-yellow-500/20 text-yellow-400 hover:text-white text-sm font-black py-3 rounded-xl tracking-widest transition-all cursor-pointer">{t('levelingPage.injectItem')}</button>
-          <div className="pt-4 border-t border-[#2b2d31] space-y-3">
-            <h3 className="text-[11px] font-black text-[#949ba4] tracking-widest uppercase">{t('levelingPage.activeItemsLabel', { count: shopItems.length })}</h3>
+          <Button type="button" variant="secondary" onClick={injectShopItem} className="w-full !py-3 tracking-widest">{t('levelingPage.injectItem')}</Button>
+          <div className="pt-4 border-t border-border-default space-y-3">
+            <h3 className="text-[11px] font-black text-text-secondary tracking-widest uppercase">{t('levelingPage.activeItemsLabel', { count: shopItems.length })}</h3>
             {shopItems.length === 0 ? (
-              <div className="text-center py-6 border border-dashed border-[#4e5058]/30 rounded-xl bg-[#111214]/50"><p className="text-sm text-gray-500">{t('levelingPage.noItemsYet')}</p></div>
+              <Card elevated className="text-center !py-6 border-dashed"><p className="text-sm text-gray-500">{t('levelingPage.noItemsYet')}</p></Card>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {shopItems.map((item, idx) => (
-                  <div key={idx} className="bg-[#111214] border border-[#232428] rounded-xl p-4 flex flex-col justify-between gap-3 shadow-md">
+                  <Card elevated key={idx} className="flex flex-col justify-between gap-3">
                     <div className="space-y-1">
-                      <div className="flex justify-between items-start"><h4 className="text-sm font-black text-white font-mono truncate max-w-[65%]">📦 {item.name}</h4><span className="text-[10px] font-bold text-green-400 bg-green-950/40 border border-green-500/20 px-2 py-0.5 rounded-full">{item.price.toLocaleString()} {currencyName}</span></div>
+                      <div className="flex justify-between items-start"><h4 className="text-sm font-black text-text-primary font-mono truncate max-w-[65%]">📦 {item.name}</h4><span className="text-[10px] font-bold text-green-400 bg-green-950/40 border border-green-500/20 px-2 py-0.5 rounded-full">{item.price.toLocaleString()} {currencyName}</span></div>
                       <p className="text-[11px] text-gray-400 line-clamp-2">{item.description}</p>
                     </div>
-                    <button type="button" onClick={() => purgeShopItem(idx)} className="w-full bg-red-950/30 hover:bg-red-600 text-red-400 hover:text-white text-[10px] font-black py-1.5 rounded-lg border border-red-500/10 transition-all">{t('levelingPage.purgeItem')}</button>
-                  </div>
+                    <Button type="button" variant="danger" onClick={() => purgeShopItem(idx)} className="w-full !py-1.5 text-[10px]">{t('levelingPage.purgeItem')}</Button>
+                  </Card>
                 ))}
               </div>
             )}
           </div>
-        </div>
+        </Card>
 
       </SettingsPageContainer>
 
       {/* Floating Status Warning Alert */}
       {isDirty && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1e1f22]/95 border border-[#FFD700]/50 px-6 py-3.5 rounded-xl shadow-2xl flex items-center justify-between gap-8 backdrop-blur-md w-[90%] max-w-xl">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-bg-surface/95 border border-brand/50 px-6 py-3.5 rounded-xl shadow-2xl flex items-center justify-between gap-8 backdrop-blur-md w-[90%] max-w-xl">
           <span className="text-sm font-bold text-gray-200">{t('levelingPage.unsavedWarning')}</span>
-          <div className="flex gap-3"><button type="button" onClick={() => { loadSettings(guildId); setIsDirty(false); }} className="text-sm font-bold text-gray-400 hover:text-white transition">{t('common.discard')}</button><button type="button" onClick={handleSaveAll} className="bg-[#23A55A] hover:bg-[#1a7f43] text-white text-sm font-black px-5 py-2 rounded-lg">{t('levelingPage.commitAll')}</button></div>
+          <div className="flex gap-3">
+            <Button type="button" variant="ghost" onClick={() => { loadSettings(guildId); setIsDirty(false); }} className="!px-0">{t('common.discard')}</Button>
+            <Button type="button" variant="success" onClick={handleSaveAll}>{t('levelingPage.commitAll')}</Button>
+          </div>
         </div>
       )}
     </div>
