@@ -5,29 +5,55 @@ html {
   scroll-behavior: smooth;
 }
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* 🛡️ [디자인 토큰] 지금까지 이 저장소 전체(app/+components/)에 하드코딩된 임의값 hex가
+   41종·1,162회 흩어져 있었다(예: 카드 배경만 #1e1f22 계열/#161626 계열 두 톤이 따로 존재).
+   이 토큰이 그 중 실제로 재사용할 핵심 팔레트를 이름 붙여 중앙화한 것 - 보라색 톤(#161626/
+   #2A1F40) 계열은 의도적으로 제외하고 surface/elevated + border-default로 통합한다.
 
+   🛡️ [WCAG 실측 검증 완료] 아래 3개 값은 원래 지정된 값이 실제 relative luminance 계산(WCAG
+   2.1 공식)에서 기준 미달로 나와 조정한 결과다 - 전부 재계산까지 마쳤다:
+   - text-muted: 원래 #6B6B70 → bg-base/surface/elevated 위에서 각각 3.73/3.47/3.21:1로
+     일반 텍스트 기준(4.5:1) 미달. #85858B로 조정 후 5.40/5.02/4.63:1 전부 통과.
+   - border-default: 원래 #2A2A2E → bg-base/surface 위에서 1.38/1.29:1로 비텍스트 UI 요소
+     기준(3:1)을 크게 미달(보더가 사실상 안 보이는 수준). #676771로 조정 후 3.54/3.29/3.04:1
+     (bg-elevated까지) 전부 통과.
+   - border-hover: 원래 #3F3F46도 surface 위 1.76:1로 미달. #797984로 조정 후 4.60/4.28/
+     3.95:1 통과, border-default 대비 뚜렷하게 밝아 hover 상태 구분도 확실하다.
+   나머지 토큰(bg-base/surface/elevated, text-primary/secondary, brand, success, danger)은
+   원래 값 그대로 전부 기준을 통과해서 조정하지 않았다(text-secondary는 6.63~7.72:1, 흰 텍스트
+   on brand는 4.61:1, success/danger는 5.78~7.15:1 - 전부 4.5:1 이상). */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* 배경 3단계 - 어두운 순서대로 base(페이지) < surface(카드) < elevated(카드 위 카드/모달) */
+  --color-bg-base: #0A0A0B;
+  --color-bg-surface: #141416;
+  --color-bg-elevated: #1C1C1F;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* 텍스트 3단계 */
+  --color-text-primary: #F5F5F5;
+  --color-text-secondary: #A1A1AA;
+  --color-text-muted: #85858B; /* WCAG 조정값 - 위 주석 참고 */
+
+  /* 보더 2단계 */
+  --color-border-default: #676771; /* WCAG 조정값 - 위 주석 참고 */
+  --color-border-hover: #797984; /* WCAG 조정값 - 위 주석 참고 */
+
+  /* 브랜드 */
+  --color-brand: #5865F2;
+  --color-brand-hover: #4752C4;
+
+  /* 상태색 - danger는 코드베이스 전체에서 가장 많이 쓰인 위험색(text-red-400, named Tailwind
+     클래스 기준 40회 - 어떤 개별 hex보다도 압도적으로 많이 쓰임)을 그대로 채택했다. */
+  --color-success: #23A55A;
+  --color-danger: #F87171;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* 🛡️ 이 앱은 다크/라이트 모드 구분이 전혀 없다(dark: 클래스 전체 검색 0건, 기존 조사에서
+     확인됨) - 예전 --background/--foreground(prefers-color-scheme 기반 라이트/다크 페어)는
+     실제로는 모든 페이지가 자기 루트 div에 불투명 배경을 직접 지정해서 가려버리는 죽은 코드였다.
+     body 자체도 이제 새 토큰(bg-base/text-primary)으로 고정해서 실제 팔레트와 일치시킨다. */
+  background: var(--color-bg-base);
+  color: var(--color-text-primary);
   /* Light text on this app's dark panels renders thin/fragmented under the OS default (auto)
      antialiasing - forcing antialiased smooths strokes across the whole dark UI, not just HelpText. */
   -webkit-font-smoothing: antialiased;
