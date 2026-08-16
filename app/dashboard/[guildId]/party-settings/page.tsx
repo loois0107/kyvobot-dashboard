@@ -14,6 +14,8 @@ import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
 import ChannelSelect from '@/components/ChannelSelect';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
 
 const COLOR_PRESETS = ['#5865F2', '#23A55A', '#FEE75C', '#EB459E', '#ED4245', '#9B59B6', '#00D2D3', '#54A0FF'];
 
@@ -138,7 +140,7 @@ export default function PartySettingsPage() {
 
   if (loadStatus === 'loading') {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-base">
+      <div className="min-h-[50vh] flex items-center justify-center text-text-secondary text-base">
         {t('partySettingsPage.loadingSettings')}
       </div>
     );
@@ -147,47 +149,38 @@ export default function PartySettingsPage() {
   if (loadStatus === 'error') {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
-        <p className="text-red-400 font-bold">{t('partySettingsPage.loadFailed')}</p>
-        <p className="text-base text-[#949ba4]">{loadErrorMsg}</p>
-        <button
-          type="button"
-          onClick={loadData}
-          className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl"
-        >
+        <p className="text-danger font-bold">{t('partySettingsPage.loadFailed')}</p>
+        <p className="text-base text-text-secondary">{loadErrorMsg}</p>
+        <Button type="button" variant="primary" onClick={loadData}>
           {t('common.retry')}
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
     <SettingsPageContainer className="pb-28">
-      <header className="border-b border-[#2b2d31] pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <header className="border-b border-border-default pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('partySettingsPage.title')}</h1>
+          <h1 className="text-xl md:text-2xl font-black tracking-wider text-brand">{t('partySettingsPage.title')}</h1>
           <HelpText className="mt-1">
             {t('partySettingsPage.subtitle')}
           </HelpText>
         </div>
-        <button
-          type="button"
-          onClick={handleSave}
-          disabled={isSaving}
-          className="w-full sm:w-auto bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all"
-        >
+        <Button type="button" variant="primary" onClick={handleSave} disabled={isSaving} className="w-full sm:w-auto">
           {isSaving ? t('common.saving') : t('common.save')}
-        </button>
+        </Button>
       </header>
 
-      <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
-        <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+      <Card className="space-y-4">
+        <h3 className="text-sm font-black tracking-widest text-text-secondary uppercase border-b border-border-default pb-2">
           {t('partySettingsPage.previewTitle')}
         </h3>
-        <div className="rounded-xl p-4 border-l-4 bg-[#111214] flex items-start justify-between gap-4" style={{ borderColor: cardColor }}>
+        <div className="rounded-xl p-4 border-l-4 bg-bg-elevated flex items-start justify-between gap-4" style={{ borderColor: cardColor }}>
           <div className="min-w-0">
-            {gameName && <p className="text-[10px] font-bold text-[#949ba4] mb-1">🎮 {gameName}</p>}
-            <p className="text-base font-bold text-white">{t('partySettingsPage.previewLine')}</p>
-            {cardDescription && <p className="text-sm text-[#b5bac1] mt-2 whitespace-pre-wrap">{cardDescription}</p>}
+            {gameName && <p className="text-[10px] font-bold text-text-secondary mb-1">🎮 {gameName}</p>}
+            <p className="text-base font-bold text-text-primary">{t('partySettingsPage.previewLine')}</p>
+            {cardDescription && <p className="text-sm text-text-secondary mt-2 whitespace-pre-wrap">{cardDescription}</p>}
           </div>
           {cardThumbnailUrl && (
             // eslint-disable-next-line @next/next/no-img-element
@@ -201,7 +194,7 @@ export default function PartySettingsPage() {
         </div>
 
         <div className="space-y-1.5 pt-2">
-          <label className="text-sm font-bold text-[#b5bac1]">{t('partySettingsPage.colorLabel')}</label>
+          <label className="text-sm font-bold text-text-secondary">{t('partySettingsPage.colorLabel')}</label>
           <div className="flex flex-wrap gap-1.5">
             {COLOR_PRESETS.map((p) => (
               <button
@@ -216,55 +209,55 @@ export default function PartySettingsPage() {
               type="text"
               value={cardColor}
               onChange={(e) => { setCardColor(e.target.value); setIsDirty(true); }}
-              className="w-24 bg-[#111214] border border-[#232428] rounded-lg px-2 text-[10px] text-white font-mono focus:outline-none focus:border-[#5865F2]"
+              className="w-24 bg-bg-elevated border border-border-default rounded-lg px-2 text-[10px] text-text-primary font-mono focus:outline-none focus:border-brand"
             />
           </div>
         </div>
 
         <div className="space-y-1.5 pt-2">
-          <label className="text-sm font-bold text-[#b5bac1]">{t('partySettingsPage.descLabel')}</label>
+          <label className="text-sm font-bold text-text-secondary">{t('partySettingsPage.descLabel')}</label>
           <textarea
             value={cardDescription}
             onChange={(e) => { setCardDescription(e.target.value); setIsDirty(true); }}
             rows={3}
             placeholder={t('partySettingsPage.descPlaceholder')}
-            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2]"
+            className="w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-text-primary focus:outline-none focus:border-brand"
           />
         </div>
 
         <div className="space-y-1.5 pt-2">
-          <label className="text-sm font-bold text-[#b5bac1]">{t('partySettingsPage.gameNameLabel')}</label>
+          <label className="text-sm font-bold text-text-secondary">{t('partySettingsPage.gameNameLabel')}</label>
           <input
             type="text"
             value={gameName}
             onChange={(e) => { setGameName(e.target.value); setIsDirty(true); }}
             maxLength={256}
             placeholder={t('partySettingsPage.gameNamePlaceholder')}
-            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2]"
+            className="w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-text-primary focus:outline-none focus:border-brand"
           />
         </div>
 
         <div className="space-y-1.5 pt-2">
-          <label className="text-sm font-bold text-[#b5bac1]">{t('partySettingsPage.thumbnailLabel')}</label>
+          <label className="text-sm font-bold text-text-secondary">{t('partySettingsPage.thumbnailLabel')}</label>
           <input
             type="text"
             value={cardThumbnailUrl}
             onChange={(e) => { setCardThumbnailUrl(e.target.value); setIsDirty(true); }}
             placeholder="https://..."
-            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white font-mono focus:outline-none focus:border-[#5865F2]"
+            className="w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-text-primary font-mono focus:outline-none focus:border-brand"
           />
           <HelpText>{t('partySettingsPage.thumbnailHelp')}</HelpText>
         </div>
-      </div>
+      </Card>
 
-      <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
-        <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+      <Card className="space-y-4">
+        <h3 className="text-sm font-black tracking-widest text-text-secondary uppercase border-b border-border-default pb-2">
           {t('partySettingsPage.timersTitle')}
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label className="text-sm font-bold text-[#b5bac1]">
+          <label className="text-sm font-bold text-text-secondary">
             {t('partySettingsPage.cardAutoCloseLabel', { min: PARTY_CARD_LIFETIME_MIN_MINUTES, max: PARTY_CARD_LIFETIME_MAX_MINUTES })}
           </label>
           <input
@@ -273,12 +266,12 @@ export default function PartySettingsPage() {
             max={PARTY_CARD_LIFETIME_MAX_MINUTES}
             value={cardLifetimeMinutes}
             onChange={(e) => { setCardLifetimeMinutes(parseInt(e.target.value) || 0); setIsDirty(true); }}
-            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]"
+            className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-brand"
           />
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-bold text-[#b5bac1]">
+          <label className="text-sm font-bold text-text-secondary">
             {t('partySettingsPage.channelAutoDeleteLabel', { min: PARTY_CHANNEL_LIFETIME_MIN_HOURS, max: PARTY_CHANNEL_LIFETIME_MAX_HOURS })}
           </label>
           <input
@@ -287,14 +280,14 @@ export default function PartySettingsPage() {
             max={PARTY_CHANNEL_LIFETIME_MAX_HOURS}
             value={channelLifetimeHours}
             onChange={(e) => { setChannelLifetimeHours(parseInt(e.target.value) || 0); setIsDirty(true); }}
-            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-3 text-sm text-white focus:outline-none focus:border-[#5865F2]"
+            className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-brand"
           />
         </div>
         </div>
-      </div>
+      </Card>
 
-      <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
-        <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+      <Card className="space-y-4">
+        <h3 className="text-sm font-black tracking-widest text-text-secondary uppercase border-b border-border-default pb-2">
           {t('partySettingsPage.weeklyReportTitle')}
         </h3>
         <HelpText>
@@ -302,36 +295,36 @@ export default function PartySettingsPage() {
         </HelpText>
 
         <div className="flex items-center justify-between">
-          <label className="text-sm font-black text-white cursor-pointer" htmlFor="weekly-report-toggle">{t('partySettingsPage.weeklyReportEnableLabel')}</label>
+          <label className="text-sm font-black text-text-primary cursor-pointer" htmlFor="weekly-report-toggle">{t('partySettingsPage.weeklyReportEnableLabel')}</label>
           <input
             id="weekly-report-toggle"
             type="checkbox"
             checked={weeklyReportEnabled}
             onChange={(e) => { setWeeklyReportEnabled(e.target.checked); setIsDirty(true); }}
-            className="w-4 h-4 accent-[#5865F2] cursor-pointer"
+            className="w-4 h-4 accent-brand cursor-pointer"
           />
         </div>
 
         <div className="space-y-1.5 pt-2">
-          <label className="text-sm font-bold text-[#b5bac1]">{t('partySettingsPage.reportChannelLabel')}</label>
+          <label className="text-sm font-bold text-text-secondary">{t('partySettingsPage.reportChannelLabel')}</label>
           <ChannelSelect
             guildId={guildId}
             value={weeklyReportChannelId}
             onChange={(id) => { setWeeklyReportChannelId(id); setIsDirty(true); }}
           />
         </div>
-      </div>
+      </Card>
 
       {isDirty && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1e1f22]/95 border border-[#FFD700]/50 px-6 py-3.5 rounded-xl shadow-2xl flex items-center justify-between gap-8 backdrop-blur-md w-[90%] max-w-xl">
-          <span className="text-sm font-bold text-gray-200">{t('common.unsavedChanges')}</span>
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-bg-surface/95 border border-brand/50 px-6 py-3.5 rounded-xl shadow-2xl flex items-center justify-between gap-8 backdrop-blur-md w-[90%] max-w-xl">
+          <span className="text-sm font-bold text-text-primary">{t('common.unsavedChanges')}</span>
           <div className="flex gap-3">
-            <button type="button" onClick={loadData} className="text-sm font-bold text-gray-400 hover:text-white transition">
+            <Button type="button" variant="ghost" onClick={loadData} className="!px-0">
               {t('common.discard')}
-            </button>
-            <button type="button" onClick={handleSave} className="bg-[#23A55A] hover:bg-[#1a7f43] text-white text-sm font-black px-5 py-2 rounded-lg">
+            </Button>
+            <Button type="button" variant="success" onClick={handleSave}>
               {t('common.save')}
-            </button>
+            </Button>
           </div>
         </div>
       )}
