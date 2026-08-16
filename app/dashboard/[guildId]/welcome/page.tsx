@@ -9,6 +9,9 @@ import { dictionaries, type Lang } from '@/lib/i18n';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
 import ChannelSelect from '@/components/ChannelSelect';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
 
 export default function WelcomeSettings() {
   const router = useRouter();
@@ -161,24 +164,24 @@ export default function WelcomeSettings() {
     <div className="min-h-screen bg-bg-base text-[#dbdee1] p-2 sm:p-4 md:p-6 pb-28">
       <SettingsPageContainer>
 
-        <header className="mb-8 border-b border-[#2b2d31] pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <header className="mb-8 border-b border-border-default pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('welcomePage.title')}</h1>
-            <p className="text-sm text-[#b5bac1] mt-1 tracking-wide font-medium">
+            <h1 className="text-xl md:text-2xl font-black tracking-wider text-brand">{t('welcomePage.title')}</h1>
+            <p className="text-sm text-text-secondary mt-1 tracking-wide font-medium">
               {t('welcomePage.subtitle')}
             </p>
           </div>
-          <button type="submit" form="welcome-form" disabled={isSaving} className="w-full sm:w-auto bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all cursor-pointer">
+          <Button type="submit" form="welcome-form" variant="primary" disabled={isSaving} className="w-full sm:w-auto">
             {isSaving ? t('welcomePage.syncing') : t('welcomePage.saveButton')}
-          </button>
+          </Button>
         </header>
 
-        <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl space-y-4">
-          <div className="flex justify-between items-center border-b border-[#2b2d31] pb-3">
-            <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase">{t('welcomePage.previewTitle')}</h3>
-            <span className={`text-[10px] px-2 py-0.5 rounded font-black ${enabled ? 'bg-green-950/40 text-green-400 border border-green-500/20' : 'bg-red-950/40 text-red-400 border border-red-500/20'}`}>
+        <Card className="space-y-4">
+          <div className="flex justify-between items-center border-b border-border-default pb-3">
+            <h3 className="text-sm font-black tracking-widest text-text-secondary uppercase">{t('welcomePage.previewTitle')}</h3>
+            <Badge variant={enabled ? 'success' : 'danger'}>
               {enabled ? t('welcomePage.cardActive') : t('welcomePage.cardOffline')}
-            </span>
+            </Badge>
           </div>
 
           <HelpText className="normal-case">{t('welcomePage.previewLangNote')}</HelpText>
@@ -201,19 +204,19 @@ export default function WelcomeSettings() {
               </div>
             </div>
           </div>
-        </div>
+        </Card>
 
         <form id="welcome-form" onSubmit={handleSave} className="grid grid-cols-1 md:grid-cols-5 gap-6">
-          <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-5 shadow-xl md:col-span-2">
-            <h2 className="text-sm font-black tracking-widest text-[#5865F2] uppercase border-b border-[#2b2d31] pb-2">{t('welcomePage.settingsSectionTitle')}</h2>
+          <Card className="space-y-5 md:col-span-2">
+            <h2 className="text-sm font-black tracking-widest text-brand uppercase border-b border-border-default pb-2">{t('welcomePage.settingsSectionTitle')}</h2>
 
-            <div className="space-y-3 p-3.5 bg-[#111214] rounded-xl border border-[#232428]">
+            <div className="space-y-3 p-3.5 bg-bg-elevated rounded-xl border border-border-default">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-black text-white cursor-pointer" htmlFor="enable-toggle">{t('welcomePage.enableWelcomeLabel')}</label>
-                <input id="enable-toggle" type="checkbox" checked={enabled} onChange={(e) => { setEnabled(e.target.checked); setIsDirty(true); }} className="w-4 h-4 accent-[#5865F2] cursor-pointer" />
+                <label className="text-sm font-black text-text-primary cursor-pointer" htmlFor="enable-toggle">{t('welcomePage.enableWelcomeLabel')}</label>
+                <input id="enable-toggle" type="checkbox" checked={enabled} onChange={(e) => { setEnabled(e.target.checked); setIsDirty(true); }} className="w-4 h-4 accent-brand cursor-pointer" />
               </div>
-              <div className="space-y-1 pt-1 border-t border-[#2b2d31]/40">
-                <label className="text-sm font-bold text-[#b5bac1] uppercase block">{t('welcomePage.welcomeChannelLabel')}</label>
+              <div className="space-y-1 pt-1 border-t border-border-default/40">
+                <label className="text-sm font-bold text-text-secondary uppercase block">{t('welcomePage.welcomeChannelLabel')}</label>
                 <ChannelSelect
                   guildId={guildId}
                   value={channelId}
@@ -224,13 +227,13 @@ export default function WelcomeSettings() {
               </div>
             </div>
 
-            <div className="space-y-3 p-3.5 bg-[#111214] rounded-xl border border-[#232428]">
+            <div className="space-y-3 p-3.5 bg-bg-elevated rounded-xl border border-border-default">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-black text-red-400 cursor-pointer" htmlFor="goodbye-toggle">{t('welcomePage.enableGoodbyeLabel')}</label>
-                <input id="goodbye-toggle" type="checkbox" checked={goodbyeEnabled} onChange={(e) => { setGoodbyeEnabled(e.target.checked); setIsDirty(true); }} className="w-4 h-4 accent-red-500 cursor-pointer" />
+                <label className="text-sm font-black text-text-secondary cursor-pointer" htmlFor="goodbye-toggle">{t('welcomePage.enableGoodbyeLabel')}</label>
+                <input id="goodbye-toggle" type="checkbox" checked={goodbyeEnabled} onChange={(e) => { setGoodbyeEnabled(e.target.checked); setIsDirty(true); }} className="w-4 h-4 accent-brand cursor-pointer" />
               </div>
-              <div className="space-y-1 pt-1 border-t border-[#2b2d31]/40">
-                <label className="text-sm font-bold text-[#b5bac1] uppercase block">{t('welcomePage.goodbyeChannelLabel')}</label>
+              <div className="space-y-1 pt-1 border-t border-border-default/40">
+                <label className="text-sm font-bold text-text-secondary uppercase block">{t('welcomePage.goodbyeChannelLabel')}</label>
                 <ChannelSelect
                   guildId={guildId}
                   value={goodbyeChannelId}
@@ -239,48 +242,48 @@ export default function WelcomeSettings() {
                 />
                 <HelpText className="normal-case">{t('welcomePage.goodbyeChannelHelp')}</HelpText>
               </div>
-              <div className="space-y-1 pt-1 border-t border-[#2b2d31]/40">
-                <label className="text-sm font-bold text-[#b5bac1] uppercase block">{t('welcomePage.goodbyeMessageLabel')}</label>
+              <div className="space-y-1 pt-1 border-t border-border-default/40">
+                <label className="text-sm font-bold text-text-secondary uppercase block">{t('welcomePage.goodbyeMessageLabel')}</label>
                 <textarea
                   value={goodbyeMessage}
                   onChange={(e) => { setGoodbyeMessage(e.target.value); setIsDirty(true); }}
                   rows={2}
                   placeholder={t('welcomePage.goodbyeMessagePlaceholder')}
-                  className="w-full bg-[#1e1f22] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-red-500"
+                  className="w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-text-primary focus:outline-none focus:border-brand"
                 />
                 <HelpText className="normal-case">
                   {t('welcomePage.goodbyeMessageHelp')}
                 </HelpText>
               </div>
             </div>
-          </div>
+          </Card>
 
-          <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-5 space-y-4 shadow-xl md:col-span-3">
-            <h2 className="text-sm font-black tracking-widest text-green-400 uppercase border-b border-[#2b2d31] pb-2">{t('welcomePage.aestheticTitle')}</h2>
+          <Card className="space-y-4 md:col-span-3">
+            <h2 className="text-sm font-semibold tracking-widest text-text-primary uppercase border-b border-border-default pb-2">{t('welcomePage.aestheticTitle')}</h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-[#b5bac1]">{t('welcomePage.accentColorLabel')}</label>
+                <label className="text-sm font-bold text-text-secondary">{t('welcomePage.accentColorLabel')}</label>
                 <div className="flex flex-wrap gap-1.5">{colorPresets.map((p) => (<button key={p} type="button" onClick={() => { setCardColor(p); setIsDirty(true); }} className={`w-5 h-5 rounded-full border ${cardColor.toLowerCase() === p.toLowerCase() ? 'border-white scale-110' : 'border-transparent opacity-60'}`} style={{ backgroundColor: p }} />))}</div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-[#b5bac1]">{t('welcomePage.solidBgLabel')}</label>
+                <label className="text-sm font-bold text-text-secondary">{t('welcomePage.solidBgLabel')}</label>
                 <div className="flex flex-wrap gap-1.5">{bgColorPresets.map((p) => (<button key={p} type="button" onClick={() => { setCardBgColor(p); setIsDirty(true); }} className={`w-5 h-5 rounded-full border ${cardBgColor.toLowerCase() === p.toLowerCase() ? 'border-white scale-110' : 'border-transparent opacity-60'}`} style={{ backgroundColor: p }} />))}</div>
               </div>
             </div>
 
             <div className="space-y-1.5 pt-2">
-              <label className="text-sm font-bold text-[#b5bac1] flex justify-between"><span>{t('welcomePage.overlayOpacityLabel')}</span><span className="text-[#5865F2] font-mono">{Math.round(overlayOpacity * 100)}%</span></label>
-              <input type="range" min="0.0" max="1.0" step="0.05" value={overlayOpacity} onChange={(e) => { setOverlayOpacity(parseFloat(e.target.value)); setIsDirty(true); }} className="w-full h-1 bg-[#232428] rounded-lg appearance-none cursor-pointer accent-[#5865F2]" />
+              <label className="text-sm font-bold text-text-secondary flex justify-between"><span>{t('welcomePage.overlayOpacityLabel')}</span><span className="text-brand font-mono">{Math.round(overlayOpacity * 100)}%</span></label>
+              <input type="range" min="0.0" max="1.0" step="0.05" value={overlayOpacity} onChange={(e) => { setOverlayOpacity(parseFloat(e.target.value)); setIsDirty(true); }} className="w-full h-1 bg-bg-elevated rounded-lg appearance-none cursor-pointer accent-brand" />
               <HelpText>{t('welcomePage.overlayOpacityHelp')}</HelpText>
             </div>
 
             <div className="space-y-2 pt-2">
-              <label className="text-sm font-bold text-[#b5bac1] block">{t('welcomePage.wallpaperLabel')}</label>
+              <label className="text-sm font-bold text-text-secondary block">{t('welcomePage.wallpaperLabel')}</label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {premiumPresets.map((preset, i) => (
                   <div key={i} onClick={() => { setBackgroundUrl(preset.url); setIsDirty(true); }}
-                    className={`aspect-[2.6/1] rounded-xl bg-cover bg-center cursor-pointer border relative group transition-all duration-200 overflow-hidden ${backgroundUrl === preset.url ? 'border-[#5865F2] scale-102 shadow-md' : 'border-[#2b2d31] opacity-40 hover:opacity-80'}`}
+                    className={`aspect-[2.6/1] rounded-xl bg-cover bg-center cursor-pointer border relative group transition-all duration-200 overflow-hidden ${backgroundUrl === preset.url ? 'border-brand scale-102 shadow-md' : 'border-border-default opacity-40 hover:opacity-80'}`}
                     style={{ backgroundImage: `url(${preset.url})` }}
                   >
                     <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
@@ -290,22 +293,22 @@ export default function WelcomeSettings() {
                 ))}
               </div>
               <div className="pt-1">
-                <input type="text" value={backgroundUrl} onChange={(e) => { setBackgroundUrl(e.target.value); setIsDirty(true); }} placeholder={t('welcomePage.wallpaperUrlPlaceholder')} className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2]" />
+                <input type="text" value={backgroundUrl} onChange={(e) => { setBackgroundUrl(e.target.value); setIsDirty(true); }} placeholder={t('welcomePage.wallpaperUrlPlaceholder')} className="w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-text-primary focus:outline-none focus:border-brand" />
                 <HelpText className="pt-1">{t('welcomePage.wallpaperFallbackHelp')}</HelpText>
               </div>
             </div>
 
-          </div>
+          </Card>
         </form>
 
       </SettingsPageContainer>
 
       {isDirty && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1e1f22]/95 border border-[#5865F2]/60 px-6 py-3.5 rounded-xl shadow-2xl flex items-center justify-between gap-8 backdrop-blur-md w-[90%] max-w-xl animate-in fade-in">
-          <span className="text-sm font-bold text-gray-200">{t('welcomePage.unsavedWarning')}</span>
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-bg-surface/95 border border-brand/60 px-6 py-3.5 rounded-xl shadow-2xl flex items-center justify-between gap-8 backdrop-blur-md w-[90%] max-w-xl animate-in fade-in">
+          <span className="text-sm font-bold text-text-primary">{t('welcomePage.unsavedWarning')}</span>
           <div className="flex gap-3">
-            <button type="button" onClick={() => { loadSettings(guildId); setIsDirty(false); }} className="text-sm font-bold text-gray-400 hover:text-white transition">{t('welcomePage.reset')}</button>
-            <button type="submit" form="welcome-form" disabled={isSaving} className="bg-[#23A55A] hover:bg-[#1a7f43] text-white text-sm font-black px-5 py-2 rounded-lg">{t('welcomePage.stickyBarSaveButton')}</button>
+            <Button type="button" variant="ghost" onClick={() => { loadSettings(guildId); setIsDirty(false); }} className="!px-0">{t('welcomePage.reset')}</Button>
+            <Button type="submit" form="welcome-form" variant="success" disabled={isSaving}>{t('welcomePage.stickyBarSaveButton')}</Button>
           </div>
         </div>
       )}
