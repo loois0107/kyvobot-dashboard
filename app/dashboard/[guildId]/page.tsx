@@ -5,6 +5,9 @@ import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useT } from '@/lib/i18n/LanguageContext';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
 
 interface LogLine {
   timestamp: string;
@@ -30,18 +33,18 @@ function ChecklistRow({ done, label, href }: { done: boolean; label: string; hre
     <Link
       href={href}
       className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border transition-all ${
-        done ? 'border-[#23A55A]/20 bg-[#23A55A]/5' : 'border-[#232428] bg-[#111214] hover:border-[#5865F2]/40'
+        done ? 'border-success/20 bg-success/5' : 'border-border-default bg-bg-elevated hover:border-brand/40'
       }`}
     >
       <span className={`w-5 h-5 rounded-full flex items-center justify-center text-sm shrink-0 ${
-        done ? 'bg-[#23A55A] text-white' : 'border border-[#4e5058] text-transparent'
+        done ? 'bg-success text-white' : 'border border-border-default text-transparent'
       }`}>
         {done ? '✓' : ''}
       </span>
-      <span className={`text-sm font-bold flex-1 ${done ? 'text-[#23A55A] line-through decoration-2' : 'text-[#dbdee1]'}`}>
+      <span className={`text-sm font-bold flex-1 ${done ? 'text-success line-through decoration-2' : 'text-text-primary'}`}>
         {label}
       </span>
-      {!done && <span className="text-[10px] text-[#5865F2] font-bold shrink-0">{t('dashboardHome.setUpArrow')}</span>}
+      {!done && <span className="text-[10px] text-brand font-bold shrink-0">{t('dashboardHome.setUpArrow')}</span>}
     </Link>
   );
 }
@@ -199,65 +202,58 @@ export default function DashboardHome() {
     <div className="max-w-7xl mx-auto w-full space-y-10 p-2 md:p-4 animate-in fade-in duration-300">
 
       {onboarding?.show_banner && (
-        <div className="bg-[#1e1f22] border border-[#5865F2]/30 rounded-2xl p-6 shadow-xl space-y-4">
+        <Card elevated className="!border-brand/30 hover:!border-brand/30 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-black text-white">{t('dashboardHome.quickStartTitle')}</h3>
-              <p className="text-[10px] text-[#949ba4] mt-1">{t('dashboardHome.quickStartSubtitle')}</p>
+              <h3 className="text-base font-black text-text-primary">{t('dashboardHome.quickStartTitle')}</h3>
+              <p className="text-[10px] text-text-secondary mt-1">{t('dashboardHome.quickStartSubtitle')}</p>
             </div>
-            <button
+            <Button
               type="button"
+              variant="ghost"
               onClick={handleDismissOnboarding}
-              className="text-gray-400 hover:text-white text-lg leading-none px-2"
               aria-label={t('dashboardHome.dismissChecklist')}
+              className="!px-2 text-lg leading-none"
             >
               ✕
-            </button>
+            </Button>
           </div>
           <div className="space-y-2">
             <ChecklistRow done={onboarding.items.automod} label={t('dashboardHome.checklistAutomod')} href={`/dashboard/${guildId}/automod`} />
             <ChecklistRow done={onboarding.items.welcome} label={t('dashboardHome.checklistWelcome')} href={`/dashboard/${guildId}/welcome`} />
             <ChecklistRow done={onboarding.items.presets} label={t('dashboardHome.checklistPresets')} href={`/dashboard/${guildId}/party-presets`} />
           </div>
-        </div>
+        </Card>
       )}
 
       {/* ==========================================
           [SECTION 1: STATUS OVERVIEW ROW]
          ========================================== */}
       <div className="grid grid-cols-1 gap-6">
-        <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-6 sm:p-8 shadow-xl flex flex-col justify-between min-h-[160px] relative overflow-hidden">
-          <div className="flex items-center justify-between pb-4 border-b border-[#2b2d31]">
+        <Card className="flex flex-col justify-between min-h-[160px] relative overflow-hidden">
+          <div className="flex items-center justify-between pb-4 border-b border-border-default">
             <div className="flex items-center gap-2">
-              <span className={`w-2.5 h-2.5 rounded-full ${isConnectionFailed ? 'bg-red-500' : isDataEmpty ? 'bg-gray-500' : 'bg-[#23a55a]'}`}></span>
-              <h3 className="text-sm font-black tracking-widest text-[#949ba4]">{t('dashboardHome.systemStatus')}</h3>
+              <span className={`w-2.5 h-2.5 rounded-full ${isConnectionFailed ? 'bg-danger' : isDataEmpty ? 'bg-text-muted' : 'bg-success'}`}></span>
+              <h3 className="text-sm font-black tracking-widest text-text-secondary">{t('dashboardHome.systemStatus')}</h3>
             </div>
 
-            {isConnectionFailed && (
-              <span className="bg-red-950/50 text-red-400 border border-red-500/30 text-[10px] font-black px-2.5 py-1 rounded font-mono">
-                {t('dashboardHome.statsUnreachable')}
-              </span>
-            )}
-            {isDataEmpty && (
-              <span className="bg-gray-800/50 text-gray-400 border border-gray-500/30 text-[10px] font-black px-2.5 py-1 rounded font-mono">
-                {t('dashboardHome.noDataYet')}
-              </span>
-            )}
+            {isConnectionFailed && <Badge variant="danger">{t('dashboardHome.statsUnreachable')}</Badge>}
+            {isDataEmpty && <Badge variant="neutral">{t('dashboardHome.noDataYet')}</Badge>}
           </div>
           {/* 🛡️ [정직성 정리] 예전엔 여기 "MATRIX VER: v2.4.0-pro"/"LATENCY TICK: 20ms Stable"처럼
               실제로 어디에서도 안 나오는 값을 하드코딩해서 마치 실시간 측정치인 것처럼 보여줬다 -
               진짜 값이 없으면 아예 안 보여주는 게 맞다(가짜 문구로 순화하지 않음). 실제 값을 가진
               두 항목(봇 이름, 이 서버 ID)만 남긴다. */}
           <div className="grid grid-cols-2 gap-6 pt-6 font-mono text-base">
-            <div className="space-y-1"><span className="text-gray-500 block text-sm">{t('dashboardHome.coreAlias')}</span><strong className="text-white text-base tracking-wide">Kyvo</strong></div>
+            <div className="space-y-1"><span className="text-text-secondary block text-sm">{t('dashboardHome.coreAlias')}</span><strong className="text-text-primary text-base tracking-wide">Kyvo</strong></div>
             <div className="space-y-1">
-              <span className="text-gray-500 block text-sm">{t('dashboardHome.activeContext')}</span>
-              <strong className="text-[#5865F2] text-base tracking-wide truncate max-w-[180px]">
+              <span className="text-text-secondary block text-sm">{t('dashboardHome.activeContext')}</span>
+              <strong className="text-brand text-base tracking-wide truncate max-w-[180px]">
                 {t('dashboardHome.activeContextValue', { id: guildId.slice(0, 6) })}
               </strong>
             </div>
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* ==========================================
@@ -270,58 +266,54 @@ export default function DashboardHome() {
             Base/Active Tickets는 ticket-settings가 관리하는 guild_knowledge/guild_ticket_settings
             테이블, Automod Logs는 audit-logs 페이지가 보여주는 automod_logs 테이블), 전부 실제로
             갈 곳이 있다는 걸 확인하고 나머지도 동일한 Link 패턴으로 맞췄다. */}
-        <Link
-          href={`/dashboard/${guildId}/settings`}
-          className="bg-[#111214] border border-[#232428] hover:border-[#5865F2]/40 rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center transition-all duration-200 group"
-        >
-          <span className="text-sm font-black text-gray-500 uppercase tracking-wider block">{t('dashboardHome.customCommandsLabel')}</span>
-          <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.customCommands === 0 ? 'text-gray-600' : 'text-[#5865F2]'}`}>
-            {isLoadingStats ? '...' : telemetry.customCommands.toLocaleString()}
-            <span className="text-sm text-[#5865F2]/60 font-sans ml-1">{t('dashboardHome.customCommandsUnit')}</span>
-          </span>
-          <span className="text-[10px] text-gray-500 font-bold tracking-widest pt-1 group-hover:text-[#5865F2] transition-colors text-left">
-            {t('dashboardHome.manageArrow')}
-          </span>
+        <Link href={`/dashboard/${guildId}/settings`}>
+          <Card elevated className="!py-8 !px-6 space-y-2 flex flex-col justify-center">
+            <span className="text-sm font-black text-text-secondary uppercase tracking-wider block">{t('dashboardHome.customCommandsLabel')}</span>
+            <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.customCommands === 0 ? 'text-text-muted' : 'text-brand'}`}>
+              {isLoadingStats ? '...' : telemetry.customCommands.toLocaleString()}
+              <span className="text-sm text-brand/60 font-sans ml-1">{t('dashboardHome.customCommandsUnit')}</span>
+            </span>
+            <span className="text-[10px] text-text-secondary font-bold tracking-widest pt-1 text-left">
+              {t('dashboardHome.manageArrow')}
+            </span>
+          </Card>
         </Link>
 
-        <Link
-          href={`/dashboard/${guildId}/ticket-settings`}
-          className="bg-[#111214] border border-[#232428] hover:border-purple-500/40 rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center transition-all duration-200 group"
-        >
-          <span className="text-sm font-black text-gray-500 uppercase tracking-wider block">{t('dashboardHome.aiKnowledgeLabel')}</span>
-          <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.ragSynapses === 0 ? 'text-gray-600' : 'text-purple-400'}`}>
-            {isLoadingStats ? '...' : telemetry.ragSynapses.toLocaleString()}
-            <span className="text-sm text-purple-600 font-sans ml-1">{t('dashboardHome.aiKnowledgeUnit')}</span>
-          </span>
-          <span className="text-[10px] text-gray-500 font-bold tracking-widest pt-1 group-hover:text-purple-400 transition-colors text-left">
-            {t('dashboardHome.manageArrow')}
-          </span>
+        <Link href={`/dashboard/${guildId}/ticket-settings`}>
+          <Card elevated className="!py-8 !px-6 space-y-2 flex flex-col justify-center">
+            <span className="text-sm font-black text-text-secondary uppercase tracking-wider block">{t('dashboardHome.aiKnowledgeLabel')}</span>
+            <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.ragSynapses === 0 ? 'text-text-muted' : 'text-purple-400'}`}>
+              {isLoadingStats ? '...' : telemetry.ragSynapses.toLocaleString()}
+              <span className="text-sm text-purple-600 font-sans ml-1">{t('dashboardHome.aiKnowledgeUnit')}</span>
+            </span>
+            <span className="text-[10px] text-text-secondary font-bold tracking-widest pt-1 text-left">
+              {t('dashboardHome.manageArrow')}
+            </span>
+          </Card>
         </Link>
-        <Link
-          href={`/dashboard/${guildId}/ticket-settings`}
-          className="bg-[#111214] border border-[#232428] hover:border-yellow-500/40 rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center transition-all duration-200 group"
-        >
-          <span className="text-sm font-black text-gray-500 uppercase tracking-wider block">{t('dashboardHome.activeTicketsLabel')}</span>
-          <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.activeTickets === 0 ? 'text-gray-600' : 'text-yellow-500'}`}>
-            {isLoadingStats ? '...' : telemetry.activeTickets}
-            <span className="text-sm text-yellow-600 font-sans ml-1">{t('dashboardHome.activeTicketsUnit')}</span>
-          </span>
-          <span className="text-[10px] text-gray-500 font-bold tracking-widest pt-1 group-hover:text-yellow-500 transition-colors text-left">
-            {t('dashboardHome.manageArrow')}
-          </span>
+        <Link href={`/dashboard/${guildId}/ticket-settings`}>
+          <Card elevated className="!py-8 !px-6 space-y-2 flex flex-col justify-center">
+            <span className="text-sm font-black text-text-secondary uppercase tracking-wider block">{t('dashboardHome.activeTicketsLabel')}</span>
+            <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.activeTickets === 0 ? 'text-text-muted' : 'text-yellow-500'}`}>
+              {isLoadingStats ? '...' : telemetry.activeTickets}
+              <span className="text-sm text-yellow-600 font-sans ml-1">{t('dashboardHome.activeTicketsUnit')}</span>
+            </span>
+            <span className="text-[10px] text-text-secondary font-bold tracking-widest pt-1 text-left">
+              {t('dashboardHome.manageArrow')}
+            </span>
+          </Card>
         </Link>
-        <Link
-          href={`/dashboard/${guildId}/audit-logs`}
-          className="bg-[#111214] border border-[#232428] hover:border-white/40 rounded-xl py-8 px-6 shadow-inner space-y-2 flex flex-col justify-center transition-all duration-200 group"
-        >
-          <span className="text-sm font-black text-gray-500 uppercase tracking-wider block">{t('dashboardHome.automodLogsLabel')}</span>
-          <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.automodLogs === 0 ? 'text-gray-600' : 'text-white'}`}>
-            {isLoadingStats ? '...' : telemetry.automodLogs.toLocaleString()}
-            <span className="text-sm text-red-600 font-sans ml-1">{t('dashboardHome.automodLogsUnit')}</span>
-          </span>
-          <span className="text-[10px] text-gray-500 font-bold tracking-widest pt-1 group-hover:text-white transition-colors text-left">
-            {t('dashboardHome.manageArrow')}
-          </span>
+        <Link href={`/dashboard/${guildId}/audit-logs`}>
+          <Card elevated className="!py-8 !px-6 space-y-2 flex flex-col justify-center">
+            <span className="text-sm font-black text-text-secondary uppercase tracking-wider block">{t('dashboardHome.automodLogsLabel')}</span>
+            <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.automodLogs === 0 ? 'text-text-muted' : 'text-text-primary'}`}>
+              {isLoadingStats ? '...' : telemetry.automodLogs.toLocaleString()}
+              <span className="text-sm text-red-600 font-sans ml-1">{t('dashboardHome.automodLogsUnit')}</span>
+            </span>
+            <span className="text-[10px] text-text-secondary font-bold tracking-widest pt-1 text-left">
+              {t('dashboardHome.manageArrow')}
+            </span>
+          </Card>
         </Link>
       </div>
 
@@ -329,19 +321,25 @@ export default function DashboardHome() {
           [SECTION 3: ⚡ CORE MODULE QUICK DISPATCH]
          ========================================== */}
       <div className="space-y-4">
-        <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase px-1">{t('dashboardHome.quickLinksTitle')}</h3>
+        <h3 className="text-sm font-black tracking-widest text-text-secondary uppercase px-1">{t('dashboardHome.quickLinksTitle')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Link href={`/dashboard/${guildId}/leveling`} className="bg-[#1e1f22] hover:bg-[#232428] border border-[#2b2d31] hover:border-[#5865F2]/40 rounded-2xl p-8 shadow-md transition-all duration-200 group cursor-pointer text-left flex flex-col justify-between min-h-[210px]">
-            <div><span className="text-3xl block mb-3">✨</span><h4 className="text-base font-black text-white group-hover:text-[#5865F2] uppercase tracking-wider">{t('dashboardHome.levelingEcoTitle')}</h4><p className="text-sm text-gray-400 mt-2 leading-relaxed">{t('dashboardHome.levelingEcoDesc')}</p></div>
-            <span className="text-[10px] text-gray-500 font-bold tracking-widest mt-4 block group-hover:text-white transition-colors">{t('dashboardHome.levelingCta')}</span>
+          <Link href={`/dashboard/${guildId}/leveling`}>
+            <Card className="!p-8 flex flex-col justify-between min-h-[210px]">
+              <div><span className="text-3xl block mb-3">✨</span><h4 className="text-base font-black text-text-primary uppercase tracking-wider">{t('dashboardHome.levelingEcoTitle')}</h4><p className="text-sm text-text-secondary mt-2 leading-relaxed">{t('dashboardHome.levelingEcoDesc')}</p></div>
+              <span className="text-[10px] text-text-secondary font-bold tracking-widest mt-4 block">{t('dashboardHome.levelingCta')}</span>
+            </Card>
           </Link>
-          <Link href={`/dashboard/${guildId}/welcome`} className="bg-[#1e1f22] hover:bg-[#232428] border border-[#2b2d31] hover:border-green-500/40 rounded-2xl p-8 shadow-md transition-all duration-200 group cursor-pointer text-left flex flex-col justify-between min-h-[210px]">
-            <div><span className="text-3xl block mb-3">📥</span><h4 className="text-base font-black text-white group-hover:text-green-400 uppercase tracking-wider">{t('dashboardHome.welcomeTitle')}</h4><p className="text-sm text-gray-400 mt-2 leading-relaxed">{t('dashboardHome.welcomeDesc')}</p></div>
-            <span className="text-[10px] text-gray-500 font-bold tracking-widest mt-4 block group-hover:text-white transition-colors">{t('dashboardHome.welcomeCta')}</span>
+          <Link href={`/dashboard/${guildId}/welcome`}>
+            <Card className="!p-8 flex flex-col justify-between min-h-[210px]">
+              <div><span className="text-3xl block mb-3">📥</span><h4 className="text-base font-black text-text-primary uppercase tracking-wider">{t('dashboardHome.welcomeTitle')}</h4><p className="text-sm text-text-secondary mt-2 leading-relaxed">{t('dashboardHome.welcomeDesc')}</p></div>
+              <span className="text-[10px] text-text-secondary font-bold tracking-widest mt-4 block">{t('dashboardHome.welcomeCta')}</span>
+            </Card>
           </Link>
-          <Link href={`/dashboard/${guildId}/ticket-settings`} className="bg-[#1e1f22] hover:bg-[#232428] border border-[#2b2d31] hover:border-purple-500/40 rounded-2xl p-8 shadow-md transition-all duration-200 group cursor-pointer text-left flex flex-col justify-between min-h-[210px]">
-            <div><span className="text-3xl block mb-3">🎫</span><h4 className="text-base font-black text-white group-hover:text-purple-400 uppercase tracking-wider">{t('dashboardHome.ticketTitle')}</h4><p className="text-sm text-gray-400 mt-2 leading-relaxed">{t('dashboardHome.ticketDesc')}</p></div>
-            <span className="text-[10px] text-gray-500 font-bold tracking-widest mt-4 block group-hover:text-white transition-colors">{t('dashboardHome.ticketCta')}</span>
+          <Link href={`/dashboard/${guildId}/ticket-settings`}>
+            <Card className="!p-8 flex flex-col justify-between min-h-[210px]">
+              <div><span className="text-3xl block mb-3">🎫</span><h4 className="text-base font-black text-text-primary uppercase tracking-wider">{t('dashboardHome.ticketTitle')}</h4><p className="text-sm text-text-secondary mt-2 leading-relaxed">{t('dashboardHome.ticketDesc')}</p></div>
+              <span className="text-[10px] text-text-secondary font-bold tracking-widest mt-4 block">{t('dashboardHome.ticketCta')}</span>
+            </Card>
           </Link>
         </div>
       </div>
@@ -349,20 +347,20 @@ export default function DashboardHome() {
       {/* ==========================================
           [SECTION 4: 💻 LIVE CORE TERMINAL STREAM]
          ========================================== */}
-      <div className="bg-[#111214] border border-[#232428] rounded-2xl p-6 shadow-2xl space-y-4">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-[#232428] pb-4 gap-3">
+      <Card elevated className="space-y-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-border-default pb-4 gap-3">
           <div className="flex items-center gap-1.5">
             <div className="w-3 h-3 bg-red-500 rounded-full"></div>
             <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="text-sm font-black font-mono text-gray-500 tracking-widest uppercase ml-2">{t('dashboardHome.activityLogHeader')}</span>
+            <span className="text-sm font-black font-mono text-text-secondary tracking-widest uppercase ml-2">{t('dashboardHome.activityLogHeader')}</span>
           </div>
 
           <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
             <select
               value={logFilter}
               onChange={(e) => setLogFilter(e.target.value as any)}
-              className="bg-[#1e1f22] border border-[#2b2d31] text-[#b5bac1] font-mono text-[10px] font-black px-3 py-1.5 rounded cursor-pointer uppercase focus:outline-none focus:border-[#5865F2]"
+              className="bg-bg-elevated border border-border-default text-text-primary font-mono text-[10px] font-black px-3 py-1.5 rounded cursor-pointer uppercase focus:outline-none focus:border-brand"
             >
               <option value="ALL">{t('dashboardHome.filterAll')}</option>
               <option value="INFO">{t('dashboardHome.filterInfo')}</option>
@@ -374,10 +372,10 @@ export default function DashboardHome() {
             <button
               type="button"
               onClick={() => setIsPaused(!isPaused)}
-              className={`font-mono text-[10px] font-black px-4 py-1.5 rounded uppercase tracking-wider transition-all duration-150 ${
+              className={`font-mono text-[10px] font-black px-4 py-1.5 rounded uppercase tracking-wider transition-all duration-150 border ${
                 isPaused
-                  ? 'bg-yellow-500 text-black border border-yellow-400 font-bold'
-                  : 'bg-[#2b2d31] text-white hover:bg-[#35373c] border border-[#4e5058]/20'
+                  ? 'bg-warning/10 text-warning border-warning-border'
+                  : 'bg-bg-elevated text-text-primary hover:bg-bg-elevated/70 border-border-default'
               }`}
             >
               {isPaused ? t('dashboardHome.resumeStream') : t('dashboardHome.pauseStream')}
@@ -387,26 +385,26 @@ export default function DashboardHome() {
 
         <div className="font-mono text-sm sm:text-base p-2 space-y-2.5 min-h-[380px] max-h-[450px] overflow-y-auto select-text scrollbar-thin scrollbar-thumb-gray-800">
           {isLoadingLogs ? (
-            <div className="text-center py-20 text-gray-500 text-sm font-semibold">{t('dashboardHome.syncingLogs')}</div>
+            <div className="text-center py-20 text-text-secondary text-sm font-semibold">{t('dashboardHome.syncingLogs')}</div>
           ) : filteredLogs.length === 0 ? (
-            <div className="text-center py-20 text-gray-600 text-sm font-semibold">{t('dashboardHome.noLogsMatch')}</div>
+            <div className="text-center py-20 text-text-muted text-sm font-semibold">{t('dashboardHome.noLogsMatch')}</div>
           ) : (
             filteredLogs.map((log, i) => (
               <div key={`${log.timestamp}-${log.type}-${log.message}-${i}`} className="flex gap-4 items-start leading-relaxed animate-in fade-in slide-in-from-left-1 duration-150">
-                <span className="text-gray-600">[{log.timestamp}]</span>
+                <span className="text-text-muted">[{log.timestamp}]</span>
                 <span className={`font-black tracking-wider text-center w-16 flex-shrink-0 text-sm ${
-                  log.type === 'SYSTEM' ? 'text-purple-400' :
-                  log.type === 'SUCCESS' ? 'text-green-400' :
-                  log.type === 'WARN' ? 'text-yellow-400' : 'text-blue-400'
+                  log.type === 'SYSTEM' ? 'text-text-secondary' :
+                  log.type === 'SUCCESS' ? 'text-success' :
+                  log.type === 'WARN' ? 'text-warning' : 'text-text-muted'
                 }`}>
                   {log.type}
                 </span>
-                <span className="text-gray-300 break-all tracking-wide">{log.message}</span>
+                <span className="text-text-primary break-all tracking-wide">{log.message}</span>
               </div>
             ))
           )}
         </div>
-      </div>
+      </Card>
 
     </div>
   );
