@@ -62,10 +62,10 @@ export default function MessageSelect({ guildId, channelId, value, onChange }: M
     };
   }, [guildId, channelId]);
 
-  const inputClassName = 'w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white font-mono focus:outline-none focus:border-[#5865F2]';
+  const inputClassName = 'w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-text-primary font-mono focus:outline-none focus:border-brand';
 
   if (!channelId) {
-    return <p className="text-sm text-[#6d7178] italic py-2">{t('reactionRolesPage.selectChannelFirstForMessages')}</p>;
+    return <p className="text-sm text-text-muted italic py-2">{t('reactionRolesPage.selectChannelFirstForMessages')}</p>;
   }
 
   if (manualMode || loadStatus === 'error') {
@@ -78,10 +78,10 @@ export default function MessageSelect({ guildId, channelId, value, onChange }: M
           placeholder="123456789012345678"
           className={inputClassName}
         />
-        {loadStatus === 'error' && <p className="text-[10px] text-red-400">⚠️ {t('reactionRolesPage.messagesLoadError')}</p>}
-        <p className="text-[10px] text-[#6d7178]">{t('reactionRolesPage.findIdsHelp')}</p>
+        {loadStatus === 'error' && <p className="text-[10px] text-danger">⚠️ {t('reactionRolesPage.messagesLoadError')}</p>}
+        <p className="text-[10px] text-text-muted">{t('reactionRolesPage.findIdsHelp')}</p>
         {loadStatus !== 'error' && (
-          <button type="button" onClick={() => setManualMode(false)} className="text-[10px] font-bold text-[#5865F2] hover:underline">
+          <button type="button" onClick={() => setManualMode(false)} className="text-[10px] font-bold text-brand hover:underline">
             {t('reactionRolesPage.backToMessageList')}
           </button>
         )}
@@ -90,13 +90,13 @@ export default function MessageSelect({ guildId, channelId, value, onChange }: M
   }
 
   if (loadStatus === 'loading') {
-    return <p className="text-sm text-[#6d7178] italic py-2">{t('reactionRolesPage.loadingMessages')}</p>;
+    return <p className="text-sm text-text-muted italic py-2">{t('reactionRolesPage.loadingMessages')}</p>;
   }
 
   return (
     <div className="space-y-1.5">
       {messages.length === 0 ? (
-        <p className="text-sm text-[#6d7178] italic py-2">{t('reactionRolesPage.noRecentMessages')}</p>
+        <p className="text-sm text-text-muted italic py-2">{t('reactionRolesPage.noRecentMessages')}</p>
       ) : (
         <div className="max-h-64 overflow-y-auto space-y-1.5 pr-1">
           {messages.map((m) => {
@@ -106,23 +106,23 @@ export default function MessageSelect({ guildId, channelId, value, onChange }: M
                 key={m.id}
                 type="button"
                 onClick={() => onChange(m.id)}
-                className={`w-full text-left bg-[#111214] border rounded-lg px-3 py-2 transition-colors ${
-                  selected ? 'border-[#5865F2] bg-[#5865F2]/10' : 'border-[#232428] hover:border-[#3a3c42]'
+                className={`w-full text-left bg-bg-elevated border rounded-lg px-3 py-2 transition-colors ${
+                  selected ? 'border-brand bg-brand/10' : 'border-border-default hover:border-border-hover'
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-bold text-white truncate">{m.author}</span>
-                  <span className="text-[10px] text-[#6d7178] shrink-0">{formatTimestamp(m.timestamp)}</span>
+                  <span className="text-sm font-bold text-text-primary truncate">{m.author}</span>
+                  <span className="text-[10px] text-text-muted shrink-0">{formatTimestamp(m.timestamp)}</span>
                 </div>
-                <p className="text-[11px] text-[#b5bac1] truncate mt-0.5">{m.preview}</p>
+                <p className="text-[11px] text-text-secondary truncate mt-0.5">{m.preview}</p>
               </button>
             );
           })}
         </div>
       )}
       <div className="flex items-center justify-between">
-        <p className="text-[10px] text-[#6d7178]">{t('reactionRolesPage.manualEntryHint')}</p>
-        <button type="button" onClick={() => setManualMode(true)} className="text-[10px] font-bold text-[#5865F2] hover:underline shrink-0">
+        <p className="text-[10px] text-text-muted">{t('reactionRolesPage.manualEntryHint')}</p>
+        <button type="button" onClick={() => setManualMode(true)} className="text-[10px] font-bold text-brand hover:underline shrink-0">
           {t('reactionRolesPage.enterManually')}
         </button>
       </div>

@@ -9,6 +9,8 @@ import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
 import ChannelSelect from '@/components/ChannelSelect';
 import MessageSelect from '@/components/MessageSelect';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
 
 interface RoleOption {
   id: string;
@@ -208,7 +210,7 @@ export default function ReactionRolesPage() {
 
   if (loadStatus === 'loading') {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-base">
+      <div className="min-h-[50vh] flex items-center justify-center text-text-secondary text-base">
         {t('reactionRolesPage.loading')}
       </div>
     );
@@ -217,32 +219,32 @@ export default function ReactionRolesPage() {
   if (loadStatus === 'error') {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
-        <p className="text-red-400 font-bold">{t('reactionRolesPage.loadFailed')}</p>
-        <p className="text-base text-[#949ba4]">{loadErrorMsg}</p>
-        <button type="button" onClick={loadData} className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl">
+        <p className="text-danger font-bold">{t('reactionRolesPage.loadFailed')}</p>
+        <p className="text-base text-text-secondary">{loadErrorMsg}</p>
+        <Button type="button" variant="primary" onClick={loadData}>
           {t('common.retry')}
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
     <SettingsPageContainer className="pb-16">
-      <header className="border-b border-[#2b2d31] pb-6">
-        <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('reactionRolesPage.title')}</h1>
+      <header className="border-b border-border-default pb-6">
+        <h1 className="text-xl md:text-2xl font-black tracking-wider text-brand">{t('reactionRolesPage.title')}</h1>
         <HelpText className="mt-1 tracking-widest uppercase">
           {t('reactionRolesPage.subtitle')}
         </HelpText>
       </header>
 
-      <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
-        <h3 className="text-sm font-black tracking-widest text-[#949ba4] border-b border-[#2b2d31] pb-2">
+      <Card className="space-y-4">
+        <h3 className="text-sm font-black tracking-widest text-text-secondary border-b border-border-default pb-2">
           {t('reactionRolesPage.addBindingTitle')}
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <label className="text-sm font-bold text-[#b5bac1]">{t('reactionRolesPage.channelIdLabel')}</label>
+            <label className="text-sm font-bold text-text-secondary">{t('reactionRolesPage.channelIdLabel')}</label>
             <ChannelSelect
               guildId={guildId}
               value={channelId}
@@ -250,7 +252,7 @@ export default function ReactionRolesPage() {
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-bold text-[#b5bac1]">{t('reactionRolesPage.messageIdLabel')}</label>
+            <label className="text-sm font-bold text-text-secondary">{t('reactionRolesPage.messageIdLabel')}</label>
             <MessageSelect
               guildId={guildId}
               channelId={channelId}
@@ -260,47 +262,42 @@ export default function ReactionRolesPage() {
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={handlePreview}
-          disabled={!channelId || !messageId || isPreviewing}
-          className="bg-[#5865F2] hover:bg-[#4752C4] disabled:opacity-50 text-white text-sm font-black px-5 py-2.5 rounded-lg"
-        >
+        <Button type="button" variant="primary" onClick={handlePreview} disabled={!channelId || !messageId || isPreviewing}>
           {isPreviewing ? t('reactionRolesPage.checking') : t('reactionRolesPage.previewMessage')}
-        </button>
+        </Button>
 
-        {previewError && <p className="text-sm text-red-400">⚠️ {previewError}</p>}
+        {previewError && <p className="text-sm text-danger">⚠️ {previewError}</p>}
 
         {preview && (
-          <div className="bg-[#111214] rounded-lg p-3 border-l-4 border-[#23A55A] space-y-1">
-            <p className="text-sm text-[#949ba4]">{t('reactionRolesPage.foundItBy')} <span className="text-white font-bold">{preview.author}</span></p>
-            <p className="text-sm text-[#b5bac1] italic">&quot;{preview.content}&quot;</p>
-            <a href={preview.jump_url} target="_blank" rel="noreferrer" className="text-[10px] text-[#5865F2] hover:underline">
+          <Card elevated className="!p-3 !border-t-0 !border-r-0 !border-b-0 !border-l-4 !border-success space-y-1">
+            <p className="text-sm text-text-secondary">{t('reactionRolesPage.foundItBy')} <span className="text-text-primary font-bold">{preview.author}</span></p>
+            <p className="text-sm text-text-secondary italic">&quot;{preview.content}&quot;</p>
+            <a href={preview.jump_url} target="_blank" rel="noreferrer" className="text-[10px] text-brand hover:underline">
               {t('reactionRolesPage.jumpToMessage')}
             </a>
-          </div>
+          </Card>
         )}
 
         {preview && (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-[#b5bac1]">{t('reactionRolesPage.emojiLabel')}</label>
+                <label className="text-sm font-bold text-text-secondary">{t('reactionRolesPage.emojiLabel')}</label>
                 <input
                   type="text"
                   value={emoji}
                   onChange={(e) => setEmoji(e.target.value)}
                   placeholder="🎮"
-                  className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-base text-white focus:outline-none focus:border-[#5865F2]"
+                  className="w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-base text-text-primary focus:outline-none focus:border-brand"
                 />
                 <HelpText>{t('reactionRolesPage.emojiHelp')}</HelpText>
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-[#b5bac1]">{t('reactionRolesPage.roleLabel')}</label>
+                <label className="text-sm font-bold text-text-secondary">{t('reactionRolesPage.roleLabel')}</label>
                 <select
                   value={roleId}
                   onChange={(e) => setRoleId(e.target.value)}
-                  className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2]"
+                  className="w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-text-primary focus:outline-none focus:border-brand"
                 >
                   <option value="">{t('reactionRolesPage.selectRolePlaceholder')}</option>
                   {roles.map((r) => (
@@ -311,98 +308,94 @@ export default function ReactionRolesPage() {
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={handleCreateClick}
-              disabled={!emoji || !roleId || isSaving}
-              className="bg-[#23A55A] hover:bg-[#1a7f43] disabled:opacity-50 text-white text-sm font-black px-6 py-3 rounded-xl"
-            >
+            <Button type="button" variant="success" onClick={handleCreateClick} disabled={!emoji || !roleId || isSaving}>
               {isSaving ? t('reactionRolesPage.creatingBinding') : t('reactionRolesPage.createBinding')}
-            </button>
+            </Button>
           </>
         )}
-      </div>
+      </Card>
 
       {confirmDialog && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#1e1f22] border border-orange-500/50 rounded-2xl p-6 max-w-md w-full space-y-4">
-            <h3 className="text-orange-400 font-black text-base">{t('reactionRolesPage.dangerousPermTitle')}</h3>
-            <p className="text-sm text-[#b5bac1]">
+          <Card className="!border-warning-border hover:!border-warning-border max-w-md w-full space-y-4">
+            <h3 className="text-warning font-black text-base">{t('reactionRolesPage.dangerousPermTitle')}</h3>
+            <p className="text-sm text-text-secondary">
               {t('reactionRolesPage.dangerousPermBody', { perms: confirmDialog.dangerous.join(', ') })}
             </p>
             <div className="flex gap-3 justify-end">
-              <button type="button" onClick={() => setConfirmDialog(null)} className="text-sm font-bold text-gray-400 hover:text-white px-4 py-2">
+              <Button type="button" variant="ghost" onClick={() => setConfirmDialog(null)}>
                 {t('common.cancel')}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="danger"
                 onClick={() => { setConfirmDialog(null); submitBinding(true); }}
-                className="bg-red-600 hover:bg-red-500 text-white text-sm font-black px-5 py-2 rounded-lg"
               >
                 {t('reactionRolesPage.confirmSaveAnyway')}
-              </button>
+              </Button>
             </div>
-          </div>
+          </Card>
         </div>
       )}
 
       {duplicateConfirm && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#1e1f22] border border-orange-500/50 rounded-2xl p-6 max-w-md w-full space-y-4">
-            <h3 className="text-orange-400 font-black text-base">{t('reactionRolesPage.duplicateExistsTitle')}</h3>
-            <p className="text-sm text-[#b5bac1]">
+          <Card className="!border-warning-border hover:!border-warning-border max-w-md w-full space-y-4">
+            <h3 className="text-warning font-black text-base">{t('reactionRolesPage.duplicateExistsTitle')}</h3>
+            <p className="text-sm text-text-secondary">
               {t('reactionRolesPage.duplicateExistsBody', { role: duplicateConfirm.existing.role_name })}
             </p>
             <div className="flex gap-3 justify-end">
-              <button type="button" onClick={() => setDuplicateConfirm(null)} className="text-sm font-bold text-gray-400 hover:text-white px-4 py-2">
+              <Button type="button" variant="ghost" onClick={() => setDuplicateConfirm(null)}>
                 {t('common.cancel')}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="danger"
                 onClick={() => { setDuplicateConfirm(null); submitBinding(false); }}
-                className="bg-red-600 hover:bg-red-500 text-white text-sm font-black px-5 py-2 rounded-lg"
               >
                 {t('reactionRolesPage.replaceExisting')}
-              </button>
+              </Button>
             </div>
-          </div>
+          </Card>
         </div>
       )}
 
-      <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-3 shadow-xl">
-        <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+      <Card className="space-y-3">
+        <h3 className="text-sm font-black tracking-widest text-text-secondary uppercase border-b border-border-default pb-2">
           {t('reactionRolesPage.existingBindingsTitle')}
         </h3>
         {bindings.length === 0 ? (
-          <p className="text-base text-[#949ba4] py-4">{t('reactionRolesPage.noBindingsYet')}</p>
+          <p className="text-base text-text-secondary py-4">{t('reactionRolesPage.noBindingsYet')}</p>
         ) : (
           <div className="space-y-2">
             {bindings.map((b) => {
               const key = `${b.message_id}:${b.emoji}`;
               return (
-                <div key={key} className="flex items-center justify-between gap-3 bg-[#111214] rounded-lg px-3 py-2.5">
+                <Card elevated key={key} className="flex items-center justify-between gap-3 !px-3 !py-2.5">
                   <div className="flex items-center gap-3 min-w-0">
                     <EmojiBadge emoji={b.emoji} />
                     <span className="text-sm font-bold" style={{ color: roleColorHex(b.role_color) }}>{b.role_name}</span>
-                    <a href={b.jump_url} target="_blank" rel="noreferrer" className="text-[10px] text-[#5865F2] hover:underline shrink-0">
+                    <a href={b.jump_url} target="_blank" rel="noreferrer" className="text-[10px] text-brand hover:underline shrink-0">
                       {t('reactionRolesPage.jump')}
                     </a>
                   </div>
-                  <button
+                  <Button
                     type="button"
+                    variant="danger"
                     onClick={() => handleDelete(b)}
                     disabled={deletingKey === key}
-                    className="text-[10px] font-bold text-red-400 hover:text-red-300 disabled:opacity-50 px-2 py-1 shrink-0"
+                    className="!px-3 !py-1.5 text-[10px] shrink-0"
                   >
                     {deletingKey === key ? t('reactionRolesPage.deletingBinding') : t('common.delete')}
-                  </button>
-                </div>
+                  </Button>
+                </Card>
               );
             })}
           </div>
         )}
         <HelpText className="pt-2">{t('reactionRolesPage.deleteBindingFooter')}</HelpText>
-      </div>
+      </Card>
     </SettingsPageContainer>
   );
 }
