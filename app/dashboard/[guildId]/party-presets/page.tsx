@@ -7,6 +7,8 @@ import { PARTY_GAME_PRESET_MAX_COUNT, PARTY_GAME_PRESET_NAME_MAX_LENGTH, type Pa
 import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
 
 const COLOR_PRESETS = ['#5865F2', '#23A55A', '#FEE75C', '#EB459E', '#ED4245', '#9B59B6', '#00D2D3', '#54A0FF'];
 
@@ -116,7 +118,7 @@ export default function PartyPresetsPage() {
 
   if (loadStatus === 'loading') {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-base">
+      <div className="min-h-[50vh] flex items-center justify-center text-text-secondary text-base">
         {t('partyPresetsPage.loadingPresets')}
       </div>
     );
@@ -125,15 +127,11 @@ export default function PartyPresetsPage() {
   if (loadStatus === 'error') {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
-        <p className="text-red-400 font-bold">{t('partyPresetsPage.loadFailed')}</p>
-        <p className="text-base text-[#949ba4]">{loadErrorMsg}</p>
-        <button
-          type="button"
-          onClick={loadData}
-          className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl"
-        >
+        <p className="text-danger font-bold">{t('partyPresetsPage.loadFailed')}</p>
+        <p className="text-base text-text-secondary">{loadErrorMsg}</p>
+        <Button type="button" variant="primary" onClick={loadData}>
           {t('common.retry')}
-        </button>
+        </Button>
       </div>
     );
   }
@@ -143,8 +141,8 @@ export default function PartyPresetsPage() {
 
   return (
     <SettingsPageContainer className="pb-16">
-      <header className="border-b border-[#2b2d31] pb-6">
-        <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('partyPresetsPage.title')}</h1>
+      <header className="border-b border-border-default pb-6">
+        <h1 className="text-xl md:text-2xl font-black tracking-wider text-brand">{t('partyPresetsPage.title')}</h1>
         <HelpText className="mt-1">
           {t('partyPresetsPage.subtitleUsage', { used: presets.length, max: PARTY_GAME_PRESET_MAX_COUNT })}
         </HelpText>
@@ -153,22 +151,22 @@ export default function PartyPresetsPage() {
         </HelpText>
       </header>
 
-      <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
-        <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+      <Card className="space-y-4">
+        <h3 className="text-sm font-black tracking-widest text-text-secondary uppercase border-b border-border-default pb-2">
           {isEditing ? t('partyPresetsPage.editingTitle', { name: editingOriginalName || '' }) : t('partyPresetsPage.addTitle')}
         </h3>
 
         {atCap && (
-          <p className="text-sm text-red-400">
+          <p className="text-sm text-danger">
             {t('partyPresetsPage.atCapWarning', { max: PARTY_GAME_PRESET_MAX_COUNT })}
           </p>
         )}
 
-        <div className="rounded-xl p-4 border-l-4 bg-[#111214] flex items-start justify-between gap-4" style={{ borderColor: form.card_color }}>
+        <div className="rounded-xl p-4 border-l-4 bg-bg-elevated flex items-start justify-between gap-4" style={{ borderColor: form.card_color }}>
           <div className="min-w-0">
-            {form.game_name && <p className="text-[10px] font-bold text-[#949ba4] mb-1">🎮 {form.game_name}</p>}
-            <p className="text-base font-bold text-white">{t('partyPresetsPage.previewLine')}</p>
-            {form.card_description && <p className="text-sm text-[#b5bac1] mt-2 whitespace-pre-wrap">{form.card_description}</p>}
+            {form.game_name && <p className="text-[10px] font-bold text-text-secondary mb-1">🎮 {form.game_name}</p>}
+            <p className="text-base font-bold text-text-primary">{t('partyPresetsPage.previewLine')}</p>
+            {form.card_description && <p className="text-sm text-text-secondary mt-2 whitespace-pre-wrap">{form.card_description}</p>}
           </div>
           {form.card_thumbnail_url && (
             // eslint-disable-next-line @next/next/no-img-element
@@ -182,7 +180,7 @@ export default function PartyPresetsPage() {
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-bold text-[#b5bac1]">{t('partyPresetsPage.gameNameLabel')}</label>
+          <label className="text-sm font-bold text-text-secondary">{t('partyPresetsPage.gameNameLabel')}</label>
           <input
             type="text"
             value={form.game_name}
@@ -190,7 +188,7 @@ export default function PartyPresetsPage() {
             maxLength={PARTY_GAME_PRESET_NAME_MAX_LENGTH}
             disabled={isEditing}
             placeholder={t('partyPresetsPage.gameNamePlaceholder')}
-            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2] disabled:opacity-50"
+            className="w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-text-primary focus:outline-none focus:border-brand disabled:opacity-50"
           />
           {isEditing ? (
             <HelpText>{t('partyPresetsPage.renameHelp')}</HelpText>
@@ -200,7 +198,7 @@ export default function PartyPresetsPage() {
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-bold text-[#b5bac1]">{t('partyPresetsPage.colorLabel')}</label>
+          <label className="text-sm font-bold text-text-secondary">{t('partyPresetsPage.colorLabel')}</label>
           <div className="flex flex-wrap gap-1.5">
             {COLOR_PRESETS.map((p) => (
               <button
@@ -215,82 +213,78 @@ export default function PartyPresetsPage() {
               type="text"
               value={form.card_color}
               onChange={(e) => setForm({ ...form, card_color: e.target.value })}
-              className="w-24 bg-[#111214] border border-[#232428] rounded-lg px-2 text-[10px] text-white font-mono focus:outline-none focus:border-[#5865F2]"
+              className="w-24 bg-bg-elevated border border-border-default rounded-lg px-2 text-[10px] text-text-primary font-mono focus:outline-none focus:border-brand"
             />
           </div>
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-bold text-[#b5bac1]">{t('partyPresetsPage.descLabel')}</label>
+          <label className="text-sm font-bold text-text-secondary">{t('partyPresetsPage.descLabel')}</label>
           <textarea
             value={form.card_description}
             onChange={(e) => setForm({ ...form, card_description: e.target.value })}
             rows={2}
-            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2]"
+            className="w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-text-primary focus:outline-none focus:border-brand"
           />
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-bold text-[#b5bac1]">{t('partyPresetsPage.thumbnailLabel')}</label>
+          <label className="text-sm font-bold text-text-secondary">{t('partyPresetsPage.thumbnailLabel')}</label>
           <input
             type="text"
             value={form.card_thumbnail_url}
             onChange={(e) => setForm({ ...form, card_thumbnail_url: e.target.value })}
             placeholder="https://..."
-            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white font-mono focus:outline-none focus:border-[#5865F2]"
+            className="w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-text-primary font-mono focus:outline-none focus:border-brand"
           />
           <HelpText>{t('partyPresetsPage.thumbnailHelp')}</HelpText>
         </div>
 
         <div className="flex gap-3 pt-2">
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={isSaving || !form.game_name.trim() || atCap}
-            className="bg-[#5865F2] hover:bg-[#4752C4] disabled:opacity-50 text-white text-sm font-black px-6 py-3 rounded-xl"
-          >
+          <Button type="button" variant="primary" onClick={handleSave} disabled={isSaving || !form.game_name.trim() || atCap}>
             {isSaving ? t('common.saving') : isEditing ? t('partyPresetsPage.saveChanges') : t('partyPresetsPage.addPreset')}
-          </button>
+          </Button>
           {isEditing && (
-            <button type="button" onClick={cancelEdit} className="text-sm font-bold text-gray-400 hover:text-white transition px-4">
+            <Button type="button" variant="ghost" onClick={cancelEdit}>
               {t('common.cancel')}
-            </button>
+            </Button>
           )}
         </div>
-      </div>
+      </Card>
 
-      <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-3 shadow-xl">
-        <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+      <Card className="space-y-3">
+        <h3 className="text-sm font-black tracking-widest text-text-secondary uppercase border-b border-border-default pb-2">
           {t('partyPresetsPage.savedTitle')}
         </h3>
         {presets.length === 0 ? (
-          <p className="text-base text-[#949ba4] py-4">{t('partyPresetsPage.noPresetsYet')}</p>
+          <p className="text-base text-text-secondary py-4">{t('partyPresetsPage.noPresetsYet')}</p>
         ) : (
           <div className="space-y-2">
             {presets.map((p) => (
-              <div key={p.game_name} className="flex items-center justify-between gap-3 bg-[#111214] rounded-lg px-3 py-2.5">
+              <Card elevated key={p.game_name} className="flex items-center justify-between gap-3 !px-3 !py-2.5">
                 <div className="flex items-center gap-3 min-w-0">
                   <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: p.card_color }} />
-                  <span className="text-sm font-bold text-white truncate">{p.game_name}</span>
+                  <span className="text-sm font-bold text-text-primary truncate">{p.game_name}</span>
                 </div>
                 <div className="flex gap-2 shrink-0">
-                  <button type="button" onClick={() => startEdit(p)} className="text-[10px] font-bold text-[#5865F2] hover:text-white px-2 py-1">
+                  <Button type="button" variant="secondary" onClick={() => startEdit(p)} className="!px-3 !py-1.5 text-[10px]">
                     {t('common.edit')}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
+                    variant="danger"
                     onClick={() => handleDelete(p.game_name)}
                     disabled={deletingName === p.game_name}
-                    className="text-[10px] font-bold text-red-400 hover:text-red-300 disabled:opacity-50 px-2 py-1"
+                    className="!px-3 !py-1.5 text-[10px]"
                   >
                     {deletingName === p.game_name ? t('common.deleting') : t('common.delete')}
-                  </button>
+                  </Button>
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
         )}
-      </div>
+      </Card>
     </SettingsPageContainer>
   );
 }
