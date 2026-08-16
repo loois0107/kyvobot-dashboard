@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter, usePathname } from 'next/navigation';
-import Link from 'next/link';
 import { useT } from '@/lib/i18n/LanguageContext';
 import LanguageToggle from '@/components/LanguageToggle';
 import AccountMenu from '@/components/AccountMenu';
 import BotNotInvitedNotice from '@/components/BotNotInvitedNotice';
 import { GuildsProvider, type ManagedGuild } from '@/components/GuildsContext';
+import Button from '@/components/ui/Button';
+import SidebarNavLink from '@/components/ui/SidebarNavLink';
 
 type BotStatus = 'checking' | 'present' | 'absent' | 'unknown';
 
@@ -104,7 +105,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="flex min-h-screen bg-[#111214] text-[#dbdee1] font-sans relative overflow-x-hidden">
+    <div className="flex min-h-screen bg-bg-base text-text-primary font-sans relative overflow-x-hidden">
       
       {isMobileMenuOpen && (
         <div 
@@ -113,180 +114,123 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         />
       )}
 
-      <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-[#1e1f22] p-4 flex flex-col justify-between border-r border-[#2b2d31] transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:h-screen ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-bg-surface p-4 flex flex-col justify-between border-r border-border-default transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:h-screen ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div>
           <div className="mb-6 flex justify-between items-center">
             <div>
-              <label className="block text-sm font-bold text-[#949ba4] uppercase tracking-wider mb-2">{t('sidebar.selectServer')}</label>
+              <label className="block text-sm font-bold text-text-secondary uppercase tracking-wider mb-2">{t('sidebar.selectServer')}</label>
               <select
                 value={currentGuildId || ''}
                 onChange={(e) => handleGuildChange(e.target.value)}
-                className="w-44 bg-[#313338] text-white rounded px-3 py-2 border border-[#232428] focus:outline-none focus:border-[#5865f2] cursor-pointer font-medium text-sm"
+                className="w-44 bg-bg-elevated text-text-primary rounded-lg px-3 py-2 border border-border-default focus:outline-none focus:border-brand cursor-pointer font-medium text-sm"
               >
                 {guilds.map((g) => (
                   <option key={g.id} value={g.id}>{g.name}</option>
                 ))}
               </select>
             </div>
-            <button type="button" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-400 hover:text-white md:hidden text-lg p-1 mt-5">✕</button>
+            <button type="button" onClick={() => setIsMobileMenuOpen(false)} className="text-text-secondary hover:text-text-primary md:hidden text-lg p-1 mt-5">✕</button>
           </div>
 
           <nav className="space-y-4">
-            <Link
-              href={`/dashboard/${currentGuildId}`}
-              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname === `/dashboard/${currentGuildId}` ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-            >
+            <SidebarNavLink href={`/dashboard/${currentGuildId}`} active={pathname === `/dashboard/${currentGuildId}`}>
               {t('sidebar.controlHubHome')}
-            </Link>
+            </SidebarNavLink>
 
-            <Link
-              href={`/profile/${currentGuildId}`}
-              className="flex items-center px-3 py-2 rounded font-medium transition hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]"
-            >
+            <SidebarNavLink href={`/profile/${currentGuildId}`}>
               {t('sidebar.myPage')}
-            </Link>
+            </SidebarNavLink>
 
-            <Link
-              href={`/dashboard/${currentGuildId}/general`}
-              className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/general') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-            >
+            <SidebarNavLink href={`/dashboard/${currentGuildId}/general`} active={pathname?.includes('/general')}>
               {t('sidebar.generalSettings')}
-            </Link>
+            </SidebarNavLink>
 
             <div className="space-y-1">
-              <label className="block text-sm font-bold text-[#949ba4] uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryCommunity')}</label>
-              <Link
-                href={`/dashboard/${currentGuildId}/automod`}
-                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/automod') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-              >
+              <label className="block text-sm font-bold text-text-secondary uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryCommunity')}</label>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/automod`} active={pathname?.includes('/automod')}>
                 {t('sidebar.automod')}
-              </Link>
-              <Link
-                href={`/dashboard/${currentGuildId}/welcome`}
-                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/welcome') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-              >
+              </SidebarNavLink>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/welcome`} active={pathname?.includes('/welcome')}>
                 {t('sidebar.welcomeSettings')}
-              </Link>
-              <Link
-                href={`/dashboard/${currentGuildId}/voice`}
-                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/voice') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-              >
+              </SidebarNavLink>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/voice`} active={pathname?.includes('/voice')}>
                 {t('sidebar.joinToCreate')}
-              </Link>
-              <Link
-                href={`/dashboard/${currentGuildId}/anonymous-reports`}
-                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/anonymous-reports') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-              >
+              </SidebarNavLink>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/anonymous-reports`} active={pathname?.includes('/anonymous-reports')}>
                 {t('sidebar.anonymousReports')}
-              </Link>
-              <Link
-                href={`/dashboard/${currentGuildId}/reaction-roles`}
-                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/reaction-roles') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-              >
+              </SidebarNavLink>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/reaction-roles`} active={pathname?.includes('/reaction-roles')}>
                 {t('sidebar.reactionRoles')}
-              </Link>
-              <Link
-                href={`/dashboard/${currentGuildId}/settings`}
-                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/settings') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-              >
+              </SidebarNavLink>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/settings`} active={pathname?.includes('/settings')}>
                 {t('sidebar.customCommands')}
-              </Link>
-              <Link
-                href={`/dashboard/${currentGuildId}/audit-logs`}
-                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/audit-logs') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-              >
+              </SidebarNavLink>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/audit-logs`} active={pathname?.includes('/audit-logs')}>
                 {t('sidebar.auditLogs')}
-              </Link>
+              </SidebarNavLink>
             </div>
 
             <div className="space-y-1">
-              <label className="block text-sm font-bold text-[#949ba4] uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryPartyGames')}</label>
-              <Link
-                href={`/dashboard/${currentGuildId}/party-settings`}
-                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/party-settings') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-              >
+              <label className="block text-sm font-bold text-text-secondary uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryPartyGames')}</label>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/party-settings`} active={pathname?.includes('/party-settings')}>
                 {t('sidebar.partyRecruitment')}
-              </Link>
-              <Link
-                href={`/dashboard/${currentGuildId}/party-stats`}
-                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/party-stats') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-              >
+              </SidebarNavLink>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/party-stats`} active={pathname?.includes('/party-stats')}>
                 {t('sidebar.partyStats')}
-              </Link>
-              <Link
-                href={`/dashboard/${currentGuildId}/party-presets`}
-                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/party-presets') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-              >
+              </SidebarNavLink>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/party-presets`} active={pathname?.includes('/party-presets')}>
                 {t('sidebar.gamePresets')}
-              </Link>
-              <Link
-                href={`/dashboard/${currentGuildId}/tier-roles`}
-                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/tier-roles') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-              >
+              </SidebarNavLink>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/tier-roles`} active={pathname?.includes('/tier-roles')}>
                 {t('sidebar.tierRoleMapping')}
-              </Link>
+              </SidebarNavLink>
             </div>
 
             <div className="space-y-1">
-              <label className="block text-sm font-bold text-[#949ba4] uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryEconomy')}</label>
-              <Link
-                href={`/dashboard/${currentGuildId}/leveling`}
-                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/leveling') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-              >
+              <label className="block text-sm font-bold text-text-secondary uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryEconomy')}</label>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/leveling`} active={pathname?.includes('/leveling')}>
                 {t('sidebar.levelingEconomy')}
-              </Link>
-              <Link
-                href={`/dashboard/${currentGuildId}/leaderboard`}
-                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/leaderboard') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-              >
+              </SidebarNavLink>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/leaderboard`} active={pathname?.includes('/leaderboard')}>
                 {t('sidebar.serverLeaderboard')}
-              </Link>
-              <Link
-                href={`/dashboard/${currentGuildId}/giveaways`}
-                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/giveaways') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-              >
+              </SidebarNavLink>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/giveaways`} active={pathname?.includes('/giveaways')}>
                 {t('sidebar.giveaways')}
-              </Link>
+              </SidebarNavLink>
             </div>
 
             <div className="space-y-1">
-              <label className="block text-sm font-bold text-[#949ba4] uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryIntegrationsAI')}</label>
-              <Link
-                href={`/dashboard/${currentGuildId}/twitch`}
-                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/twitch') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-              >
+              <label className="block text-sm font-bold text-text-secondary uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryIntegrationsAI')}</label>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/twitch`} active={pathname?.includes('/twitch')}>
                 {t('sidebar.twitchStreamers')}
-              </Link>
-              <Link
-                href={`/dashboard/${currentGuildId}/ticket-settings`}
-                className={`flex items-center px-3 py-2 rounded font-medium transition ${pathname?.includes('/ticket-settings') ? 'bg-[#404249] text-white' : 'hover:bg-[#35373c] text-[#b5bac1] hover:text-[#dbdee1]'}`}
-              >
+              </SidebarNavLink>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/ticket-settings`} active={pathname?.includes('/ticket-settings')}>
                 {t('sidebar.aiSupportTicket')}
-              </Link>
+              </SidebarNavLink>
             </div>
           </nav>
         </div>
 
-        <div className="pt-4 border-t border-[#2b2d31] text-sm text-[#949ba4]">
+        <div className="pt-4 border-t border-border-default text-sm text-text-secondary">
           <p>{t('sidebar.activeServerLabel')}</p>
-          <code className="text-[#5865f2] block mt-1 truncate">{currentGuildId}</code>
+          <code className="text-brand block mt-1 truncate">{currentGuildId}</code>
         </div>
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <div className="md:hidden flex items-center justify-between bg-[#1e1f22] px-4 py-3 border-b border-[#2b2d31] z-20">
-          <button type="button" onClick={() => setIsMobileMenuOpen(true)} className="text-gray-300 hover:text-white p-1 focus:outline-none">
+        <div className="md:hidden flex items-center justify-between bg-bg-surface px-4 py-3 border-b border-border-default z-20">
+          <button type="button" onClick={() => setIsMobileMenuOpen(true)} className="text-text-secondary hover:text-text-primary p-1 focus:outline-none">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
-          <span className="text-sm font-black tracking-widest text-[#FFD700] uppercase">{t('sidebar.mobileHeaderTitle')}</span>
+          <span className="text-sm font-black tracking-widest text-brand uppercase">{t('sidebar.mobileHeaderTitle')}</span>
           <LanguageToggle />
         </div>
 
         <main className="flex-1 p-5 md:p-8 overflow-y-auto">
-          <header className="mb-6 pb-4 border-b border-[#2b2d31] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <h1 className="text-xl md:text-2xl font-bold text-white uppercase tracking-wide break-words max-w-full">{t('sidebar.mainHeaderTitle')}</h1>
+          <header className="mb-6 pb-4 border-b border-border-default flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <h1 className="text-xl md:text-2xl font-bold text-text-primary uppercase tracking-wide break-words max-w-full">{t('sidebar.mainHeaderTitle')}</h1>
             <div className="flex items-center gap-3">
-              <div className="bg-[#232428] px-3 py-1 rounded-full text-sm text-[#23a55a] font-semibold flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#23a55a] animate-pulse"></span> {t('sidebar.syncStatus')}</div>
+              <div className="bg-bg-elevated px-3 py-1 rounded-full text-sm text-success font-semibold flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-success animate-pulse"></span> {t('sidebar.syncStatus')}</div>
               <div className="hidden md:block">
                 <LanguageToggle />
               </div>
@@ -295,14 +239,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </header>
 
           {botStatus === 'checking' ? (
-            <div className="flex items-center justify-center py-20 text-base text-[#6d7178]">{t('botNotInvited.checking')}</div>
+            <div className="flex items-center justify-center py-20 text-base text-text-muted">{t('botNotInvited.checking')}</div>
           ) : botStatus === 'absent' ? (
             <BotNotInvitedNotice onRecheck={() => checkBotStatus(currentGuildId)} />
           ) : (
             <>
               {isSubPage && (
                 <div className="mb-6">
-                  <button type="button" onClick={() => router.back()} className="inline-flex items-center gap-2 text-sm font-bold text-[#5865F2] hover:text-white bg-[#5865F2]/10 hover:bg-[#5865F2] border border-[#5865F2]/20 px-4 py-2 rounded-lg transition-all duration-200 cursor-pointer shadow-md"><span>◀</span> {t('sidebar.goBack')}</button>
+                  <Button type="button" variant="ghost" onClick={() => router.back()}>
+                    <span>◀</span> {t('sidebar.goBack')}
+                  </Button>
                 </div>
               )}
               <GuildsProvider guilds={guilds}>{children}</GuildsProvider>

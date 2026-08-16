@@ -95,7 +95,7 @@ export default function GeneralSettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F0F1A] text-white p-6 font-mono selection:bg-[#2A1F40]">
+    <div className="min-h-screen bg-bg-base text-white p-6 font-mono selection:bg-[#2A1F40]">
       <SettingsPageContainer>
         <header className="mb-8 border-b border-[#2A1F40] pb-4">
           <h1 className="text-2xl font-extrabold text-purple-400">{t('generalSettingsPage.title')}</h1>
