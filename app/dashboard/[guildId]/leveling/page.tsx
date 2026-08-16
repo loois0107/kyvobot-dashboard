@@ -203,7 +203,7 @@ export default function LevelingEconomySettings() {
   if (status === 'loading') return null;
 
   return (
-    <div className="min-h-screen bg-bg-base text-[#dbdee1] p-2 sm:p-4 md:p-6 pb-28">
+    <div className="min-h-screen bg-bg-base text-text-primary p-2 sm:p-4 md:p-6 pb-28">
       <SettingsPageContainer>
 
         {/* ==========================================
