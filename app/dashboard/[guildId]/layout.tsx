@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter, usePathname } from 'next/navigation';
 import { useT } from '@/lib/i18n/LanguageContext';
 import LanguageToggle from '@/components/LanguageToggle';
+import ThemeToggle from '@/components/ThemeToggle';
 import AccountMenu from '@/components/AccountMenu';
 import BotNotInvitedNotice from '@/components/BotNotInvitedNotice';
 import { GuildsProvider, type ManagedGuild } from '@/components/GuildsContext';
@@ -223,14 +224,31 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
           <span className="text-sm font-black tracking-widest text-brand uppercase">{t('sidebar.mobileHeaderTitle')}</span>
-          <LanguageToggle />
+          <div className="flex items-center gap-2">
+            <Button type="button" variant="ghost" onClick={() => router.push('/')} aria-label={t('sidebar.homeButton')} title={t('sidebar.homeButton')} className="!px-2 !py-1 text-base">
+              🏠
+            </Button>
+            <Button type="button" variant="ghost" onClick={() => router.push('/guide')} aria-label={t('sidebar.guideButton')} title={t('sidebar.guideButton')} className="!px-2 !py-1 text-base">
+              📖
+            </Button>
+            <LanguageToggle />
+          </div>
         </div>
 
         <main className="flex-1 p-5 md:p-8 overflow-y-auto">
           <header className="mb-6 pb-4 border-b border-border-default flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <h1 className="text-xl md:text-2xl font-bold text-text-primary uppercase tracking-wide break-words max-w-full">{t('sidebar.mainHeaderTitle')}</h1>
             <div className="flex items-center gap-3">
-              <div className="bg-bg-elevated px-3 py-1 rounded-full text-sm text-success font-semibold flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-success animate-pulse"></span> {t('sidebar.syncStatus')}</div>
+              <div className="bg-bg-elevated px-3 py-1 rounded-full text-sm text-success font-semibold flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-success"></span> {t('sidebar.syncStatus')}</div>
+              <div className="hidden md:flex items-center gap-2">
+                <Button type="button" variant="ghost" onClick={() => router.push('/')}>
+                  <span>🏠</span> {t('sidebar.homeButton')}
+                </Button>
+                <Button type="button" variant="ghost" onClick={() => router.push('/guide')}>
+                  <span>📖</span> {t('sidebar.guideButton')}
+                </Button>
+              </div>
+              <ThemeToggle />
               <div className="hidden md:block">
                 <LanguageToggle />
               </div>

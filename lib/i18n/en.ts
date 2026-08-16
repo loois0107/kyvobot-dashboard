@@ -36,6 +36,10 @@ const en = {
     mainHeaderTitle: 'Kyvo Central Control Hub',
     syncStatus: 'Connected',
     goBack: 'Go Back',
+    homeButton: 'Home',
+    guideButton: 'Guide',
+    switchToLightMode: 'Switch to light mode',
+    switchToDarkMode: 'Switch to dark mode',
     logout: '🚪 Log Out',
   },
   botNotInvited: {

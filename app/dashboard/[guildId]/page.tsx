@@ -229,12 +229,12 @@ export default function DashboardHome() {
         <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-6 sm:p-8 shadow-xl flex flex-col justify-between min-h-[160px] relative overflow-hidden">
           <div className="flex items-center justify-between pb-4 border-b border-[#2b2d31]">
             <div className="flex items-center gap-2">
-              <span className={`w-2.5 h-2.5 rounded-full ${isConnectionFailed ? 'bg-red-500 animate-ping' : isDataEmpty ? 'bg-gray-500' : 'bg-[#23a55a] animate-pulse'}`}></span>
+              <span className={`w-2.5 h-2.5 rounded-full ${isConnectionFailed ? 'bg-red-500' : isDataEmpty ? 'bg-gray-500' : 'bg-[#23a55a]'}`}></span>
               <h3 className="text-sm font-black tracking-widest text-[#949ba4]">{t('dashboardHome.systemStatus')}</h3>
             </div>
 
             {isConnectionFailed && (
-              <span className="bg-red-950/50 text-red-400 border border-red-500/30 text-[10px] font-black px-2.5 py-1 rounded font-mono animate-pulse">
+              <span className="bg-red-950/50 text-red-400 border border-red-500/30 text-[10px] font-black px-2.5 py-1 rounded font-mono">
                 {t('dashboardHome.statsUnreachable')}
               </span>
             )}

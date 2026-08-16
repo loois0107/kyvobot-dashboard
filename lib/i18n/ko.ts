@@ -38,6 +38,10 @@ const ko: typeof en = {
     mainHeaderTitle: 'Kyvo 중앙 컨트롤 허브',
     syncStatus: '연결됨',
     goBack: '뒤로 가기',
+    homeButton: '홈',
+    guideButton: '가이드',
+    switchToLightMode: '라이트 모드로 전환',
+    switchToDarkMode: '다크 모드로 전환',
     logout: '🚪 로그아웃',
   },
   botNotInvited: {

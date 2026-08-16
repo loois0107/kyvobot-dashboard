@@ -29,8 +29,15 @@ html {
    - warning-border: 원래 border-orange-500/50(반투명) 같은 값을 대체하는 불투명 보더 전용
      톤 - orange-700(#C2410C)이 3.82/3.55/3.28:1로 비텍스트 UI 기준(3:1)을 전부 통과해서
      그대로 채택했다(참고로 기존 border-default도 bg-elevated 위에서 3.04:1이라 이 마진이
-     특별히 빡빡한 것도 아니다). */
-@theme inline {
+     특별히 빡빡한 것도 아니다).
+
+   🛡️ [inline 제거] 원래 `@theme inline`이었는데, 컴파일된 CSS를 직접 열어 실측해보니 `inline`이
+   유틸리티 클래스에 var(--color-x)를 참조시키는 게 아니라 값 자체를 리터럴로 박아버리는 걸
+   확인했다(예: .bg-bg-base { background-color: #0a0a0b } - 변수 참조가 아예 없음). 이러면
+   :root[data-theme="light"] 같은 런타임 오버라이드가 유틸리티 클래스에 전혀 반영되지 않아
+   라이트 모드 토글이 원천적으로 불가능하다. inline을 빼면 유틸리티가 var(--color-x)를
+   참조하게 되어 아래 [data-theme="light"] 블록의 오버라이드가 정상적으로 먹는다. */
+@theme {
   /* 배경 3단계 - 어두운 순서대로 base(페이지) < surface(카드) < elevated(카드 위 카드/모달) */
   --color-bg-base: #0A0A0B;
   --color-bg-surface: #141416;
@@ -57,11 +64,60 @@ html {
   --color-warning-border: #C2410C;
 }
 
+/* 🛡️ [라이트 모드 - 관리자 대시보드 전용] app/layout.tsx가 kyvo_theme 쿠키를 서버에서 미리
+   읽어 <html data-theme="light">을 SSR로 박아준다(기본값은 항상 dark - 쿠키가 없거나 'light'가
+   아니면 이 블록 자체가 안 먹는다). 토글 UI(ThemeToggle)는 대시보드 헤더에만 있으므로 실제로
+   이 값이 'light'가 되는 건 대시보드에서 쿠키를 남긴 경우뿐이지만, 랜딩/가이드 페이지는 애초에
+   이 토큰들을 거의 안 쓰기 때문에(하드코딩 hex 위주) 어차피 영향이 없다.
+
+   각 값은 다크 스케일의 명도 관계를 거울처럼 뒤집어서 잡았고(base가 배경 중 가장 어둡고 surface/
+   elevated로 갈수록 밝아지는 다크 쪽 규칙과 달리, 라이트는 흰색이 명도의 물리적 상한이라
+   surface(카드, 흰색)가 base(페이지, 연회색)보다 밝고 elevated(카드 위 카드/모달)는 대신
+   surface보다 살짝 더 어두운 회색을 써서 "구분되는 톤"이라는 실질적 역할만 유지했다), WCAG
+   실측 후 기준 미달인 값은 전부 조정했다(브랜드/상태색 포함 - 원래 값 그대로면 흰 배경 위에서
+   보더는 최대 1.48:1, success/danger/warning은 최대 3.18:1까지 떨어져 각각 3:1/4.5:1 기준에
+   크게 미달이었다):
+   - text-muted: #71717A 시도 시 base/elevated 위 4.40/4.10:1로 미달 → #686871로 조정 후
+     5.02~5.52:1 전부 통과.
+   - border-default/border-hover: 다크와 같은 값(#D4D4D8 등 밝은 회색)은 흰 배경 위에서
+     1.3~1.5:1까지 떨어져 사실상 안 보임 → #84848F(default)/#6F6F7B(hover, default보다 더
+     어둡게 - 밝은 배경에선 "더 어두울수록" 대비가 세지므로 다크 모드의 "더 밝을수록"과 반대
+     방향)로 조정, 각각 최소 3.13:1 / 4.20:1 통과.
+   - brand: #5865F2 그대로면 base/elevated 위 4.19/3.90:1로 텍스트 기준(4.5:1) 미달 →
+     #4756F1로 소폭 조정 후 최소 4.60:1 통과(버튼 배경으로 쓰일 때의 흰 텍스트 대비는 원래도
+     충분해서 영향 없음).
+   - success/danger/warning: 다크 모드용으로 고른 파스텔 톤(살짝 밝은 값)은 흰 배경 위에서
+     전부 2~3:1대로 텍스트 기준에 크게 못 미쳐 원색 계열을 유지한 채 채도/명도만 낮춰 재조정
+     했다 - success #1A7942(최소 4.61:1), danger #D20A0A(최소 4.70:1), warning #AA4E03
+     (최소 4.68:1) 전부 통과. warning-border(#C2410C)는 원래 값 그대로도 흰 배경 위에서
+     최소 4.39:1로 이미 3:1을 넉넉히 통과해서 조정하지 않았다. brand-hover는 버튼 배경으로만
+     쓰이고(텍스트로 쓰인 곳 0건, grep으로 확인) 원래도 더 어두운 값이라 조정 불필요. */
+[data-theme='light'] {
+  --color-bg-base: #F4F4F5;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-elevated: #ECECEE;
+
+  --color-text-primary: #18181B;
+  --color-text-secondary: #52525B;
+  --color-text-muted: #686871;
+
+  --color-border-default: #84848F;
+  --color-border-hover: #6F6F7B;
+
+  --color-brand: #4756F1;
+
+  --color-success: #1A7942;
+  --color-danger: #D20A0A;
+  --color-warning: #AA4E03;
+}
+
 body {
-  /* 🛡️ 이 앱은 다크/라이트 모드 구분이 전혀 없다(dark: 클래스 전체 검색 0건, 기존 조사에서
-     확인됨) - 예전 --background/--foreground(prefers-color-scheme 기반 라이트/다크 페어)는
-     실제로는 모든 페이지가 자기 루트 div에 불투명 배경을 직접 지정해서 가려버리는 죽은 코드였다.
-     body 자체도 이제 새 토큰(bg-base/text-primary)으로 고정해서 실제 팔레트와 일치시킨다. */
+  /* 🛡️ 이 앱은 관리자 대시보드를 제외하면 다크/라이트 모드 구분이 없다(dark: 클래스 전체
+     검색 0건, 기존 조사에서 확인됨) - 예전 --background/--foreground(prefers-color-scheme
+     기반 라이트/다크 페어)는 실제로는 모든 페이지가 자기 루트 div에 불투명 배경을 직접
+     지정해서 가려버리는 죽은 코드였다. body 자체도 새 토큰(bg-base/text-primary)으로 고정해서
+     실제 팔레트와 일치시킨다 - var() 참조라서 대시보드에서 [data-theme="light"]가 켜지면
+     body 배경도 자동으로 같이 바뀐다. */
   background: var(--color-bg-base);
   color: var(--color-text-primary);
   /* Light text on this app's dark panels renders thin/fragmented under the OS default (auto)
