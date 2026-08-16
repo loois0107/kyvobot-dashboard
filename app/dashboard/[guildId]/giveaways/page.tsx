@@ -10,6 +10,8 @@ import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
 import ChannelSelect from '@/components/ChannelSelect';
 import RoleSelect from '@/components/RoleSelect';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
 import type { TranslationKey } from '@/lib/i18n';
 
 // 봇의 /internal/giveaway/create 응답 status를 그대로 통과시킨 code -> 로컬라이즈된 문구 매핑.
@@ -229,92 +231,92 @@ export default function GiveawaysPage() {
       <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
         <p className="text-red-400 font-bold">{t('giveawaysPage.loadFailed')}</p>
         <p className="text-base text-[#949ba4]">{loadErrorMsg}</p>
-        <button type="button" onClick={loadGiveaways} className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl">
+        <Button type="button" variant="primary" onClick={loadGiveaways}>
           {t('common.retry')}
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
     <SettingsPageContainer className="pb-16">
-      <header className="border-b border-[#2b2d31] pb-6 flex items-center justify-between">
+      <header className="border-b border-border-default pb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('giveawaysPage.title')}</h1>
+          <h1 className="text-xl md:text-2xl font-black tracking-wider text-brand">{t('giveawaysPage.title')}</h1>
           <HelpText className="mt-1">
             {t('giveawaysPage.subtitle')}
           </HelpText>
         </div>
-        <button type="button" onClick={loadGiveaways} className="text-sm font-bold text-[#5865F2] hover:underline">
+        <button type="button" onClick={loadGiveaways} className="text-sm font-bold text-brand hover:underline">
           {t('common.refresh')}
         </button>
       </header>
 
-      <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
-        <h3 className="text-sm font-black tracking-widest text-[#949ba4] border-b border-[#2b2d31] pb-2">
+      <Card className="space-y-4">
+        <h3 className="text-sm font-black tracking-widest text-text-secondary border-b border-border-default pb-2">
           {t('giveawaysPage.createSectionTitle')}
         </h3>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-bold text-[#b5bac1]">{t('giveawaysPage.prizeLabel')}</label>
+          <label className="text-sm font-bold text-text-secondary">{t('giveawaysPage.prizeLabel')}</label>
           <input
             type="text"
             value={prize}
             onChange={(e) => setPrize(e.target.value)}
             placeholder={t('giveawaysPage.prizePlaceholder')}
-            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2]"
+            className="w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-text-primary focus:outline-none focus:border-brand"
           />
           <HelpText>{t('giveawaysPage.prizeHelp')}</HelpText>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="space-y-1.5">
-            <label className="text-sm font-bold text-[#b5bac1]">{t('giveawaysPage.entryCostLabel')}</label>
+            <label className="text-sm font-bold text-text-secondary">{t('giveawaysPage.entryCostLabel')}</label>
             <input
               type="number" min="1" value={entryCost} onChange={(e) => setEntryCost(e.target.value)}
-              className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2]"
+              className="w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-text-primary focus:outline-none focus:border-brand"
             />
             <HelpText>{t('giveawaysPage.entryCostHelp')}</HelpText>
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-bold text-[#b5bac1]">{t('giveawaysPage.winnerCountLabel')}</label>
+            <label className="text-sm font-bold text-text-secondary">{t('giveawaysPage.winnerCountLabel')}</label>
             <input
               type="number" min="1" value={winnerCount} onChange={(e) => setWinnerCount(e.target.value)}
-              className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2]"
+              className="w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-text-primary focus:outline-none focus:border-brand"
             />
             <HelpText>{t('giveawaysPage.winnerCountHelp')}</HelpText>
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-bold text-[#b5bac1]">{t('giveawaysPage.durationLabel')}</label>
+            <label className="text-sm font-bold text-text-secondary">{t('giveawaysPage.durationLabel')}</label>
             <input
               type="number" min={GIVEAWAY_MIN_DURATION_MINUTES} max={GIVEAWAY_MAX_DURATION_MINUTES}
               value={durationMinutes} onChange={(e) => setDurationMinutes(e.target.value)}
-              className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2]"
+              className="w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-text-primary focus:outline-none focus:border-brand"
             />
             <HelpText>{t('giveawaysPage.durationHelp', { min: GIVEAWAY_MIN_DURATION_MINUTES, max: GIVEAWAY_MAX_DURATION_MINUTES })}</HelpText>
           </div>
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-bold text-[#b5bac1]">{t('giveawaysPage.channelLabel')}</label>
+          <label className="text-sm font-bold text-text-secondary">{t('giveawaysPage.channelLabel')}</label>
           <ChannelSelect guildId={guildId} value={channelId} onChange={setChannelId} />
           <HelpText>{t('giveawaysPage.channelHelp')}</HelpText>
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-bold text-[#b5bac1]">{t('giveawaysPage.prizeTypeLabel')}</label>
+          <label className="text-sm font-bold text-text-secondary">{t('giveawaysPage.prizeTypeLabel')}</label>
           <div className="flex gap-2">
             <button
               type="button"
               onClick={() => setPrizeType('points')}
-              className={`flex-1 text-sm font-bold py-2.5 rounded-lg border transition-all ${prizeType === 'points' ? 'bg-[#5865F2] border-[#5865F2] text-white' : 'bg-[#111214] border-[#232428] text-[#b5bac1]'}`}
+              className={`flex-1 text-sm font-bold py-2.5 rounded-lg border transition-all ${prizeType === 'points' ? 'bg-brand border-brand text-white' : 'bg-bg-elevated border-border-default text-text-secondary'}`}
             >
               {t('giveawaysPage.prizeTypePoints')}
             </button>
             <button
               type="button"
               onClick={() => setPrizeType('role')}
-              className={`flex-1 text-sm font-bold py-2.5 rounded-lg border transition-all ${prizeType === 'role' ? 'bg-[#5865F2] border-[#5865F2] text-white' : 'bg-[#111214] border-[#232428] text-[#b5bac1]'}`}
+              className={`flex-1 text-sm font-bold py-2.5 rounded-lg border transition-all ${prizeType === 'role' ? 'bg-brand border-brand text-white' : 'bg-bg-elevated border-border-default text-text-secondary'}`}
             >
               {t('giveawaysPage.prizeTypeRole')}
             </button>
@@ -323,138 +325,138 @@ export default function GiveawaysPage() {
 
         {prizeType === 'points' ? (
           <div className="space-y-1.5">
-            <label className="text-sm font-bold text-[#b5bac1]">{t('giveawaysPage.prizeAmountLabel')}</label>
+            <label className="text-sm font-bold text-text-secondary">{t('giveawaysPage.prizeAmountLabel')}</label>
             <input
               type="number" min="1" value={prizeAmount} onChange={(e) => setPrizeAmount(e.target.value)}
-              className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2]"
+              className="w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-text-primary focus:outline-none focus:border-brand"
             />
           </div>
         ) : (
           <div className="space-y-1.5">
-            <label className="text-sm font-bold text-[#b5bac1]">{t('giveawaysPage.prizeRoleLabel')}</label>
+            <label className="text-sm font-bold text-text-secondary">{t('giveawaysPage.prizeRoleLabel')}</label>
             <RoleSelect guildId={guildId} value={prizeRoleId} onChange={setPrizeRoleId} />
             <HelpText>{t('giveawaysPage.prizeRoleHelp')}</HelpText>
           </div>
         )}
 
-        <button
+        <Button
           type="button"
+          variant="success"
           onClick={handleCreateClick}
           disabled={!prize.trim() || !channelId || (prizeType === 'role' && !prizeRoleId) || isCreating}
-          className="bg-[#23A55A] hover:bg-[#1a7f43] disabled:opacity-50 text-white text-sm font-black px-6 py-3 rounded-xl"
         >
           {isCreating ? t('giveawaysPage.creating') : t('giveawaysPage.createButton')}
-        </button>
-      </div>
+        </Button>
+      </Card>
 
       {createConfirmDialog && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#1e1f22] border border-orange-500/50 rounded-2xl p-6 max-w-md w-full space-y-4">
-            <h3 className="text-orange-400 font-black text-base">{t('giveawaysPage.dangerousPermTitle')}</h3>
-            <p className="text-sm text-[#b5bac1]">
+          <Card className="!border-warning-border hover:!border-warning-border max-w-md w-full space-y-4">
+            <h3 className="text-warning font-black text-base">{t('giveawaysPage.dangerousPermTitle')}</h3>
+            <p className="text-sm text-text-secondary">
               {t('giveawaysPage.dangerousPermBody', { perms: createConfirmDialog.dangerous.join(', ') })}
             </p>
             <div className="flex gap-3 justify-end">
-              <button type="button" onClick={() => setCreateConfirmDialog(null)} className="text-sm font-bold text-gray-400 hover:text-white px-4 py-2">
+              <Button type="button" variant="ghost" onClick={() => setCreateConfirmDialog(null)}>
                 {t('common.cancel')}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="danger"
                 onClick={() => { setCreateConfirmDialog(null); submitCreate(true); }}
-                className="bg-red-600 hover:bg-red-500 text-white text-sm font-black px-5 py-2 rounded-lg"
               >
                 {t('common.confirm')}
-              </button>
+              </Button>
             </div>
-          </div>
+          </Card>
         </div>
       )}
 
       {giveaways.length === 0 ? (
-        <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-6 shadow-xl">
-          <p className="text-base text-[#949ba4] py-4">{t('giveawaysPage.noGiveawaysYet')}</p>
-        </div>
+        <Card>
+          <p className="text-base text-text-secondary py-4">{t('giveawaysPage.noGiveawaysYet')}</p>
+        </Card>
       ) : (
         <div className="space-y-4">
           {giveaways.map((g) => (
-            <div key={g.id} className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl space-y-3">
-              <div className="flex items-center justify-between border-b border-[#2b2d31] pb-2">
-                <h3 className="text-base font-black text-white">🎁 {g.prize}</h3>
-                <span className="text-sm text-[#8b8d98]">{new Date(g.concluded_at).toLocaleString()}</span>
+            <Card key={g.id} className="space-y-3">
+              <div className="flex items-center justify-between border-b border-border-default pb-2">
+                <h3 className="text-base font-black text-text-primary">🎁 {g.prize}</h3>
+                <span className="text-sm text-text-secondary">{new Date(g.concluded_at).toLocaleString()}</span>
               </div>
-              <p className="text-[10px] text-[#949ba4]">
+              <p className="text-[10px] text-text-secondary">
                 {g.prize_type === 'points'
                   ? t('giveawaysPage.pointsPerWinner', { amount: g.prize_amount?.toLocaleString() || '0' })
                   : t('giveawaysPage.roleLabel', { role: g.prize_role_name || g.prize_role_id || '' })}
               </p>
               <div className="space-y-2">
                 {g.winners.map((w) => (
-                  <div key={w.user_id} className="flex items-center justify-between gap-3 bg-[#111214] rounded-lg px-3 py-2.5">
+                  <Card elevated key={w.user_id} className="!px-3 !py-2.5 flex items-center justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-sm font-bold text-white truncate">
+                      <p className="text-sm font-bold text-text-primary truncate">
                         {w.username || t('giveawaysPage.unknownUser', { id: w.user_id })}
                       </p>
-                      {!w.in_server && <p className="text-[10px] text-red-400">{t('giveawaysPage.noLongerInServer')}</p>}
+                      {!w.in_server && <p className="text-[10px] text-danger">{t('giveawaysPage.noLongerInServer')}</p>}
                     </div>
                     <button
                       type="button"
                       onClick={() => openReplaceDialog(g, w)}
-                      className="shrink-0 bg-[#2b2d31] hover:bg-[#35373c] text-white text-[10px] font-black px-3 py-1.5 rounded-lg transition-all"
+                      className="shrink-0 bg-border-default/25 hover:bg-border-default/40 text-text-primary text-[10px] font-black px-3 py-1.5 rounded-lg transition-all"
                     >
                       {t('giveawaysPage.replaceButton')}
                     </button>
-                  </div>
+                  </Card>
                 ))}
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       )}
 
       {replaceTarget && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
-            <h3 className="text-base font-black text-white">
-              {t('giveawaysPage.replaceWinnerForPrefix')} <span className="text-[#FFD700]">{replaceTarget.giveaway.prize}</span>?
+          <Card className="max-w-md w-full space-y-4">
+            <h3 className="text-base font-black text-text-primary">
+              {t('giveawaysPage.replaceWinnerForPrefix')} <span className="text-brand">{replaceTarget.giveaway.prize}</span>?
             </h3>
-            <p className="text-sm text-[#b5bac1]">
+            <p className="text-sm text-text-secondary">
               {t('giveawaysPage.replaceWinnerBody', { winner: replaceTarget.winner.username || replaceTarget.winner.user_id })}
               {replaceTarget.giveaway.prize_type === 'points' && t('giveawaysPage.replaceWinnerPointsNote')}
             </p>
             {replaceTarget.giveaway.prize_type === 'role' && (
-              <div className="bg-amber-950/40 border border-amber-500/30 rounded-lg p-3 text-[11px] text-amber-300">
+              <div className="bg-warning/10 border border-warning-border rounded-lg p-3 text-[11px] text-warning">
                 {t('giveawaysPage.replaceWinnerRoleWarning', { role: replaceTarget.giveaway.prize_role_name || replaceTarget.giveaway.prize_role_id || '' })}
               </div>
             )}
             <div className="space-y-1.5">
-              <label className="text-sm font-bold text-[#b5bac1]">{t('giveawaysPage.reasonLabel')}</label>
+              <label className="text-sm font-bold text-text-secondary">{t('giveawaysPage.reasonLabel')}</label>
               <textarea
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder={t('giveawaysPage.reasonPlaceholder')}
                 rows={2}
-                className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2]"
+                className="w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-text-primary focus:outline-none focus:border-brand"
               />
             </div>
             <div className="flex gap-2 justify-end">
-              <button
+              <Button
                 type="button"
+                variant="ghost"
                 onClick={() => setReplaceTarget(null)}
                 disabled={isReplacing}
-                className="text-sm font-bold text-gray-400 hover:text-white transition px-4 py-2"
               >
                 {t('common.cancel')}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="danger"
                 onClick={handleConfirmReplace}
                 disabled={isReplacing || !reason.trim()}
-                className="bg-[#ED4245] hover:bg-[#c13537] disabled:opacity-50 text-white text-sm font-black px-5 py-2 rounded-lg"
               >
                 {isReplacing ? t('giveawaysPage.replacing') : t('giveawaysPage.confirmReplace')}
-              </button>
+              </Button>
             </div>
-          </div>
+          </Card>
         </div>
       )}
     </SettingsPageContainer>

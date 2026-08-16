@@ -21,7 +21,15 @@ html {
      3.95:1 통과, border-default 대비 뚜렷하게 밝아 hover 상태 구분도 확실하다.
    나머지 토큰(bg-base/surface/elevated, text-primary/secondary, brand, success, danger)은
    원래 값 그대로 전부 기준을 통과해서 조정하지 않았다(text-secondary는 6.63~7.72:1, 흰 텍스트
-   on brand는 4.61:1, success/danger는 5.78~7.15:1 - 전부 4.5:1 이상). */
+   on brand는 4.61:1, success/danger는 5.78~7.15:1 - 전부 4.5:1 이상).
+   - warning: giveaways/settings/reaction-roles 등 여러 페이지에 orange-400/orange-500/50%/
+     amber-300 등으로 제각각 흩어져 있던 "경고"(파괴적 행동은 아니지만 확인이 필요한) 색을
+     하나로 통일한 것 - 기존 orange-400(#FB923C)이 bg-base/surface/elevated 위에서 이미
+     8.74/8.13/7.51:1로 텍스트 기준(4.5:1)을 넉넉히 통과해 조정 없이 그대로 채택했다.
+   - warning-border: 원래 border-orange-500/50(반투명) 같은 값을 대체하는 불투명 보더 전용
+     톤 - orange-700(#C2410C)이 3.82/3.55/3.28:1로 비텍스트 UI 기준(3:1)을 전부 통과해서
+     그대로 채택했다(참고로 기존 border-default도 bg-elevated 위에서 3.04:1이라 이 마진이
+     특별히 빡빡한 것도 아니다). */
 @theme inline {
   /* 배경 3단계 - 어두운 순서대로 base(페이지) < surface(카드) < elevated(카드 위 카드/모달) */
   --color-bg-base: #0A0A0B;
@@ -45,6 +53,8 @@ html {
      클래스 기준 40회 - 어떤 개별 hex보다도 압도적으로 많이 쓰임)을 그대로 채택했다. */
   --color-success: #23A55A;
   --color-danger: #F87171;
+  --color-warning: #FB923C;
+  --color-warning-border: #C2410C;
 }
 
 body {
