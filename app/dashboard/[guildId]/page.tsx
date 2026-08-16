@@ -188,9 +188,9 @@ export default function DashboardHome() {
 
   if (!guildId || guildId === '[guildId]') {
     return (
-      <div className="flex min-h-[400px] items-center justify-center bg-[#111214] text-red-400 font-mono p-8 text-center border border-red-500/20 rounded-2xl">
+      <Card elevated className="!p-8 !border-danger/20 hover:!border-danger/20 flex min-h-[400px] items-center justify-center font-mono text-center text-danger">
         {t('dashboardHome.invalidAccess')}
-      </div>
+      </Card>
     );
   }
 
@@ -269,9 +269,9 @@ export default function DashboardHome() {
         <Link href={`/dashboard/${guildId}/settings`}>
           <Card elevated className="!py-8 !px-6 space-y-2 flex flex-col justify-center">
             <span className="text-sm font-black text-text-secondary uppercase tracking-wider block">{t('dashboardHome.customCommandsLabel')}</span>
-            <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.customCommands === 0 ? 'text-text-muted' : 'text-brand'}`}>
+            <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.customCommands === 0 ? 'text-text-muted' : 'text-text-primary'}`}>
               {isLoadingStats ? '...' : telemetry.customCommands.toLocaleString()}
-              <span className="text-sm text-brand/60 font-sans ml-1">{t('dashboardHome.customCommandsUnit')}</span>
+              <span className={`text-sm font-sans ml-1 ${telemetry.customCommands === 0 ? 'text-text-muted' : 'text-text-primary'}`}>{t('dashboardHome.customCommandsUnit')}</span>
             </span>
             <span className="text-[10px] text-text-secondary font-bold tracking-widest pt-1 text-left">
               {t('dashboardHome.manageArrow')}
@@ -282,9 +282,9 @@ export default function DashboardHome() {
         <Link href={`/dashboard/${guildId}/ticket-settings`}>
           <Card elevated className="!py-8 !px-6 space-y-2 flex flex-col justify-center">
             <span className="text-sm font-black text-text-secondary uppercase tracking-wider block">{t('dashboardHome.aiKnowledgeLabel')}</span>
-            <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.ragSynapses === 0 ? 'text-text-muted' : 'text-purple-400'}`}>
+            <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.ragSynapses === 0 ? 'text-text-muted' : 'text-text-primary'}`}>
               {isLoadingStats ? '...' : telemetry.ragSynapses.toLocaleString()}
-              <span className="text-sm text-purple-600 font-sans ml-1">{t('dashboardHome.aiKnowledgeUnit')}</span>
+              <span className={`text-sm font-sans ml-1 ${telemetry.ragSynapses === 0 ? 'text-text-muted' : 'text-text-primary'}`}>{t('dashboardHome.aiKnowledgeUnit')}</span>
             </span>
             <span className="text-[10px] text-text-secondary font-bold tracking-widest pt-1 text-left">
               {t('dashboardHome.manageArrow')}
@@ -294,9 +294,9 @@ export default function DashboardHome() {
         <Link href={`/dashboard/${guildId}/ticket-settings`}>
           <Card elevated className="!py-8 !px-6 space-y-2 flex flex-col justify-center">
             <span className="text-sm font-black text-text-secondary uppercase tracking-wider block">{t('dashboardHome.activeTicketsLabel')}</span>
-            <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.activeTickets === 0 ? 'text-text-muted' : 'text-yellow-500'}`}>
+            <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.activeTickets === 0 ? 'text-text-muted' : 'text-text-primary'}`}>
               {isLoadingStats ? '...' : telemetry.activeTickets}
-              <span className="text-sm text-yellow-600 font-sans ml-1">{t('dashboardHome.activeTicketsUnit')}</span>
+              <span className={`text-sm font-sans ml-1 ${telemetry.activeTickets === 0 ? 'text-text-muted' : 'text-text-primary'}`}>{t('dashboardHome.activeTicketsUnit')}</span>
             </span>
             <span className="text-[10px] text-text-secondary font-bold tracking-widest pt-1 text-left">
               {t('dashboardHome.manageArrow')}
@@ -308,7 +308,7 @@ export default function DashboardHome() {
             <span className="text-sm font-black text-text-secondary uppercase tracking-wider block">{t('dashboardHome.automodLogsLabel')}</span>
             <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.automodLogs === 0 ? 'text-text-muted' : 'text-text-primary'}`}>
               {isLoadingStats ? '...' : telemetry.automodLogs.toLocaleString()}
-              <span className="text-sm text-red-600 font-sans ml-1">{t('dashboardHome.automodLogsUnit')}</span>
+              <span className={`text-sm font-sans ml-1 ${telemetry.automodLogs === 0 ? 'text-text-muted' : 'text-text-primary'}`}>{t('dashboardHome.automodLogsUnit')}</span>
             </span>
             <span className="text-[10px] text-text-secondary font-bold tracking-widest pt-1 text-left">
               {t('dashboardHome.manageArrow')}
