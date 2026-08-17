@@ -8,6 +8,7 @@ import { useT } from '@/lib/i18n/LanguageContext';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
+import { Sparkles, Inbox, Ticket, Terminal, BookOpen, ShieldCheck, History } from 'lucide-react';
 
 interface LogLine {
   timestamp: string;
@@ -230,7 +231,7 @@ export default function DashboardHome() {
           [SECTION 1: STATUS OVERVIEW ROW]
          ========================================== */}
       <div className="grid grid-cols-1 gap-6">
-        <Card className="flex flex-col justify-between min-h-[160px] relative overflow-hidden">
+        <Card className="!border-brand/30 hover:!border-brand/30 flex flex-col justify-between min-h-[160px] relative overflow-hidden">
           <div className="flex items-center justify-between pb-4 border-b border-border-default">
             <div className="flex items-center gap-2">
               <span className={`w-2.5 h-2.5 rounded-full ${isConnectionFailed ? 'bg-danger' : isDataEmpty ? 'bg-text-muted' : 'bg-success'}`}></span>
@@ -268,10 +269,13 @@ export default function DashboardHome() {
             갈 곳이 있다는 걸 확인하고 나머지도 동일한 Link 패턴으로 맞췄다. */}
         <Link href={`/dashboard/${guildId}/settings`}>
           <Card elevated className="!py-8 !px-6 space-y-2 flex flex-col justify-center">
-            <span className="text-sm font-black text-text-secondary uppercase tracking-wider block">{t('dashboardHome.customCommandsLabel')}</span>
-            <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.customCommands === 0 ? 'text-text-muted' : 'text-text-primary'}`}>
+            <span className="flex items-center gap-1.5 text-sm font-black text-text-secondary uppercase tracking-wider">
+              <Terminal className="w-4 h-4 shrink-0" />
+              {t('dashboardHome.customCommandsLabel')}
+            </span>
+            <span className={`text-4xl font-black font-mono tracking-wide ${telemetry.customCommands === 0 ? 'text-text-muted' : 'text-text-primary'}`}>
               {isLoadingStats ? '...' : telemetry.customCommands.toLocaleString()}
-              <span className={`text-sm font-sans ml-1 ${telemetry.customCommands === 0 ? 'text-text-muted' : 'text-text-primary'}`}>{t('dashboardHome.customCommandsUnit')}</span>
+              <span className={`text-sm font-sans block mt-0.5 ${telemetry.customCommands === 0 ? 'text-text-muted' : 'text-text-primary'}`}>{t('dashboardHome.customCommandsUnit')}</span>
             </span>
             <span className="text-[10px] text-text-secondary font-bold tracking-widest pt-1 text-left">
               {t('dashboardHome.manageArrow')}
@@ -281,10 +285,13 @@ export default function DashboardHome() {
 
         <Link href={`/dashboard/${guildId}/ticket-settings`}>
           <Card elevated className="!py-8 !px-6 space-y-2 flex flex-col justify-center">
-            <span className="text-sm font-black text-text-secondary uppercase tracking-wider block">{t('dashboardHome.aiKnowledgeLabel')}</span>
-            <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.ragSynapses === 0 ? 'text-text-muted' : 'text-text-primary'}`}>
+            <span className="flex items-center gap-1.5 text-sm font-black text-text-secondary uppercase tracking-wider">
+              <BookOpen className="w-4 h-4 shrink-0" />
+              {t('dashboardHome.aiKnowledgeLabel')}
+            </span>
+            <span className={`text-4xl font-black font-mono tracking-wide ${telemetry.ragSynapses === 0 ? 'text-text-muted' : 'text-text-primary'}`}>
               {isLoadingStats ? '...' : telemetry.ragSynapses.toLocaleString()}
-              <span className={`text-sm font-sans ml-1 ${telemetry.ragSynapses === 0 ? 'text-text-muted' : 'text-text-primary'}`}>{t('dashboardHome.aiKnowledgeUnit')}</span>
+              <span className={`text-sm font-sans block mt-0.5 ${telemetry.ragSynapses === 0 ? 'text-text-muted' : 'text-text-primary'}`}>{t('dashboardHome.aiKnowledgeUnit')}</span>
             </span>
             <span className="text-[10px] text-text-secondary font-bold tracking-widest pt-1 text-left">
               {t('dashboardHome.manageArrow')}
@@ -293,10 +300,13 @@ export default function DashboardHome() {
         </Link>
         <Link href={`/dashboard/${guildId}/ticket-settings`}>
           <Card elevated className="!py-8 !px-6 space-y-2 flex flex-col justify-center">
-            <span className="text-sm font-black text-text-secondary uppercase tracking-wider block">{t('dashboardHome.activeTicketsLabel')}</span>
-            <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.activeTickets === 0 ? 'text-text-muted' : 'text-text-primary'}`}>
+            <span className="flex items-center gap-1.5 text-sm font-black text-text-secondary uppercase tracking-wider">
+              <Ticket className="w-4 h-4 shrink-0" />
+              {t('dashboardHome.activeTicketsLabel')}
+            </span>
+            <span className={`text-4xl font-black font-mono tracking-wide ${telemetry.activeTickets === 0 ? 'text-text-muted' : 'text-text-primary'}`}>
               {isLoadingStats ? '...' : telemetry.activeTickets}
-              <span className={`text-sm font-sans ml-1 ${telemetry.activeTickets === 0 ? 'text-text-muted' : 'text-text-primary'}`}>{t('dashboardHome.activeTicketsUnit')}</span>
+              <span className={`text-sm font-sans block mt-0.5 ${telemetry.activeTickets === 0 ? 'text-text-muted' : 'text-text-primary'}`}>{t('dashboardHome.activeTicketsUnit')}</span>
             </span>
             <span className="text-[10px] text-text-secondary font-bold tracking-widest pt-1 text-left">
               {t('dashboardHome.manageArrow')}
@@ -305,10 +315,13 @@ export default function DashboardHome() {
         </Link>
         <Link href={`/dashboard/${guildId}/audit-logs`}>
           <Card elevated className="!py-8 !px-6 space-y-2 flex flex-col justify-center">
-            <span className="text-sm font-black text-text-secondary uppercase tracking-wider block">{t('dashboardHome.automodLogsLabel')}</span>
-            <span className={`text-3xl font-black font-mono tracking-wide ${telemetry.automodLogs === 0 ? 'text-text-muted' : 'text-text-primary'}`}>
+            <span className="flex items-center gap-1.5 text-sm font-black text-text-secondary uppercase tracking-wider">
+              <ShieldCheck className="w-4 h-4 shrink-0" />
+              {t('dashboardHome.automodLogsLabel')}
+            </span>
+            <span className={`text-4xl font-black font-mono tracking-wide ${telemetry.automodLogs === 0 ? 'text-text-muted' : 'text-text-primary'}`}>
               {isLoadingStats ? '...' : telemetry.automodLogs.toLocaleString()}
-              <span className={`text-sm font-sans ml-1 ${telemetry.automodLogs === 0 ? 'text-text-muted' : 'text-text-primary'}`}>{t('dashboardHome.automodLogsUnit')}</span>
+              <span className={`text-sm font-sans block mt-0.5 ${telemetry.automodLogs === 0 ? 'text-text-muted' : 'text-text-primary'}`}>{t('dashboardHome.automodLogsUnit')}</span>
             </span>
             <span className="text-[10px] text-text-secondary font-bold tracking-widest pt-1 text-left">
               {t('dashboardHome.manageArrow')}
@@ -325,19 +338,19 @@ export default function DashboardHome() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Link href={`/dashboard/${guildId}/leveling`}>
             <Card className="!p-8 flex flex-col justify-between min-h-[210px]">
-              <div><span className="text-3xl block mb-3">✨</span><h4 className="text-base font-black text-text-primary uppercase tracking-wider">{t('dashboardHome.levelingEcoTitle')}</h4><p className="text-sm text-text-secondary mt-2 leading-relaxed">{t('dashboardHome.levelingEcoDesc')}</p></div>
+              <div><Sparkles className="w-8 h-8 mb-3 text-text-secondary" /><h4 className="text-base font-black text-text-primary uppercase tracking-wider">{t('dashboardHome.levelingEcoTitle')}</h4><p className="text-sm text-text-secondary mt-2 leading-relaxed">{t('dashboardHome.levelingEcoDesc')}</p></div>
               <span className="text-[10px] text-text-secondary font-bold tracking-widest mt-4 block">{t('dashboardHome.levelingCta')}</span>
             </Card>
           </Link>
           <Link href={`/dashboard/${guildId}/welcome`}>
             <Card className="!p-8 flex flex-col justify-between min-h-[210px]">
-              <div><span className="text-3xl block mb-3">📥</span><h4 className="text-base font-black text-text-primary uppercase tracking-wider">{t('dashboardHome.welcomeTitle')}</h4><p className="text-sm text-text-secondary mt-2 leading-relaxed">{t('dashboardHome.welcomeDesc')}</p></div>
+              <div><Inbox className="w-8 h-8 mb-3 text-text-secondary" /><h4 className="text-base font-black text-text-primary uppercase tracking-wider">{t('dashboardHome.welcomeTitle')}</h4><p className="text-sm text-text-secondary mt-2 leading-relaxed">{t('dashboardHome.welcomeDesc')}</p></div>
               <span className="text-[10px] text-text-secondary font-bold tracking-widest mt-4 block">{t('dashboardHome.welcomeCta')}</span>
             </Card>
           </Link>
           <Link href={`/dashboard/${guildId}/ticket-settings`}>
             <Card className="!p-8 flex flex-col justify-between min-h-[210px]">
-              <div><span className="text-3xl block mb-3">🎫</span><h4 className="text-base font-black text-text-primary uppercase tracking-wider">{t('dashboardHome.ticketTitle')}</h4><p className="text-sm text-text-secondary mt-2 leading-relaxed">{t('dashboardHome.ticketDesc')}</p></div>
+              <div><Ticket className="w-8 h-8 mb-3 text-text-secondary" /><h4 className="text-base font-black text-text-primary uppercase tracking-wider">{t('dashboardHome.ticketTitle')}</h4><p className="text-sm text-text-secondary mt-2 leading-relaxed">{t('dashboardHome.ticketDesc')}</p></div>
               <span className="text-[10px] text-text-secondary font-bold tracking-widest mt-4 block">{t('dashboardHome.ticketCta')}</span>
             </Card>
           </Link>
@@ -387,7 +400,10 @@ export default function DashboardHome() {
           {isLoadingLogs ? (
             <div className="text-center py-20 text-text-secondary text-sm font-semibold">{t('dashboardHome.syncingLogs')}</div>
           ) : filteredLogs.length === 0 ? (
-            <div className="text-center py-20 text-text-muted text-sm font-semibold">{t('dashboardHome.noLogsMatch')}</div>
+            <div className="text-center py-20 text-text-muted text-sm font-semibold">
+              <History className="w-10 h-10 mx-auto mb-3 text-text-muted" />
+              {t('dashboardHome.noLogsMatch')}
+            </div>
           ) : (
             filteredLogs.map((log, i) => (
               <div key={`${log.timestamp}-${log.type}-${log.message}-${i}`} className="flex gap-4 items-start leading-relaxed animate-in fade-in slide-in-from-left-1 duration-150">
