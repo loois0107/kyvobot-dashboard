@@ -26,36 +26,38 @@ const FEATURES = [
     titleKey: 'featureTicketTitle',
     descKey: 'featureTicketDesc',
     icon: '🤖',
-    badgeBg: 'bg-purple-500/15',
-    border: 'hover:border-purple-500/50',
-    shadow: 'hover:shadow-[0_0_25px_rgba(168,85,247,0.25)]',
+    // 🛡️ 레거시 보라(purple-500) 대체 - 신규 토큰 시스템엔 보라가 없어서 warning(#FB923C)으로 이관.
+    badgeBg: 'bg-[#FB923C]/15',
+    border: 'hover:border-[#FB923C]/50',
+    shadow: 'hover:shadow-[0_0_25px_rgba(251,146,60,0.25)]',
     hasDetail: true,
   },
   {
     titleKey: 'featureLevelingTitle',
     descKey: 'featureLevelingDesc',
     icon: '📊',
-    badgeBg: 'bg-green-500/15',
-    border: 'hover:border-green-500/50',
-    shadow: 'hover:shadow-[0_0_25px_rgba(34,197,94,0.25)]',
+    badgeBg: 'bg-[#23A55A]/15',
+    border: 'hover:border-[#23A55A]/50',
+    shadow: 'hover:shadow-[0_0_25px_rgba(35,165,90,0.25)]',
     hasDetail: true,
   },
   {
     titleKey: 'featureAutomodTitle',
     descKey: 'featureAutomodDesc',
     icon: '🛡️',
-    badgeBg: 'bg-red-500/15',
-    border: 'hover:border-red-500/50',
-    shadow: 'hover:shadow-[0_0_25px_rgba(239,68,68,0.25)]',
+    badgeBg: 'bg-[#F87171]/15',
+    border: 'hover:border-[#F87171]/50',
+    shadow: 'hover:shadow-[0_0_25px_rgba(248,113,113,0.25)]',
     hasDetail: false,
   },
   {
     titleKey: 'featureReactionRolesTitle',
     descKey: 'featureReactionRolesDesc',
     icon: '🎭',
-    badgeBg: 'bg-[#FFD700]/15',
-    border: 'hover:border-[#FFD700]/50',
-    shadow: 'hover:shadow-[0_0_25px_rgba(255,215,0,0.25)]',
+    // 🛡️ 짝 없는 단독 장식(고아 금색) - 이번 세션 전역 패턴대로 브랜드 블루로 통일.
+    badgeBg: 'bg-[#5865F2]/15',
+    border: 'hover:border-[#5865F2]/50',
+    shadow: 'hover:shadow-[0_0_25px_rgba(88,101,242,0.25)]',
     hasDetail: false,
   },
   {
@@ -82,20 +84,21 @@ const PAIN_POINTS = [
   {
     descriptionKey: 'painPointAutomodDescription',
     icon: '🛡️',
-    badgeBg: 'bg-red-500/15',
-    accentText: 'text-red-400',
+    badgeBg: 'bg-[#F87171]/15',
+    accentText: 'text-[#F87171]',
   },
   {
     descriptionKey: 'painPointTicketDescription',
     icon: '🤖',
-    badgeBg: 'bg-purple-500/15',
-    accentText: 'text-purple-400',
+    // 🛡️ 레거시 보라 대체 - FEATURES의 같은 카테고리(featureTicketTitle)와 동일하게 warning으로.
+    badgeBg: 'bg-[#FB923C]/15',
+    accentText: 'text-[#FB923C]',
   },
   {
     descriptionKey: 'painPointLevelingDescription',
     icon: '📊',
-    badgeBg: 'bg-green-500/15',
-    accentText: 'text-green-400',
+    badgeBg: 'bg-[#23A55A]/15',
+    accentText: 'text-[#23A55A]',
   },
 ] as const;
 
@@ -224,7 +227,7 @@ export default async function RootPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0F0F1A] text-[#dbdee1] flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-[#0A0A0B] text-[#F5F5F5] flex flex-col relative overflow-hidden">
       {/* Decorative background glow, spans hero through the preview section so there's no dead space between them */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-[#5865F2]/25 rounded-full blur-[130px]" />
@@ -239,7 +242,7 @@ export default async function RootPage() {
             {t.landingPage.heroTitle}
           </span>
         </h1>
-        <p className="max-w-xl text-base md:text-lg text-[#b5bac1] leading-relaxed">{t.landingPage.heroTagline}</p>
+        <p className="max-w-xl text-base md:text-lg text-[#A1A1AA] leading-relaxed">{t.landingPage.heroTagline}</p>
 
         <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
           {!session?.user ? (
@@ -252,7 +255,7 @@ export default async function RootPage() {
               </a>
               <a
                 href="/api/auth/signin"
-                className="border border-[#5865F2]/40 hover:border-[#5865F2] text-[#b5bac1] hover:text-white text-base font-bold px-10 py-4 rounded-xl transition-all"
+                className="border border-[#5865F2]/40 hover:border-[#5865F2] text-[#A1A1AA] hover:text-[#F5F5F5] text-base font-bold px-10 py-4 rounded-xl transition-all"
               >
                 {t.landingPage.loginCta}
               </a>
@@ -265,10 +268,10 @@ export default async function RootPage() {
               🎛️ {t.landingPage.goToDashboardCta}
             </Link>
           ) : guildFetchFailed ? (
-            <p className="text-sm text-red-400">{t.landingPage.guildListFailed}</p>
+            <p className="text-sm text-[#F87171]">{t.landingPage.guildListFailed}</p>
           ) : (
             <div className="flex flex-col items-center gap-4">
-              <p className="text-sm text-[#949ba4]">{t.landingPage.noManagedServers}</p>
+              <p className="text-sm text-[#85858B]">{t.landingPage.noManagedServers}</p>
               <Link
                 href="/profile"
                 className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-base font-black px-10 py-4 rounded-xl shadow-[0_0_30px_rgba(88,101,242,0.45)] hover:shadow-[0_0_45px_rgba(88,101,242,0.65)] transition-all"
@@ -282,10 +285,10 @@ export default async function RootPage() {
 
       <section className="relative min-h-[85vh] flex flex-col justify-center max-w-5xl mx-auto w-full px-4 pb-32">
         <RevealOnScroll className="mb-10 text-center">
-          <p className="text-xs font-black tracking-widest text-[#FFD700] uppercase mb-3">
+          <p className="text-xs font-black tracking-widest text-[#5865F2] uppercase mb-3">
             {t.landingPage.painPointsEyebrow}
           </p>
-          <h2 className="text-3xl md:text-4xl font-black text-white">
+          <h2 className="text-3xl md:text-4xl font-black text-[#F5F5F5]">
             {t.landingPage.painPointsTitle}
           </h2>
         </RevealOnScroll>
@@ -304,20 +307,20 @@ export default async function RootPage() {
                 className={isHero ? 'sm:col-span-6' : 'sm:col-span-2'}
               >
                 {isHero ? (
-                  <div className="h-full bg-[#161626] border border-[#2A1F40] rounded-2xl p-8 sm:p-10 flex items-start gap-4 sm:gap-6">
+                  <div className="h-full bg-[#141416] border border-[#676771] rounded-2xl p-8 sm:p-10 flex items-start gap-4 sm:gap-6">
                     <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-full flex items-center justify-center text-2xl sm:text-4xl shrink-0 ${item.badgeBg}`}>
                       {item.icon}
                     </div>
-                    <p className="text-sm sm:text-base text-[#949ba4] leading-relaxed">
+                    <p className="text-sm sm:text-base text-[#85858B] leading-relaxed">
                       {renderHighlightedText(t.landingPage[item.descriptionKey], item.accentText)}
                     </p>
                   </div>
                 ) : (
-                  <div className="h-full bg-[#161626] border border-[#2A1F40] rounded-2xl p-8 flex items-start gap-4">
+                  <div className="h-full bg-[#141416] border border-[#676771] rounded-2xl p-8 flex items-start gap-4">
                     <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl shrink-0 ${item.badgeBg}`}>
                       {item.icon}
                     </div>
-                    <p className="text-sm text-[#949ba4] leading-relaxed">
+                    <p className="text-sm text-[#85858B] leading-relaxed">
                       {renderHighlightedText(t.landingPage[item.descriptionKey], item.accentText)}
                     </p>
                   </div>
@@ -330,10 +333,10 @@ export default async function RootPage() {
 
       <section id="features" className="relative min-h-[85vh] flex flex-col justify-center max-w-7xl mx-auto w-full px-4 pb-32">
         <RevealOnScroll className="mb-10 text-center">
-          <p className="text-xs font-black tracking-widest text-[#FFD700] uppercase mb-3">
+          <p className="text-xs font-black tracking-widest text-[#5865F2] uppercase mb-3">
             {t.landingPage.featuresEyebrow}
           </p>
-          <h2 className="text-3xl md:text-4xl font-black text-white">
+          <h2 className="text-3xl md:text-4xl font-black text-[#F5F5F5]">
             {t.landingPage.featuresTitle}
           </h2>
         </RevealOnScroll>
@@ -349,8 +352,8 @@ export default async function RootPage() {
               return (
                 <div
                   key={feature.titleKey}
-                  className={`bg-[#161626] border rounded-2xl transition-all duration-200 hover:-translate-y-1 ${feature.border} ${feature.shadow} ${
-                    isEmphasized ? 'p-10 border-[#3d3157] space-y-4' : 'p-8 border-[#2A1F40] space-y-3'
+                  className={`bg-[#141416] border rounded-2xl transition-all duration-200 hover:-translate-y-1 ${feature.border} ${feature.shadow} ${
+                    isEmphasized ? 'p-10 border-[#5865F2]/40 space-y-4' : 'p-8 border-[#676771] space-y-3'
                   }`}
                 >
                   {/* 🛡️ 제목 텍스트에서 같은 이모지를 뺐으니(featurePartyTitle 등) 이 배지는 이제
@@ -364,12 +367,12 @@ export default async function RootPage() {
                   >
                     {feature.icon}
                   </div>
-                  <h3 className={`font-bold text-white ${isEmphasized ? 'text-xl' : 'text-lg'}`}>{t.landingPage[feature.titleKey]}</h3>
-                  <p className="text-sm text-[#949ba4] leading-relaxed">{t.landingPage[feature.descKey]}</p>
+                  <h3 className={`font-bold text-[#F5F5F5] ${isEmphasized ? 'text-xl' : 'text-lg'}`}>{t.landingPage[feature.titleKey]}</h3>
+                  <p className="text-sm text-[#85858B] leading-relaxed">{t.landingPage[feature.descKey]}</p>
                   {feature.hasDetail && (
                     <a
                       href="#see-it-in-action"
-                      className="inline-block text-xs font-bold text-[#5865F2] hover:text-white transition-colors pt-1"
+                      className="inline-block text-xs font-bold text-[#5865F2] hover:text-[#F5F5F5] transition-colors pt-1"
                     >
                       {t.landingPage.featureDetailHint}
                     </a>
