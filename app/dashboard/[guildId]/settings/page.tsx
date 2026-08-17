@@ -10,6 +10,9 @@ import SettingsPageContainer from '@/components/SettingsPageContainer';
 import RoleSelect from '@/components/RoleSelect';
 import { useGuildName } from '@/components/GuildsContext';
 import type { TranslationKey } from '@/lib/i18n';
+import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
+import Badge from '@/components/ui/Badge';
 
 // 🛡️ /cc_add role_add·role_remove(봇 슬래시 커맨드)로 만든 매크로는 문자열이 아니라
 // {type, role_id} 객체로 저장된다(cogs/custom_commands.py의 _normalize_command_entry와 동일한
@@ -221,103 +224,101 @@ export default function SettingsPage() {
   const macroCount = Object.keys(commands).length;
 
   return (
-    <div className="min-h-screen bg-bg-base text-white p-6 font-mono selection:bg-[#2A1F40]">
+    <div className="min-h-screen bg-bg-base text-text-primary p-6 font-mono selection:bg-brand/20">
       <SettingsPageContainer>
-        <header className="mb-8 border-b border-[#2A1F40] pb-4">
-          <h1 className="text-2xl font-extrabold text-purple-400">{t('settingsPage.title')}</h1>
+        <header className="mb-8 border-b border-border-default pb-4">
+          <h1 className="text-2xl font-extrabold text-brand">{t('settingsPage.title')}</h1>
           <HelpText className="mt-1">
             {t('settingsPage.subtitle')}
           </HelpText>
         </header>
 
-        <div className="flex flex-col gap-6 bg-[#161626] border border-[#2A1F40] p-6 rounded-xl shadow-xl">
+        <Card className="flex flex-col gap-6">
 
           <div>
-            <label className="text-sm text-gray-400 block mb-1">{t('common.activeContext')}</label>
-            <div className="w-full sm:w-1/2 bg-[#0F0F1A] border border-[#2A1F40] text-base text-purple-400 px-3 py-2 rounded font-bold select-none">
+            <label className="text-sm text-text-secondary block mb-1">{t('common.activeContext')}</label>
+            <div className="w-full sm:w-1/2 bg-bg-elevated border border-border-default text-base text-text-primary px-3 py-2 rounded font-bold select-none">
               {guildName || (guildId ? `${t('common.guildLabel')} ${guildId}` : t('common.loading'))}
             </div>
           </div>
 
-          <div className="border border-[#2A1F40] bg-[#0F0F1A] p-4 rounded-lg">
-            <div className="flex items-center justify-between mb-3 border-b border-[#2A1F40] pb-2">
-              <span className="text-sm font-bold text-gray-400">{t('settingsPage.macrosTitle')}</span>
-              <button
-                onClick={() => setShowAddModal(true)}
-                disabled={loading}
-                className="text-[11px] bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 text-white px-2 py-1 rounded font-bold"
-              >
+          <Card elevated className="!p-4">
+            <div className="flex items-center justify-between mb-3 border-b border-border-default pb-2">
+              <span className="text-sm font-bold text-text-secondary">{t('settingsPage.macrosTitle')}</span>
+              <Button type="button" variant="primary" onClick={() => setShowAddModal(true)} disabled={loading} className="!px-2 !py-1 text-[11px]">
                 {t('settingsPage.addNew')}
-              </button>
+              </Button>
             </div>
-            <div className="text-[11px] text-gray-500 mb-3 space-y-0.5">
+            <div className="text-[11px] text-text-secondary mb-3 space-y-0.5">
               <p>{t('settingsPage.macrosHelpBullet1')}</p>
               <p>{t('settingsPage.macrosHelpBullet2')}</p>
               <p>{t('settingsPage.macrosHelpBullet3', { max: MACRO_RESPONSE_MAX_LENGTH.toLocaleString() })}</p>
             </div>
 
             {macroCount === 0 ? (
-              <div className="text-center py-10 border border-dashed border-[#2A1F40] rounded-xl bg-[#161626]">
+              <div className="text-center py-10 border border-dashed border-border-default rounded-xl bg-bg-surface">
                 <p className="text-4xl mb-2">📭</p>
-                <p className="text-sm text-gray-400">{t('settingsPage.noMacros')}</p>
-                <p className="text-xs text-gray-600 mt-1">{t('settingsPage.noMacrosHint')}</p>
+                <p className="text-sm text-text-secondary">{t('settingsPage.noMacros')}</p>
+                <p className="text-xs text-text-muted mt-1">{t('settingsPage.noMacrosHint')}</p>
               </div>
             ) : (
               <div className="flex flex-col gap-2 max-h-64 overflow-y-auto">
                 {Object.entries(commands).map(([trigger, value]) => (
-                  <div key={trigger} className="flex justify-between items-center gap-2 text-sm bg-[#161626] p-2 rounded border border-[#2A1F40]">
-                    <span className="text-green-400 font-bold shrink-0">/{trigger}</span>
+                  <Card elevated key={trigger} className="flex justify-between items-center gap-2 !p-2 text-sm">
+                    <span className="text-text-primary font-bold shrink-0">/{trigger}</span>
                     {isRoleMacro(value) ? (
-                      <span className="text-[10px] font-bold text-amber-400 bg-amber-950/30 border border-amber-500/20 px-2 py-0.5 rounded truncate">
+                      <Badge variant="warning" className="truncate">
                         {t('settingsPage.roleMacroBadge', {
                           action: value.type === 'role_add' ? t('settingsPage.grants') : t('settingsPage.removes'),
                           roleName: roleName(value.role_id),
                         })}
-                      </span>
+                      </Badge>
                     ) : (
-                      <span className="text-gray-400 truncate flex-1">{macroResponseText(value)}</span>
+                      <span className="text-text-secondary truncate flex-1">{macroResponseText(value)}</span>
                     )}
-                    <button
+                    <Button
+                      type="button"
+                      variant="danger"
                       onClick={() => handleDeleteCommand(trigger)}
                       disabled={loading}
-                      className="text-red-400 hover:text-red-500 font-bold disabled:opacity-50 shrink-0"
+                      className="!px-2 !py-1 text-[10px] shrink-0"
                     >
                       {t('settingsPage.deleteButton')}
-                    </button>
-                  </div>
+                    </Button>
+                  </Card>
                 ))}
               </div>
             )}
-          </div>
-        </div>
+          </Card>
+        </Card>
 
         {showAddModal && (
           <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-            <div className="bg-[#161626] border border-[#2A1F40] rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
-              <h3 className="text-purple-400 font-black text-base">{t('settingsPage.addModalTitle')}</h3>
+            <Card className="max-w-md w-full space-y-4">
+              <h3 className="text-brand font-black text-base">{t('settingsPage.addModalTitle')}</h3>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-gray-400">{t('settingsPage.macroNameLabel')}</label>
+                <label className="text-sm font-bold text-text-secondary">{t('settingsPage.macroNameLabel')}</label>
                 <input
                   type="text"
                   value={macroName}
                   onChange={(e) => setMacroName(e.target.value)}
                   placeholder={t('settingsPage.macroNamePlaceholder')}
                   maxLength={MACRO_TRIGGER_MAX_LENGTH}
-                  className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-white px-3 py-2 rounded focus:border-purple-500 outline-none"
+                  className="w-full bg-bg-elevated border border-border-default text-sm text-text-primary px-3 py-2 rounded focus:border-brand outline-none"
                 />
                 <HelpText>{t('settingsPage.macroNameHelp')}</HelpText>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-gray-400">{t('settingsPage.macroTypeLabel')}</label>
+                <label className="text-sm font-bold text-text-secondary">{t('settingsPage.macroTypeLabel')}</label>
                 <div className="flex gap-2">
                   {(['text', 'role_add', 'role_remove'] as MacroType[]).map((tp) => (
                     <button
                       key={tp}
                       type="button"
                       onClick={() => setMacroType(tp)}
-                      className={`flex-1 text-[11px] font-bold py-2 rounded-lg border transition-all ${macroType === tp ? 'bg-purple-600 border-purple-600 text-white' : 'bg-[#0F0F1A] border-[#2A1F40] text-gray-400'}`}
+                      className={`flex-1 text-[11px] font-bold py-2 rounded-lg border transition-all ${macroType === tp ? 'bg-brand border-brand text-white' : 'bg-bg-elevated border-border-default text-text-secondary'}`}
                     >
                       {tp === 'text' ? t('settingsPage.macroTypeText') : tp === 'role_add' ? t('settingsPage.macroTypeRoleAdd') : t('settingsPage.macroTypeRoleRemove')}
                     </button>
@@ -327,61 +328,57 @@ export default function SettingsPage() {
 
               {macroType === 'text' ? (
                 <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-gray-400">{t('settingsPage.macroResponseLabel')}</label>
+                  <label className="text-sm font-bold text-text-secondary">{t('settingsPage.macroResponseLabel')}</label>
                   <textarea
                     value={macroResponse}
                     onChange={(e) => setMacroResponse(e.target.value)}
                     placeholder={t('settingsPage.macroResponsePlaceholder')}
                     maxLength={MACRO_RESPONSE_MAX_LENGTH}
                     rows={3}
-                    className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-sm text-white px-3 py-2 rounded focus:border-purple-500 outline-none resize-none"
+                    className="w-full bg-bg-elevated border border-border-default text-sm text-text-primary px-3 py-2 rounded focus:border-brand outline-none resize-none"
                   />
                 </div>
               ) : (
                 <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-gray-400">{t('settingsPage.macroRoleLabel')}</label>
+                  <label className="text-sm font-bold text-text-secondary">{t('settingsPage.macroRoleLabel')}</label>
                   <RoleSelect guildId={guildId || ''} value={macroRoleId} onChange={setMacroRoleId} />
                   <HelpText>{macroType === 'role_add' ? t('settingsPage.macroRoleAddHelp') : t('settingsPage.macroRoleRemoveHelp')}</HelpText>
                 </div>
               )}
 
               <div className="flex gap-3 justify-end pt-2">
-                <button type="button" onClick={resetAddModal} disabled={isSavingMacro} className="text-sm font-bold text-gray-400 hover:text-white px-4 py-2">
+                <Button type="button" variant="ghost" onClick={resetAddModal} disabled={isSavingMacro}>
                   {t('common.cancel')}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant="success"
                   onClick={handleSubmitMacro}
                   disabled={isSavingMacro || !macroName.trim() || (macroType === 'text' ? !macroResponse.trim() : !macroRoleId)}
-                  className="bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white text-sm font-black px-5 py-2 rounded-lg"
                 >
                   {isSavingMacro ? t('settingsPage.savingMacro') : t('settingsPage.saveMacroButton')}
-                </button>
+                </Button>
               </div>
-            </div>
+            </Card>
           </div>
         )}
 
         {dangerousConfirm && (
           <div className="fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4">
-            <div className="bg-[#161626] border border-orange-500/50 rounded-2xl p-6 max-w-md w-full space-y-4">
-              <h3 className="text-orange-400 font-black text-base">{t('settingsPage.dangerousPermTitle')}</h3>
-              <p className="text-sm text-gray-400">
+            <Card className="!border-warning-border hover:!border-warning-border max-w-md w-full space-y-4">
+              <h3 className="text-warning font-black text-base">{t('settingsPage.dangerousPermTitle')}</h3>
+              <p className="text-sm text-text-secondary">
                 {t('settingsPage.dangerousPermBody', { perms: dangerousConfirm.dangerous.join(', ') })}
               </p>
               <div className="flex gap-3 justify-end">
-                <button type="button" onClick={() => setDangerousConfirm(null)} className="text-sm font-bold text-gray-400 hover:text-white px-4 py-2">
+                <Button type="button" variant="ghost" onClick={() => setDangerousConfirm(null)}>
                   {t('common.cancel')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setDangerousConfirm(null); submitRoleMacro(true); }}
-                  className="bg-red-600 hover:bg-red-500 text-white text-sm font-black px-5 py-2 rounded-lg"
-                >
+                </Button>
+                <Button type="button" variant="danger" onClick={() => { setDangerousConfirm(null); submitRoleMacro(true); }}>
                   {t('common.confirm')}
-                </button>
+                </Button>
               </div>
-            </div>
+            </Card>
           </div>
         )}
       </SettingsPageContainer>
