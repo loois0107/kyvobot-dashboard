@@ -8,6 +8,8 @@ import SettingsPageContainer from '@/components/SettingsPageContainer';
 import ChannelSelect from '@/components/ChannelSelect';
 import { useGuildName } from '@/components/GuildsContext';
 import ConfiguredBadge from '@/components/ConfiguredBadge';
+import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
 
 export default function VoiceSettingsPage() {
   const params = useParams();
@@ -18,6 +20,7 @@ export default function VoiceSettingsPage() {
   const [triggerChannelId, setTriggerChannelId] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error' | null>(null);
   const [hasLoaded, setHasLoaded] = useState(false);
 
   const isConfigured = Boolean(triggerChannelId.trim());
@@ -26,6 +29,7 @@ export default function VoiceSettingsPage() {
     if (!guildId || guildId === '[guildId]') return;
     setLoading(true);
     setMessage('');
+    setMessageType(null);
 
     fetch(`/api/voice-settings/${guildId}`)
       .then(async (res) => {
@@ -34,6 +38,7 @@ export default function VoiceSettingsPage() {
           setTriggerChannelId(data.voice_settings?.trigger_channel_id || '');
         } else {
           setMessage(`${t('voicePage.loadFailedPrefix')} [${res.status}]: ${data.error || t('voicePage.unknownError')}`);
+          setMessageType('error');
         }
         setLoading(false);
         setHasLoaded(true);
@@ -41,6 +46,7 @@ export default function VoiceSettingsPage() {
       .catch((err) => {
         console.error(err);
         setMessage(t('voicePage.fetchFailed'));
+        setMessageType('error');
         setLoading(false);
         setHasLoaded(true);
       });
@@ -54,6 +60,7 @@ export default function VoiceSettingsPage() {
     if (!guildId || guildId === '[guildId]') return;
     setLoading(true);
     setMessage('');
+    setMessageType(null);
 
     try {
       const res = await fetch(`/api/voice-settings/${guildId}`, {
@@ -65,23 +72,26 @@ export default function VoiceSettingsPage() {
 
       if (res.ok && data.ok) {
         setMessage(t('voicePage.saveSuccess'));
+        setMessageType('success');
       } else {
         setMessage(`${t('voicePage.saveFailedPrefix')} [${res.status}]: ${data.error || t('voicePage.unknownError')}`);
+        setMessageType('error');
       }
     } catch (err) {
       console.error(err);
       setMessage(t('voicePage.saveFailed'));
+      setMessageType('error');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-bg-base text-white p-6 font-mono selection:bg-[#2A1F40]">
+    <div className="min-h-screen bg-bg-base text-text-primary p-6 font-mono selection:bg-brand/20">
       <SettingsPageContainer>
-        <header className="mb-8 border-b border-[#2A1F40] pb-4 flex items-start justify-between gap-4">
+        <header className="mb-8 border-b border-border-default pb-4 flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-extrabold text-purple-400">{t('voicePage.title')}</h1>
+            <h1 className="text-2xl font-extrabold text-brand">{t('voicePage.title')}</h1>
             <HelpText className="mt-1">
               {t('voicePage.subtitle')}
             </HelpText>
@@ -89,20 +99,20 @@ export default function VoiceSettingsPage() {
           {hasLoaded && <ConfiguredBadge configured={isConfigured} />}
         </header>
 
-        <div className="flex flex-col gap-6 bg-[#161626] border border-[#2A1F40] p-6 rounded-xl shadow-xl">
+        <Card className="flex flex-col gap-6">
           <div>
-            <label className="text-sm text-gray-400 block mb-1">{t('common.activeContext')}</label>
-            <div className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-base text-purple-400 px-3 py-2 rounded font-bold select-none">
+            <label className="text-sm text-text-secondary block mb-1">{t('common.activeContext')}</label>
+            <div className="w-full bg-bg-elevated border border-border-default text-base text-text-primary px-3 py-2 rounded font-bold select-none">
               {guildName || (guildId ? `${t('common.guildLabel')} ${guildId}` : t('common.loading'))}
             </div>
           </div>
 
-          <div className="bg-[#0F0F1A] border border-[#2A1F40] rounded-lg p-3 text-[11px] text-gray-300 leading-relaxed">
+          <div className="bg-bg-elevated border border-border-default rounded-lg p-3 text-[11px] text-text-secondary leading-relaxed">
             {t('voicePage.explainer')}
           </div>
 
           <div>
-            <label className="text-sm text-gray-400 block mb-1">{t('voicePage.triggerChannelLabel')}</label>
+            <label className="text-sm text-text-secondary block mb-1">{t('voicePage.triggerChannelLabel')}</label>
             <ChannelSelect
               guildId={guildId || ''}
               value={triggerChannelId}
@@ -115,19 +125,21 @@ export default function VoiceSettingsPage() {
           </div>
 
           {message && (
-            <div className="bg-[#0F0F1A] border border-purple-900/50 text-sm text-center p-3 rounded text-gray-300 break-all whitespace-pre-wrap">
+            <div
+              className={`text-sm text-center p-3 rounded border break-all whitespace-pre-wrap ${
+                messageType === 'success'
+                  ? 'bg-success/10 border-success/20 text-success'
+                  : 'bg-danger/10 border-danger/20 text-danger'
+              }`}
+            >
               {message}
             </div>
           )}
 
-          <button
-            onClick={handleSave}
-            disabled={loading}
-            className="w-full text-base bg-purple-600 hover:bg-purple-700 disabled:bg-gray-700 text-white px-4 py-2 rounded font-bold"
-          >
+          <Button type="button" variant="primary" onClick={handleSave} disabled={loading} className="w-full text-base">
             {loading ? t('common.saving') : t('common.save')}
-          </button>
-        </div>
+          </Button>
+        </Card>
       </SettingsPageContainer>
     </div>
   );
