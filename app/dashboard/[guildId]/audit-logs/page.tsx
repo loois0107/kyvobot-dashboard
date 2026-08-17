@@ -5,6 +5,9 @@ import { useParams } from 'next/navigation';
 import { useT, useLanguage } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
+import Badge, { type BadgeVariant } from '@/components/ui/Badge';
 
 interface AuditLog {
   id: string;
@@ -24,12 +27,11 @@ function formatLogTimestamp(iso: string, lang: 'ko' | 'en'): string {
 
 type LoadStatus = 'loading' | 'loaded' | 'error';
 
-function actionBadgeColor(action: string): string {
+function actionBadgeVariant(action: string): BadgeVariant {
   const a = action.toLowerCase();
-  if (a.includes('timeout') || a.includes('ban') || a.includes('kick')) return 'border-red-500 text-red-400 bg-red-950/30';
-  if (a.includes('bad_word') || a.includes('warn')) return 'border-orange-500 text-orange-400 bg-orange-950/30';
-  if (a.includes('spam') || a.includes('delete')) return 'border-purple-500 text-purple-400 bg-purple-950/30';
-  return 'border-[#5865F2] text-[#5865F2] bg-[#5865F2]/10';
+  if (a.includes('timeout') || a.includes('ban') || a.includes('kick')) return 'danger';
+  if (a.includes('bad_word') || a.includes('warn') || a.includes('spam') || a.includes('delete')) return 'warning';
+  return 'neutral';
 }
 
 export default function AuditLogsPage() {
@@ -82,7 +84,7 @@ export default function AuditLogsPage() {
 
   if (loadStatus === 'loading') {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-base">
+      <div className="min-h-[50vh] flex items-center justify-center text-text-secondary text-base">
         {t('auditLogsPage.loadingLogs')}
       </div>
     );
@@ -91,64 +93,55 @@ export default function AuditLogsPage() {
   if (loadStatus === 'error') {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
-        <p className="text-red-400 font-bold">{t('auditLogsPage.loadFailed')}</p>
-        <p className="text-base text-[#949ba4]">{loadErrorMsg}</p>
-        <button
-          type="button"
-          onClick={() => loadData(false)}
-          className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl"
-        >
+        <p className="text-danger font-bold">{t('auditLogsPage.loadFailed')}</p>
+        <p className="text-base text-text-secondary">{loadErrorMsg}</p>
+        <Button type="button" variant="primary" onClick={() => loadData(false)}>
           {t('common.retry')}
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
     <SettingsPageContainer className="pb-16">
-      <header className="border-b border-[#2b2d31] pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <header className="border-b border-border-default pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('auditLogsPage.title')}</h1>
+          <h1 className="text-xl md:text-2xl font-black tracking-wider text-brand">{t('auditLogsPage.title')}</h1>
           <HelpText className="mt-1 tracking-widest uppercase">
             {t('auditLogsPage.subtitle')}
           </HelpText>
         </div>
-        <button
-          type="button"
-          onClick={() => loadData(true)}
-          disabled={isRefreshing}
-          className="w-full sm:w-auto bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all"
-        >
+        <Button type="button" variant="primary" onClick={() => loadData(true)} disabled={isRefreshing} className="w-full sm:w-auto">
           {isRefreshing ? t('auditLogsPage.refreshing') : t('auditLogsPage.refreshNow')}
-        </button>
+        </Button>
       </header>
 
-      <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-3 shadow-xl">
+      <Card className="space-y-3">
         {logs.length === 0 ? (
-          <p className="text-base text-[#949ba4] py-4">{t('auditLogsPage.noLogsYet')}</p>
+          <p className="text-base text-text-secondary py-4">{t('auditLogsPage.noLogsYet')}</p>
         ) : (
           <div className="space-y-2">
             {logs.map((log) => (
-              <div key={log.id} className="bg-[#111214] rounded-lg px-3 py-2.5 space-y-1.5">
+              <Card elevated key={log.id} className="!px-3 !py-2.5 space-y-1.5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded border shrink-0 ${actionBadgeColor(log.action)}`}>
+                    <Badge variant={actionBadgeVariant(log.action)} className="shrink-0">
                       {log.action}
-                    </span>
-                    <span className="text-sm text-[#b5bac1] truncate">
-                      {t('auditLogsPage.targetLabel')} <code className="text-white">{log.username || log.user_id}</code>
+                    </Badge>
+                    <span className="text-sm text-text-secondary truncate">
+                      {t('auditLogsPage.targetLabel')} <code className="text-text-primary">{log.username || log.user_id}</code>
                     </span>
                   </div>
-                  <span className="text-sm text-[#8b8d98] shrink-0">
+                  <span className="text-sm text-text-muted shrink-0">
                     {formatLogTimestamp(log.created_at, lang)}
                   </span>
                 </div>
-                {log.reason && <p className="text-sm text-[#949ba4]">{log.reason}</p>}
-              </div>
+                {log.reason && <p className="text-sm text-text-secondary">{log.reason}</p>}
+              </Card>
             ))}
           </div>
         )}
-      </div>
+      </Card>
     </SettingsPageContainer>
   );
 }
