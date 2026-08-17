@@ -185,6 +185,7 @@ const ko: typeof en = {
     reportRejected: '제보가 거절되었습니다.',
     reportRejectedBlocked: '제보가 거절되고 제보자가 차단되었습니다.',
     decideNetworkError: '이 제보를 처리하는 중 네트워크 오류가 발생했습니다.',
+    confirmBlock: '이 사용자의 향후 익명 제보를 차단합니다. 계속하시겠습니까?',
   },
   auditLogsPage: {
     loadingLogs: '감사 로그를 불러오는 중...',

@@ -185,6 +185,7 @@ const en = {
     reportRejected: 'Report rejected.',
     reportRejectedBlocked: 'Report rejected and reporter blocked.',
     decideNetworkError: 'Network error while processing this report.',
+    confirmBlock: "This blocks the reporter from submitting future anonymous reports. Continue?",
   },
   auditLogsPage: {
     loadingLogs: 'Loading audit logs...',
