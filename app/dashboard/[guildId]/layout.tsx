@@ -10,6 +10,29 @@ import BotNotInvitedNotice from '@/components/BotNotInvitedNotice';
 import { GuildsProvider, type ManagedGuild } from '@/components/GuildsContext';
 import Button from '@/components/ui/Button';
 import SidebarNavLink from '@/components/ui/SidebarNavLink';
+import {
+  LayoutDashboard,
+  User,
+  Settings,
+  Shield,
+  DoorOpen,
+  Mic,
+  Flag,
+  Smile,
+  Terminal,
+  ScrollText,
+  Users,
+  BarChart3,
+  Gamepad2,
+  Swords,
+  Sparkles,
+  Trophy,
+  Gift,
+  TvMinimalPlay,
+  Ticket,
+  Home,
+  BookOpen,
+} from 'lucide-react';
 
 type BotStatus = 'checking' | 'present' | 'absent' | 'unknown';
 
@@ -134,78 +157,78 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
 
           <nav className="space-y-4">
-            <SidebarNavLink href={`/dashboard/${currentGuildId}`} active={pathname === `/dashboard/${currentGuildId}`}>
+            <SidebarNavLink href={`/dashboard/${currentGuildId}`} active={pathname === `/dashboard/${currentGuildId}`} icon={LayoutDashboard}>
               {t('sidebar.controlHubHome')}
             </SidebarNavLink>
 
-            <SidebarNavLink href={`/profile/${currentGuildId}`}>
+            <SidebarNavLink href={`/profile/${currentGuildId}`} icon={User}>
               {t('sidebar.myPage')}
             </SidebarNavLink>
 
-            <SidebarNavLink href={`/dashboard/${currentGuildId}/general`} active={pathname?.includes('/general')}>
+            <SidebarNavLink href={`/dashboard/${currentGuildId}/general`} active={pathname?.includes('/general')} icon={Settings}>
               {t('sidebar.generalSettings')}
             </SidebarNavLink>
 
             <div className="space-y-1">
               <label className="block text-sm font-bold text-text-secondary uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryCommunity')}</label>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/automod`} active={pathname?.includes('/automod')}>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/automod`} active={pathname?.includes('/automod')} icon={Shield}>
                 {t('sidebar.automod')}
               </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/welcome`} active={pathname?.includes('/welcome')}>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/welcome`} active={pathname?.includes('/welcome')} icon={DoorOpen}>
                 {t('sidebar.welcomeSettings')}
               </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/voice`} active={pathname?.includes('/voice')}>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/voice`} active={pathname?.includes('/voice')} icon={Mic}>
                 {t('sidebar.joinToCreate')}
               </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/anonymous-reports`} active={pathname?.includes('/anonymous-reports')}>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/anonymous-reports`} active={pathname?.includes('/anonymous-reports')} icon={Flag}>
                 {t('sidebar.anonymousReports')}
               </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/reaction-roles`} active={pathname?.includes('/reaction-roles')}>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/reaction-roles`} active={pathname?.includes('/reaction-roles')} icon={Smile}>
                 {t('sidebar.reactionRoles')}
               </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/settings`} active={pathname?.includes('/settings')}>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/settings`} active={pathname?.includes('/settings')} icon={Terminal}>
                 {t('sidebar.customCommands')}
               </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/audit-logs`} active={pathname?.includes('/audit-logs')}>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/audit-logs`} active={pathname?.includes('/audit-logs')} icon={ScrollText}>
                 {t('sidebar.auditLogs')}
               </SidebarNavLink>
             </div>
 
             <div className="space-y-1">
               <label className="block text-sm font-bold text-text-secondary uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryPartyGames')}</label>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/party-settings`} active={pathname?.includes('/party-settings')}>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/party-settings`} active={pathname?.includes('/party-settings')} icon={Users}>
                 {t('sidebar.partyRecruitment')}
               </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/party-stats`} active={pathname?.includes('/party-stats')}>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/party-stats`} active={pathname?.includes('/party-stats')} icon={BarChart3}>
                 {t('sidebar.partyStats')}
               </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/party-presets`} active={pathname?.includes('/party-presets')}>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/party-presets`} active={pathname?.includes('/party-presets')} icon={Gamepad2}>
                 {t('sidebar.gamePresets')}
               </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/tier-roles`} active={pathname?.includes('/tier-roles')}>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/tier-roles`} active={pathname?.includes('/tier-roles')} icon={Swords}>
                 {t('sidebar.tierRoleMapping')}
               </SidebarNavLink>
             </div>
 
             <div className="space-y-1">
               <label className="block text-sm font-bold text-text-secondary uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryEconomy')}</label>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/leveling`} active={pathname?.includes('/leveling')}>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/leveling`} active={pathname?.includes('/leveling')} icon={Sparkles}>
                 {t('sidebar.levelingEconomy')}
               </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/leaderboard`} active={pathname?.includes('/leaderboard')}>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/leaderboard`} active={pathname?.includes('/leaderboard')} icon={Trophy}>
                 {t('sidebar.serverLeaderboard')}
               </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/giveaways`} active={pathname?.includes('/giveaways')}>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/giveaways`} active={pathname?.includes('/giveaways')} icon={Gift}>
                 {t('sidebar.giveaways')}
               </SidebarNavLink>
             </div>
 
             <div className="space-y-1">
               <label className="block text-sm font-bold text-text-secondary uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryIntegrationsAI')}</label>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/twitch`} active={pathname?.includes('/twitch')}>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/twitch`} active={pathname?.includes('/twitch')} icon={TvMinimalPlay}>
                 {t('sidebar.twitchStreamers')}
               </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/ticket-settings`} active={pathname?.includes('/ticket-settings')}>
+              <SidebarNavLink href={`/dashboard/${currentGuildId}/ticket-settings`} active={pathname?.includes('/ticket-settings')} icon={Ticket}>
                 {t('sidebar.aiSupportTicket')}
               </SidebarNavLink>
             </div>
@@ -225,11 +248,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </button>
           <span className="text-sm font-black tracking-widest text-brand uppercase">{t('sidebar.mobileHeaderTitle')}</span>
           <div className="flex items-center gap-2">
-            <Button type="button" variant="ghost" onClick={() => router.push('/')} aria-label={t('sidebar.homeButton')} title={t('sidebar.homeButton')} className="!px-2 !py-1 text-base">
-              🏠
+            <Button type="button" variant="ghost" onClick={() => router.push('/')} aria-label={t('sidebar.homeButton')} title={t('sidebar.homeButton')} className="!px-2 !py-1">
+              <Home className="w-5 h-5" />
             </Button>
-            <Button type="button" variant="ghost" onClick={() => router.push('/guide')} aria-label={t('sidebar.guideButton')} title={t('sidebar.guideButton')} className="!px-2 !py-1 text-base">
-              📖
+            <Button type="button" variant="ghost" onClick={() => router.push('/guide')} aria-label={t('sidebar.guideButton')} title={t('sidebar.guideButton')} className="!px-2 !py-1">
+              <BookOpen className="w-5 h-5" />
             </Button>
             <LanguageToggle />
           </div>
@@ -242,10 +265,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <div className="bg-bg-elevated px-3 py-1 rounded-full text-sm text-success font-semibold flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-success"></span> {t('sidebar.syncStatus')}</div>
               <div className="hidden md:flex items-center gap-2">
                 <Button type="button" variant="ghost" onClick={() => router.push('/')}>
-                  <span>🏠</span> {t('sidebar.homeButton')}
+                  <Home className="w-4 h-4" /> {t('sidebar.homeButton')}
                 </Button>
                 <Button type="button" variant="ghost" onClick={() => router.push('/guide')}>
-                  <span>📖</span> {t('sidebar.guideButton')}
+                  <BookOpen className="w-4 h-4" /> {t('sidebar.guideButton')}
                 </Button>
               </div>
               <ThemeToggle />
