@@ -7,6 +7,8 @@ import { useToast } from '@/components/Toast';
 import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
+import Button from '@/components/ui/Button';
+import Badge from '@/components/ui/Badge';
 
 const HISTORY_PREVIEW_COUNT = 5;
 
@@ -32,11 +34,15 @@ export default function ProfileActivityPage() {
   const { showToast } = useToast();
   const t = useT();
 
-  const STATUS_BADGE: Record<string, { label: string; className: string }> = {
-    recruiting: { label: t('profileCardPage.statusRecruiting'), className: 'border-[#5865F2] text-[#5865F2] bg-[#5865F2]/10' },
-    full: { label: t('profileCardPage.statusFull'), className: 'border-[#23A55A] text-[#23A55A] bg-[#23A55A]/10' },
-    closed: { label: t('profileCardPage.statusClosed'), className: 'border-[#949ba4] text-[#949ba4] bg-[#949ba4]/10' },
-    expired: { label: t('profileCardPage.statusExpired'), className: 'border-[#949ba4] text-[#949ba4] bg-[#949ba4]/10' },
+  // 🛡️ Badge는 success/warning/danger/neutral 4단계뿐이라 "모집중"(브랜드 블루)엔 대응하는
+  // variant가 없다 - 억지로 neutral에 욱여넣으면 모집중/종료/만료가 전부 같은 회색이 되어 색으로
+  // 구분하던 의미가 사라진다. 그래서 모집중만 Badge의 시각 레시피(text-[10px] font-mono px-2 py-0.5
+  // rounded font-black uppercase)를 그대로 재현한 별도 span으로 렌더링한다(렌더 지점 참고).
+  const STATUS_BADGE: Record<string, { label: string; variant: 'success' | 'neutral' | 'brand' }> = {
+    recruiting: { label: t('profileCardPage.statusRecruiting'), variant: 'brand' },
+    full: { label: t('profileCardPage.statusFull'), variant: 'success' },
+    closed: { label: t('profileCardPage.statusClosed'), variant: 'neutral' },
+    expired: { label: t('profileCardPage.statusExpired'), variant: 'neutral' },
   };
 
   const rawGuildId = params?.guildId as string | undefined;
@@ -127,14 +133,18 @@ export default function ProfileActivityPage() {
   // _process_purchase) - 대시보드는 포인트/인벤토리를 직접 건드리지 않는다. active_transactions
   // 락 덕분에 이 버튼을 더블클릭해도, 또는 같은 유저가 동시에 /shop buy 커맨드를 쳐도 하나만
   // 통과한다(나머지는 "locked" 사유로 거부됨).
-  const handleBuy = async (itemName: string) => {
+  // 🛡️ 실제 재화가 즉시 차감되는 유일한 동작이라 confirm()을 fetch 전(가드 바로 다음)에 둔다 -
+  // 취소하면 네트워크 요청 자체가 안 나간다. itemName만 받던 이전 시그니처는 확인 문구에 필요한
+  // 가격/화폐명이 없어서 item 전체를 받도록 바꿨다(호출부가 이미 item을 들고 있어 조회 불필요).
+  const handleBuy = async (item: ShopItem) => {
     if (purchasingItem) return;
-    setPurchasingItem(itemName);
+    if (!confirm(t('profileCardPage.confirmPurchase', { item: item.name, price: item.price?.toLocaleString() || '0', currency: currencyName }))) return;
+    setPurchasingItem(item.name);
     try {
       const res = await fetch(`/api/profile/${guildId}/shop/buy`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ item_name: itemName }),
+        body: JSON.stringify({ item_name: item.name }),
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
@@ -217,57 +227,58 @@ export default function ProfileActivityPage() {
     }
   };
 
-  if (status === 'loading') return <div className="min-h-screen bg-[#111214]" />;
+  if (status === 'loading') return <div className="min-h-screen bg-bg-base" />;
 
   const visibleHistory = showAllHistory ? history : history.slice(0, HISTORY_PREVIEW_COUNT);
 
   return (
-    <div className="min-h-screen bg-[#111214] text-[#dbdee1] p-2 sm:p-4 md:p-6 space-y-4">
+    <div className="min-h-screen bg-bg-base text-text-primary p-2 sm:p-4 md:p-6 space-y-4">
       <SettingsPageContainer>
-        <div className="space-y-4 bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl">
-          <div className="flex items-center justify-between border-b border-[#2b2d31] pb-2">
-            <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase">
+        <div className="space-y-4 bg-bg-surface border border-border-default rounded-2xl p-4 sm:p-6 shadow-xl">
+          <div className="flex items-center justify-between border-b border-border-default pb-2">
+            <h3 className="text-xs font-black tracking-widest text-text-secondary uppercase">
               {t('profileCardPage.shopTitle')}
             </h3>
             {!shopLoading && !shopError && (
-              <span className="text-xs font-bold text-[#FFD700]">🪙 {points.toLocaleString()} {currencyName}</span>
+              <span className="text-xs font-bold text-brand">🪙 {points.toLocaleString()} {currencyName}</span>
             )}
           </div>
 
           {shopLoading ? (
-            <p className="text-sm text-[#949ba4] py-4">{t('profileCardPage.loadingShop')}</p>
+            <p className="text-sm text-text-secondary py-4">{t('profileCardPage.loadingShop')}</p>
           ) : shopError ? (
             <div className="text-center py-4 space-y-2">
-              <p className="text-sm text-red-400">⚠️ {shopError}</p>
-              <button type="button" onClick={loadShop} className="text-xs font-bold text-[#5865F2] hover:underline">
+              <p className="text-sm text-danger">⚠️ {shopError}</p>
+              <button type="button" onClick={loadShop} className="text-xs font-bold text-brand hover:underline">
                 {t('common.retry')}
               </button>
             </div>
           ) : shopItems.length === 0 ? (
-            <p className="text-sm text-[#949ba4] py-4">{t('profileCardPage.shopEmpty')}</p>
+            <p className="text-sm text-text-secondary py-4">{t('profileCardPage.shopEmpty')}</p>
           ) : (
             <div className="space-y-2">
               {shopItems.map((item) => {
                 const affordable = item.price !== null && points >= item.price;
                 const isPurchasing = purchasingItem === item.name;
                 return (
-                  <div key={item.name} className="flex items-center justify-between gap-3 bg-[#111214] rounded-lg px-3 py-2.5">
+                  <div key={item.name} className="flex items-center justify-between gap-3 bg-bg-base rounded-lg px-3 py-2.5">
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-white truncate">{item.name}</p>
+                      <p className="text-xs font-bold text-text-primary truncate">{item.name}</p>
                       {item.description && <HelpText className="truncate">{item.description}</HelpText>}
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-[10px] font-bold text-[#FFD700]">
+                      <span className="text-[10px] font-bold text-brand">
                         {item.price !== null ? `${item.price.toLocaleString()} ${currencyName}` : 'N/A'}
                       </span>
-                      <button
+                      <Button
                         type="button"
-                        onClick={() => handleBuy(item.name)}
+                        variant="success"
+                        onClick={() => handleBuy(item)}
                         disabled={item.price === null || !affordable || Boolean(purchasingItem)}
-                        className="bg-[#23A55A] hover:bg-[#1a7f43] disabled:bg-[#2b2d31] disabled:text-[#57576F] disabled:cursor-not-allowed text-white text-[10px] font-black px-3 py-1.5 rounded-lg transition-all"
+                        className="!text-[10px] !px-3 !py-1.5"
                       >
                         {isPurchasing ? t('profileCardPage.buying') : item.price === null ? t('profileCardPage.unavailable') : affordable ? t('profileCardPage.buy') : t('profileCardPage.notEnough')}
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 );
@@ -276,8 +287,8 @@ export default function ProfileActivityPage() {
           )}
         </div>
 
-        <div className="space-y-4 bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl">
-          <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+        <div className="space-y-4 bg-bg-surface border border-border-default rounded-2xl p-4 sm:p-6 shadow-xl">
+          <h3 className="text-xs font-black tracking-widest text-text-secondary uppercase border-b border-border-default pb-2">
             {t('profileCardPage.favoriteGameTitle')}
           </h3>
           <HelpText>
@@ -285,90 +296,84 @@ export default function ProfileActivityPage() {
           </HelpText>
 
           {favoriteGameLoading ? (
-            <p className="text-sm text-[#949ba4] py-2">{t('profileCardPage.loadingShort')}</p>
+            <p className="text-sm text-text-secondary py-2">{t('profileCardPage.loadingShort')}</p>
           ) : favoriteGameError ? (
             <div className="py-2 space-y-2">
-              <p className="text-sm text-red-400">⚠️ {favoriteGameError}</p>
-              <button type="button" onClick={loadFavoriteGame} className="text-xs font-bold text-[#5865F2] hover:underline">
+              <p className="text-sm text-danger">⚠️ {favoriteGameError}</p>
+              <button type="button" onClick={loadFavoriteGame} className="text-xs font-bold text-brand hover:underline">
                 {t('common.retry')}
               </button>
             </div>
           ) : gamePresets.length === 0 ? (
-            <p className="text-sm text-[#949ba4] py-2">{t('profileCardPage.noPresetsYet')}</p>
+            <p className="text-sm text-text-secondary py-2">{t('profileCardPage.noPresetsYet')}</p>
           ) : (
             <div className="flex flex-col sm:flex-row gap-2">
               <select
                 value={selectedGameDraft}
                 onChange={(e) => setSelectedGameDraft(e.target.value)}
-                className="flex-1 bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-[#5865F2]"
+                className="flex-1 bg-bg-base border border-border-default rounded-lg p-2.5 text-xs text-text-primary focus:outline-none focus:border-brand"
               >
                 <option value="" disabled>{t('profileCardPage.selectGamePlaceholder')}</option>
                 {gamePresets.map((name) => (
                   <option key={name} value={name}>{name}</option>
                 ))}
               </select>
-              <button
-                type="button"
-                onClick={handleSaveFavoriteGame}
-                disabled={isSavingFavoriteGame || !selectedGameDraft || selectedGameDraft === favoriteGame}
-                className="bg-[#5865F2] hover:bg-[#4752C4] disabled:opacity-50 text-white text-xs font-black px-4 py-2 rounded-lg transition-all"
-              >
+              <Button type="button" variant="primary" onClick={handleSaveFavoriteGame} disabled={isSavingFavoriteGame || !selectedGameDraft || selectedGameDraft === favoriteGame} className="!text-xs">
                 {isSavingFavoriteGame ? t('common.saving') : t('common.save')}
-              </button>
+              </Button>
               {favoriteGame && (
-                <button
-                  type="button"
-                  onClick={handleClearFavoriteGame}
-                  disabled={isSavingFavoriteGame}
-                  className="bg-[#2b2d31] hover:bg-[#35373c] disabled:opacity-50 text-white text-xs font-black px-4 py-2 rounded-lg transition-all"
-                >
+                <Button type="button" variant="secondary" onClick={handleClearFavoriteGame} disabled={isSavingFavoriteGame} className="!text-xs">
                   {t('profileCardPage.clear')}
-                </button>
+                </Button>
               )}
             </div>
           )}
           {favoriteGame && !favoriteGameLoading && (
-            <p className="text-[10px] text-[#23A55A]">{t('profileCardPage.currentlySetTo', { game: favoriteGame })}</p>
+            <p className="text-[10px] text-success">{t('profileCardPage.currentlySetTo', { game: favoriteGame })}</p>
           )}
         </div>
 
-        <div className="space-y-4 bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl">
-          <h3 className="text-xs font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+        <div className="space-y-4 bg-bg-surface border border-border-default rounded-2xl p-4 sm:p-6 shadow-xl">
+          <h3 className="text-xs font-black tracking-widest text-text-secondary uppercase border-b border-border-default pb-2">
             {t('profileCardPage.partyHistoryTitle')}
           </h3>
 
           {historyLoading ? (
-            <p className="text-sm text-[#949ba4] py-4">{t('profileCardPage.loadingHistory')}</p>
+            <p className="text-sm text-text-secondary py-4">{t('profileCardPage.loadingHistory')}</p>
           ) : historyError ? (
             <div className="text-center py-4 space-y-2">
-              <p className="text-sm text-red-400">⚠️ {historyError}</p>
-              <button type="button" onClick={loadHistory} className="text-xs font-bold text-[#5865F2] hover:underline">
+              <p className="text-sm text-danger">⚠️ {historyError}</p>
+              <button type="button" onClick={loadHistory} className="text-xs font-bold text-brand hover:underline">
                 {t('common.retry')}
               </button>
             </div>
           ) : history.length === 0 ? (
-            <p className="text-sm text-[#949ba4] py-4">{t('profileCardPage.noHistoryYet')}</p>
+            <p className="text-sm text-text-secondary py-4">{t('profileCardPage.noHistoryYet')}</p>
           ) : (
             <div className="space-y-2">
               {visibleHistory.map((entry) => {
-                const badge = STATUS_BADGE[entry.status] || { label: entry.status, className: 'border-[#949ba4] text-[#949ba4] bg-[#949ba4]/10' };
+                const badge = STATUS_BADGE[entry.status] || { label: entry.status, variant: 'neutral' as const };
                 return (
-                  <div key={entry.id} className="flex items-center justify-between gap-3 bg-[#111214] rounded-lg px-3 py-2.5">
+                  <div key={entry.id} className="flex items-center justify-between gap-3 bg-bg-base rounded-lg px-3 py-2.5">
                     <div className="flex items-center gap-3 min-w-0">
                       <span className="text-[10px] shrink-0" title={entry.role === 'leader' ? t('profileCardPage.ledRecruitment') : t('profileCardPage.joinedRecruitment')}>
                         {entry.role === 'leader' ? '👑' : '🙋'}
                       </span>
                       <div className="min-w-0">
-                        <p className="text-xs font-bold text-white truncate">
+                        <p className="text-xs font-bold text-text-primary truncate">
                           {entry.selected_game || entry.queue_type}
-                          {entry.lanes && <span className="text-[#949ba4] font-normal"> · {entry.lanes}</span>}
+                          {entry.lanes && <span className="text-text-secondary font-normal"> · {entry.lanes}</span>}
                         </p>
                         <HelpText>{new Date(entry.created_at).toLocaleString()}</HelpText>
                       </div>
                     </div>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded border shrink-0 ${badge.className}`}>
-                      {badge.label}
-                    </span>
+                    {badge.variant === 'brand' ? (
+                      <span className="bg-brand/10 text-brand border-brand/20 border text-[10px] font-mono px-2 py-0.5 rounded font-black uppercase shrink-0">
+                        {badge.label}
+                      </span>
+                    ) : (
+                      <Badge variant={badge.variant} className="shrink-0">{badge.label}</Badge>
+                    )}
                   </div>
                 );
               })}
@@ -376,7 +381,7 @@ export default function ProfileActivityPage() {
                 <button
                   type="button"
                   onClick={() => setShowAllHistory(true)}
-                  className="w-full text-center text-xs font-bold text-[#5865F2] hover:underline py-2"
+                  className="w-full text-center text-xs font-bold text-brand hover:underline py-2"
                 >
                   {t('profileCardPage.showMoreHistory', { count: history.length - HISTORY_PREVIEW_COUNT })}
                 </button>

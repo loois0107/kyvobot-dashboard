@@ -810,6 +810,7 @@ const ko: typeof en = {
     statusFull: '정원 마감',
     statusClosed: '종료됨',
     statusExpired: '만료됨',
+    confirmPurchase: '{price} {currency}로 {item}을(를) 구매하시겠습니까?',
     purchasedSuccess: '{price} {currency}로 {item}을(를) 구매했습니다!',
     purchaseFailed: '구매 실패 ({status})',
     purchaseNetworkError: '구매 중 네트워크 오류가 발생했습니다.',

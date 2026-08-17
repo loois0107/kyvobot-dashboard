@@ -810,6 +810,7 @@ const en = {
     statusFull: 'Full',
     statusClosed: 'Closed',
     statusExpired: 'Expired',
+    confirmPurchase: 'Spend {price} {currency} on {item}?',
     purchasedSuccess: 'Purchased {item} for {price} {currency}!',
     purchaseFailed: 'Purchase failed ({status})',
     purchaseNetworkError: 'Network error while purchasing.',

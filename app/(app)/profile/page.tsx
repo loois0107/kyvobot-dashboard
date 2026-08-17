@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
+import Card from '@/components/ui/Card';
 
 interface Guild {
   id: string;
@@ -28,46 +29,43 @@ export default function ProfileGuildPicker() {
   }, [status]);
 
   if (status === 'loading' || loading) {
-    return <div className="min-h-screen bg-[#111214]" />;
+    return <div className="min-h-screen bg-bg-base" />;
   }
 
   return (
-    <div className="min-h-screen bg-[#111214] text-[#dbdee1] p-4 sm:p-8">
+    <div className="min-h-screen bg-bg-base text-text-primary p-4 sm:p-8">
       <div className="max-w-3xl mx-auto space-y-6">
         <header>
-          <h1 className="text-xl md:text-2xl font-black tracking-wider text-white">{t('profilePickerPage.title')}</h1>
+          <h1 className="text-xl md:text-2xl font-black tracking-wider text-text-primary">{t('profilePickerPage.title')}</h1>
           <HelpText className="mt-1 tracking-widest uppercase">
             {t('profilePickerPage.subtitle')}
           </HelpText>
         </header>
 
         {guilds.length === 0 ? (
-          <div className="text-center py-12 border border-dashed border-[#2b2d31] rounded-xl bg-[#1e1f22]">
-            <p className="text-sm text-gray-400">
+          <Card elevated className="!py-12 border-dashed text-center">
+            <p className="text-sm text-text-secondary">
               {t('profilePickerPage.noServersFound')}
             </p>
-          </div>
+          </Card>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {guilds.map((g) => (
-              <button
-                key={g.id}
-                type="button"
-                onClick={() => router.push(`/profile/${g.id}`)}
-                className="flex items-center gap-3 bg-[#1e1f22] border border-[#2b2d31] hover:border-[#5865F2] rounded-xl p-4 text-left transition-colors"
-              >
-                {g.icon ? (
-                  <img
-                    src={`https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png`}
-                    alt=""
-                    className="w-10 h-10 rounded-full"
-                  />
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-[#313338] flex items-center justify-center text-xs font-bold text-gray-400">
-                    {g.name.slice(0, 2).toUpperCase()}
-                  </div>
-                )}
-                <span className="text-sm font-bold text-white truncate">{g.name}</span>
+              <button key={g.id} type="button" onClick={() => router.push(`/profile/${g.id}`)} className="text-left">
+                <Card className="!p-4 flex items-center gap-3 hover:!border-brand">
+                  {g.icon ? (
+                    <img
+                      src={`https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png`}
+                      alt=""
+                      className="w-10 h-10 rounded-full"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-bg-elevated flex items-center justify-center text-xs font-bold text-text-secondary">
+                      {g.name.slice(0, 2).toUpperCase()}
+                    </div>
+                  )}
+                  <span className="text-sm font-bold text-text-primary truncate">{g.name}</span>
+                </Card>
               </button>
             ))}
           </div>

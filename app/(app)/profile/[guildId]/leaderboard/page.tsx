@@ -39,7 +39,7 @@ export default function ProfileLeaderboardPage() {
       });
   }, [status, guildId]);
 
-  if (status === 'loading') return <div className="min-h-screen bg-[#111214]" />;
+  if (status === 'loading') return <div className="min-h-screen bg-bg-base" />;
 
   const myUserId = (session?.user as any)?.id as string | undefined;
   // 🛡️ 쿼리에 .limit(100)이 걸려있어서(app/api/profile/[guildId]/leaderboard/route.ts) 100등
@@ -49,19 +49,19 @@ export default function ProfileLeaderboardPage() {
   const myRank = myIndex >= 0 ? myIndex + 1 : null;
 
   return (
-    <div className="min-h-screen bg-[#111214] text-white p-2 sm:p-4 md:p-6 font-mono">
+    <div className="min-h-screen bg-bg-base text-text-primary p-2 sm:p-4 md:p-6 font-mono">
       <SettingsPageContainer>
-        <div className="border-b border-[#2A1F40] pb-4">
-          <h1 className="text-xl md:text-2xl font-black tracking-wider text-white">{t('profileLeaderboardPage.title')}</h1>
+        <div className="border-b border-border-default pb-4">
+          <h1 className="text-xl md:text-2xl font-black tracking-wider text-text-primary">{t('profileLeaderboardPage.title')}</h1>
           <HelpText className="mt-1 tracking-wide">{t('profileLeaderboardPage.subtitle')}</HelpText>
         </div>
 
         {!loading && (
-          <div className="text-center py-3 rounded-xl border border-[#5865F2]/40 bg-[#5865F2]/10">
+          <div className="text-center py-3 rounded-xl border border-brand/40 bg-brand/10">
             {myRank !== null ? (
-              <p className="text-sm sm:text-base font-black text-[#5865F2]">{t('profileLeaderboardPage.yourRank', { rank: myRank })}</p>
+              <p className="text-sm sm:text-base font-black text-brand">{t('profileLeaderboardPage.yourRank', { rank: myRank })}</p>
             ) : (
-              <p className="text-sm font-bold text-[#a1a1aa]">{t('profileLeaderboardPage.outsideTop100')}</p>
+              <p className="text-sm font-bold text-text-secondary">{t('profileLeaderboardPage.outsideTop100')}</p>
             )}
           </div>
         )}
