@@ -22,8 +22,8 @@ export default function DashboardShowcase({ eyebrow, title, description, imageSr
         <span className="inline-block text-xs font-black tracking-widest text-[#5865F2] uppercase bg-[#5865F2]/10 border border-[#5865F2]/30 rounded-full px-4 py-1.5">
           {eyebrow}
         </span>
-        <h2 className="text-3xl md:text-4xl font-black text-white">{title}</h2>
-        <p className="max-w-2xl mx-auto text-base md:text-lg text-[#b5bac1] leading-relaxed">{description}</p>
+        <h2 className="text-3xl md:text-4xl font-black text-[#F5F5F5]">{title}</h2>
+        <p className="max-w-2xl mx-auto text-base md:text-lg text-[#A1A1AA] leading-relaxed">{description}</p>
       </div>
       {/* 🛡️ aspect-[16/9]+object-cover(고정 박스 크롭)를 버리고, 실제 width/height + w-full h-auto로
           이미지 자체 비율을 그대로 살린다 - overflow-hidden은 이제 잘라내는 용도가 아니라 rounded-2xl

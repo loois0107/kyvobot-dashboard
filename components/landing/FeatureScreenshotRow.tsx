@@ -71,12 +71,12 @@ function ImageSlot({
       />
     );
   }
-  /* bg-[#161626] + border는 캡처본이 없는 동안 이 슬롯이 빈 구멍처럼 안 보이게 하는
+  /* bg-[#141416] + border는 캡처본이 없는 동안 이 슬롯이 빈 구멍처럼 안 보이게 하는
      자리표시자 전용 - 실제 이미지가 준비되면(src) 위 분기로 완전히 대체된다. */
   return (
-    <div className="aspect-[16/9] rounded-2xl bg-[#161626] border border-[#2A1F40] flex flex-col items-center justify-center gap-3" title={future}>
+    <div className="aspect-[16/9] rounded-2xl bg-[#141416] border border-[#676771] flex flex-col items-center justify-center gap-3" title={future}>
       <span className="text-5xl opacity-60">{icon}</span>
-      <span className="font-mono text-[10px] uppercase tracking-widest text-[#5f6570]">{comingSoonLabel}</span>
+      <span className="font-mono text-[10px] uppercase tracking-widest text-[#85858B]">{comingSoonLabel}</span>
     </div>
   );
 }
@@ -128,8 +128,8 @@ export default function FeatureScreenshotRow({
         />
       </div>
       <div className="w-full md:w-1/2 space-y-4 text-center md:text-left">
-        <h3 className="text-2xl md:text-3xl font-bold text-white">{title}</h3>
-        <p className="text-base md:text-lg text-[#a1a1aa] leading-relaxed">{description}</p>
+        <h3 className="text-2xl md:text-3xl font-bold text-[#F5F5F5]">{title}</h3>
+        <p className="text-base md:text-lg text-[#A1A1AA] leading-relaxed">{description}</p>
       </div>
     </div>
   );
