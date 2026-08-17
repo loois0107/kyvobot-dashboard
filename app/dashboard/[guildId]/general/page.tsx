@@ -7,6 +7,7 @@ import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
 import { useGuildName } from '@/components/GuildsContext';
+import Card from '@/components/ui/Card';
 
 // 서버 언어 설정 전용 페이지 - 예전엔 settings/page.tsx(커스텀 매크로 페이지)에 매크로 관리와
 // 한 화면에 섞여 있었다. 둘 다 /api/settings/{guildId}의 같은 GET/POST를 쓰지만, POST의
@@ -95,28 +96,28 @@ export default function GeneralSettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg-base text-white p-6 font-mono selection:bg-[#2A1F40]">
+    <div className="min-h-screen bg-bg-base text-text-primary p-6 font-mono selection:bg-brand/20">
       <SettingsPageContainer>
-        <header className="mb-8 border-b border-[#2A1F40] pb-4">
-          <h1 className="text-2xl font-extrabold text-purple-400">{t('generalSettingsPage.title')}</h1>
+        <header className="mb-8 border-b border-border-default pb-4">
+          <h1 className="text-2xl font-extrabold text-brand">{t('generalSettingsPage.title')}</h1>
           <HelpText className="mt-1">{t('generalSettingsPage.subtitle')}</HelpText>
         </header>
 
-        <div className="flex flex-col gap-6 bg-[#161626] border border-[#2A1F40] p-6 rounded-xl shadow-xl">
+        <Card className="flex flex-col gap-6">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="text-sm text-gray-400 block mb-1">{t('common.activeContext')}</label>
-              <div className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-base text-purple-400 px-3 py-2 rounded font-bold select-none">
+              <label className="text-sm text-text-secondary block mb-1">{t('common.activeContext')}</label>
+              <div className="w-full bg-bg-elevated border border-border-default text-base text-text-primary px-3 py-2 rounded font-bold select-none">
                 {guildName || (guildId ? `${t('common.guildLabel')} ${guildId}` : t('common.loading'))}
               </div>
             </div>
             <div>
-              <label className="text-sm text-gray-400 block mb-1">{t('generalSettingsPage.serverLanguageLabel')}</label>
+              <label className="text-sm text-text-secondary block mb-1">{t('generalSettingsPage.serverLanguageLabel')}</label>
               <select
                 value={language}
                 onChange={(e) => handleLanguageChange(e.target.value)}
                 disabled={loading}
-                className="w-full bg-[#0F0F1A] border border-[#2A1F40] text-base text-white px-3 py-2 rounded focus:border-purple-500 outline-none cursor-pointer font-bold disabled:opacity-50"
+                className="w-full bg-bg-elevated border border-border-default text-base text-text-primary px-3 py-2 rounded focus:border-brand outline-none cursor-pointer font-bold disabled:opacity-50"
               >
                 <option value="en">🇺🇸 English (EN)</option>
                 <option value="ko">🇰🇷 한국어 (KO)</option>
@@ -125,7 +126,7 @@ export default function GeneralSettingsPage() {
             </div>
           </div>
 
-          <div className="pt-2 border-t border-[#2A1F40]">
+          <div className="pt-2 border-t border-border-default">
             <div className="flex items-center gap-2">
               <input
                 id="inviter-dm-toggle"
@@ -133,15 +134,15 @@ export default function GeneralSettingsPage() {
                 checked={inviterDmEnabled}
                 onChange={(e) => handleInviterDmToggle(e.target.checked)}
                 disabled={loading}
-                className="w-4 h-4 accent-[#5865F2] cursor-pointer disabled:opacity-50"
+                className="w-4 h-4 accent-brand cursor-pointer disabled:opacity-50"
               />
-              <label htmlFor="inviter-dm-toggle" className="text-sm font-black text-white cursor-pointer">
+              <label htmlFor="inviter-dm-toggle" className="text-sm font-black text-text-primary cursor-pointer">
                 {t('generalSettingsPage.inviterDmLabel')}
               </label>
             </div>
             <HelpText className="mt-1">{t('generalSettingsPage.inviterDmHelp')}</HelpText>
           </div>
-        </div>
+        </Card>
       </SettingsPageContainer>
     </div>
   );
