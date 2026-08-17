@@ -2,6 +2,7 @@
 
 import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
+import Card from '@/components/ui/Card';
 
 export interface LeaderboardUser {
   user_id: string;
@@ -84,39 +85,39 @@ function PodiumCard({
   const progress = Math.min(user.xp / maxXp, 1);
 
   return (
-    <div className={`flex flex-col items-center gap-2 p-5 sm:p-6 rounded-2xl border bg-[#161626] ${style.borderClass} ${style.glowClass} ${style.mobileOrder} ${style.desktopOrder} ${style.lift} ${style.cardWidth} ${isYou ? 'ring-2 ring-[#5865F2] ring-offset-2 ring-offset-[#0F0F1A]' : ''}`}>
+    <div className={`flex flex-col items-center gap-2 p-5 sm:p-6 rounded-2xl border bg-bg-surface ${style.borderClass} ${style.glowClass} ${style.mobileOrder} ${style.desktopOrder} ${style.lift} ${style.cardWidth} ${isYou ? 'ring-2 ring-brand ring-offset-2 ring-offset-bg-elevated' : ''}`}>
       {place === 1 && <span className="text-4xl leading-none">👑</span>}
-      <div className={`relative rounded-full ${style.avatarSize} ${style.borderClass} overflow-hidden bg-[#383A40] flex-shrink-0`}>
+      <div className={`relative rounded-full ${style.avatarSize} ${style.borderClass} overflow-hidden bg-bg-elevated flex-shrink-0`}>
         {user.avatar_url ? (
           <img src={user.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
         ) : (
-          <div className="h-full w-full bg-[#2A1F40] flex items-center justify-center text-sm font-black text-gray-400">KYVO</div>
+          <div className="h-full w-full bg-bg-surface flex items-center justify-center text-sm font-black text-text-secondary">KYVO</div>
         )}
       </div>
       <span className="text-2xl leading-none">{style.medal}</span>
-      <h3 className={`${style.nameSize} font-bold text-white text-center truncate max-w-[11rem]`}>
+      <h3 className={`${style.nameSize} font-bold text-text-primary text-center truncate max-w-[11rem]`}>
         {user.username}
-        {isYou && <span className="ml-1.5 text-[10px] font-black text-[#5865F2] align-middle">({youBadgeLabel})</span>}
+        {isYou && <span className="ml-1.5 text-[10px] font-black text-brand align-middle">({youBadgeLabel})</span>}
       </h3>
 
       <div className="w-full px-1">
-        <div className="flex justify-between text-xs font-bold text-gray-400 tracking-tighter mb-0.5">
+        <div className="flex justify-between text-xs font-bold text-text-secondary tracking-tighter mb-0.5">
           <span>{formatMetric(user.xp)} / {formatMetric(maxXp)} XP</span>
-          <span className="text-blue-400">{Math.round(progress * 100)}%</span>
+          <span className="text-brand">{Math.round(progress * 100)}%</span>
         </div>
-        <div className="w-full h-2.5 bg-[#383A40] rounded-full overflow-hidden">
-          <div className="h-full bg-[#5865F2] transition-all duration-500 ease-out" style={{ width: `${progress * 100}%` }} />
+        <div className="w-full h-2.5 bg-bg-elevated rounded-full overflow-hidden">
+          <div className="h-full bg-brand transition-all duration-500 ease-out" style={{ width: `${progress * 100}%` }} />
         </div>
       </div>
 
       <div className="flex gap-4 text-center font-mono pt-1">
         <div>
-          <div className="text-[10px] text-[#8b8d98] tracking-wider">{levelLabel}</div>
-          <div className={`${style.statSize} font-black text-white`}>{user.level}</div>
+          <div className="text-[10px] text-text-muted tracking-wider">{levelLabel}</div>
+          <div className={`${style.statSize} font-black text-text-primary`}>{user.level}</div>
         </div>
         <div>
-          <div className="text-[10px] text-[#8b8d98] tracking-wider">{pointsLabel}</div>
-          <div className={`${style.statSize} font-black text-[#FFD700]`}>{formatMetric(user.points)}P</div>
+          <div className="text-[10px] text-text-muted tracking-wider">{pointsLabel}</div>
+          <div className={`${style.statSize} font-black text-text-primary`}>{formatMetric(user.points)}P</div>
         </div>
       </div>
     </div>
@@ -139,31 +140,31 @@ export default function LeaderboardBoard({
   };
 
   const getRankStyle = (index: number, isYou: boolean) => {
-    const highlightRing = isYou ? ' ring-2 ring-[#5865F2]' : '';
+    const highlightRing = isYou ? ' ring-2 ring-brand' : '';
     switch (index) {
       case 0:
         return {
-          bg: `bg-[#FFD700]/5 border-[#FFD700]/30 animate-gold-aura${highlightRing}`,
+          bg: `!bg-[#FFD700]/5 !border-[#FFD700]/30 animate-gold-aura${highlightRing}`,
           badge: '🥇',
           text: 'text-[#FFD700] font-black scale-110 drop-shadow-[0_0_8px_rgba(255,215,0,0.6)]',
         };
       case 1:
         return {
-          bg: `bg-[#C0C0C0]/5 border-[#C0C0C0]/20 animate-silver-aura${highlightRing}`,
+          bg: `!bg-[#C0C0C0]/5 !border-[#C0C0C0]/20 animate-silver-aura${highlightRing}`,
           badge: '🥈',
           text: 'text-[#C0C0C0] font-bold drop-shadow-[0_0_8px_rgba(192,192,192,0.5)]',
         };
       case 2:
         return {
-          bg: `bg-[#CD7F32]/5 border-[#CD7F32]/20 animate-bronze-aura${highlightRing}`,
+          bg: `!bg-[#CD7F32]/5 !border-[#CD7F32]/20 animate-bronze-aura${highlightRing}`,
           badge: '🥉',
           text: 'text-[#CD7F32] font-bold drop-shadow-[0_0_8px_rgba(205,127,50,0.5)]',
         };
       default:
         return {
-          bg: `bg-[#161626] border-[#2A1F40] hover:border-[#5865F2]/40 hover:shadow-[0_0_20px_rgba(88,101,242,0.15)]${highlightRing}`,
+          bg: `hover:!border-brand/40 hover:shadow-[0_0_20px_rgba(88,101,242,0.15)]${highlightRing}`,
           badge: `#${index + 1}`,
-          text: 'text-[#a1a1aa] font-mono',
+          text: 'text-text-secondary font-mono',
         };
     }
   };
@@ -198,14 +199,14 @@ export default function LeaderboardBoard({
 
       <div className="space-y-3">
         {loading ? (
-          <div className="text-center py-20 border border-[#2A1F40] bg-[#161626] rounded-xl animate-pulse">
-            <p className="text-base text-[#FFD700] tracking-widest">{t('leaderboardPage.loadingStandings')}</p>
-          </div>
+          <Card elevated className="text-center !py-20 animate-pulse">
+            <p className="text-base text-text-secondary tracking-widest">{t('leaderboardPage.loadingStandings')}</p>
+          </Card>
         ) : users.length === 0 ? (
-          <div className="text-center py-20 border border-red-500/20 bg-[#161626] rounded-xl">
-            <p className="text-base text-red-400 tracking-wider font-bold">{t('leaderboardPage.noUsersTitle')}</p>
+          <Card elevated className="!border-danger/20 hover:!border-danger/20 text-center !py-20">
+            <p className="text-base text-danger tracking-wider font-bold">{t('leaderboardPage.noUsersTitle')}</p>
             <HelpText className="mt-2 font-sans">{t('leaderboardPage.noUsersSubtitle')}</HelpText>
-          </div>
+          </Card>
         ) : (
           (users.length >= 3 ? users.slice(3) : users).map((user, i) => {
             // 포디움이 그려질 땐(3명 이상) 상위 3명은 이미 위에 카드로 나왔으니 리스트에서
@@ -218,42 +219,46 @@ export default function LeaderboardBoard({
             const progress = Math.min(user.xp / maxXp, 1);
 
             return (
-              <div key={user.user_id} className={`border p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 transform transition-all duration-300 ease-out cursor-pointer hover:scale-[1.01) active:scale-[0.99] ${style.bg}`}>
+              <Card
+                elevated
+                key={user.user_id}
+                className={`!p-4 flex flex-col sm:flex-row items-center justify-between gap-4 transform transition-all duration-300 ease-out cursor-pointer hover:scale-[1.01] active:scale-[0.99] ${style.bg}`}
+              >
                 <div className="flex items-center gap-4 w-full sm:w-auto">
                   <span className={`text-base md:text-lg w-10 text-center ${style.text}`}>{style.badge}</span>
-                  <div className="h-12 w-12 rounded-full bg-[#383A40] overflow-hidden flex-shrink-0 border-2 border-[#2A1F40]">
-                    {user.avatar_url ? <img src={user.avatar_url} alt="Avatar" className="h-full w-full object-cover" /> : <div className="h-full w-full bg-[#2A1F40] flex items-center justify-center text-sm font-black text-gray-400">KYVO</div>}
+                  <div className="h-12 w-12 rounded-full bg-bg-elevated overflow-hidden flex-shrink-0 border-2 border-border-default">
+                    {user.avatar_url ? <img src={user.avatar_url} alt="Avatar" className="h-full w-full object-cover" /> : <div className="h-full w-full bg-bg-surface flex items-center justify-center text-sm font-black text-text-secondary">KYVO</div>}
                   </div>
                   <div className="truncate">
-                    <h3 className="text-base md:text-base font-bold text-white truncate">
+                    <h3 className="text-base md:text-base font-bold text-text-primary truncate">
                       {user.username}
-                      {isYou && <span className="ml-1.5 text-[10px] font-black text-[#5865F2]">({t('profileLeaderboardPage.youBadge')})</span>}
+                      {isYou && <span className="ml-1.5 text-[10px] font-black text-brand">({t('profileLeaderboardPage.youBadge')})</span>}
                     </h3>
                     <HelpText className="font-mono mt-0.5">{t('leaderboardPage.nodeIdLabel')} {user.user_id}</HelpText>
                   </div>
                 </div>
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-8 w-full sm:w-auto justify-end">
                   <div className="flex flex-col gap-1 w-full sm:w-44">
-                    <div className="flex justify-between text-[10px] font-bold text-gray-400 tracking-tighter">
+                    <div className="flex justify-between text-[10px] font-bold text-text-secondary tracking-tighter">
                       <span>{formatMetric(user.xp)} / {formatMetric(maxXp)} XP</span>
-                      <span className="text-blue-400">{Math.round(progress * 100)}%</span>
+                      <span className="text-brand">{Math.round(progress * 100)}%</span>
                     </div>
-                    <div className="w-full h-2 bg-[#383A40] rounded-full overflow-hidden">
-                      <div className="h-full bg-[#5865F2] transition-all duration-500 ease-out" style={{ width: `${progress * 100}%` }} />
+                    <div className="w-full h-2 bg-bg-elevated rounded-full overflow-hidden">
+                      <div className="h-full bg-brand transition-all duration-500 ease-out" style={{ width: `${progress * 100}%` }} />
                     </div>
                   </div>
                   <div className="flex justify-between sm:justify-end gap-6 text-right font-mono min-w-[120px]">
                     <div>
-                      <div className="text-sm text-[#8b8d98] tracking-wider">{t('leaderboardPage.level')}</div>
-                      <div className="text-base md:text-base font-black text-white">{user.level}</div>
+                      <div className="text-sm text-text-muted tracking-wider">{t('leaderboardPage.level')}</div>
+                      <div className="text-base md:text-base font-black text-text-primary">{user.level}</div>
                     </div>
                     <div>
-                      <div className="text-sm text-[#8b8d98] tracking-wider">{t('leaderboardPage.points')}</div>
-                      <div className="text-base md:text-base font-black text-[#FFD700]">{formatMetric(user.points)}P</div>
+                      <div className="text-sm text-text-muted tracking-wider">{t('leaderboardPage.points')}</div>
+                      <div className="text-base md:text-base font-black text-text-primary">{formatMetric(user.points)}P</div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Card>
             );
           })
         )}

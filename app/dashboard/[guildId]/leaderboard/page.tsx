@@ -8,6 +8,7 @@ import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
 import { useGuildName } from '@/components/GuildsContext';
 import LeaderboardBoard, { type LeaderboardUser } from '@/components/LeaderboardBoard';
+import Card from '@/components/ui/Card';
 
 export default function GuildLeaderboardTerminal() {
   const router = useRouter();
@@ -51,27 +52,27 @@ export default function GuildLeaderboardTerminal() {
 
   if (status === 'loading' || status === 'unauthenticated') {
     return (
-      <div className="text-center space-y-3 border border-red-500/30 bg-[#161626] p-8 rounded-xl max-w-md mx-auto shadow-2xl mt-20">
-        <p className="text-base text-red-400 font-bold tracking-widest animate-pulse">
+      <Card elevated className="!border-danger/30 hover:!border-danger/30 text-center space-y-3 !p-8 max-w-md mx-auto shadow-2xl mt-20">
+        <p className="text-base text-danger font-bold tracking-widest animate-pulse">
           {t('leaderboardPage.accessDenied')}
         </p>
         <HelpText>
           {t('leaderboardPage.redirecting')}
         </HelpText>
-      </div>
+      </Card>
     );
   }
 
   return (
-    <div className="font-mono text-white selection:bg-[#2A1F40]">
+    <div className="font-mono text-text-primary selection:bg-brand/20">
       <SettingsPageContainer>
         {/* 🛡️ [정직성 정리] "ALL PREMIUM BYPASS ACTIVE" 배지가 있었지만, 이 봇엔 애초에 프리미엄
             등급 자체가 없다 - 아무 상태와도 연결되지 않은 채 항상 떠 있던 문구라 그냥 없앤다. */}
-        <div className="flex justify-between items-center border-b border-[#2A1F40] pb-4">
+        <div className="flex justify-between items-center border-b border-border-default pb-4">
           <div>
-            <h1 className="text-xl md:text-2xl font-black tracking-wider text-white">{t('leaderboardPage.title')}</h1>
+            <h1 className="text-xl md:text-2xl font-black tracking-wider text-text-primary">{t('leaderboardPage.title')}</h1>
             <HelpText className="mt-1 tracking-wide">
-              {t('leaderboardPage.subtitle')} <code className="text-[#5865F2]">{guildName || guildId}</code>
+              {t('leaderboardPage.subtitle')} <code className="text-brand">{guildName || guildId}</code>
             </HelpText>
           </div>
         </div>
