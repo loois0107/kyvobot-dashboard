@@ -23,24 +23,24 @@ export default function LanguageToggle() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 bg-[#232428] hover:bg-[#2b2d31] rounded-full px-3 py-1.5 text-xs font-black tracking-wider text-white transition-colors"
+        className="flex items-center gap-1.5 bg-bg-elevated hover:bg-bg-elevated/70 rounded-full px-3 py-1.5 text-xs font-black tracking-wider text-text-primary transition-colors"
       >
         <span>{current.flag}</span>
         <span className="hidden sm:inline">{current.label}</span>
-        <span className="text-[#949ba4] text-[10px]">▾</span>
+        <span className="text-text-muted text-[10px]">▾</span>
       </button>
 
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 mt-2 w-40 bg-[#1e1f22] border border-[#2b2d31] rounded-xl shadow-2xl overflow-hidden z-20">
+          <div className="absolute right-0 mt-2 w-40 bg-bg-surface border border-border-default rounded-xl shadow-2xl overflow-hidden z-20">
             {LANGUAGE_OPTIONS.map((o) => (
               <button
                 key={o.code}
                 type="button"
                 onClick={() => { setLang(o.code); setOpen(false); }}
                 className={`flex items-center gap-2 w-full text-left px-4 py-2.5 text-sm font-bold transition-colors ${
-                  o.code === lang ? 'bg-[#5865F2]/15 text-white' : 'text-[#dbdee1] hover:bg-[#2b2d31]'
+                  o.code === lang ? 'bg-brand/15 text-text-primary' : 'text-text-secondary hover:bg-bg-elevated'
                 }`}
               >
                 <span>{o.flag}</span>
