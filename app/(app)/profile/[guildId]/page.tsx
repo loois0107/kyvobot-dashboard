@@ -8,6 +8,7 @@ import { useToast } from '@/components/Toast';
 import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
+import Button from '@/components/ui/Button';
 
 const COLOR_PRESETS = ['#5865F2', '#23A55A', '#FEE75C', '#EB459E', '#ED4245', '#9B59B6', '#00D2D3', '#54A0FF', '#FF6B6B', '#FFFFFF'];
 const BG_COLOR_PRESETS = ['#1E1F22', '#2B2D31', '#313338', '#111214', '#0F0F1A', '#161626'];
@@ -172,45 +173,44 @@ export default function PersonalCardSettings() {
     }
   };
 
-  if (status === 'loading' || loading) return <div className="min-h-screen bg-[#111214]" />;
+  if (status === 'loading' || loading) return <div className="min-h-screen bg-bg-base" />;
 
   return (
-    <div className="min-h-screen bg-[#111214] text-[#dbdee1] p-2 sm:p-4 md:p-6 pb-28">
+    <div className="min-h-screen bg-bg-base text-text-primary p-2 sm:p-4 md:p-6 pb-28">
       <SettingsPageContainer>
-        <header className="border-b border-[#2b2d31] pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <header className="border-b border-border-default pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('profileCardPage.title')}</h1>
-            <HelpText className="mt-1 tracking-widest uppercase">
+            <h1 className="text-xl md:text-2xl font-black tracking-wider text-brand">{t('profileCardPage.title')}</h1>
+            {/* 🛡️ 문장 길이 때문에 Badge(10px mono uppercase pill)로는 안 바꿨다 - "Personal style
+                active for this server" 같은 완전한 문장을 pill 모양에 억지로 넣으면 줄바꿈되어
+                깨진다. 대신 상태에 따라 색만 success/secondary로 갈아써서 같은 "지금 활성 상태인가"
+                신호는 유지한다. */}
+            <p className={`text-sm mt-1 tracking-widest uppercase font-medium ${hasOverride ? 'text-success' : 'text-text-secondary'}`}>
               {hasOverride ? t('profileCardPage.personalStyleActive') : t('profileCardPage.usingServerDefault')}
-            </HelpText>
+            </p>
           </div>
           <div className="flex gap-2 w-full sm:w-auto">
             {hasOverride && (
-              <button
-                type="button"
-                onClick={handleReset}
-                disabled={isSaving}
-                className="flex-1 sm:flex-none bg-[#2b2d31] hover:bg-[#35373c] text-white text-xs font-black px-4 py-3 rounded-xl transition-all"
-              >
+              <Button type="button" variant="secondary" onClick={handleReset} disabled={isSaving} className="flex-1 sm:flex-none">
                 {t('profileCardPage.resetToDefault')}
-              </button>
+              </Button>
             )}
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={isSaving}
-              className="flex-1 sm:flex-none bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all"
-            >
+            <Button type="button" variant="primary" onClick={handleSave} disabled={isSaving} className="flex-1 sm:flex-none">
               {isSaving ? t('common.saving') : t('profileCardPage.saveMyCard')}
-            </button>
+            </Button>
           </div>
         </header>
 
-        <div className="space-y-4 bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 shadow-xl">
-          <h3 className="text-xs font-black tracking-widest text-[#949ba4] border-b border-[#2b2d31] pb-2">
+        <div className="space-y-4 bg-bg-surface border border-border-default rounded-2xl p-4 sm:p-6 shadow-xl">
+          <h3 className="text-xs font-black tracking-widest text-text-secondary border-b border-border-default pb-2">
             {t('profileCardPage.previewTitle')}
           </h3>
 
+          {/* 🛡️ [미리보기 캔버스 보호] 이 div부터 그 안의 모든 자손 요소는 leveling/welcome의
+              카드 미리보기와 동일하게 손대지 않는다 - 실제 Discord에 렌더링되는 카드 모습을
+              그대로 시뮬레이션하는 영역이라 항상 고정된 다크 배경이어야 하고(관리자 대시보드의
+              다크/라이트 토글과 무관), cardColor/cardBgColor/overlayOpacity/backgroundUrl 같은
+              유저가 고른 값도 여기 섞여 있다. */}
           <div
             className="w-full aspect-[920/240] rounded-xl relative bg-cover bg-center overflow-hidden border border-[#232428]"
             style={{
@@ -243,8 +243,11 @@ export default function PersonalCardSettings() {
           <div className="pt-4 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#b5bac1]">{t('profileCardPage.accentColorLabel')}</label>
+                <label className="text-xs font-bold text-text-secondary">{t('profileCardPage.accentColorLabel')}</label>
                 <div className="flex flex-wrap gap-1.5">
+                  {/* 🛡️ [보호] COLOR_PRESETS 리터럴 값과 선택 링(border-white)은 leveling/welcome과
+                      동일하게 그대로 둔다 - 값이 우연히 브랜드/성공 토큰과 같아 보여도 이건 유저가
+                      고르는 고정 팔레트라 토큰과 연동되면 안 된다. */}
                   {COLOR_PRESETS.map((p) => (
                     <button
                       key={p}
@@ -257,7 +260,7 @@ export default function PersonalCardSettings() {
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[#b5bac1]">{t('profileCardPage.bgColorLabel')}</label>
+                <label className="text-xs font-bold text-text-secondary">{t('profileCardPage.bgColorLabel')}</label>
                 <div className="flex flex-wrap gap-1.5">
                   {BG_COLOR_PRESETS.map((p) => (
                     <button
@@ -273,8 +276,8 @@ export default function PersonalCardSettings() {
             </div>
 
             <div className="space-y-1.5 pt-2">
-              <label className="text-xs font-bold text-[#b5bac1]">
-                {t('profileCardPage.overlayOpacityLabel')} <span className="text-[#5865F2] font-mono">{Math.round(overlayOpacity * 100)}%</span>
+              <label className="text-xs font-bold text-text-secondary">
+                {t('profileCardPage.overlayOpacityLabel')} <span className="text-brand font-mono">{Math.round(overlayOpacity * 100)}%</span>
               </label>
               <input
                 type="range"
@@ -283,14 +286,14 @@ export default function PersonalCardSettings() {
                 step="0.05"
                 value={overlayOpacity}
                 onChange={(e) => { setOverlayOpacity(parseFloat(e.target.value)); setIsDirty(true); }}
-                className="w-full h-1 bg-[#232428] rounded-lg cursor-pointer accent-[#5865F2]"
+                className="w-full h-1 bg-bg-elevated rounded-lg cursor-pointer accent-brand"
               />
             </div>
 
             <div className="space-y-2 pt-2">
-              <label className="text-xs font-bold text-[#b5bac1]">{t('profileCardPage.bgImageLabel')}</label>
+              <label className="text-xs font-bold text-text-secondary">{t('profileCardPage.bgImageLabel')}</label>
               <div className="flex items-center gap-3">
-                <label className={`inline-block bg-[#2b2d31] hover:bg-[#35373c] text-white text-xs font-black px-4 py-2.5 rounded-lg transition-all ${isUploadingBg ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+                <label className={`inline-block bg-bg-elevated hover:bg-bg-elevated/70 text-text-primary text-xs font-black px-4 py-2.5 rounded-lg transition-all ${isUploadingBg ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
                   {isUploadingBg
                     ? t('profileCardPage.uploading')
                     : backgroundUrl
@@ -308,7 +311,7 @@ export default function PersonalCardSettings() {
                   <button
                     type="button"
                     onClick={() => { setBackgroundUrl(''); setIsDirty(true); }}
-                    className="text-xs font-bold text-red-400 hover:underline"
+                    className="text-xs font-bold text-danger hover:underline"
                   >
                     {t('profileCardPage.bgImageRemoveButton')}
                   </button>
@@ -321,15 +324,15 @@ export default function PersonalCardSettings() {
       </SettingsPageContainer>
 
       {isDirty && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1e1f22]/95 border border-[#FFD700]/50 px-6 py-3.5 rounded-xl shadow-2xl flex items-center justify-between gap-8 backdrop-blur-md w-[90%] max-w-xl">
-          <span className="text-xs font-bold text-gray-200">{t('common.unsavedChanges')}</span>
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-bg-surface/95 border border-warning/50 px-6 py-3.5 rounded-xl shadow-2xl flex items-center justify-between gap-8 backdrop-blur-md w-[90%] max-w-xl">
+          <span className="text-xs font-bold text-text-primary">{t('common.unsavedChanges')}</span>
           <div className="flex gap-3">
-            <button type="button" onClick={loadSettings} className="text-xs font-bold text-gray-400 hover:text-white transition">
+            <Button type="button" variant="ghost" onClick={loadSettings} className="!px-0">
               {t('common.discard')}
-            </button>
-            <button type="button" onClick={handleSave} className="bg-[#23A55A] hover:bg-[#1a7f43] text-white text-xs font-black px-5 py-2 rounded-lg">
+            </Button>
+            <Button type="button" variant="success" onClick={handleSave} className="!px-5 !py-2 text-xs">
               {t('common.save')}
-            </button>
+            </Button>
           </div>
         </div>
       )}

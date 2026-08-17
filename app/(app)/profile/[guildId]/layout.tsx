@@ -23,13 +23,13 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
   if (status === 'unauthenticated') {
     const callbackUrl = pathname || (guildId ? `/profile/${guildId}` : '/profile');
     return (
-      <div className="min-h-screen bg-[#111214] flex items-center justify-center p-4">
-        <div className="text-center space-y-4 border border-[#2b2d31] bg-[#1e1f22] p-8 rounded-2xl shadow-2xl max-w-md w-full">
-          <h1 className="text-xl font-black text-[#FFD700]">{t('profileCardPage.loginRequiredTitle')}</h1>
-          <p className="text-sm text-[#a1a1aa]">{t('profileCardPage.loginRequiredDesc')}</p>
+      <div className="min-h-screen bg-bg-base flex items-center justify-center p-4">
+        <div className="text-center space-y-4 border border-border-default bg-bg-surface p-8 rounded-2xl shadow-2xl max-w-md w-full">
+          <h1 className="text-xl font-black text-warning">{t('profileCardPage.loginRequiredTitle')}</h1>
+          <p className="text-sm text-text-secondary">{t('profileCardPage.loginRequiredDesc')}</p>
           <a
             href={`/api/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`}
-            className="inline-block bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all"
+            className="inline-block bg-brand hover:bg-brand-hover text-white text-sm font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all"
           >
             {t('profileCardPage.loginButton')}
           </a>
@@ -38,7 +38,7 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
     );
   }
 
-  if (status === 'loading') return <div className="min-h-screen bg-[#111214]" />;
+  if (status === 'loading') return <div className="min-h-screen bg-bg-base" />;
 
   const isActivityTab = pathname?.endsWith('/activity');
   const isLeaderboardTab = pathname?.endsWith('/leaderboard');
@@ -49,14 +49,14 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
   ];
 
   return (
-    <div className="min-h-screen bg-[#111214]">
-      <div className="flex gap-1 border-b border-[#2b2d31] px-2 sm:px-4 pt-2">
+    <div className="min-h-screen bg-bg-base">
+      <div className="flex gap-1 border-b border-border-default px-2 sm:px-4 pt-2">
         {tabs.map((tab) => (
           <Link
             key={tab.href}
             href={tab.href}
             className={`px-4 py-2.5 text-xs font-black tracking-widest uppercase border-b-2 transition-all ${
-              tab.active ? 'border-[#5865F2] text-white' : 'border-transparent text-[#949ba4] hover:text-[#dbdee1]'
+              tab.active ? 'border-brand text-text-primary' : 'border-transparent text-text-secondary hover:text-text-primary'
             }`}
           >
             {tab.label}
