@@ -20,12 +20,15 @@ type GroupTabLayoutProps = {
 export default function GroupTabLayout({ tabs, children }: GroupTabLayoutProps) {
   return (
     <div>
-      <div className="flex gap-1 border-b border-border-default mb-6">
+      {/* 🛡️ overflow-x-auto + whitespace-nowrap - 탭 2개(연동 & AI 지원)일 땐 안 걸렸지만, 4개
+          (파티 & 게임)로 늘어나자 모바일 폭에서 탭바가 부모 폭을 넘어 마지막 탭이 화면 밖으로
+          잘리는 걸 확인했다. 줄바꿈 대신 가로 스크롤로 흘려보내 전부 클릭 가능하게 유지한다. */}
+      <div className="flex gap-1 border-b border-border-default mb-6 overflow-x-auto">
         {tabs.map((tab) => (
           <Link
             key={tab.href}
             href={tab.href}
-            className={`px-4 py-2.5 text-xs font-black tracking-widest uppercase border-b-2 transition-all ${
+            className={`px-4 py-2.5 text-xs font-black tracking-widest uppercase border-b-2 transition-all whitespace-nowrap shrink-0 ${
               tab.active ? 'border-brand text-text-primary' : 'border-transparent text-text-secondary hover:text-text-primary'
             }`}
           >

@@ -21,10 +21,7 @@ import {
   Smile,
   Terminal,
   ScrollText,
-  Users,
-  BarChart3,
   Gamepad2,
-  Swords,
   Sparkles,
   Trophy,
   Gift,
@@ -193,21 +190,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </SidebarNavLink>
             </div>
 
-            <div className="space-y-1">
-              <label className="block text-sm font-bold text-text-secondary uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryPartyGames')}</label>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/party-settings`} active={pathname?.includes('/party-settings')} icon={Users}>
-                {t('sidebar.partyRecruitment')}
-              </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/party-stats`} active={pathname?.includes('/party-stats')} icon={BarChart3}>
-                {t('sidebar.partyStats')}
-              </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/party-presets`} active={pathname?.includes('/party-presets')} icon={Gamepad2}>
-                {t('sidebar.gamePresets')}
-              </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/tier-roles`} active={pathname?.includes('/tier-roles')} icon={Swords}>
-                {t('sidebar.tierRoleMapping')}
-              </SidebarNavLink>
-            </div>
+            {/* 🛡️ [파티 & 게임 그룹] "연동 & AI 지원" 파일럿과 동일 패턴 - 개별 링크 4개 대신
+                그룹 진입점 1개. 아이콘은 기존 4개 중 Gamepad2(게임 프리셋에서 재사용) - 게임
+                컨트롤러가 "파티 모집/통계/프리셋/티어"를 아우르는 "같이 게임한다"는 그룹
+                전체 개념을 가장 보편적으로 대표한다고 판단해서 새로 고르지 않고 그대로 썼다. */}
+            <SidebarNavLink href={`/dashboard/${currentGuildId}/party/party-settings`} active={pathname?.includes('/party')} icon={Gamepad2}>
+              {t('sidebar.categoryPartyGames')}
+            </SidebarNavLink>
 
             <div className="space-y-1">
               <label className="block text-sm font-bold text-text-secondary uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryEconomy')}</label>

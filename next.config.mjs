@@ -19,6 +19,27 @@ const nextConfig = {
         destination: '/dashboard/:guildId/integrations/ticket-settings',
         permanent: false,
       },
+      // 🛡️ [파티 & 게임 그룹] 연동 & AI 지원과 동일한 정책(permanent: false).
+      {
+        source: '/dashboard/:guildId/party-settings',
+        destination: '/dashboard/:guildId/party/party-settings',
+        permanent: false,
+      },
+      {
+        source: '/dashboard/:guildId/party-stats',
+        destination: '/dashboard/:guildId/party/party-stats',
+        permanent: false,
+      },
+      {
+        source: '/dashboard/:guildId/party-presets',
+        destination: '/dashboard/:guildId/party/party-presets',
+        permanent: false,
+      },
+      {
+        source: '/dashboard/:guildId/tier-roles',
+        destination: '/dashboard/:guildId/party/tier-roles',
+        permanent: false,
+      },
     ];
   },
 };

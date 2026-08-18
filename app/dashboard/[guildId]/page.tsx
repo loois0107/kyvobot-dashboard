@@ -222,7 +222,7 @@ export default function DashboardHome() {
           <div className="space-y-2">
             <ChecklistRow done={onboarding.items.automod} label={t('dashboardHome.checklistAutomod')} href={`/dashboard/${guildId}/automod`} />
             <ChecklistRow done={onboarding.items.welcome} label={t('dashboardHome.checklistWelcome')} href={`/dashboard/${guildId}/welcome`} />
-            <ChecklistRow done={onboarding.items.presets} label={t('dashboardHome.checklistPresets')} href={`/dashboard/${guildId}/party-presets`} />
+            <ChecklistRow done={onboarding.items.presets} label={t('dashboardHome.checklistPresets')} href={`/dashboard/${guildId}/party/party-presets`} />
           </div>
         </Card>
       )}
