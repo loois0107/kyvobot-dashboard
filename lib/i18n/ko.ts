@@ -4,9 +4,8 @@ import type en from './en';
 // 키 하나라도 빠지거나 이름이 다르면 컴파일 타임에 바로 에러가 난다.
 const ko: typeof en = {
   sidebar: {
-    genericHome: '🏠 홈',
-    genericControlHub: '🎛️ 컨트롤 허브',
-    genericTitle: 'KYVO DASH',
+    genericHome: '홈',
+    genericControlHub: '컨트롤 허브',
     genericStatus: 'Kyvo 대시보드',
     selectServer: '서버 선택',
     modules: '모듈',

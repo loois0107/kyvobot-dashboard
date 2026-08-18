@@ -5,9 +5,9 @@ import Sidebar from '@/components/Sidebar';
 // own full-screen layout instead.
 export default function AppGroupLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex flex-col md:flex-row min-h-screen font-mono">
+    <div className="flex flex-col md:flex-row min-h-screen">
       <Sidebar />
-      <main className="flex-1 w-full bg-[#0F0F1A] p-4 md:p-8 overflow-x-hidden">
+      <main className="flex-1 w-full bg-bg-base p-4 md:p-8 overflow-x-hidden">
         {children}
       </main>
     </div>

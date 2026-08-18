@@ -2,9 +2,8 @@
 // 한다(lib/i18n/index.ts의 타입이 이걸 강제한다) - 키가 어긋나면 컴파일 타임에 바로 잡힌다.
 const en = {
   sidebar: {
-    genericHome: '🏠 Home',
-    genericControlHub: '🎛️ Control Hub',
-    genericTitle: 'KYVO DASH',
+    genericHome: 'Home',
+    genericControlHub: 'Control Hub',
     genericStatus: 'Kyvo Dashboard',
     selectServer: 'Select Server',
     modules: 'Modules',
