@@ -174,10 +174,10 @@ const RANK_CARD_SHOWCASE = {
   imageHeight: 240,
   setupLocalizedBaseName: 'rank-card-setup',
   setupFutureImageSrc: '/images/features/rank-card-setup.png',
-  // 🛡️ 아직 실측 못 함(파일 미준비) - 일반적인 대시보드 설정 패널 비율로 근사치를 잡아둔다.
-  // 실제 파일이 들어오면 다른 슬롯들처럼 w-full h-auto가 로드된 진짜 크기를 그대로 따라간다.
-  setupImageWidth: 1200,
-  setupImageHeight: 800,
+  // 🛡️ rank-card-setup-en.png/-ko.png 실측(1362x863, 둘이 정확히 같음) - 레이아웃 예약용 근사치일
+  // 뿐이지만(w-full h-auto가 실제 로드된 크기를 그대로 따라감), 재캡처 후 실측치로 갱신해둔다.
+  setupImageWidth: 1362,
+  setupImageHeight: 863,
 } as const;
 
 interface DiscordGuild {
@@ -394,11 +394,11 @@ export default async function RootPage() {
             // resolveLocalizedImage가 반대 언어 파일로 폴백하므로 깨진 이미지가 뜰 일이 없다.
             // 최종 ?? 은 두 언어 파일이 전부 사라지는(배포 사고급) 극단적 상황에 대비한 타입 안전용.
             imageSrc={resolveLocalizedImage('leveling-dashboard', lang) ?? '/images/features/leveling-dashboard-en.png'}
-            // 🛡️ leveling-dashboard-en.png(2880x1800) 실측 비율 - ko 버전(1477x854)과 정확히
+            // 🛡️ leveling-dashboard-en.png(1630x3375) 실측 비율 - ko 버전(1630x3329)과 정확히
             // 같진 않지만 레이아웃 예약용 근사치면 충분하다(실제 렌더는 w-full h-auto가 로드된
             // 파일 크기를 그대로 따라감).
-            imageWidth={2880}
-            imageHeight={1800}
+            imageWidth={1630}
+            imageHeight={3375}
           />
         </RevealOnScroll>
       </section>
