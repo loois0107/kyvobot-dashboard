@@ -22,9 +22,7 @@ import {
   Terminal,
   ScrollText,
   Gamepad2,
-  Sparkles,
   Trophy,
-  Gift,
   Plug,
   Home,
   BookOpen,
@@ -198,24 +196,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               {t('sidebar.categoryPartyGames')}
             </SidebarNavLink>
 
-            <div className="space-y-1">
-              <label className="block text-sm font-bold text-text-secondary uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryEconomy')}</label>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/leveling`} active={pathname?.includes('/leveling')} icon={Sparkles}>
-                {t('sidebar.levelingEconomy')}
-              </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/leaderboard`} active={pathname?.includes('/leaderboard')} icon={Trophy}>
-                {t('sidebar.serverLeaderboard')}
-              </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/giveaways`} active={pathname?.includes('/giveaways')} icon={Gift}>
-                {t('sidebar.giveaways')}
-              </SidebarNavLink>
-            </div>
+            {/* 🛡️ [경제 & 참여도 그룹] 개별 링크 3개 대신 그룹 진입점 1개. 아이콘은 기존 3개
+                (Sparkles/Trophy/Gift) 중 Trophy - 레벨링(XP 적립)·리더보드(순위)·추첨(보상)이
+                전부 "서버 참여도에 따른 성취/보상"이라는 한 개념으로 묶이는데, Trophy가 그
+                "성취"를 가장 보편적으로 표현하고, 셋 중 리더보드가 economy 시스템 전체의
+                결과를 보여주는 요약 화면 성격이라는 점도 반영했다. */}
+            <SidebarNavLink href={`/dashboard/${currentGuildId}/economy/leveling`} active={pathname?.includes('/economy')} icon={Trophy}>
+              {t('sidebar.categoryEconomy')}
+            </SidebarNavLink>
 
             {/* 🛡️ [연동 & AI 지원 그룹 파일럿] 트위치/AI지원티켓 개별 링크 2개 대신, 그룹
                 진입점 1개로 교체 - 클릭하면 첫 탭(twitch)으로 들어가고, 그 안에서
                 integrations/layout.tsx가 렌더링하는 탭바로 두 세부 페이지를 전환한다.
-                나머지 3개 그룹(커뮤니티 관리/파티 & 게임/경제 & 참여도)은 이번 파일럿
-                범위가 아니라 기존 "카테고리 라벨 + 개별 링크" 구조 그대로 유지한다. */}
+                나머지 1개 그룹(커뮤니티 관리)만 아직 이번 재구성 대상이 아니라 기존
+                "카테고리 라벨 + 개별 링크" 구조 그대로 유지한다. */}
             <SidebarNavLink href={`/dashboard/${currentGuildId}/integrations/twitch`} active={pathname?.includes('/integrations')} icon={Plug}>
               {t('sidebar.categoryIntegrationsAI')}
             </SidebarNavLink>

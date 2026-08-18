@@ -336,7 +336,7 @@ export default function DashboardHome() {
       <div className="space-y-4">
         <h3 className="text-sm font-black tracking-widest text-text-secondary uppercase px-1">{t('dashboardHome.quickLinksTitle')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Link href={`/dashboard/${guildId}/leveling`}>
+          <Link href={`/dashboard/${guildId}/economy/leveling`}>
             <Card className="!p-8 flex flex-col justify-between min-h-[210px]">
               <div><Sparkles className="w-8 h-8 mb-3 text-text-secondary" /><h4 className="text-base font-black text-text-primary uppercase tracking-wider">{t('dashboardHome.levelingEcoTitle')}</h4><p className="text-sm text-text-secondary mt-2 leading-relaxed">{t('dashboardHome.levelingEcoDesc')}</p></div>
               <span className="text-[10px] text-text-secondary font-bold tracking-widest mt-4 block">{t('dashboardHome.levelingCta')}</span>

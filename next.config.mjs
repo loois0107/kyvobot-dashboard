@@ -40,6 +40,22 @@ const nextConfig = {
         destination: '/dashboard/:guildId/party/tier-roles',
         permanent: false,
       },
+      // 🛡️ [경제 & 참여도 그룹] 동일 정책(permanent: false).
+      {
+        source: '/dashboard/:guildId/leveling',
+        destination: '/dashboard/:guildId/economy/leveling',
+        permanent: false,
+      },
+      {
+        source: '/dashboard/:guildId/leaderboard',
+        destination: '/dashboard/:guildId/economy/leaderboard',
+        permanent: false,
+      },
+      {
+        source: '/dashboard/:guildId/giveaways',
+        destination: '/dashboard/:guildId/economy/giveaways',
+        permanent: false,
+      },
     ];
   },
 };
