@@ -37,6 +37,7 @@ const ko: typeof en = {
     mobileHeaderTitle: 'Kyvo 컨트롤 허브',
     mainHeaderTitle: 'Kyvo 중앙 컨트롤 허브',
     syncStatus: '연결됨',
+    breadcrumbRoot: '대시보드',
     goBack: '뒤로 가기',
     homeButton: '홈',
     guideButton: '가이드',

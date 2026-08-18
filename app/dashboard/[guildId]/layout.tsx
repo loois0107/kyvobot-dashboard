@@ -10,6 +10,7 @@ import BotNotInvitedNotice from '@/components/BotNotInvitedNotice';
 import { GuildsProvider, type ManagedGuild } from '@/components/GuildsContext';
 import Button from '@/components/ui/Button';
 import SidebarNavLink from '@/components/ui/SidebarNavLink';
+import Breadcrumb from '@/components/dashboard/Breadcrumb';
 import {
   LayoutDashboard,
   User,
@@ -117,6 +118,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
+    // 🛡️ [브레드크럼] guilds 목록을 예전엔 children 바로 앞에서만 GuildsProvider로 감쌌는데,
+    // 브레드크럼이 모바일 전용 줄(<main> 바깥)과 데스크톱 줄(botStatus 게이트 안) 두 군데에서
+    // useGuildName()을 써야 해서 트리 전체를 감싸는 최상위로 끌어올렸다.
+    <GuildsProvider guilds={guilds}>
     <div className="flex min-h-screen bg-bg-base text-text-primary font-sans relative overflow-x-hidden">
       
       {isMobileMenuOpen && (
@@ -217,6 +222,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <LanguageToggle />
           </div>
         </div>
+        {/* 🛡️ [브레드크럼] 모바일 헤더는 이미 햄버거/타이틀/아이콘 3분할로 꽉 차 있어서 그 안에
+            욱여넣지 않고, 전용 줄을 아래에 하나 더 뺐다 - GroupTabLayout의 모바일 7탭 스크롤에
+            쓴 것과 동일한 overflow-x-auto 패턴이라 별도 축약 로직 없이 길어져도 가로 스크롤된다. */}
+        <div className="md:hidden bg-bg-surface px-4 py-2 border-b border-border-default">
+          <Breadcrumb />
+        </div>
 
         <main className="flex-1 p-5 md:p-8 overflow-y-auto">
           <header className="mb-6 pb-4 border-b border-border-default flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -245,19 +256,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <BotNotInvitedNotice onRecheck={() => checkBotStatus(currentGuildId)} />
           ) : (
             <>
-              {isSubPage && (
-                <div className="mb-6">
+              {/* 🛡️ [브레드크럼] Go Back(router.back(), 히스토리 기반 한 단계 뒤로가기)과
+                  브레드크럼(고정 href, 위치 파악용)은 서로 대체 관계가 아니라 나란히 공존한다 -
+                  브레드크럼은 컨트롤 허브 홈에서도 항상 보이지만 Go Back은 기존과 동일하게
+                  isSubPage일 때만 나온다. 데스크톱 전용인 이유는 모바일엔 헤더 바로 아래
+                  전용 브레드크럼 줄이 이미 따로 있기 때문(중복 방지). */}
+              <div className="mb-6 flex items-center justify-between gap-3">
+                <div className="hidden md:block">
+                  <Breadcrumb />
+                </div>
+                {isSubPage && (
                   <Button type="button" variant="ghost" onClick={() => router.back()}>
                     <span>◀</span> {t('sidebar.goBack')}
                   </Button>
-                </div>
-              )}
-              <GuildsProvider guilds={guilds}>{children}</GuildsProvider>
+                )}
+              </div>
+              {children}
             </>
           )}
         </main>
       </div>
 
     </div>
+    </GuildsProvider>
   );
 }

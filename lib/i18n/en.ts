@@ -35,6 +35,7 @@ const en = {
     mobileHeaderTitle: 'Kyvo Control Hub',
     mainHeaderTitle: 'Kyvo Central Control Hub',
     syncStatus: 'Connected',
+    breadcrumbRoot: 'Dashboard',
     goBack: 'Go Back',
     homeButton: 'Home',
     guideButton: 'Guide',
