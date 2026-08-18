@@ -6,6 +6,7 @@ const MANAGE_GUILD = BigInt(0x20);
 interface DiscordGuild {
   id: string;
   name: string;
+  icon: string | null;
   owner: boolean;
   permissions: string;
 }
@@ -36,7 +37,7 @@ export async function GET() {
   const guilds: DiscordGuild[] = await res.json();
   const managed = guilds
     .filter((g) => g.owner || (BigInt(g.permissions) & MANAGE_GUILD) === MANAGE_GUILD)
-    .map((g) => ({ id: g.id, name: g.name }));
+    .map((g) => ({ id: g.id, name: g.name, icon: g.icon }));
 
   return NextResponse.json(managed);
 }

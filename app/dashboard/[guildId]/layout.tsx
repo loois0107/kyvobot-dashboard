@@ -11,6 +11,7 @@ import { GuildsProvider, type ManagedGuild } from '@/components/GuildsContext';
 import Button from '@/components/ui/Button';
 import SidebarNavLink from '@/components/ui/SidebarNavLink';
 import Breadcrumb from '@/components/dashboard/Breadcrumb';
+import ServerSelect from '@/components/dashboard/ServerSelect';
 import {
   LayoutDashboard,
   User,
@@ -133,20 +134,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-bg-surface p-4 flex flex-col justify-between border-r border-border-default transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:h-screen ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div>
-          <div className="mb-6 flex justify-between items-center">
-            <div>
-              <label className="block text-sm font-bold text-text-secondary uppercase tracking-wider mb-2">{t('sidebar.selectServer')}</label>
-              <select
-                value={currentGuildId || ''}
-                onChange={(e) => handleGuildChange(e.target.value)}
-                className="w-44 bg-bg-elevated text-text-primary rounded-lg px-3 py-2 border border-border-default focus:outline-none focus:border-brand cursor-pointer font-medium text-sm"
-              >
-                {guilds.map((g) => (
-                  <option key={g.id} value={g.id}>{g.name}</option>
-                ))}
-              </select>
+          <div className="mb-6">
+            <div className="flex justify-between items-center mb-2">
+              <label className="text-sm font-bold text-text-secondary uppercase tracking-wider">{t('sidebar.selectServer')}</label>
+              <button type="button" onClick={() => setIsMobileMenuOpen(false)} className="text-text-secondary hover:text-text-primary md:hidden text-lg p-1">✕</button>
             </div>
-            <button type="button" onClick={() => setIsMobileMenuOpen(false)} className="text-text-secondary hover:text-text-primary md:hidden text-lg p-1 mt-5">✕</button>
+            <ServerSelect guilds={guilds} currentGuildId={currentGuildId} onChange={handleGuildChange} />
           </div>
 
           <nav className="space-y-4">

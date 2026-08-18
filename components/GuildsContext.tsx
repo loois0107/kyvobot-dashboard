@@ -2,7 +2,7 @@
 
 import { createContext, useContext, type ReactNode } from 'react';
 
-export type ManagedGuild = { id: string; name: string };
+export type ManagedGuild = { id: string; name: string; icon: string | null };
 
 // The dashboard layout already fetches the caller's managed guild list (id + real Discord name) for
 // the sidebar's server picker - this just makes that same list available to nested pages, so a
