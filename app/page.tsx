@@ -405,10 +405,10 @@ export default async function RootPage() {
 
       <section id="see-it-in-action" className="relative max-w-7xl mx-auto w-full px-4 pb-32 space-y-16">
         <RevealOnScroll className="text-center">
-          <p className="text-xs font-black tracking-widest text-[#FFD700] uppercase mb-3">
+          <p className="text-xs font-black tracking-widest text-[#5865F2] uppercase mb-3">
             {t.landingPage.screenshotsEyebrow}
           </p>
-          <h2 className="text-3xl md:text-4xl font-black text-white">
+          <h2 className="text-3xl md:text-4xl font-black text-[#F5F5F5]">
             {t.landingPage.screenshotsTitle}
           </h2>
         </RevealOnScroll>

@@ -69,7 +69,7 @@ export default async function GuidePage() {
   const t = dictionaries[lang];
 
   return (
-    <div className="min-h-screen bg-[#0F0F1A] text-[#dbdee1] flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-[#0A0A0B] text-[#F5F5F5] flex flex-col relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-[#5865F2]/25 rounded-full blur-[130px]" />
         <div className="absolute top-64 -right-32 w-[500px] h-[500px] bg-[#2DD4BF]/10 rounded-full blur-[130px]" />
@@ -86,24 +86,24 @@ export default async function GuidePage() {
                 {t.guidePage.heroTitle}
               </span>
             </h1>
-            <p className="text-base md:text-lg text-[#b5bac1] leading-relaxed">{t.guidePage.heroDesc}</p>
+            <p className="text-base md:text-lg text-[#A1A1AA] leading-relaxed">{t.guidePage.heroDesc}</p>
           </RevealOnScroll>
         </section>
 
         {GUIDE_CATEGORIES.map((category) => (
           <section key={category.categoryKey} className="max-w-7xl mx-auto w-full px-4 pb-24">
             <RevealOnScroll className="mb-10 text-center">
-              <p className="text-xs font-black tracking-widest text-[#FFD700] uppercase mb-3">
+              <p className="text-xs font-black tracking-widest text-[#5865F2] uppercase mb-3">
                 {t.sidebar[category.categoryKey]}
               </p>
-              <h2 className="text-2xl md:text-3xl font-black text-white">{t.sidebar[category.categoryKey]}</h2>
+              <h2 className="text-2xl md:text-3xl font-black text-[#F5F5F5]">{t.sidebar[category.categoryKey]}</h2>
             </RevealOnScroll>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {category.items.map((item, i) => (
                 <RevealOnScroll key={item.titleKey} delayMs={(i % 3) * 100}>
-                  <div className="h-full bg-[#161626] border border-[#2A1F40] rounded-2xl p-6 space-y-3">
-                    <h3 className="text-base font-bold text-white leading-snug">{t.guidePage[item.titleKey]}</h3>
-                    <p className="text-sm text-[#949ba4] leading-relaxed">{t.guidePage[item.descKey]}</p>
+                  <div className="h-full bg-[#141416] border border-[#676771] rounded-2xl p-6 space-y-3">
+                    <h3 className="text-base font-bold text-[#F5F5F5] leading-snug">{t.guidePage[item.titleKey]}</h3>
+                    <p className="text-sm text-[#85858B] leading-relaxed">{t.guidePage[item.descKey]}</p>
                   </div>
                 </RevealOnScroll>
               ))}
@@ -111,9 +111,9 @@ export default async function GuidePage() {
           </section>
         ))}
 
-        <section className="relative flex flex-col items-center w-full px-4 py-24 text-center bg-[#050508] border-t-4 border-[#2A1F40]">
+        <section className="relative flex flex-col items-center w-full px-4 py-24 text-center bg-[#0A0A0B] border-t-4 border-[#676771]">
           <RevealOnScroll className="flex flex-col items-center gap-6 max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-black text-white">{t.guidePage.ctaTitle}</h2>
+            <h2 className="text-3xl md:text-4xl font-black text-[#F5F5F5]">{t.guidePage.ctaTitle}</h2>
             <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
               <a
                 href={BOT_INVITE_URL}
@@ -123,7 +123,7 @@ export default async function GuidePage() {
               </a>
               <Link
                 href="/"
-                className="border border-white/20 hover:border-white/40 text-[#b5bac1] hover:text-white text-base font-bold px-10 py-4 rounded-full transition-all"
+                className="border border-[#5865F2]/40 hover:border-[#5865F2] text-[#A1A1AA] hover:text-[#F5F5F5] text-base font-bold px-10 py-4 rounded-full transition-all"
               >
                 {t.landingPage.heroTitle}
               </Link>
@@ -132,35 +132,35 @@ export default async function GuidePage() {
         </section>
       </main>
 
-      <footer className="relative bg-[#050508] border-t border-white/10 py-16 px-4">
+      <footer className="relative bg-[#0A0A0B] border-t border-[#676771]/40 py-16 px-4">
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-10">
           <div className="space-y-3 text-center sm:text-left">
             <div className="flex items-center justify-center sm:justify-start gap-2">
               <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#5865F2] to-[#4752C4] flex items-center justify-center text-xs font-black text-white">
                 K
               </span>
-              <span className="text-base font-black text-white">{t.landingPage.heroTitle}</span>
+              <span className="text-base font-black text-[#F5F5F5]">{t.landingPage.heroTitle}</span>
             </div>
-            <p className="text-xs text-[#71717a]">{t.landingPage.footerTagline}</p>
+            <p className="text-xs text-[#85858B]">{t.landingPage.footerTagline}</p>
           </div>
           <div className="space-y-3 text-center sm:text-left">
-            <h4 className="text-sm font-bold text-white">{t.landingPage.footerQuickLinksHeader}</h4>
+            <h4 className="text-sm font-bold text-[#F5F5F5]">{t.landingPage.footerQuickLinksHeader}</h4>
             <div className="flex flex-col gap-2">
-              <Link href="/#features" className="text-xs text-[#71717a] hover:text-white transition-colors">
+              <Link href="/#features" className="text-xs text-[#85858B] hover:text-[#F5F5F5] transition-colors">
                 {t.landingPage.navFeatures}
               </Link>
-              <Link href="/guide" className="text-xs text-[#71717a] hover:text-white transition-colors">
+              <Link href="/guide" className="text-xs text-[#85858B] hover:text-[#F5F5F5] transition-colors">
                 {t.landingPage.navGuide}
               </Link>
             </div>
           </div>
           <div className="space-y-3 text-center sm:text-left">
-            <h4 className="text-sm font-bold text-white">{t.landingPage.footerLegalHeader}</h4>
+            <h4 className="text-sm font-bold text-[#F5F5F5]">{t.landingPage.footerLegalHeader}</h4>
             <div className="flex flex-col gap-2">
-              <Link href="/privacy" className="text-xs text-[#71717a] hover:text-white transition-colors">
+              <Link href="/privacy" className="text-xs text-[#85858B] hover:text-[#F5F5F5] transition-colors">
                 {t.landingPage.footerPrivacy}
               </Link>
-              <Link href="/terms" className="text-xs text-[#71717a] hover:text-white transition-colors">
+              <Link href="/terms" className="text-xs text-[#85858B] hover:text-[#F5F5F5] transition-colors">
                 {t.landingPage.footerTerms}
               </Link>
             </div>
