@@ -15,12 +15,6 @@ import {
   User,
   Settings,
   Shield,
-  DoorOpen,
-  Mic,
-  Flag,
-  Smile,
-  Terminal,
-  ScrollText,
   Gamepad2,
   Trophy,
   Plug,
@@ -163,30 +157,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               {t('sidebar.generalSettings')}
             </SidebarNavLink>
 
-            <div className="space-y-1">
-              <label className="block text-sm font-bold text-text-secondary uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryCommunity')}</label>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/automod`} active={pathname?.includes('/automod')} icon={Shield}>
-                {t('sidebar.automod')}
-              </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/welcome`} active={pathname?.includes('/welcome')} icon={DoorOpen}>
-                {t('sidebar.welcomeSettings')}
-              </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/voice`} active={pathname?.includes('/voice')} icon={Mic}>
-                {t('sidebar.joinToCreate')}
-              </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/anonymous-reports`} active={pathname?.includes('/anonymous-reports')} icon={Flag}>
-                {t('sidebar.anonymousReports')}
-              </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/reaction-roles`} active={pathname?.includes('/reaction-roles')} icon={Smile}>
-                {t('sidebar.reactionRoles')}
-              </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/settings`} active={pathname?.includes('/settings')} icon={Terminal}>
-                {t('sidebar.customCommands')}
-              </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/audit-logs`} active={pathname?.includes('/audit-logs')} icon={ScrollText}>
-                {t('sidebar.auditLogs')}
-              </SidebarNavLink>
-            </div>
+            {/* 🛡️ [커뮤니티 관리 그룹] 다른 그룹들과 동일 패턴 - 개별 링크 7개 대신 그룹
+                진입점 1개. 아이콘은 기존 7개(Shield/DoorOpen/Mic/Flag/Smile/Terminal/
+                ScrollText) 중 Shield - 자동관리(첫 탭)의 아이콘이기도 하고, 자동 관리·
+                익명 제보·감사 로그처럼 그룹의 절반 이상이 "서버를 안전하게 지키고 운영을
+                감시한다"는 보호/관리 개념이라 Shield가 그룹 전체를 가장 보편적으로
+                대표한다고 판단했다. */}
+            <SidebarNavLink href={`/dashboard/${currentGuildId}/community/automod`} active={pathname?.includes('/community')} icon={Shield}>
+              {t('sidebar.categoryCommunity')}
+            </SidebarNavLink>
 
             {/* 🛡️ [파티 & 게임 그룹] "연동 & AI 지원" 파일럿과 동일 패턴 - 개별 링크 4개 대신
                 그룹 진입점 1개. 아이콘은 기존 4개 중 Gamepad2(게임 프리셋에서 재사용) - 게임
@@ -208,8 +187,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {/* 🛡️ [연동 & AI 지원 그룹 파일럿] 트위치/AI지원티켓 개별 링크 2개 대신, 그룹
                 진입점 1개로 교체 - 클릭하면 첫 탭(twitch)으로 들어가고, 그 안에서
                 integrations/layout.tsx가 렌더링하는 탭바로 두 세부 페이지를 전환한다.
-                나머지 1개 그룹(커뮤니티 관리)만 아직 이번 재구성 대상이 아니라 기존
-                "카테고리 라벨 + 개별 링크" 구조 그대로 유지한다. */}
+                이로써 4개 그룹(커뮤니티 관리/파티 & 게임/경제 & 참여도/연동 & AI 지원)
+                전부 동일한 "그룹 진입점 1개 + 탭 레이아웃" 구조로 재구성 완료. */}
             <SidebarNavLink href={`/dashboard/${currentGuildId}/integrations/twitch`} active={pathname?.includes('/integrations')} icon={Plug}>
               {t('sidebar.categoryIntegrationsAI')}
             </SidebarNavLink>

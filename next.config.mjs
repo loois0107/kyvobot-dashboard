@@ -56,6 +56,42 @@ const nextConfig = {
         destination: '/dashboard/:guildId/economy/giveaways',
         permanent: false,
       },
+      // 🛡️ [커뮤니티 관리 그룹] 동일 정책(permanent: false).
+      {
+        source: '/dashboard/:guildId/automod',
+        destination: '/dashboard/:guildId/community/automod',
+        permanent: false,
+      },
+      {
+        source: '/dashboard/:guildId/welcome',
+        destination: '/dashboard/:guildId/community/welcome',
+        permanent: false,
+      },
+      {
+        source: '/dashboard/:guildId/voice',
+        destination: '/dashboard/:guildId/community/voice',
+        permanent: false,
+      },
+      {
+        source: '/dashboard/:guildId/anonymous-reports',
+        destination: '/dashboard/:guildId/community/anonymous-reports',
+        permanent: false,
+      },
+      {
+        source: '/dashboard/:guildId/reaction-roles',
+        destination: '/dashboard/:guildId/community/reaction-roles',
+        permanent: false,
+      },
+      {
+        source: '/dashboard/:guildId/settings',
+        destination: '/dashboard/:guildId/community/settings',
+        permanent: false,
+      },
+      {
+        source: '/dashboard/:guildId/audit-logs',
+        destination: '/dashboard/:guildId/community/audit-logs',
+        permanent: false,
+      },
     ];
   },
 };

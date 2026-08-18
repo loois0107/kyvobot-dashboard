@@ -220,8 +220,8 @@ export default function DashboardHome() {
             </Button>
           </div>
           <div className="space-y-2">
-            <ChecklistRow done={onboarding.items.automod} label={t('dashboardHome.checklistAutomod')} href={`/dashboard/${guildId}/automod`} />
-            <ChecklistRow done={onboarding.items.welcome} label={t('dashboardHome.checklistWelcome')} href={`/dashboard/${guildId}/welcome`} />
+            <ChecklistRow done={onboarding.items.automod} label={t('dashboardHome.checklistAutomod')} href={`/dashboard/${guildId}/community/automod`} />
+            <ChecklistRow done={onboarding.items.welcome} label={t('dashboardHome.checklistWelcome')} href={`/dashboard/${guildId}/community/welcome`} />
             <ChecklistRow done={onboarding.items.presets} label={t('dashboardHome.checklistPresets')} href={`/dashboard/${guildId}/party/party-presets`} />
           </div>
         </Card>
@@ -267,7 +267,7 @@ export default function DashboardHome() {
             Base/Active Tickets는 ticket-settings가 관리하는 guild_knowledge/guild_ticket_settings
             테이블, Automod Logs는 audit-logs 페이지가 보여주는 automod_logs 테이블), 전부 실제로
             갈 곳이 있다는 걸 확인하고 나머지도 동일한 Link 패턴으로 맞췄다. */}
-        <Link href={`/dashboard/${guildId}/settings`}>
+        <Link href={`/dashboard/${guildId}/community/settings`}>
           <Card elevated className="!py-8 !px-6 space-y-2 flex flex-col justify-center">
             <span className="flex items-center gap-1.5 text-sm font-black text-text-secondary uppercase tracking-wider">
               <Terminal className="w-4 h-4 shrink-0" />
@@ -313,7 +313,7 @@ export default function DashboardHome() {
             </span>
           </Card>
         </Link>
-        <Link href={`/dashboard/${guildId}/audit-logs`}>
+        <Link href={`/dashboard/${guildId}/community/audit-logs`}>
           <Card elevated className="!py-8 !px-6 space-y-2 flex flex-col justify-center">
             <span className="flex items-center gap-1.5 text-sm font-black text-text-secondary uppercase tracking-wider">
               <ShieldCheck className="w-4 h-4 shrink-0" />
@@ -342,7 +342,7 @@ export default function DashboardHome() {
               <span className="text-[10px] text-text-secondary font-bold tracking-widest mt-4 block">{t('dashboardHome.levelingCta')}</span>
             </Card>
           </Link>
-          <Link href={`/dashboard/${guildId}/welcome`}>
+          <Link href={`/dashboard/${guildId}/community/welcome`}>
             <Card className="!p-8 flex flex-col justify-between min-h-[210px]">
               <div><Inbox className="w-8 h-8 mb-3 text-text-secondary" /><h4 className="text-base font-black text-text-primary uppercase tracking-wider">{t('dashboardHome.welcomeTitle')}</h4><p className="text-sm text-text-secondary mt-2 leading-relaxed">{t('dashboardHome.welcomeDesc')}</p></div>
               <span className="text-[10px] text-text-secondary font-bold tracking-widest mt-4 block">{t('dashboardHome.welcomeCta')}</span>
