@@ -28,8 +28,7 @@ import {
   Sparkles,
   Trophy,
   Gift,
-  TvMinimalPlay,
-  Ticket,
+  Plug,
   Home,
   BookOpen,
 } from 'lucide-react';
@@ -223,15 +222,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </SidebarNavLink>
             </div>
 
-            <div className="space-y-1">
-              <label className="block text-sm font-bold text-text-secondary uppercase tracking-wider mb-2 px-2">{t('sidebar.categoryIntegrationsAI')}</label>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/twitch`} active={pathname?.includes('/twitch')} icon={TvMinimalPlay}>
-                {t('sidebar.twitchStreamers')}
-              </SidebarNavLink>
-              <SidebarNavLink href={`/dashboard/${currentGuildId}/ticket-settings`} active={pathname?.includes('/ticket-settings')} icon={Ticket}>
-                {t('sidebar.aiSupportTicket')}
-              </SidebarNavLink>
-            </div>
+            {/* 🛡️ [연동 & AI 지원 그룹 파일럿] 트위치/AI지원티켓 개별 링크 2개 대신, 그룹
+                진입점 1개로 교체 - 클릭하면 첫 탭(twitch)으로 들어가고, 그 안에서
+                integrations/layout.tsx가 렌더링하는 탭바로 두 세부 페이지를 전환한다.
+                나머지 3개 그룹(커뮤니티 관리/파티 & 게임/경제 & 참여도)은 이번 파일럿
+                범위가 아니라 기존 "카테고리 라벨 + 개별 링크" 구조 그대로 유지한다. */}
+            <SidebarNavLink href={`/dashboard/${currentGuildId}/integrations/twitch`} active={pathname?.includes('/integrations')} icon={Plug}>
+              {t('sidebar.categoryIntegrationsAI')}
+            </SidebarNavLink>
           </nav>
         </div>
 

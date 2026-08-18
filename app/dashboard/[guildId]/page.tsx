@@ -283,7 +283,7 @@ export default function DashboardHome() {
           </Card>
         </Link>
 
-        <Link href={`/dashboard/${guildId}/ticket-settings`}>
+        <Link href={`/dashboard/${guildId}/integrations/ticket-settings`}>
           <Card elevated className="!py-8 !px-6 space-y-2 flex flex-col justify-center">
             <span className="flex items-center gap-1.5 text-sm font-black text-text-secondary uppercase tracking-wider">
               <BookOpen className="w-4 h-4 shrink-0" />
@@ -298,7 +298,7 @@ export default function DashboardHome() {
             </span>
           </Card>
         </Link>
-        <Link href={`/dashboard/${guildId}/ticket-settings`}>
+        <Link href={`/dashboard/${guildId}/integrations/ticket-settings`}>
           <Card elevated className="!py-8 !px-6 space-y-2 flex flex-col justify-center">
             <span className="flex items-center gap-1.5 text-sm font-black text-text-secondary uppercase tracking-wider">
               <Ticket className="w-4 h-4 shrink-0" />
@@ -348,7 +348,7 @@ export default function DashboardHome() {
               <span className="text-[10px] text-text-secondary font-bold tracking-widest mt-4 block">{t('dashboardHome.welcomeCta')}</span>
             </Card>
           </Link>
-          <Link href={`/dashboard/${guildId}/ticket-settings`}>
+          <Link href={`/dashboard/${guildId}/integrations/ticket-settings`}>
             <Card className="!p-8 flex flex-col justify-between min-h-[210px]">
               <div><Ticket className="w-8 h-8 mb-3 text-text-secondary" /><h4 className="text-base font-black text-text-primary uppercase tracking-wider">{t('dashboardHome.ticketTitle')}</h4><p className="text-sm text-text-secondary mt-2 leading-relaxed">{t('dashboardHome.ticketDesc')}</p></div>
               <span className="text-[10px] text-text-secondary font-bold tracking-widest mt-4 block">{t('dashboardHome.ticketCta')}</span>
