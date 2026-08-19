@@ -774,7 +774,7 @@ const ko: typeof en = {
     resetToDefault: '기본값으로 초기화',
     saveMyCard: '내 카드 저장',
     previewTitle: '/level 미리보기',
-    youLabel: '나',
+    youLabel: '미리보기',
     accentColorLabel: '강조 색상',
     bgColorLabel: '배경 색상',
     overlayOpacityLabel: '오버레이 농도:',
