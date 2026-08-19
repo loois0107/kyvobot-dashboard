@@ -12,6 +12,7 @@ import Button from '@/components/ui/Button';
 import SidebarNavLink from '@/components/ui/SidebarNavLink';
 import Breadcrumb from '@/components/dashboard/Breadcrumb';
 import ServerSelect from '@/components/dashboard/ServerSelect';
+import RouteLoadingOverlay, { triggerRouteLoading } from '@/components/dashboard/RouteLoadingOverlay';
 import {
   LayoutDashboard,
   User,
@@ -129,6 +130,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     // instead of maintaining a manually-synced whitelist of known subpages.
     const pathSegments = pathname.split('/').filter(Boolean);
     const destinationMenu = pathSegments.slice(2).join('/');
+    // 🛡️ [전환 오버레이] 서버 전환은 <a href>가 아니라 버튼 클릭 → router.push()라서
+    // RouteLoadingOverlay의 전역 document 클릭 리스너로는 안 잡힌다 - 여기서 직접 트리거.
+    triggerRouteLoading();
     router.push(`/dashboard/${targetId}${destinationMenu ? `/${destinationMenu}` : ''}`);
   };
 
@@ -142,7 +146,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     // useGuildName()을 써야 해서 트리 전체를 감싸는 최상위로 끌어올렸다.
     <GuildsProvider guilds={guilds}>
     <div className="flex min-h-screen bg-bg-base text-text-primary font-sans relative overflow-x-hidden">
-      
+      <RouteLoadingOverlay />
+
       {isMobileMenuOpen && (
         <div 
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 md:hidden transition-opacity duration-300"
