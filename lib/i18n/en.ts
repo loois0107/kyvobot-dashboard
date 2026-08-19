@@ -3,7 +3,7 @@
 const en = {
   sidebar: {
     genericHome: 'Home',
-    genericControlHub: 'Control Hub',
+    goToAdminDashboard: 'Go to Admin Dashboard',
     genericStatus: 'Kyvo Dashboard',
     selectServer: 'Select Server',
     modules: 'Modules',

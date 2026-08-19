@@ -40,6 +40,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const currentGuildId = isValidGuildId(rawGuildId) ? rawGuildId : undefined;
 
   const [guilds, setGuilds] = useState<ManagedGuild[]>([]);
+  const [guildsLoaded, setGuildsLoaded] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [botStatus, setBotStatus] = useState<BotStatus>('checking');
 
@@ -68,6 +69,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         const data = await res.json();
         if (!cancelled && Array.isArray(data)) {
           setGuilds(data.filter((g: any): g is ManagedGuild => g && isValidGuildId(g.id) && typeof g.name === 'string'));
+          // Only flip this on a successful response - a network hiccup shouldn't bounce a real
+          // admin out just because the list came back empty by accident (fail open, matching the
+          // bot-status check's philosophy below).
+          setGuildsLoaded(true);
         }
       } catch (err) {
         console.error('[GUILD LIST SYNC FAULT]', err);
@@ -77,6 +82,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       cancelled = true;
     };
   }, []);
+
+  // 🛡️ [권한 없는 접근 가드] guilds 목록이 로드된 뒤에도 현재 URL의 guildId가 그 안에 없다면
+  // (관리 권한이 아예 없거나, 관리하지 않는 다른 서버 ID를 직접 입력/링크로 들어온 경우) 이 페이지
+  // 트리 전체가 조각조각 깨진 채로 렌더링되는 대신(각 위젯이 개별 API의 403을 각자 다르게
+  // 처리해서 "숫자 전부 0 + 경고 배지"처럼 보임) /dashboard로 되돌린다 - 그 피커 페이지가 이미
+  // "관리 서버 0개면 프로필로 안내 / 1개면 자동 이동 / 여러 개면 선택"을 전부 처리해준다.
+  useEffect(() => {
+    if (!guildsLoaded || !currentGuildId) return;
+    const hasAccess = guilds.some((g) => g.id === currentGuildId);
+    if (!hasAccess) {
+      router.replace('/dashboard');
+    }
+  }, [guildsLoaded, guilds, currentGuildId, router]);
 
   // Gates every page under this layout on whether Kyvo is actually in the guild being viewed -
   // user permission (owner/MANAGE_GUILD) and bot membership are completely independent, so without

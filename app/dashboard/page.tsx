@@ -96,27 +96,27 @@ export default function DashboardPickerPage() {
 
   if (fetchFailed) {
     return (
-      <div className="min-h-screen bg-[#0F0F1A] text-[#dbdee1] flex items-center justify-center px-4">
-        <p className="text-sm text-red-400">{t('dashboardPickerPage.fetchFailed')}</p>
+      <div className="min-h-screen bg-bg-base text-text-primary flex items-center justify-center px-4">
+        <p className="text-sm text-danger">{t('dashboardPickerPage.fetchFailed')}</p>
       </div>
     );
   }
 
   if (guilds === null || autoRedirecting) {
     return (
-      <div className="min-h-screen bg-[#0F0F1A] text-[#dbdee1] flex items-center justify-center px-4">
-        <p className="text-sm text-[#949ba4]">{t('dashboardPickerPage.loading')}</p>
+      <div className="min-h-screen bg-bg-base text-text-primary flex items-center justify-center px-4">
+        <p className="text-sm text-text-secondary">{t('dashboardPickerPage.loading')}</p>
       </div>
     );
   }
 
   if (guilds.length === 0) {
     return (
-      <div className="min-h-screen bg-[#0F0F1A] text-[#dbdee1] flex flex-col items-center justify-center gap-4 px-4 text-center">
-        <p className="text-sm text-[#949ba4]">{t('dashboardPickerPage.noManagedServers')}</p>
+      <div className="min-h-screen bg-bg-base text-text-primary flex flex-col items-center justify-center gap-4 px-4 text-center">
+        <p className="text-sm text-text-secondary">{t('dashboardPickerPage.noManagedServers')}</p>
         <Link
           href="/profile"
-          className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-8 py-3 rounded-xl transition-all"
+          className="bg-brand hover:bg-brand-hover text-white text-sm font-black px-8 py-3 rounded-xl transition-all"
         >
           {t('profilePickerPage.title')}
         </Link>
@@ -125,11 +125,11 @@ export default function DashboardPickerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0F0F1A] text-[#dbdee1] px-4 py-16">
+    <div className="min-h-screen bg-bg-base text-text-primary px-4 py-16">
       <div className="max-w-3xl mx-auto space-y-8">
         <div className="text-center space-y-2">
-          <h1 className="text-2xl md:text-3xl font-black text-white">{t('dashboardPickerPage.title')}</h1>
-          <p className="text-sm text-[#949ba4]">{t('dashboardPickerPage.subtitle')}</p>
+          <h1 className="text-2xl md:text-3xl font-black text-text-primary">{t('dashboardPickerPage.title')}</h1>
+          <p className="text-sm text-text-secondary">{t('dashboardPickerPage.subtitle')}</p>
         </div>
 
         <input
@@ -137,11 +137,11 @@ export default function DashboardPickerPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={t('dashboardPickerPage.searchPlaceholder')}
-          className="w-full bg-[#161626] border border-[#2A1F40] rounded-xl px-4 py-3 text-sm text-white placeholder-[#5c5c6e] focus:outline-none focus:border-[#5865F2] transition-colors"
+          className="w-full bg-bg-surface border border-border-default rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-brand transition-colors"
         />
 
         {filteredGuilds.length === 0 ? (
-          <p className="text-center text-sm text-[#949ba4] py-8">{t('dashboardPickerPage.noResults')}</p>
+          <p className="text-center text-sm text-text-secondary py-8">{t('dashboardPickerPage.noResults')}</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {filteredGuilds.map((g) => {
@@ -151,11 +151,11 @@ export default function DashboardPickerPage() {
 
               const cardBody = (
                 <>
-                  <p className="text-sm font-bold text-white truncate">{g.name}</p>
+                  <p className="text-sm font-bold text-text-primary truncate">{g.name}</p>
                   {isChecking ? (
-                    <p className="text-xs text-[#71717a] mt-1">{t('dashboardPickerPage.checkingStatus')}</p>
+                    <p className="text-xs text-text-muted mt-1">{t('dashboardPickerPage.checkingStatus')}</p>
                   ) : isPresent ? (
-                    <p className="text-xs text-green-400 mt-1">{t('dashboardPickerPage.botPresentBadge')}</p>
+                    <p className="text-xs text-success mt-1">{t('dashboardPickerPage.botPresentBadge')}</p>
                   ) : null}
                 </>
               );
@@ -165,7 +165,7 @@ export default function DashboardPickerPage() {
                   <Link
                     key={g.id}
                     href={`/dashboard/${g.id}`}
-                    className="bg-[#161626] border border-[#2A1F40] hover:border-[#5865F2]/50 rounded-xl p-5 transition-all hover:-translate-y-0.5"
+                    className="bg-bg-surface border border-border-default hover:border-brand/50 rounded-xl p-5 transition-all hover:-translate-y-0.5"
                   >
                     {cardBody}
                   </Link>
@@ -173,14 +173,14 @@ export default function DashboardPickerPage() {
               }
 
               return (
-                <div key={g.id} className="bg-[#161626] border border-[#2A1F40] rounded-xl p-5 space-y-3">
+                <div key={g.id} className="bg-bg-surface border border-border-default rounded-xl p-5 space-y-3">
                   {cardBody}
                   {!isChecking && (
                     <a
                       href={`${BOT_INVITE_URL}&guild_id=${g.id}&disable_guild_select=true`}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-block bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs font-black px-4 py-2 rounded-lg transition-all"
+                      className="inline-block bg-brand hover:bg-brand-hover text-white text-xs font-black px-4 py-2 rounded-lg transition-all"
                     >
                       {t('dashboardPickerPage.inviteCta')}
                     </a>

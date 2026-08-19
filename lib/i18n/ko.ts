@@ -5,7 +5,7 @@ import type en from './en';
 const ko: typeof en = {
   sidebar: {
     genericHome: '홈',
-    genericControlHub: '컨트롤 허브',
+    goToAdminDashboard: '관리자 대시보드로 이동',
     genericStatus: 'Kyvo 대시보드',
     selectServer: '서버 선택',
     modules: '모듈',
