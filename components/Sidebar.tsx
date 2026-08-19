@@ -67,10 +67,10 @@ export default function Sidebar() {
             EN/KO 공통 고정 문자열 - mainHeaderTitle(대시보드 데스크톱 헤더)과 값은 같지만 호출부별
             반응형 크기가 달라 키는 분리해서 유지한다. */}
         <div className="flex items-center gap-2 mb-0 md:mb-8">
-          <span className="w-8 h-8 rounded-lg overflow-hidden bg-white shrink-0 relative">
-            <Image src="/images/features/brand/kyvobot character.png" alt="" fill className="object-contain" sizes="32px" />
+          <span className="w-11 h-11 rounded-lg overflow-hidden bg-white shrink-0 relative">
+            <Image src="/images/features/brand/kyvobot character.png" alt="" fill className="object-contain" sizes="44px" />
           </span>
-          <h2 className="text-sm md:text-xl font-black text-brand tracking-wider whitespace-nowrap uppercase">
+          <h2 className="text-sm md:text-xl font-black text-text-primary tracking-wider whitespace-nowrap uppercase">
             {t('sidebar.mobileHeaderTitle')}
           </h2>
         </div>

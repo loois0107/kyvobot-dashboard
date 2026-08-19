@@ -258,8 +258,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <main className="flex-1 p-5 md:p-8 overflow-y-auto">
           <header className="mb-6 pb-4 border-b border-border-default flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div className="flex items-center gap-3 min-w-0">
-              <span className="w-8 h-8 rounded-lg overflow-hidden bg-white shrink-0 relative">
-                <Image src="/images/features/brand/kyvobot character.png" alt="" fill className="object-contain" sizes="32px" />
+              <span className="w-11 h-11 rounded-lg overflow-hidden bg-white shrink-0 relative">
+                <Image src="/images/features/brand/kyvobot character.png" alt="" fill className="object-contain" sizes="44px" />
               </span>
               <h1 className="text-xl md:text-2xl font-bold text-text-primary uppercase tracking-wide break-words max-w-full">{t('sidebar.mainHeaderTitle')}</h1>
             </div>
