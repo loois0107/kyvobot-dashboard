@@ -22,7 +22,7 @@ type CardProps = {
 export default function Card({ children, className = '', elevated = false }: CardProps) {
   return (
     <div
-      className={`${elevated ? 'bg-bg-elevated' : 'bg-bg-surface'} border border-border-default hover:border-border-hover rounded-xl p-6 transition-colors ${className}`}
+      className={`${elevated ? 'bg-bg-elevated' : 'bg-bg-surface shadow-[0_0_18px_rgba(88,101,242,0.16)] hover:scale-[1.005]'} border border-border-default hover:border-border-hover rounded-xl p-6 transition-[color,background-color,border-color,box-shadow,transform] duration-300 ease-out ${className}`}
     >
       {children}
     </div>

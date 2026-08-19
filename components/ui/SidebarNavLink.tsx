@@ -22,10 +22,10 @@ export default function SidebarNavLink({ href, children, active = false, icon: I
   return (
     <Link
       href={href}
-      className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition ${
+      className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium border-l-2 transition hover:scale-[1.01] active:scale-[0.99] ${
         active
-          ? 'bg-bg-elevated text-text-primary'
-          : 'text-text-secondary hover:bg-bg-surface hover:text-text-primary'
+          ? 'bg-bg-elevated text-text-primary border-brand'
+          : 'text-text-secondary border-transparent hover:bg-bg-surface hover:text-text-primary'
       }`}
     >
       {Icon && <Icon className="w-4 h-4 shrink-0" />}
