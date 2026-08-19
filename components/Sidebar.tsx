@@ -70,13 +70,21 @@ export default function Sidebar() {
 
         {/* 🛡️ [브랜드명은 번역 안 함] "KyvoBot Dashboard"는 랜딩 헤더(heroTitle)와 동일하게
             EN/KO 공통 고정 문자열 - mainHeaderTitle(대시보드 데스크톱 헤더)과 값은 같지만 호출부별
-            반응형 크기가 달라 키는 분리해서 유지한다. */}
+            반응형 크기가 달라 키는 분리해서 유지한다.
+
+            🛡️ [768px+에서는 축약형] 이 aside는 md:부터 폭이 256px(패딩 제외 실사용 208px)로
+            고정되는데, 뱃지(44px)+"KyvoBot Dashboard"(text-xl 기준 실측 ~253px)를 그대로 넣으면
+            72.8px가 옆 탭바 위로 그대로 삐져나왔다(overflow-hidden도 없어서 안 잘리고 겹침).
+            모바일 상단바가 이미 쓰던 축약형 mobileTopBarTitle("KyvoBot", 실측 110px)을 여기서도
+            재사용하면 뱃지+gap+텍스트 = 162.1px로 208px 안에 45.9px 여유 있게 들어간다 - 뱃지를
+            더 줄일 필요 없음. 768px 미만(모바일, aside가 풀폭)에서는 원래대로 전체 문구 유지. */}
         <div className="flex items-center gap-2 mb-8">
           <span className="w-11 h-11 rounded-lg overflow-hidden bg-white shrink-0 relative">
             <Image src="/images/features/brand/kyvobot character.png" alt="" fill className="object-contain" sizes="44px" />
           </span>
           <h2 className="text-sm md:text-xl font-black text-text-primary tracking-wider whitespace-nowrap uppercase">
-            {t('sidebar.mobileHeaderTitle')}
+            <span className="md:hidden">{t('sidebar.mobileHeaderTitle')}</span>
+            <span className="hidden md:inline">{t('sidebar.mobileTopBarTitle')}</span>
           </h2>
         </div>
 
