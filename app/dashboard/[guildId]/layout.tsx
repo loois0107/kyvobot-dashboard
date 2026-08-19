@@ -256,21 +256,48 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         <main className="flex-1 p-5 md:p-8 overflow-y-auto">
-          <header className="mb-6 pb-4 border-b border-border-default flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          {/* 🛡️ [행 전환을 lg:로 미룸] 원래 sm:(640px)부터 제목/버튼 클러스터를 한 줄에
+              나란히 뒀는데, 우측 버튼 클러스터 자연폭(뱃지+동기화뱃지+Home+Guide+테마토글+
+              언어토글+계정메뉴 합 547px)이 768~1023px 구간 가용폭(433~704px)보다 넓어서 아이콘만
+              남겨도(375.4px) 제목과 한 줄을 나눠 쓰기엔 여전히 빠듯했다. 실측 결과 두 클러스터를
+              각자 자기 줄로 나누면(둘 다 704px 미만 가용폭에도 여유 있게 들어감) 768~1023px
+              전체가 안전해서, 한 줄로 합치는 시점을 lg:(1024px)까지 늦췄다. */}
+          <header className="mb-6 pb-4 border-b border-border-default flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
             <div className="flex items-center gap-3 min-w-0">
               <span className="w-11 h-11 rounded-lg overflow-hidden bg-white shrink-0 relative">
                 <Image src="/images/features/brand/kyvobot character.png" alt="" fill className="object-contain" sizes="44px" />
               </span>
-              <h1 className="text-xl md:text-2xl font-bold text-text-primary uppercase tracking-wide break-words max-w-full">{t('sidebar.mainHeaderTitle')}</h1>
+              {/* 🛡️ [768px+에서 축약형] 이 h1도 Sidebar.tsx의 같은 문제(고정폭 컬럼 옆에서
+                  break-words만 있고 whitespace-nowrap이 없어 자리 없으면 글자 하나씩 세로로
+                  붕괴)를 겪고 있었다 - 실측: 767px는 정상(h=28px)인데 768px에서 h=512px,
+                  850px에서 h=192px, 900px에서 h=128px로 붕괴, 950~1024px도 완전 붕괴는
+                  아니지만 "KYVOBOT"/"DASHBOARD" 2줄로 쪼개짐(704px 가용폭 vs 890.7px 필요폭).
+                  Sidebar.tsx와 동일하게 mobileTopBarTitle("KyvoBot")을 재사용. */}
+              <h1 className="text-xl md:text-2xl font-bold text-text-primary uppercase tracking-wide break-words max-w-full">
+                <span className="md:hidden">{t('sidebar.mainHeaderTitle')}</span>
+                <span className="hidden md:inline">{t('sidebar.mobileTopBarTitle')}</span>
+              </h1>
             </div>
-            <div className="flex items-center gap-3">
+            {/* 🛡️ [flex-wrap을 안전망으로] Home/Guide를 아이콘만으로 줄여도 이 클러스터 자연폭
+                (동기화뱃지+아이콘 Home/Guide+테마토글+언어토글+계정메뉴 합 479.5px)이 768px
+                가용폭(433px)보다 넓다 - 언어토글을 더 늦은 breakpoint로 숨기는 것도 검토했지만,
+                모바일 전용 상단바의 LanguageToggle은 md:hidden이라 768px 이상에서는 이 인스턴스가
+                유일한 접근 경로라 숨기면 그 구간 전체에서 언어 전환 자체가 막힌다(실제로 한 번
+                그렇게 했다가 되돌림). 대신 flex-wrap을 켜서, 다 안 들어가면 아무것도 숨기거나
+                깨지지 않고 그냥 다음 줄로 자연스럽게 넘어가게 한다 - 768px 부근에서만 잠깐
+                2줄이 되고 850px부터는 한 줄로 돌아온다(실측 확인). */}
+            <div className="flex flex-wrap items-center gap-3">
               <div className="bg-bg-elevated px-3 py-1 rounded-full text-sm text-success font-semibold flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-success"></span> {t('sidebar.syncStatus')}</div>
+              {/* 🛡️ [1024~1279px은 아이콘만, 1280px+에서 라벨] md:(768px)부터 아이콘 버튼은 이미
+                  보이고(스크린리더용 aria-label 상시 유지), 텍스트 라벨만 xl:(1280px)부터 붙는다 -
+                  라벨까지 진작 붙이면 클러스터가 더 자주/넓게 flex-wrap을 타서 버튼 줄이 잦게
+                  2줄이 된다. */}
               <div className="hidden md:flex items-center gap-2">
-                <Button type="button" variant="ghost" onClick={() => router.push('/')}>
-                  <Home className="w-4 h-4" /> {t('sidebar.homeButton')}
+                <Button type="button" variant="ghost" onClick={() => router.push('/')} aria-label={t('sidebar.homeButton')}>
+                  <Home className="w-4 h-4" /> <span className="hidden xl:inline">{t('sidebar.homeButton')}</span>
                 </Button>
-                <Button type="button" variant="ghost" onClick={() => router.push('/guide')}>
-                  <BookOpen className="w-4 h-4" /> {t('sidebar.guideButton')}
+                <Button type="button" variant="ghost" onClick={() => router.push('/guide')} aria-label={t('sidebar.guideButton')}>
+                  <BookOpen className="w-4 h-4" /> <span className="hidden xl:inline">{t('sidebar.guideButton')}</span>
                 </Button>
               </div>
               <ThemeToggle />
