@@ -28,6 +28,17 @@ interface OnboardingState {
   items: { automod: boolean; welcome: boolean; presets: boolean };
 }
 
+function ActionChip({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  // 🛡️ [self-start 필수] 이 칩은 Card의 flex flex-col 컨테이너 안 직계 flex item이라, 기본
+  // align-items: stretch 때문에 카드 전체 너비로 늘어나 버린다(실측: width 160px, 컨텐츠는
+  // 70~90px면 충분). self-start로 늘어남을 막아야 실제로 "작은 칩"처럼 보인다.
+  return (
+    <span className={`self-start inline-flex items-center text-[10px] font-black text-brand bg-brand/10 border border-brand/20 px-2 py-0.5 rounded ${className}`}>
+      {children}
+    </span>
+  );
+}
+
 function ChecklistRow({ done, label, href }: { done: boolean; label: string; href: string }) {
   const t = useT();
   return (
@@ -245,7 +256,7 @@ export default function DashboardHome() {
               실제로 어디에서도 안 나오는 값을 하드코딩해서 마치 실시간 측정치인 것처럼 보여줬다 -
               진짜 값이 없으면 아예 안 보여주는 게 맞다(가짜 문구로 순화하지 않음). 실제 값을 가진
               두 항목(봇 이름, 이 서버 ID)만 남긴다. */}
-          <div className="grid grid-cols-2 gap-6 pt-6 font-mono text-base">
+          <div className="flex flex-wrap gap-8 pt-6 font-mono text-base">
             <div className="space-y-1"><span className="text-text-secondary block text-sm">{t('dashboardHome.coreAlias')}</span><strong className="text-text-primary text-base tracking-wide">Kyvo</strong></div>
             <div className="space-y-1">
               <span className="text-text-secondary block text-sm">{t('dashboardHome.activeContext')}</span>
@@ -277,9 +288,7 @@ export default function DashboardHome() {
               {isLoadingStats ? '...' : telemetry.customCommands.toLocaleString()}
               <span className={`text-sm font-sans block mt-0.5 ${telemetry.customCommands === 0 ? 'text-text-muted' : 'text-text-primary'}`}>{t('dashboardHome.customCommandsUnit')}</span>
             </span>
-            <span className="text-[10px] text-text-secondary font-bold tracking-widest pt-1 text-left">
-              {t('dashboardHome.manageArrow')}
-            </span>
+            <ActionChip className="mt-1">{t('dashboardHome.manageArrow')}</ActionChip>
           </Card>
         </Link>
 
@@ -293,9 +302,7 @@ export default function DashboardHome() {
               {isLoadingStats ? '...' : telemetry.ragSynapses.toLocaleString()}
               <span className={`text-sm font-sans block mt-0.5 ${telemetry.ragSynapses === 0 ? 'text-text-muted' : 'text-text-primary'}`}>{t('dashboardHome.aiKnowledgeUnit')}</span>
             </span>
-            <span className="text-[10px] text-text-secondary font-bold tracking-widest pt-1 text-left">
-              {t('dashboardHome.manageArrow')}
-            </span>
+            <ActionChip className="mt-1">{t('dashboardHome.manageArrow')}</ActionChip>
           </Card>
         </Link>
         <Link href={`/dashboard/${guildId}/integrations/ticket-settings`}>
@@ -308,9 +315,7 @@ export default function DashboardHome() {
               {isLoadingStats ? '...' : telemetry.activeTickets}
               <span className={`text-sm font-sans block mt-0.5 ${telemetry.activeTickets === 0 ? 'text-text-muted' : 'text-text-primary'}`}>{t('dashboardHome.activeTicketsUnit')}</span>
             </span>
-            <span className="text-[10px] text-text-secondary font-bold tracking-widest pt-1 text-left">
-              {t('dashboardHome.manageArrow')}
-            </span>
+            <ActionChip className="mt-1">{t('dashboardHome.manageArrow')}</ActionChip>
           </Card>
         </Link>
         <Link href={`/dashboard/${guildId}/community/audit-logs`}>
@@ -323,9 +328,7 @@ export default function DashboardHome() {
               {isLoadingStats ? '...' : telemetry.automodLogs.toLocaleString()}
               <span className={`text-sm font-sans block mt-0.5 ${telemetry.automodLogs === 0 ? 'text-text-muted' : 'text-text-primary'}`}>{t('dashboardHome.automodLogsUnit')}</span>
             </span>
-            <span className="text-[10px] text-text-secondary font-bold tracking-widest pt-1 text-left">
-              {t('dashboardHome.manageArrow')}
-            </span>
+            <ActionChip className="mt-1">{t('dashboardHome.manageArrow')}</ActionChip>
           </Card>
         </Link>
       </div>
@@ -339,19 +342,19 @@ export default function DashboardHome() {
           <Link href={`/dashboard/${guildId}/economy/leveling`}>
             <Card className="!p-8 flex flex-col justify-between min-h-[210px]">
               <div><Sparkles className="w-8 h-8 mb-3 text-text-secondary" /><h4 className="text-base font-black text-text-primary uppercase tracking-wider">{t('dashboardHome.levelingEcoTitle')}</h4><p className="text-sm text-text-secondary mt-2 leading-relaxed">{t('dashboardHome.levelingEcoDesc')}</p></div>
-              <span className="text-[10px] text-text-secondary font-bold tracking-widest mt-4 block">{t('dashboardHome.levelingCta')}</span>
+              <ActionChip className="mt-4">{t('dashboardHome.levelingCta')}</ActionChip>
             </Card>
           </Link>
           <Link href={`/dashboard/${guildId}/community/welcome`}>
             <Card className="!p-8 flex flex-col justify-between min-h-[210px]">
               <div><Inbox className="w-8 h-8 mb-3 text-text-secondary" /><h4 className="text-base font-black text-text-primary uppercase tracking-wider">{t('dashboardHome.welcomeTitle')}</h4><p className="text-sm text-text-secondary mt-2 leading-relaxed">{t('dashboardHome.welcomeDesc')}</p></div>
-              <span className="text-[10px] text-text-secondary font-bold tracking-widest mt-4 block">{t('dashboardHome.welcomeCta')}</span>
+              <ActionChip className="mt-4">{t('dashboardHome.welcomeCta')}</ActionChip>
             </Card>
           </Link>
           <Link href={`/dashboard/${guildId}/integrations/ticket-settings`}>
             <Card className="!p-8 flex flex-col justify-between min-h-[210px]">
               <div><Ticket className="w-8 h-8 mb-3 text-text-secondary" /><h4 className="text-base font-black text-text-primary uppercase tracking-wider">{t('dashboardHome.ticketTitle')}</h4><p className="text-sm text-text-secondary mt-2 leading-relaxed">{t('dashboardHome.ticketDesc')}</p></div>
-              <span className="text-[10px] text-text-secondary font-bold tracking-widest mt-4 block">{t('dashboardHome.ticketCta')}</span>
+              <ActionChip className="mt-4">{t('dashboardHome.ticketCta')}</ActionChip>
             </Card>
           </Link>
         </div>
