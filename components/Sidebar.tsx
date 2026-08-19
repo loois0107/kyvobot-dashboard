@@ -60,13 +60,18 @@ export default function Sidebar() {
   const isActive = Boolean(menuItem) && (pathname === menuItem!.href || (menuItem!.href !== '/' && pathname?.startsWith(menuItem!.href)));
 
   return (
-    <aside className="w-full md:w-64 bg-bg-surface border-b md:border-b-0 md:border-r border-border-default p-4 md:p-6 flex flex-row md:flex-col justify-between items-center md:items-stretch sticky top-0 z-50">
-      <div className="flex flex-row md:flex-col items-center md:items-stretch gap-4 md:gap-0 w-full md:w-auto justify-between md:justify-start">
+    <aside className="w-full md:w-64 bg-bg-surface border-b md:border-b-0 md:border-r border-border-default p-4 md:p-6 flex flex-col justify-between items-stretch sticky top-0 z-50">
+      {/* 🛡️ [모바일도 데스크톱과 같은 세로 배치] 원래 모바일만 flex-row로 (뱃지+타이틀)과 nav
+          링크를 한 줄에 나란히 욱여넣었는데, 390px 폭에서 nav 링크("관리자 대시보드로 이동")에
+          남는 가로 공간이 60~100px밖에 안 남아 글자가 한 자씩 세로로 쌓이는 렌더링 붕괴가 있었다
+          (뱃지 크기와 무관하게 재현됨 - 원래부터 있던 버그). 모바일도 데스크톱과 동일하게
+          flex-col로 통일해서 nav 링크가 항상 전체 폭을 쓰는 한 줄로 내려온다. */}
+      <div className="flex flex-col items-stretch gap-0 w-full justify-start">
 
         {/* 🛡️ [브랜드명은 번역 안 함] "KyvoBot Dashboard"는 랜딩 헤더(heroTitle)와 동일하게
             EN/KO 공통 고정 문자열 - mainHeaderTitle(대시보드 데스크톱 헤더)과 값은 같지만 호출부별
             반응형 크기가 달라 키는 분리해서 유지한다. */}
-        <div className="flex items-center gap-2 mb-0 md:mb-8">
+        <div className="flex items-center gap-2 mb-8">
           <span className="w-11 h-11 rounded-lg overflow-hidden bg-white shrink-0 relative">
             <Image src="/images/features/brand/kyvobot character.png" alt="" fill className="object-contain" sizes="44px" />
           </span>
@@ -84,7 +89,7 @@ export default function Sidebar() {
         )}
       </div>
 
-      <div className="flex flex-row md:flex-col items-center md:items-stretch gap-3 md:gap-2">
+      <div className="flex flex-col items-stretch gap-2">
         <button
           type="button"
           onClick={() => signOut({ callbackUrl: '/' })}
