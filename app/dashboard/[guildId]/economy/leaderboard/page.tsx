@@ -64,7 +64,7 @@ export default function GuildLeaderboardTerminal() {
   }
 
   return (
-    <div className="font-mono text-text-primary selection:bg-brand/20">
+    <div className="text-text-primary selection:bg-brand/20">
       <SettingsPageContainer>
         {/* 🛡️ [정직성 정리] "ALL PREMIUM BYPASS ACTIVE" 배지가 있었지만, 이 봇엔 애초에 프리미엄
             등급 자체가 없다 - 아무 상태와도 연결되지 않은 채 항상 떠 있던 문구라 그냥 없앤다. */}

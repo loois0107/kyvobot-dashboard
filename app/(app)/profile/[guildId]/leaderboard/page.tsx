@@ -49,7 +49,7 @@ export default function ProfileLeaderboardPage() {
   const myRank = myIndex >= 0 ? myIndex + 1 : null;
 
   return (
-    <div className="min-h-screen bg-bg-base text-text-primary p-2 sm:p-4 md:p-6 font-mono">
+    <div className="min-h-screen bg-bg-base text-text-primary p-2 sm:p-4 md:p-6">
       <SettingsPageContainer>
         <div className="border-b border-border-default pb-4">
           <h1 className="text-xl md:text-2xl font-black tracking-wider text-text-primary">{t('profileLeaderboardPage.title')}</h1>

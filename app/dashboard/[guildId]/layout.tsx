@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useParams, useRouter, usePathname } from 'next/navigation';
 import { useT } from '@/lib/i18n/LanguageContext';
 import LanguageToggle from '@/components/LanguageToggle';
@@ -145,7 +146,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     // 브레드크럼이 모바일 전용 줄(<main> 바깥)과 데스크톱 줄(botStatus 게이트 안) 두 군데에서
     // useGuildName()을 써야 해서 트리 전체를 감싸는 최상위로 끌어올렸다.
     <GuildsProvider guilds={guilds}>
-    <div className="flex min-h-screen bg-bg-base text-text-primary font-sans relative overflow-x-hidden">
+    {/* 🛡️ [font-sans 제거] 전역 Inter는 app/layout.tsx의 body에 이미 걸려 있는데, 이 div가
+        font-sans(Tailwind 기본 --font-sans, Inter 아님)를 명시적으로 지정해서 대시보드 섹션
+        전체(이 레이아웃 아래 모든 페이지)가 Inter 대신 브라우저/OS 기본 산세리프로 렌더링되고
+        있었다 - font-mono 6곳 정리 검증 중 발견. 이 div가 최상위 조상이라 지우면 body의 Inter가
+        정상적으로 상속된다. */}
+    <div className="flex min-h-screen bg-bg-base text-text-primary relative overflow-x-hidden">
       <RouteLoadingOverlay />
 
       {isMobileMenuOpen && (
@@ -227,7 +233,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <button type="button" onClick={() => setIsMobileMenuOpen(true)} className="text-text-secondary hover:text-text-primary p-1 focus:outline-none">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16" /></svg>
           </button>
-          <span className="text-sm font-black tracking-widest text-brand uppercase">{t('sidebar.mobileHeaderTitle')}</span>
+          {/* 🛡️ [모바일 좁은 상단바 전용 축약] 이 바는 햄버거+타이틀+아이콘 3개로 이미 꽉 차 있어서
+              "KyvoBot Dashboard"가 두 줄로 줄바꿈되며 바 높이가 늘어나는 문제가 있었다 - 여기만
+              별도 키(mobileTopBarTitle)로 "KyvoBot"만 쓴다. 데스크톱 헤더(mainHeaderTitle)와
+              Sidebar.tsx(mobileHeaderTitle)는 그대로 "KyvoBot Dashboard" 유지. */}
+          <span className="text-sm font-black tracking-widest text-brand uppercase whitespace-nowrap">{t('sidebar.mobileTopBarTitle')}</span>
           <div className="flex items-center gap-2">
             <Button type="button" variant="ghost" onClick={() => router.push('/')} aria-label={t('sidebar.homeButton')} title={t('sidebar.homeButton')} className="!px-2 !py-1">
               <Home className="w-5 h-5" />
@@ -247,7 +257,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         <main className="flex-1 p-5 md:p-8 overflow-y-auto">
           <header className="mb-6 pb-4 border-b border-border-default flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <h1 className="text-xl md:text-2xl font-bold text-text-primary uppercase tracking-wide break-words max-w-full">{t('sidebar.mainHeaderTitle')}</h1>
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="w-8 h-8 rounded-lg overflow-hidden bg-white shrink-0 relative">
+                <Image src="/images/features/brand/kyvobot character.png" alt="" fill className="object-contain" sizes="32px" />
+              </span>
+              <h1 className="text-xl md:text-2xl font-bold text-text-primary uppercase tracking-wide break-words max-w-full">{t('sidebar.mainHeaderTitle')}</h1>
+            </div>
             <div className="flex items-center gap-3">
               <div className="bg-bg-elevated px-3 py-1 rounded-full text-sm text-success font-semibold flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-success"></span> {t('sidebar.syncStatus')}</div>
               <div className="hidden md:flex items-center gap-2">

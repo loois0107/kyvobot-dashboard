@@ -166,7 +166,7 @@ export default function AnonymousReportsSettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg-base text-text-primary p-6 font-mono selection:bg-brand/20">
+    <div className="min-h-screen bg-bg-base text-text-primary p-6 selection:bg-brand/20">
       <SettingsPageContainer>
         <header className="mb-8 border-b border-border-default pb-4 flex items-start justify-between gap-4">
           <div>

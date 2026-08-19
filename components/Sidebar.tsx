@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { signOut, useSession } from 'next-auth/react';
 import { LayoutDashboard, Home } from 'lucide-react';
@@ -62,13 +63,17 @@ export default function Sidebar() {
     <aside className="w-full md:w-64 bg-bg-surface border-b md:border-b-0 md:border-r border-border-default p-4 md:p-6 flex flex-row md:flex-col justify-between items-center md:items-stretch sticky top-0 z-50">
       <div className="flex flex-row md:flex-col items-center md:items-stretch gap-4 md:gap-0 w-full md:w-auto justify-between md:justify-start">
 
-        {/* 🛡️ [리디자인] 이 사이드바의 실제 역할이 "링크 1개 + 로그아웃"뿐이라, 메인 대시보드
-            헤더의 풀네임("Kyvo Central Control Hub") 대신 대시보드 모바일 헤더가 이미 같은
-            "간결한 브랜드 라벨" 용도로 쓰던 mobileHeaderTitle을 재사용했다 - 새 문구를 안
-            만들어도 톤이 자연스럽게 맞는다. 옛 genericTitle 키("KYVO DASH")는 폐기. */}
-        <h2 className="text-sm md:text-xl font-black text-brand tracking-wider mb-0 md:mb-8 whitespace-nowrap uppercase">
-          {t('sidebar.mobileHeaderTitle')}
-        </h2>
+        {/* 🛡️ [브랜드명은 번역 안 함] "KyvoBot Dashboard"는 랜딩 헤더(heroTitle)와 동일하게
+            EN/KO 공통 고정 문자열 - mainHeaderTitle(대시보드 데스크톱 헤더)과 값은 같지만 호출부별
+            반응형 크기가 달라 키는 분리해서 유지한다. */}
+        <div className="flex items-center gap-2 mb-0 md:mb-8">
+          <span className="w-8 h-8 rounded-lg overflow-hidden bg-white shrink-0 relative">
+            <Image src="/images/features/brand/kyvobot character.png" alt="" fill className="object-contain" sizes="32px" />
+          </span>
+          <h2 className="text-sm md:text-xl font-black text-brand tracking-wider whitespace-nowrap uppercase">
+            {t('sidebar.mobileHeaderTitle')}
+          </h2>
+        </div>
 
         {menuItem && (
           <nav className="text-xs md:text-sm">
