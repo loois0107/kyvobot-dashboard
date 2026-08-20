@@ -69,19 +69,18 @@ export default async function GuidePage() {
     (session?.user as any)?.discordLocale
   );
   const t = dictionaries[lang];
-  // 🛡️ [1단계 임시 글루 - 본문은 아직 다크 전용] LandingHeader가 이제 useLandingTheme()을 필수로
-  // 요구해서(LandingThemeToggle 때문에) 감싸주지 않으면 크래시 난다. 다만 가이드 페이지 본문은
-  // 이번 1단계 범위 밖이라 여전히 리터럴 다크 색상 그대로다 - 헤더에서 토글을 눌러도 헤더만
-  // 라이트로 바뀌고 본문은 다크로 남는 반쪽짜리 상태가 됨(2단계에서 본문까지 토큰 전환하며 해결).
+  // 🛡️ [2단계 완료 - 본문도 토큰화] 1단계 때는 크래시 방지용 임시 글루였지만, 이제 본문 전체가
+  // app/page.tsx와 동일한 토큰/리터럴 예외 규칙을 그대로 따른다 - 토글을 누르면 헤더뿐 아니라
+  // 본문까지 함께 라이트/다크로 전환된다.
   const landingTheme = resolveInitialLandingTheme(cookieStore.get(LANDING_THEME_COOKIE_NAME)?.value);
 
   return (
-    <LandingThemeProvider initialTheme={landingTheme}>
-    <div className="min-h-screen bg-[#0A0A0B] text-[#F5F5F5] flex flex-col relative overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-[#5865F2]/25 rounded-full blur-[130px]" />
-        <div className="absolute top-64 -right-32 w-[500px] h-[500px] bg-[#2DD4BF]/10 rounded-full blur-[130px]" />
-      </div>
+    <LandingThemeProvider
+      initialTheme={landingTheme}
+      className="min-h-screen bg-bg-base text-text-primary flex flex-col relative overflow-hidden"
+    >
+      {/* 🛡️ 히어로 배경 글로우 제거 - app/page.tsx와 동일(랜딩 무채색 정리 범위, 브랜드 블루/민트
+          글로우 완전 삭제). */}
 
       {/* 🛡️ 문서 페이지라 실제 관리 서버 조회가 불필요 - dashboardHref=null로 헤더의 Discord API 호출을 건너뛴다. */}
       <LandingHeader dashboardHref={null} />
@@ -90,28 +89,28 @@ export default async function GuidePage() {
         <section className="max-w-3xl mx-auto w-full px-4 pt-20 pb-16 text-center">
           <RevealOnScroll>
             <h1 className="text-4xl md:text-5xl font-black tracking-wide mb-6">
-              <span className="bg-gradient-to-r from-white via-[#c7cdfd] to-[#5865F2] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-text-primary to-text-secondary bg-clip-text text-transparent">
                 {t.guidePage.heroTitle}
               </span>
             </h1>
-            <p className="text-base md:text-lg text-[#A1A1AA] leading-relaxed">{t.guidePage.heroDesc}</p>
+            <p className="text-base md:text-lg text-text-secondary leading-relaxed">{t.guidePage.heroDesc}</p>
           </RevealOnScroll>
         </section>
 
         {GUIDE_CATEGORIES.map((category) => (
           <section key={category.categoryKey} className="max-w-7xl mx-auto w-full px-4 pb-24">
             <RevealOnScroll className="mb-10 text-center">
-              <p className="text-xs font-black tracking-widest text-[#5865F2] uppercase mb-3">
+              <p className="text-xs font-black tracking-widest text-text-secondary uppercase mb-3">
                 {t.sidebar[category.categoryKey]}
               </p>
-              <h2 className="text-2xl md:text-3xl font-black text-[#F5F5F5]">{t.sidebar[category.categoryKey]}</h2>
+              <h2 className="text-2xl md:text-3xl font-black text-text-primary">{t.sidebar[category.categoryKey]}</h2>
             </RevealOnScroll>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {category.items.map((item, i) => (
                 <RevealOnScroll key={item.titleKey} delayMs={(i % 3) * 100}>
-                  <div className="h-full bg-[#141416] border border-[#676771] rounded-2xl p-6 space-y-3">
-                    <h3 className="text-base font-bold text-[#F5F5F5] leading-snug">{t.guidePage[item.titleKey]}</h3>
-                    <p className="text-sm text-[#85858B] leading-relaxed">{t.guidePage[item.descKey]}</p>
+                  <div className="h-full bg-bg-surface border border-border-default rounded-2xl p-6 space-y-3">
+                    <h3 className="text-base font-bold text-text-primary leading-snug">{t.guidePage[item.titleKey]}</h3>
+                    <p className="text-sm text-text-muted leading-relaxed">{t.guidePage[item.descKey]}</p>
                   </div>
                 </RevealOnScroll>
               ))}
@@ -119,19 +118,19 @@ export default async function GuidePage() {
           </section>
         ))}
 
-        <section className="relative flex flex-col items-center w-full px-4 py-24 text-center bg-[#0A0A0B] border-t-4 border-[#676771]">
+        <section className="relative flex flex-col items-center w-full px-4 py-24 text-center bg-bg-base border-t-4 border-border-default">
           <RevealOnScroll className="flex flex-col items-center gap-6 max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-black text-[#F5F5F5]">{t.guidePage.ctaTitle}</h2>
+            <h2 className="text-3xl md:text-4xl font-black text-text-primary">{t.guidePage.ctaTitle}</h2>
             <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
               <a
                 href={BOT_INVITE_URL}
-                className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-base font-black px-10 py-4 rounded-full shadow-[0_0_30px_rgba(88,101,242,0.45)] hover:shadow-[0_0_45px_rgba(88,101,242,0.65)] transition-all"
+                className="bg-[#27272A] hover:bg-[#3F3F46] text-white text-base font-black px-10 py-4 rounded-full shadow-[0_0_30px_rgba(0,0,0,0.45)] hover:shadow-[0_0_45px_rgba(0,0,0,0.65)] transition-all"
               >
                 🤖 {t.landingPage.addBotCta}
               </a>
               <Link
                 href="/"
-                className="border border-[#5865F2]/40 hover:border-[#5865F2] text-[#A1A1AA] hover:text-[#F5F5F5] text-base font-bold px-10 py-4 rounded-full transition-all"
+                className="border border-border-default/40 hover:border-border-hover text-text-secondary hover:text-text-primary text-base font-bold px-10 py-4 rounded-full transition-all"
               >
                 {t.landingPage.heroTitle}
               </Link>
@@ -140,42 +139,41 @@ export default async function GuidePage() {
         </section>
       </main>
 
-      <footer className="relative bg-[#0A0A0B] border-t border-[#676771]/40 py-16 px-4">
+      <footer className="relative bg-bg-base border-t border-border-default/40 py-16 px-4">
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-10">
           <div className="space-y-3 text-center sm:text-left">
             <div className="flex items-center justify-center sm:justify-start gap-2">
-              <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#5865F2] to-[#4752C4] flex items-center justify-center text-xs font-black text-white">
+              <span className="w-7 h-7 rounded-lg bg-[#000000] border border-[#FFFFFF] flex items-center justify-center text-xs font-black text-white">
                 K
               </span>
-              <span className="text-base font-black text-[#F5F5F5]">{t.landingPage.heroTitle}</span>
+              <span className="text-base font-black text-text-primary">{t.landingPage.heroTitle}</span>
             </div>
-            <p className="text-xs text-[#85858B]">{t.landingPage.footerTagline}</p>
+            <p className="text-xs text-text-muted">{t.landingPage.footerTagline}</p>
           </div>
           <div className="space-y-3 text-center sm:text-left">
-            <h4 className="text-sm font-bold text-[#F5F5F5]">{t.landingPage.footerQuickLinksHeader}</h4>
+            <h4 className="text-sm font-bold text-text-primary">{t.landingPage.footerQuickLinksHeader}</h4>
             <div className="flex flex-col gap-2">
-              <Link href="/#features" className="text-xs text-[#85858B] hover:text-[#F5F5F5] transition-colors">
+              <Link href="/#features" className="text-xs text-text-muted hover:text-text-primary transition-colors">
                 {t.landingPage.navFeatures}
               </Link>
-              <Link href="/guide" className="text-xs text-[#85858B] hover:text-[#F5F5F5] transition-colors">
+              <Link href="/guide" className="text-xs text-text-muted hover:text-text-primary transition-colors">
                 {t.landingPage.navGuide}
               </Link>
             </div>
           </div>
           <div className="space-y-3 text-center sm:text-left">
-            <h4 className="text-sm font-bold text-[#F5F5F5]">{t.landingPage.footerLegalHeader}</h4>
+            <h4 className="text-sm font-bold text-text-primary">{t.landingPage.footerLegalHeader}</h4>
             <div className="flex flex-col gap-2">
-              <Link href="/privacy" className="text-xs text-[#85858B] hover:text-[#F5F5F5] transition-colors">
+              <Link href="/privacy" className="text-xs text-text-muted hover:text-text-primary transition-colors">
                 {t.landingPage.footerPrivacy}
               </Link>
-              <Link href="/terms" className="text-xs text-[#85858B] hover:text-[#F5F5F5] transition-colors">
+              <Link href="/terms" className="text-xs text-text-muted hover:text-text-primary transition-colors">
                 {t.landingPage.footerTerms}
               </Link>
             </div>
           </div>
         </div>
       </footer>
-    </div>
     </LandingThemeProvider>
   );
 }

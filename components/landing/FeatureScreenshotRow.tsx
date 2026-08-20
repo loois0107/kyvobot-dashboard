@@ -57,26 +57,30 @@ function ImageSlot({
   comingSoonLabel: string;
 }) {
   if (src) {
-    // 🛡️ 액자(bg/border) 없이 이미지 자체가 자연스러운 비율로 보이도록 fill+object-cover를
-    // 버리고 실제 width/height + w-full h-auto를 쓴다 - 세로로 긴 디스코드 캡처든 가로로
-    // 넓은 랭크카드든 잘리지 않고 카드 폭에 맞춰 온전히 보인다.
+    // 🛡️ [프레임 추가 - 랜딩 무채색 정리 2단계] 이전엔 "액자(bg/border) 없이 이미지 자체가
+    // 자연스러운 비율로 보이도록" 일부러 프레임을 안 씌웠는데, 랜딩이 라이트 배경 기본값이
+    // 되면서 다크 배경 스크린샷이 밝은 페이지 위에 그대로 붕 뜨는 문제가 생겼다. DashboardShowcase와
+    // 동일한 중립 프레임(--showcase-border/--showcase-shadow)으로 감싸서 두 컴포넌트의 스크린샷
+    // 취급을 통일한다 - width/height + w-full h-auto로 비율을 살리는 부분은 그대로 유지.
     return (
-      <Image
-        src={src}
-        alt={alt}
-        width={width ?? 1200}
-        height={height ?? 675}
-        className="w-full h-auto rounded-2xl"
-        sizes="(max-width: 768px) 100vw, 50vw"
-      />
+      <div className="rounded-2xl overflow-hidden border-2 border-[color:var(--showcase-border)] shadow-[var(--showcase-shadow)]">
+        <Image
+          src={src}
+          alt={alt}
+          width={width ?? 1200}
+          height={height ?? 675}
+          className="w-full h-auto block"
+          sizes="(max-width: 768px) 100vw, 50vw"
+        />
+      </div>
     );
   }
-  /* bg-[#141416] + border는 캡처본이 없는 동안 이 슬롯이 빈 구멍처럼 안 보이게 하는
+  /* bg-bg-surface + border는 캡처본이 없는 동안 이 슬롯이 빈 구멍처럼 안 보이게 하는
      자리표시자 전용 - 실제 이미지가 준비되면(src) 위 분기로 완전히 대체된다. */
   return (
-    <div className="aspect-[16/9] rounded-2xl bg-[#141416] border border-[#676771] flex flex-col items-center justify-center gap-3" title={future}>
+    <div className="aspect-[16/9] rounded-2xl bg-bg-surface border border-border-default flex flex-col items-center justify-center gap-3" title={future}>
       <span className="text-5xl opacity-60">{icon}</span>
-      <span className="font-mono text-[10px] uppercase tracking-widest text-[#85858B]">{comingSoonLabel}</span>
+      <span className="font-mono text-[10px] uppercase tracking-widest text-text-muted">{comingSoonLabel}</span>
     </div>
   );
 }
@@ -114,7 +118,7 @@ export default function FeatureScreenshotRow({
               icon={icon}
               comingSoonLabel={comingSoonLabel}
             />
-            <div className="flex justify-center text-2xl text-[#5865F2]" aria-hidden="true">↓</div>
+            <div className="flex justify-center text-2xl text-text-secondary" aria-hidden="true">↓</div>
           </>
         )}
         <ImageSlot
@@ -128,8 +132,8 @@ export default function FeatureScreenshotRow({
         />
       </div>
       <div className="w-full md:w-1/2 space-y-4 text-center md:text-left">
-        <h3 className="text-2xl md:text-3xl font-bold text-[#F5F5F5]">{title}</h3>
-        <p className="text-base md:text-lg text-[#A1A1AA] leading-relaxed">{description}</p>
+        <h3 className="text-2xl md:text-3xl font-bold text-text-primary">{title}</h3>
+        <p className="text-base md:text-lg text-text-secondary leading-relaxed">{description}</p>
       </div>
     </div>
   );

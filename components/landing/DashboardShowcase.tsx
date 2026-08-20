@@ -12,23 +12,26 @@ type DashboardShowcaseProps = {
   imageHeight?: number;
 };
 
-// 🛡️ 다른 기능 카드/스크린샷 행과 톤을 의도적으로 다르게 간다 - 이 섹션 하나만 "웹 대시보드"라는
-// 킬러 피처를 단독으로 강조해야 해서, 알약 모양 eyebrow 배지 + 파란 글로우 테두리로 시각적으로
-// 확실히 구분되게 만든다(이 테두리/글로우는 스크린샷 잘림 문제와 무관한 의도된 디자인이라 유지).
+// 🛡️ [브랜드 블루 예외를 없앰 - 랜딩 무채색 정리 2단계] 예전엔 이 섹션만 "웹 대시보드"라는
+// 킬러 피처를 단독으로 강조한다는 이유로 파란 eyebrow 배지 + 파란 글로우 테두리를 의도적으로
+// 유지했었다. 이제 랜딩 전체가 무채색으로 통일되는 범위에 이 컴포넌트도 편입되면서 그 예외를
+// 없앴다 - 강조 자체(알약 배지, 글로우 테두리 굵기)는 그대로 두되 색만 중립톤으로 바꿨다.
+// 보더/글로우는 Card.tsx와 동일한 패턴(app/globals.css --showcase-border/--showcase-shadow,
+// 다크는 옅은 글로우/라이트는 드롭섀도우)의 CSS 변수로 분기한다.
 export default function DashboardShowcase({ eyebrow, title, description, imageSrc, imageWidth, imageHeight }: DashboardShowcaseProps) {
   return (
     <div className="text-center space-y-8">
       <div className="space-y-4">
-        <span className="inline-block text-xs font-black tracking-widest text-[#5865F2] uppercase bg-[#5865F2]/10 border border-[#5865F2]/30 rounded-full px-4 py-1.5">
+        <span className="inline-block text-xs font-black tracking-widest text-text-secondary uppercase bg-text-secondary/10 border border-text-secondary/30 rounded-full px-4 py-1.5">
           {eyebrow}
         </span>
-        <h2 className="text-3xl md:text-4xl font-black text-[#F5F5F5]">{title}</h2>
-        <p className="max-w-2xl mx-auto text-base md:text-lg text-[#A1A1AA] leading-relaxed">{description}</p>
+        <h2 className="text-3xl md:text-4xl font-black text-text-primary">{title}</h2>
+        <p className="max-w-2xl mx-auto text-base md:text-lg text-text-secondary leading-relaxed">{description}</p>
       </div>
       {/* 🛡️ aspect-[16/9]+object-cover(고정 박스 크롭)를 버리고, 실제 width/height + w-full h-auto로
           이미지 자체 비율을 그대로 살린다 - overflow-hidden은 이제 잘라내는 용도가 아니라 rounded-2xl
           모서리를 유지하기 위한 것뿐(이미지가 박스보다 커질 일이 없으므로 실질적으로 아무것도 안 잘림). */}
-      <div className="max-w-4xl mx-auto rounded-2xl overflow-hidden border-2 border-[#5865F2]/30 shadow-[0_0_60px_rgba(88,101,242,0.25)]">
+      <div className="max-w-4xl mx-auto rounded-2xl overflow-hidden border-2 border-[color:var(--showcase-border)] shadow-[var(--showcase-shadow)]">
         <Image
           src={imageSrc}
           alt={title}

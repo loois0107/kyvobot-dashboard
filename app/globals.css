@@ -70,18 +70,27 @@ html {
    회색 보더 그대로 유지 + non-elevated 카드만 브랜드 글로우. 라이트에서는 실측(라이트 배경
    위 브랜드 글로우가 사실상 안 보임 - 카드 스타일 검토 스크린샷으로 확인) 결과 보더를 완전히
    지우고 중립 드롭섀도우로 "뜬" 느낌만 주는 쪽이 더 깔끔해서, elevated 여부와 무관하게 라이트는
-   항상 같은 중립 그림자를 쓴다. */
+   항상 같은 중립 그림자를 쓴다.
+
+   --showcase-border/--showcase-shadow는 랜딩 DashboardShowcase/FeatureScreenshotRow 전용 -
+   같은 이유로 같은 패턴을 재사용한다: 원래 이 두 컴포넌트만 "킬러 피처" 강조용으로 브랜드
+   블루 글로우 테두리를 예외적으로 유지했었는데, 랜딩 전체 무채색 정리 범위에 편입되면서 그
+   예외를 없앴다. 다크에서는 Card와 동일하게 옅은 흰색 글로우, 라이트에서는 글로우 대신
+   Card 라이트처럼 중립 드롭섀도우로 "뜬" 느낌만 준다(밝은 배경 위 글로우 테두리는 Card
+   케이스와 동일하게 거의 안 보이므로). */
 :root {
   --card-border: var(--color-border-default);
   --card-shadow: none; /* dark, elevated 카드 - 원래도 그림자 없었음 */
   --card-shadow-accent: 0 0 18px rgba(88, 101, 242, 0.16); /* dark, non-elevated 카드 - 기존 브랜드 글로우 그대로 */
+  --showcase-border: rgba(245, 245, 245, 0.18); /* dark - 브랜드 블루 대신 옅은 중립 글로우 테두리 */
+  --showcase-shadow: 0 0 60px rgba(245, 245, 245, 0.12); /* dark - 브랜드 블루 글로우 대신 중립 글로우 */
 }
 
-/* 🛡️ [라이트 모드 - 관리자 대시보드 전용] app/layout.tsx가 kyvo_theme 쿠키를 서버에서 미리
-   읽어 <html data-theme="light">을 SSR로 박아준다(기본값은 항상 dark - 쿠키가 없거나 'light'가
-   아니면 이 블록 자체가 안 먹는다). 토글 UI(ThemeToggle)는 대시보드 헤더에만 있으므로 실제로
-   이 값이 'light'가 되는 건 대시보드에서 쿠키를 남긴 경우뿐이지만, 랜딩/가이드 페이지는 애초에
-   이 토큰들을 거의 안 쓰기 때문에(하드코딩 hex 위주) 어차피 영향이 없다.
+/* 🛡️ [랜딩/가이드도 이제 이 토큰을 쓴다] app/layout.tsx가 kyvo_theme 쿠키를 서버에서 미리 읽어
+   <html data-theme="light">을 SSR로 박아준다(대시보드 전용, 기본값은 항상 dark). 랜딩/가이드는
+   완전히 별개인 kyvo_landing_theme 쿠키 + LandingThemeProvider가 로컬 wrapper div에 자체
+   data-theme을 얹는 방식으로 이 같은 속성 선택자 규칙을 받는다(lib/theme/LandingThemeContext.tsx
+   참고) - 대시보드 <html>과는 독립이지만, 밑에 정의된 라이트 값 자체는 두 쪽이 그대로 공유한다.
 
    각 값은 다크 스케일의 명도 관계를 거울처럼 뒤집어서 잡았고(base가 배경 중 가장 어둡고 surface/
    elevated로 갈수록 밝아지는 다크 쪽 규칙과 달리, 라이트는 흰색이 명도의 물리적 상한이라
@@ -126,6 +135,8 @@ html {
   --card-border: transparent;
   --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
   --card-shadow-accent: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --showcase-border: transparent; /* light - Card 라이트와 동일하게 보더 대신 드롭섀도우로만 구분 */
+  --showcase-shadow: 0 8px 30px rgba(24, 24, 27, 0.10);
 }
 
 body {
