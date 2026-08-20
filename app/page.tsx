@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import Link from 'next/link';
+import { Gamepad2, Shield, Ticket, Sparkles, Smile, TvMinimalPlay } from 'lucide-react';
 import { auth } from '@/auth';
 import { COOKIE_NAME, dictionaries, resolveInitialLanguage } from '@/lib/i18n';
 import LandingHeader from '@/components/landing/LandingHeader';
@@ -12,93 +13,99 @@ import { resolveLocalizedImage } from '@/lib/resolveLocalizedImage';
 // 🛡️ hasDetail: true인 3개(파티/AI티켓/레벨링)는 SEE IT IN ACTION에 대응하는 스크린샷 행이
 // 있어서 카드 하단에 "자세히 보기" 링크를 붙인다(#see-it-in-action으로 스크롤). 나머지 3개는
 // 대응 스크린샷이 없어서 힌트 없이 아이콘 카드로만 충분하다.
+// 🛡️ [흑백 톤 정리 - 아이콘 강조색 통일] 카테고리별로 다르던 배지/보더/그림자 색을 전부
+// text-secondary의 리터럴 값(#A1A1AA, rgb 161,161,170)으로 통일했다 - 랜딩은 반응형 토큰
+// 클래스를 안 쓰는 고정 다크 페이지라 토큰 이름이 아니라 그 값 자체를 그대로 박아넣는다.
+// PAIN_POINTS도 같은 톤으로 통일했으니(아래), 파티모집/자동관리/AI티켓/레벨링 4쌍의
+// "문제(색) -> 기능(같은 색)" 매칭 스토리텔링은 색으로는 더 이상 안 이어진다 - 대신 이모지를
+// 대시보드 사이드바와 동일한 lucide 아이콘으로 바꿔서, "같은 모양"으로 여전히 짝이 맞게 했다
+// (Gamepad2/Shield/Ticket/Sparkles를 두 섹션에서 각각 재사용).
 const FEATURES = [
   {
     titleKey: 'featurePartyTitle',
     descKey: 'featurePartyDesc',
-    icon: '🎮',
-    badgeBg: 'bg-[#5865F2]/15',
-    border: 'hover:border-[#5865F2]/50',
-    shadow: 'hover:shadow-[0_0_25px_rgba(88,101,242,0.25)]',
+    icon: Gamepad2,
+    badgeBg: 'bg-[#A1A1AA]/15',
+    border: 'hover:border-[#A1A1AA]/50',
+    shadow: 'hover:shadow-[0_0_25px_rgba(161,161,170,0.25)]',
     hasDetail: true,
   },
   {
     titleKey: 'featureTicketTitle',
     descKey: 'featureTicketDesc',
-    icon: '🤖',
-    // 🛡️ 레거시 보라(purple-500) 대체 - 신규 토큰 시스템엔 보라가 없어서 warning(#FB923C)으로 이관.
-    badgeBg: 'bg-[#FB923C]/15',
-    border: 'hover:border-[#FB923C]/50',
-    shadow: 'hover:shadow-[0_0_25px_rgba(251,146,60,0.25)]',
+    icon: Ticket,
+    badgeBg: 'bg-[#A1A1AA]/15',
+    border: 'hover:border-[#A1A1AA]/50',
+    shadow: 'hover:shadow-[0_0_25px_rgba(161,161,170,0.25)]',
     hasDetail: true,
   },
   {
     titleKey: 'featureLevelingTitle',
     descKey: 'featureLevelingDesc',
-    icon: '📊',
-    badgeBg: 'bg-[#23A55A]/15',
-    border: 'hover:border-[#23A55A]/50',
-    shadow: 'hover:shadow-[0_0_25px_rgba(35,165,90,0.25)]',
+    icon: Sparkles,
+    badgeBg: 'bg-[#A1A1AA]/15',
+    border: 'hover:border-[#A1A1AA]/50',
+    shadow: 'hover:shadow-[0_0_25px_rgba(161,161,170,0.25)]',
     hasDetail: true,
   },
   {
     titleKey: 'featureAutomodTitle',
     descKey: 'featureAutomodDesc',
-    icon: '🛡️',
-    badgeBg: 'bg-[#F87171]/15',
-    border: 'hover:border-[#F87171]/50',
-    shadow: 'hover:shadow-[0_0_25px_rgba(248,113,113,0.25)]',
+    icon: Shield,
+    badgeBg: 'bg-[#A1A1AA]/15',
+    border: 'hover:border-[#A1A1AA]/50',
+    shadow: 'hover:shadow-[0_0_25px_rgba(161,161,170,0.25)]',
     hasDetail: false,
   },
   {
     titleKey: 'featureReactionRolesTitle',
     descKey: 'featureReactionRolesDesc',
-    icon: '🎭',
-    // 🛡️ 짝 없는 단독 장식(고아 금색) - 이번 세션 전역 패턴대로 브랜드 블루로 통일.
-    badgeBg: 'bg-[#5865F2]/15',
-    border: 'hover:border-[#5865F2]/50',
-    shadow: 'hover:shadow-[0_0_25px_rgba(88,101,242,0.25)]',
+    icon: Smile,
+    badgeBg: 'bg-[#A1A1AA]/15',
+    border: 'hover:border-[#A1A1AA]/50',
+    shadow: 'hover:shadow-[0_0_25px_rgba(161,161,170,0.25)]',
     hasDetail: false,
   },
   {
     titleKey: 'featureTwitchTitle',
     descKey: 'featureTwitchDesc',
-    icon: '📺',
-    badgeBg: 'bg-[#9146FF]/15',
-    border: 'hover:border-[#9146FF]/50',
-    shadow: 'hover:shadow-[0_0_25px_rgba(145,70,255,0.25)]',
+    icon: TvMinimalPlay,
+    badgeBg: 'bg-[#A1A1AA]/15',
+    border: 'hover:border-[#A1A1AA]/50',
+    shadow: 'hover:shadow-[0_0_25px_rgba(161,161,170,0.25)]',
     hasDetail: false,
   },
 ] as const;
 
-// 🛡️ 아이콘/색은 아래에서 이 주제를 이어받는 섹션과 맞춰뒀다 - party/ticket/leveling은 SCREENSHOTS의
+// 🛡️ 아이콘은 아래에서 이 주제를 이어받는 섹션과 맞춰뒀다 - party/ticket/leveling은 SCREENSHOTS의
 // 대표 행과, automod는 FEATURES 카드와 - 스크롤을 내렸을 때 "이 고민 -> 저 기능"으로 자연스럽게
-// 이어져 보이게 한다(우연이 아니라 의도적 연결).
+// 이어져 보이게 한다(우연이 아니라 의도적 연결). 색은 FEATURES와 동일하게 중립 회색(#A1A1AA)으로
+// 통일 - 원래는 카테고리별 색이 이 연결을 만들었지만, 이제 같은 lucide 아이콘 모양이 그 역할을
+// 대신한다.
 const PAIN_POINTS = [
   {
     descriptionKey: 'painPointPartyDescription',
-    icon: '🎮',
-    badgeBg: 'bg-[#5865F2]/15',
-    accentText: 'text-[#5865F2]',
+    icon: Gamepad2,
+    badgeBg: 'bg-[#A1A1AA]/15',
+    accentText: 'text-[#A1A1AA]',
   },
   {
     descriptionKey: 'painPointAutomodDescription',
-    icon: '🛡️',
-    badgeBg: 'bg-[#F87171]/15',
-    accentText: 'text-[#F87171]',
+    icon: Shield,
+    badgeBg: 'bg-[#A1A1AA]/15',
+    accentText: 'text-[#A1A1AA]',
   },
   {
     descriptionKey: 'painPointTicketDescription',
-    icon: '🤖',
-    // 🛡️ 레거시 보라 대체 - FEATURES의 같은 카테고리(featureTicketTitle)와 동일하게 warning으로.
-    badgeBg: 'bg-[#FB923C]/15',
-    accentText: 'text-[#FB923C]',
+    icon: Ticket,
+    badgeBg: 'bg-[#A1A1AA]/15',
+    accentText: 'text-[#A1A1AA]',
   },
   {
     descriptionKey: 'painPointLevelingDescription',
-    icon: '📊',
-    badgeBg: 'bg-[#23A55A]/15',
-    accentText: 'text-[#23A55A]',
+    icon: Sparkles,
+    badgeBg: 'bg-[#A1A1AA]/15',
+    accentText: 'text-[#A1A1AA]',
   },
 ] as const;
 
@@ -228,12 +235,6 @@ export default async function RootPage() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-[#F5F5F5] flex flex-col relative overflow-hidden">
-      {/* Decorative background glow, spans hero through the preview section so there's no dead space between them */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-[#5865F2]/25 rounded-full blur-[130px]" />
-        <div className="absolute top-64 -right-32 w-[500px] h-[500px] bg-[#2DD4BF]/10 rounded-full blur-[130px]" />
-      </div>
-
       <LandingHeader dashboardHref={dashboardHref} />
 
       <main className="relative min-h-screen flex flex-col items-center justify-center text-center px-4 pt-4 pb-16 gap-6">
@@ -249,13 +250,13 @@ export default async function RootPage() {
             <>
               <a
                 href={BOT_INVITE_URL}
-                className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-base font-black px-10 py-4 rounded-xl shadow-[0_0_30px_rgba(88,101,242,0.45)] hover:shadow-[0_0_45px_rgba(88,101,242,0.65)] transition-all"
+                className="bg-[#27272A] hover:bg-[#3F3F46] text-white text-base font-black px-10 py-4 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.45)] hover:shadow-[0_0_45px_rgba(0,0,0,0.65)] transition-all"
               >
                 🤖 {t.landingPage.addBotCta}
               </a>
               <a
                 href="/api/auth/signin"
-                className="border border-[#5865F2]/40 hover:border-[#5865F2] text-[#A1A1AA] hover:text-[#F5F5F5] text-base font-bold px-10 py-4 rounded-xl transition-all"
+                className="border border-[#676771]/40 hover:border-[#797984] text-[#A1A1AA] hover:text-[#F5F5F5] text-base font-bold px-10 py-4 rounded-xl transition-all"
               >
                 {t.landingPage.loginCta}
               </a>
@@ -263,7 +264,7 @@ export default async function RootPage() {
           ) : dashboardHref ? (
             <Link
               href={dashboardHref}
-              className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-base font-black px-10 py-4 rounded-xl shadow-[0_0_30px_rgba(88,101,242,0.45)] hover:shadow-[0_0_45px_rgba(88,101,242,0.65)] transition-all"
+              className="bg-[#27272A] hover:bg-[#3F3F46] text-white text-base font-black px-10 py-4 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.45)] hover:shadow-[0_0_45px_rgba(0,0,0,0.65)] transition-all"
             >
               🎛️ {t.landingPage.goToDashboardCta}
             </Link>
@@ -274,7 +275,7 @@ export default async function RootPage() {
               <p className="text-sm text-[#85858B]">{t.landingPage.noManagedServers}</p>
               <Link
                 href="/profile"
-                className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-base font-black px-10 py-4 rounded-xl shadow-[0_0_30px_rgba(88,101,242,0.45)] hover:shadow-[0_0_45px_rgba(88,101,242,0.65)] transition-all"
+                className="bg-[#27272A] hover:bg-[#3F3F46] text-white text-base font-black px-10 py-4 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.45)] hover:shadow-[0_0_45px_rgba(0,0,0,0.65)] transition-all"
               >
                 {t.profilePickerPage.title}
               </Link>
@@ -308,8 +309,8 @@ export default async function RootPage() {
               >
                 {isHero ? (
                   <div className="h-full bg-[#141416] border border-[#676771] rounded-2xl p-8 sm:p-10 flex items-start gap-4 sm:gap-6">
-                    <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-full flex items-center justify-center text-2xl sm:text-4xl shrink-0 ${item.badgeBg}`}>
-                      {item.icon}
+                    <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-full flex items-center justify-center shrink-0 ${item.badgeBg}`}>
+                      <item.icon className="w-6 h-6 sm:w-9 sm:h-9 text-[#F5F5F5]" />
                     </div>
                     <p className="text-sm sm:text-base text-[#85858B] leading-relaxed">
                       {renderHighlightedText(t.landingPage[item.descriptionKey], item.accentText)}
@@ -317,8 +318,8 @@ export default async function RootPage() {
                   </div>
                 ) : (
                   <div className="h-full bg-[#141416] border border-[#676771] rounded-2xl p-8 flex items-start gap-4">
-                    <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl shrink-0 ${item.badgeBg}`}>
-                      {item.icon}
+                    <div className={`w-14 h-14 rounded-full flex items-center justify-center shrink-0 ${item.badgeBg}`}>
+                      <item.icon className="w-6 h-6 text-[#F5F5F5]" />
                     </div>
                     <p className="text-sm text-[#85858B] leading-relaxed">
                       {renderHighlightedText(t.landingPage[item.descriptionKey], item.accentText)}
@@ -353,19 +354,19 @@ export default async function RootPage() {
                 <div
                   key={feature.titleKey}
                   className={`bg-[#141416] border rounded-2xl transition-all duration-200 hover:-translate-y-1 ${feature.border} ${feature.shadow} ${
-                    isEmphasized ? 'p-10 border-[#5865F2]/40 space-y-4' : 'p-8 border-[#676771] space-y-3'
+                    isEmphasized ? 'p-10 border-[#A1A1AA]/40 space-y-4' : 'p-8 border-[#676771] space-y-3'
                   }`}
                 >
-                  {/* 🛡️ 제목 텍스트에서 같은 이모지를 뺐으니(featurePartyTitle 등) 이 배지는 이제
-                      순수 장식이다 - aria-hidden 없이 두면 스크린리더가 "게임패드, 파티모집"처럼
-                      이모지 이름과 제목을 중복으로 읽는다. */}
+                  {/* 🛡️ 제목 텍스트에서 같은 아이콘을 뺐으니(featurePartyTitle 등) 이 배지는 이제
+                      순수 장식이다 - aria-hidden 없이 두면 스크린리더가 "게임패드 아이콘, 파티모집"처럼
+                      아이콘 이름과 제목을 중복으로 읽는다. */}
                   <div
                     aria-hidden="true"
                     className={`rounded-full flex items-center justify-center ${feature.badgeBg} ${
-                      isEmphasized ? 'w-20 h-20 text-5xl' : 'w-16 h-16 text-4xl'
+                      isEmphasized ? 'w-20 h-20' : 'w-16 h-16'
                     }`}
                   >
-                    {feature.icon}
+                    <feature.icon className={isEmphasized ? 'w-12 h-12 text-[#F5F5F5]' : 'w-9 h-9 text-[#F5F5F5]'} />
                   </div>
                   <h3 className={`font-bold text-[#F5F5F5] ${isEmphasized ? 'text-xl' : 'text-lg'}`}>{t.landingPage[feature.titleKey]}</h3>
                   <p className="text-sm text-[#85858B] leading-relaxed">{t.landingPage[feature.descKey]}</p>
@@ -463,13 +464,13 @@ export default async function RootPage() {
           <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
             <a
               href={BOT_INVITE_URL}
-              className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-base font-black px-10 py-4 rounded-full shadow-[0_0_30px_rgba(88,101,242,0.45)] hover:shadow-[0_0_45px_rgba(88,101,242,0.65)] transition-all"
+              className="bg-[#27272A] hover:bg-[#3F3F46] text-white text-base font-black px-10 py-4 rounded-full shadow-[0_0_30px_rgba(0,0,0,0.45)] hover:shadow-[0_0_45px_rgba(0,0,0,0.65)] transition-all"
             >
               🤖 {t.landingPage.addBotCta}
             </a>
             <a
               href="/api/auth/signin"
-              className="border border-[#5865F2]/40 hover:border-[#5865F2] text-[#A1A1AA] hover:text-[#F5F5F5] text-base font-bold px-10 py-4 rounded-full transition-all"
+              className="border border-[#676771]/40 hover:border-[#797984] text-[#A1A1AA] hover:text-[#F5F5F5] text-base font-bold px-10 py-4 rounded-full transition-all"
             >
               {t.landingPage.loginCta}
             </a>
@@ -481,7 +482,7 @@ export default async function RootPage() {
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-10">
           <div className="space-y-3 text-center sm:text-left">
             <div className="flex items-center justify-center sm:justify-start gap-2">
-              <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#5865F2] to-[#4752C4] flex items-center justify-center text-xs font-black text-white">
+              <span className="w-7 h-7 rounded-lg bg-[#000000] border border-[#FFFFFF] flex items-center justify-center text-xs font-black text-white">
                 K
               </span>
               <span className="text-base font-black text-[#F5F5F5]">{t.landingPage.heroTitle}</span>

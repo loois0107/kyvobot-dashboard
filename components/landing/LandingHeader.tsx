@@ -23,7 +23,7 @@ export default function LandingHeader({ dashboardHref }: LandingHeaderProps) {
     <header className="relative z-20 mt-6 mx-4 sm:mx-6 lg:max-w-7xl lg:mx-auto rounded-2xl border border-[#676771] bg-[#141416] flex items-center justify-between gap-3 px-6 sm:px-8 py-4 sm:py-5">
       <div className="flex items-center gap-6">
         <Link href="/" className="flex items-center gap-2 text-lg font-black tracking-wide">
-          <span className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#5865F2] to-[#4752C4] flex items-center justify-center text-sm text-white">
+          <span className="w-8 h-8 rounded-lg bg-[#000000] border border-[#FFFFFF] flex items-center justify-center text-sm text-white">
             K
           </span>
           <span className="bg-gradient-to-r from-white via-[#c7cdfd] to-[#5865F2] bg-clip-text text-transparent">
