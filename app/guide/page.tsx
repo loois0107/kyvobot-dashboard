@@ -5,6 +5,8 @@ import { COOKIE_NAME, dictionaries, resolveInitialLanguage } from '@/lib/i18n';
 import LandingHeader from '@/components/landing/LandingHeader';
 import RevealOnScroll from '@/components/landing/RevealOnScroll';
 import { BOT_INVITE_URL } from '@/lib/botInvite';
+import { LANDING_THEME_COOKIE_NAME, resolveInitialLandingTheme } from '@/lib/theme';
+import { LandingThemeProvider } from '@/lib/theme/LandingThemeContext';
 
 // 🛡️ 대시보드 사이드바와 동일한 4개 카테고리(app/dashboard/[guildId]/layout.tsx 기준)로
 // 묶었다 - "밀접한 커맨드는 하나로 묶는다" 원칙에 따라 카지노 게임 6개 -> 1개 항목 등으로
@@ -67,8 +69,14 @@ export default async function GuidePage() {
     (session?.user as any)?.discordLocale
   );
   const t = dictionaries[lang];
+  // 🛡️ [1단계 임시 글루 - 본문은 아직 다크 전용] LandingHeader가 이제 useLandingTheme()을 필수로
+  // 요구해서(LandingThemeToggle 때문에) 감싸주지 않으면 크래시 난다. 다만 가이드 페이지 본문은
+  // 이번 1단계 범위 밖이라 여전히 리터럴 다크 색상 그대로다 - 헤더에서 토글을 눌러도 헤더만
+  // 라이트로 바뀌고 본문은 다크로 남는 반쪽짜리 상태가 됨(2단계에서 본문까지 토큰 전환하며 해결).
+  const landingTheme = resolveInitialLandingTheme(cookieStore.get(LANDING_THEME_COOKIE_NAME)?.value);
 
   return (
+    <LandingThemeProvider initialTheme={landingTheme}>
     <div className="min-h-screen bg-[#0A0A0B] text-[#F5F5F5] flex flex-col relative overflow-hidden">
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-[#5865F2]/25 rounded-full blur-[130px]" />
@@ -168,5 +176,6 @@ export default async function GuidePage() {
         </div>
       </footer>
     </div>
+    </LandingThemeProvider>
   );
 }

@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { Gamepad2, Shield, Ticket, Sparkles, Smile, TvMinimalPlay } from 'lucide-react';
 import { auth } from '@/auth';
 import { COOKIE_NAME, dictionaries, resolveInitialLanguage } from '@/lib/i18n';
+import { LANDING_THEME_COOKIE_NAME, resolveInitialLandingTheme } from '@/lib/theme';
+import { LandingThemeProvider } from '@/lib/theme/LandingThemeContext';
 import LandingHeader from '@/components/landing/LandingHeader';
 import RevealOnScroll from '@/components/landing/RevealOnScroll';
 import FeatureScreenshotRow from '@/components/landing/FeatureScreenshotRow';
@@ -14,9 +16,11 @@ import { resolveLocalizedImage } from '@/lib/resolveLocalizedImage';
 // 있어서 카드 하단에 "자세히 보기" 링크를 붙인다(#see-it-in-action으로 스크롤). 나머지 3개는
 // 대응 스크린샷이 없어서 힌트 없이 아이콘 카드로만 충분하다.
 // 🛡️ [흑백 톤 정리 - 아이콘 강조색 통일] 카테고리별로 다르던 배지/보더/그림자 색을 전부
-// text-secondary의 리터럴 값(#A1A1AA, rgb 161,161,170)으로 통일했다 - 랜딩은 반응형 토큰
-// 클래스를 안 쓰는 고정 다크 페이지라 토큰 이름이 아니라 그 값 자체를 그대로 박아넣는다.
-// PAIN_POINTS도 같은 톤으로 통일했으니(아래), 파티모집/자동관리/AI티켓/레벨링 4쌍의
+// text-secondary 토큰(다크 #A1A1AA/라이트 #52525B)으로 통일했다 - 랜딩이 이제 자체 다크/라이트
+// 토글을 갖게 되면서 반응형 토큰 클래스로 전환했다(kyvo_landing_theme, LandingThemeProvider).
+// shadow는 예외 - 색이 섞인 box-shadow 다중 값이라 직접 대응하는 토큰이 없어 리터럴
+// rgba(161,161,170,...)를 그대로 뒀다(라이트에서는 흐릿해지지만 hover 전용 은은한 효과라
+// 깨지는 수준은 아님). PAIN_POINTS도 같은 톤으로 통일했으니(아래), 파티모집/자동관리/AI티켓/레벨링 4쌍의
 // "문제(색) -> 기능(같은 색)" 매칭 스토리텔링은 색으로는 더 이상 안 이어진다 - 대신 이모지를
 // 대시보드 사이드바와 동일한 lucide 아이콘으로 바꿔서, "같은 모양"으로 여전히 짝이 맞게 했다
 // (Gamepad2/Shield/Ticket/Sparkles를 두 섹션에서 각각 재사용).
@@ -25,8 +29,8 @@ const FEATURES = [
     titleKey: 'featurePartyTitle',
     descKey: 'featurePartyDesc',
     icon: Gamepad2,
-    badgeBg: 'bg-[#A1A1AA]/15',
-    border: 'hover:border-[#A1A1AA]/50',
+    badgeBg: 'bg-text-secondary/15',
+    border: 'hover:border-text-secondary/50',
     shadow: 'hover:shadow-[0_0_25px_rgba(161,161,170,0.25)]',
     hasDetail: true,
   },
@@ -34,8 +38,8 @@ const FEATURES = [
     titleKey: 'featureTicketTitle',
     descKey: 'featureTicketDesc',
     icon: Ticket,
-    badgeBg: 'bg-[#A1A1AA]/15',
-    border: 'hover:border-[#A1A1AA]/50',
+    badgeBg: 'bg-text-secondary/15',
+    border: 'hover:border-text-secondary/50',
     shadow: 'hover:shadow-[0_0_25px_rgba(161,161,170,0.25)]',
     hasDetail: true,
   },
@@ -43,8 +47,8 @@ const FEATURES = [
     titleKey: 'featureLevelingTitle',
     descKey: 'featureLevelingDesc',
     icon: Sparkles,
-    badgeBg: 'bg-[#A1A1AA]/15',
-    border: 'hover:border-[#A1A1AA]/50',
+    badgeBg: 'bg-text-secondary/15',
+    border: 'hover:border-text-secondary/50',
     shadow: 'hover:shadow-[0_0_25px_rgba(161,161,170,0.25)]',
     hasDetail: true,
   },
@@ -52,8 +56,8 @@ const FEATURES = [
     titleKey: 'featureAutomodTitle',
     descKey: 'featureAutomodDesc',
     icon: Shield,
-    badgeBg: 'bg-[#A1A1AA]/15',
-    border: 'hover:border-[#A1A1AA]/50',
+    badgeBg: 'bg-text-secondary/15',
+    border: 'hover:border-text-secondary/50',
     shadow: 'hover:shadow-[0_0_25px_rgba(161,161,170,0.25)]',
     hasDetail: false,
   },
@@ -61,8 +65,8 @@ const FEATURES = [
     titleKey: 'featureReactionRolesTitle',
     descKey: 'featureReactionRolesDesc',
     icon: Smile,
-    badgeBg: 'bg-[#A1A1AA]/15',
-    border: 'hover:border-[#A1A1AA]/50',
+    badgeBg: 'bg-text-secondary/15',
+    border: 'hover:border-text-secondary/50',
     shadow: 'hover:shadow-[0_0_25px_rgba(161,161,170,0.25)]',
     hasDetail: false,
   },
@@ -70,8 +74,8 @@ const FEATURES = [
     titleKey: 'featureTwitchTitle',
     descKey: 'featureTwitchDesc',
     icon: TvMinimalPlay,
-    badgeBg: 'bg-[#A1A1AA]/15',
-    border: 'hover:border-[#A1A1AA]/50',
+    badgeBg: 'bg-text-secondary/15',
+    border: 'hover:border-text-secondary/50',
     shadow: 'hover:shadow-[0_0_25px_rgba(161,161,170,0.25)]',
     hasDetail: false,
   },
@@ -79,33 +83,33 @@ const FEATURES = [
 
 // 🛡️ 아이콘은 아래에서 이 주제를 이어받는 섹션과 맞춰뒀다 - party/ticket/leveling은 SCREENSHOTS의
 // 대표 행과, automod는 FEATURES 카드와 - 스크롤을 내렸을 때 "이 고민 -> 저 기능"으로 자연스럽게
-// 이어져 보이게 한다(우연이 아니라 의도적 연결). 색은 FEATURES와 동일하게 중립 회색(#A1A1AA)으로
+// 이어져 보이게 한다(우연이 아니라 의도적 연결). 색은 FEATURES와 동일하게 text-secondary 토큰으로
 // 통일 - 원래는 카테고리별 색이 이 연결을 만들었지만, 이제 같은 lucide 아이콘 모양이 그 역할을
 // 대신한다.
 const PAIN_POINTS = [
   {
     descriptionKey: 'painPointPartyDescription',
     icon: Gamepad2,
-    badgeBg: 'bg-[#A1A1AA]/15',
-    accentText: 'text-[#A1A1AA]',
+    badgeBg: 'bg-text-secondary/15',
+    accentText: 'text-text-secondary',
   },
   {
     descriptionKey: 'painPointAutomodDescription',
     icon: Shield,
-    badgeBg: 'bg-[#A1A1AA]/15',
-    accentText: 'text-[#A1A1AA]',
+    badgeBg: 'bg-text-secondary/15',
+    accentText: 'text-text-secondary',
   },
   {
     descriptionKey: 'painPointTicketDescription',
     icon: Ticket,
-    badgeBg: 'bg-[#A1A1AA]/15',
-    accentText: 'text-[#A1A1AA]',
+    badgeBg: 'bg-text-secondary/15',
+    accentText: 'text-text-secondary',
   },
   {
     descriptionKey: 'painPointLevelingDescription',
     icon: Sparkles,
-    badgeBg: 'bg-[#A1A1AA]/15',
-    accentText: 'text-[#A1A1AA]',
+    badgeBg: 'bg-text-secondary/15',
+    accentText: 'text-text-secondary',
   },
 ] as const;
 
@@ -204,6 +208,11 @@ export default async function RootPage() {
     (session?.user as any)?.discordLocale
   );
   const t = dictionaries[lang];
+  // 🛡️ [랜딩 전용 테마 - 대시보드와 독립] 언어와 동일한 패턴으로 서버에서 미리 계산해서
+  // LandingThemeProvider의 초깃값으로 넘긴다(깜빡임 방지) - 대시보드용 kyvo_theme 쿠키가 아니라
+  // 별도의 kyvo_landing_theme을 읽으므로, 대시보드에서 뭘 골랐든 이 값에 영향이 없다. 기본값도
+  // 반대(쿠키 없으면 light)다.
+  const landingTheme = resolveInitialLandingTheme(cookieStore.get(LANDING_THEME_COOKIE_NAME)?.value);
 
   // 🛡️ 로그인 여부와 상관없이 항상 이 랜딩 화면을 렌더링한다(더 이상 자동 리다이렉트하지 않음) -
   // 로그인한 유저는 헤더의 아바타 드롭다운이나 히어로의 "내 대시보드로 이동" 버튼으로 스스로
@@ -234,16 +243,19 @@ export default async function RootPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0B] text-[#F5F5F5] flex flex-col relative overflow-hidden">
+    <LandingThemeProvider
+      initialTheme={landingTheme}
+      className="min-h-screen bg-bg-base text-text-primary flex flex-col relative overflow-hidden"
+    >
       <LandingHeader dashboardHref={dashboardHref} />
 
       <main className="relative min-h-screen flex flex-col items-center justify-center text-center px-4 pt-4 pb-16 gap-6">
         <h1 className="text-4xl md:text-6xl font-black tracking-wide">
-          <span className="bg-gradient-to-r from-white via-[#c7cdfd] to-[#5865F2] bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-text-primary to-text-secondary bg-clip-text text-transparent">
             {t.landingPage.heroTitle}
           </span>
         </h1>
-        <p className="max-w-xl text-base md:text-lg text-[#A1A1AA] leading-relaxed">{t.landingPage.heroTagline}</p>
+        <p className="max-w-xl text-base md:text-lg text-text-secondary leading-relaxed">{t.landingPage.heroTagline}</p>
 
         <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
           {!session?.user ? (
@@ -256,7 +268,7 @@ export default async function RootPage() {
               </a>
               <a
                 href="/api/auth/signin"
-                className="border border-[#676771]/40 hover:border-[#797984] text-[#A1A1AA] hover:text-[#F5F5F5] text-base font-bold px-10 py-4 rounded-xl transition-all"
+                className="border border-border-default/40 hover:border-border-hover text-text-secondary hover:text-text-primary text-base font-bold px-10 py-4 rounded-xl transition-all"
               >
                 {t.landingPage.loginCta}
               </a>
@@ -269,10 +281,10 @@ export default async function RootPage() {
               🎛️ {t.landingPage.goToDashboardCta}
             </Link>
           ) : guildFetchFailed ? (
-            <p className="text-sm text-[#F87171]">{t.landingPage.guildListFailed}</p>
+            <p className="text-sm text-danger">{t.landingPage.guildListFailed}</p>
           ) : (
             <div className="flex flex-col items-center gap-4">
-              <p className="text-sm text-[#85858B]">{t.landingPage.noManagedServers}</p>
+              <p className="text-sm text-text-muted">{t.landingPage.noManagedServers}</p>
               <Link
                 href="/profile"
                 className="bg-[#27272A] hover:bg-[#3F3F46] text-white text-base font-black px-10 py-4 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.45)] hover:shadow-[0_0_45px_rgba(0,0,0,0.65)] transition-all"
@@ -286,10 +298,10 @@ export default async function RootPage() {
 
       <section className="relative min-h-[85vh] flex flex-col justify-center max-w-5xl mx-auto w-full px-4 pb-32">
         <RevealOnScroll className="mb-10 text-center">
-          <p className="text-xs font-black tracking-widest text-[#5865F2] uppercase mb-3">
+          <p className="text-xs font-black tracking-widest text-text-secondary uppercase mb-3">
             {t.landingPage.painPointsEyebrow}
           </p>
-          <h2 className="text-3xl md:text-4xl font-black text-[#F5F5F5]">
+          <h2 className="text-3xl md:text-4xl font-black text-text-primary">
             {t.landingPage.painPointsTitle}
           </h2>
         </RevealOnScroll>
@@ -308,20 +320,20 @@ export default async function RootPage() {
                 className={isHero ? 'sm:col-span-6' : 'sm:col-span-2'}
               >
                 {isHero ? (
-                  <div className="h-full bg-[#141416] border border-[#676771] rounded-2xl p-8 sm:p-10 flex items-start gap-4 sm:gap-6">
+                  <div className="h-full bg-bg-surface border border-border-default rounded-2xl p-8 sm:p-10 flex items-start gap-4 sm:gap-6">
                     <div className={`w-14 h-14 sm:w-20 sm:h-20 rounded-full flex items-center justify-center shrink-0 ${item.badgeBg}`}>
-                      <item.icon className="w-6 h-6 sm:w-9 sm:h-9 text-[#F5F5F5]" />
+                      <item.icon className="w-6 h-6 sm:w-9 sm:h-9 text-text-primary" />
                     </div>
-                    <p className="text-sm sm:text-base text-[#85858B] leading-relaxed">
+                    <p className="text-sm sm:text-base text-text-muted leading-relaxed">
                       {renderHighlightedText(t.landingPage[item.descriptionKey], item.accentText)}
                     </p>
                   </div>
                 ) : (
-                  <div className="h-full bg-[#141416] border border-[#676771] rounded-2xl p-8 flex items-start gap-4">
+                  <div className="h-full bg-bg-surface border border-border-default rounded-2xl p-8 flex items-start gap-4">
                     <div className={`w-14 h-14 rounded-full flex items-center justify-center shrink-0 ${item.badgeBg}`}>
-                      <item.icon className="w-6 h-6 text-[#F5F5F5]" />
+                      <item.icon className="w-6 h-6 text-text-primary" />
                     </div>
-                    <p className="text-sm text-[#85858B] leading-relaxed">
+                    <p className="text-sm text-text-muted leading-relaxed">
                       {renderHighlightedText(t.landingPage[item.descriptionKey], item.accentText)}
                     </p>
                   </div>
@@ -334,10 +346,10 @@ export default async function RootPage() {
 
       <section id="features" className="relative min-h-[85vh] flex flex-col justify-center max-w-7xl mx-auto w-full px-4 pb-32">
         <RevealOnScroll className="mb-10 text-center">
-          <p className="text-xs font-black tracking-widest text-[#5865F2] uppercase mb-3">
+          <p className="text-xs font-black tracking-widest text-text-secondary uppercase mb-3">
             {t.landingPage.featuresEyebrow}
           </p>
-          <h2 className="text-3xl md:text-4xl font-black text-[#F5F5F5]">
+          <h2 className="text-3xl md:text-4xl font-black text-text-primary">
             {t.landingPage.featuresTitle}
           </h2>
         </RevealOnScroll>
@@ -353,8 +365,8 @@ export default async function RootPage() {
               return (
                 <div
                   key={feature.titleKey}
-                  className={`bg-[#141416] border rounded-2xl transition-all duration-200 hover:-translate-y-1 ${feature.border} ${feature.shadow} ${
-                    isEmphasized ? 'p-10 border-[#A1A1AA]/40 space-y-4' : 'p-8 border-[#676771] space-y-3'
+                  className={`bg-bg-surface border rounded-2xl transition-all duration-200 hover:-translate-y-1 ${feature.border} ${feature.shadow} ${
+                    isEmphasized ? 'p-10 border-text-secondary/40 space-y-4' : 'p-8 border-border-default space-y-3'
                   }`}
                 >
                   {/* 🛡️ 제목 텍스트에서 같은 아이콘을 뺐으니(featurePartyTitle 등) 이 배지는 이제
@@ -366,14 +378,14 @@ export default async function RootPage() {
                       isEmphasized ? 'w-20 h-20' : 'w-16 h-16'
                     }`}
                   >
-                    <feature.icon className={isEmphasized ? 'w-12 h-12 text-[#F5F5F5]' : 'w-9 h-9 text-[#F5F5F5]'} />
+                    <feature.icon className={isEmphasized ? 'w-12 h-12 text-text-primary' : 'w-9 h-9 text-text-primary'} />
                   </div>
-                  <h3 className={`font-bold text-[#F5F5F5] ${isEmphasized ? 'text-xl' : 'text-lg'}`}>{t.landingPage[feature.titleKey]}</h3>
-                  <p className="text-sm text-[#85858B] leading-relaxed">{t.landingPage[feature.descKey]}</p>
+                  <h3 className={`font-bold text-text-primary ${isEmphasized ? 'text-xl' : 'text-lg'}`}>{t.landingPage[feature.titleKey]}</h3>
+                  <p className="text-sm text-text-muted leading-relaxed">{t.landingPage[feature.descKey]}</p>
                   {feature.hasDetail && (
                     <a
                       href="#see-it-in-action"
-                      className="inline-block text-xs font-bold text-[#5865F2] hover:text-[#F5F5F5] transition-colors pt-1"
+                      className="inline-block text-xs font-bold text-text-secondary hover:text-text-primary transition-colors pt-1"
                     >
                       {t.landingPage.featureDetailHint}
                     </a>
@@ -406,10 +418,10 @@ export default async function RootPage() {
 
       <section id="see-it-in-action" className="relative max-w-7xl mx-auto w-full px-4 pb-32 space-y-16">
         <RevealOnScroll className="text-center">
-          <p className="text-xs font-black tracking-widest text-[#5865F2] uppercase mb-3">
+          <p className="text-xs font-black tracking-widest text-text-secondary uppercase mb-3">
             {t.landingPage.screenshotsEyebrow}
           </p>
-          <h2 className="text-3xl md:text-4xl font-black text-[#F5F5F5]">
+          <h2 className="text-3xl md:text-4xl font-black text-text-primary">
             {t.landingPage.screenshotsTitle}
           </h2>
         </RevealOnScroll>
@@ -457,10 +469,10 @@ export default async function RootPage() {
         </RevealOnScroll>
       </section>
 
-      <section className="relative min-h-[85vh] flex flex-col justify-center items-center w-full px-4 pb-32 text-center bg-[#0A0A0B] border-t-4 border-[#676771]">
+      <section className="relative min-h-[85vh] flex flex-col justify-center items-center w-full px-4 pb-32 text-center bg-bg-base border-t-4 border-border-default">
         <RevealOnScroll className="flex flex-col items-center gap-6 max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-black text-[#F5F5F5]">{t.landingPage.finalCtaTitle}</h2>
-          <p className="max-w-xl text-base md:text-lg text-[#A1A1AA] leading-relaxed">{t.landingPage.finalCtaDesc}</p>
+          <h2 className="text-3xl md:text-4xl font-black text-text-primary">{t.landingPage.finalCtaTitle}</h2>
+          <p className="max-w-xl text-base md:text-lg text-text-secondary leading-relaxed">{t.landingPage.finalCtaDesc}</p>
           <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
             <a
               href={BOT_INVITE_URL}
@@ -470,7 +482,7 @@ export default async function RootPage() {
             </a>
             <a
               href="/api/auth/signin"
-              className="border border-[#676771]/40 hover:border-[#797984] text-[#A1A1AA] hover:text-[#F5F5F5] text-base font-bold px-10 py-4 rounded-full transition-all"
+              className="border border-border-default/40 hover:border-border-hover text-text-secondary hover:text-text-primary text-base font-bold px-10 py-4 rounded-full transition-all"
             >
               {t.landingPage.loginCta}
             </a>
@@ -478,41 +490,41 @@ export default async function RootPage() {
         </RevealOnScroll>
       </section>
 
-      <footer className="relative bg-[#0A0A0B] border-t border-[#676771]/40 py-16 px-4">
+      <footer className="relative bg-bg-base border-t border-border-default/40 py-16 px-4">
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-10">
           <div className="space-y-3 text-center sm:text-left">
             <div className="flex items-center justify-center sm:justify-start gap-2">
               <span className="w-7 h-7 rounded-lg bg-[#000000] border border-[#FFFFFF] flex items-center justify-center text-xs font-black text-white">
                 K
               </span>
-              <span className="text-base font-black text-[#F5F5F5]">{t.landingPage.heroTitle}</span>
+              <span className="text-base font-black text-text-primary">{t.landingPage.heroTitle}</span>
             </div>
-            <p className="text-xs text-[#85858B]">{t.landingPage.footerTagline}</p>
+            <p className="text-xs text-text-muted">{t.landingPage.footerTagline}</p>
           </div>
           <div className="space-y-3 text-center sm:text-left">
-            <h4 className="text-sm font-bold text-[#F5F5F5]">{t.landingPage.footerQuickLinksHeader}</h4>
+            <h4 className="text-sm font-bold text-text-primary">{t.landingPage.footerQuickLinksHeader}</h4>
             <div className="flex flex-col gap-2">
-              <a href="#features" className="text-xs text-[#85858B] hover:text-[#F5F5F5] transition-colors">
+              <a href="#features" className="text-xs text-text-muted hover:text-text-primary transition-colors">
                 {t.landingPage.navFeatures}
               </a>
-              <a href="#see-it-in-action" className="text-xs text-[#85858B] hover:text-[#F5F5F5] transition-colors">
+              <a href="#see-it-in-action" className="text-xs text-text-muted hover:text-text-primary transition-colors">
                 {t.landingPage.screenshotsTitle}
               </a>
             </div>
           </div>
           <div className="space-y-3 text-center sm:text-left">
-            <h4 className="text-sm font-bold text-[#F5F5F5]">{t.landingPage.footerLegalHeader}</h4>
+            <h4 className="text-sm font-bold text-text-primary">{t.landingPage.footerLegalHeader}</h4>
             <div className="flex flex-col gap-2">
-              <Link href="/privacy" className="text-xs text-[#85858B] hover:text-[#F5F5F5] transition-colors">
+              <Link href="/privacy" className="text-xs text-text-muted hover:text-text-primary transition-colors">
                 {t.landingPage.footerPrivacy}
               </Link>
-              <Link href="/terms" className="text-xs text-[#85858B] hover:text-[#F5F5F5] transition-colors">
+              <Link href="/terms" className="text-xs text-text-muted hover:text-text-primary transition-colors">
                 {t.landingPage.footerTerms}
               </Link>
             </div>
           </div>
         </div>
       </footer>
-    </div>
+    </LandingThemeProvider>
   );
 }
