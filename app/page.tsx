@@ -413,11 +413,11 @@ export default async function RootPage() {
             // resolveLocalizedImage가 반대 언어 파일로 폴백하므로 깨진 이미지가 뜰 일이 없다.
             // 최종 ?? 은 두 언어 파일이 전부 사라지는(배포 사고급) 극단적 상황에 대비한 타입 안전용.
             imageSrc={resolveLocalizedImage('leveling-dashboard', lang) ?? '/images/features/leveling-dashboard-en.png'}
-            // 🛡️ leveling-dashboard-en.png(1630x3375) 실측 비율 - ko 버전(1630x3329)과 정확히
+            // 🛡️ leveling-dashboard-en.png(1630x3443) 실측 비율 - ko 버전(1630x3377)과 정확히
             // 같진 않지만 레이아웃 예약용 근사치면 충분하다(실제 렌더는 w-full h-auto가 로드된
             // 파일 크기를 그대로 따라감).
             imageWidth={1630}
-            imageHeight={3375}
+            imageHeight={3443}
           />
         </RevealOnScroll>
       </section>
