@@ -190,6 +190,7 @@ export default function ReactionRolesPage() {
   };
 
   const handleDelete = async (b: Binding) => {
+    if (!window.confirm(t('reactionRolesPage.confirmDeleteBinding', { emoji: b.emoji, role: b.role_name }))) return;
     const key = `${b.message_id}:${b.emoji}`;
     setDeletingKey(key);
     try {

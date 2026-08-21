@@ -98,6 +98,7 @@ export default function PartyPresetsPage() {
   };
 
   const handleDelete = async (gameName: string) => {
+    if (!window.confirm(t('partyPresetsPage.confirmDeletePreset', { name: gameName }))) return;
     setDeletingName(gameName);
     try {
       const res = await fetch(`/api/party-presets/${guildId}?game_name=${encodeURIComponent(gameName)}`, { method: 'DELETE' });

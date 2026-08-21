@@ -237,6 +237,7 @@ export default function TicketAiSettings() {
   };
 
   const purgeKnowledgeNode = async (id: string) => {
+    if (!window.confirm(t('ticketSettingsPage.confirmPurgeKnowledge'))) return;
     if (!guildId || guildId === '[guildId]') return;
     try {
       const res = await fetch(`/api/ticket-knowledge?id=${id}&guild_id=${guildId.trim()}`, {
