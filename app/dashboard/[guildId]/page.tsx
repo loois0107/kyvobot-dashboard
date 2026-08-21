@@ -198,16 +198,12 @@ export default function DashboardHome() {
     };
   }, [guildId, isPaused]);
 
-  if (!guildId || guildId === '[guildId]') {
-    return (
-      <Card elevated className="!p-8 !border-danger/20 hover:!border-danger/20 flex min-h-[400px] items-center justify-center font-mono text-center text-danger">
-        {t('dashboardHome.invalidAccess')}
-      </Card>
-    );
-  }
-
   const filteredLogs = logFilter === 'ALL' ? logs : logs.filter(log => log.type === logFilter);
 
+  // 🛡️ guildId가 없는 동안(레이아웃의 router.replace('/') 가드가 처리 중인 짧은 틈)엔 아무것도
+  // 안 그린다 - 예전엔 여기서 별도 에러 카드를 보여줬지만, 상위 레이아웃 가드가 이미 이 상태를
+  // 잡아 리다이렉트하므로 실제로 유저 눈에 보일 일이 없는 죽은 코드였다(TS 타입 좁히기 목적만 남음).
+  if (!guildId) return null;
   if (status === 'loading') return null;
 
   return (

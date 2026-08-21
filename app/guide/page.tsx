@@ -100,9 +100,6 @@ export default async function GuidePage() {
         {GUIDE_CATEGORIES.map((category) => (
           <section key={category.categoryKey} className="max-w-7xl mx-auto w-full px-4 pb-24">
             <RevealOnScroll className="mb-10 text-center">
-              <p className="text-xs font-black tracking-widest text-text-secondary uppercase mb-3">
-                {t.sidebar[category.categoryKey]}
-              </p>
               <h2 className="text-2xl md:text-3xl font-black text-text-primary">{t.sidebar[category.categoryKey]}</h2>
             </RevealOnScroll>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
