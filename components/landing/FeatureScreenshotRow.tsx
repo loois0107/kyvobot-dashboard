@@ -1,9 +1,12 @@
 import Image from 'next/image';
+import type { LucideIcon } from 'lucide-react';
 
 type FeatureScreenshotRowProps = {
   title: string;
   description: string;
-  icon: string;
+  // 🛡️ page.tsx의 FEATURES/PAIN_POINTS와 동일하게 이모지 문자열 대신 lucide 컴포넌트를 직접
+  // 받는다 - Coming Soon 자리표시자에서만 실제로 렌더링된다(캡처본이 있으면 이미지로 대체).
+  icon: LucideIcon;
   comingSoonLabel: string;
   // 🛡️ [alt ≠ title] 예전엔 이미지 alt를 title 그대로 재사용했다 - 화면에 보이는 제목과 스크린
   // 리더가 읽는 이미지 설명이 완전히 같은 문자열이었다는 뜻. alt는 "이 이미지가 실제로 뭘
@@ -45,7 +48,7 @@ function ImageSlot({
   width,
   height,
   alt,
-  icon,
+  icon: Icon,
   comingSoonLabel,
 }: {
   src: string | undefined;
@@ -53,7 +56,7 @@ function ImageSlot({
   width: number | undefined;
   height: number | undefined;
   alt: string;
-  icon: string;
+  icon: LucideIcon;
   comingSoonLabel: string;
 }) {
   if (src) {
@@ -79,7 +82,7 @@ function ImageSlot({
      자리표시자 전용 - 실제 이미지가 준비되면(src) 위 분기로 완전히 대체된다. */
   return (
     <div className="aspect-[16/9] rounded-2xl bg-bg-surface border border-border-default flex flex-col items-center justify-center gap-3" title={future}>
-      <span className="text-5xl opacity-60">{icon}</span>
+      <Icon className="w-12 h-12 text-text-primary opacity-60" aria-hidden="true" />
       <span className="font-mono text-[10px] uppercase tracking-widest text-text-muted">{comingSoonLabel}</span>
     </div>
   );

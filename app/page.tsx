@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import Link from 'next/link';
-import { Gamepad2, Shield, Ticket, Sparkles, Smile, TvMinimalPlay } from 'lucide-react';
+import { Gamepad2, Shield, Ticket, Sparkles, Smile, TvMinimalPlay, Palette } from 'lucide-react';
 import { auth } from '@/auth';
 import { COOKIE_NAME, dictionaries, resolveInitialLanguage } from '@/lib/i18n';
 import { LANDING_THEME_COOKIE_NAME, resolveInitialLandingTheme } from '@/lib/theme';
@@ -141,7 +141,10 @@ const SCREENSHOTS = [
     titleKey: 'screenshotPartyTitle',
     descKey: 'screenshotPartyDesc',
     altKey: 'screenshotPartyAlt',
-    icon: '🎮',
+    // 🛡️ FEATURES/PAIN_POINTS와 동일한 이유(위 26번째 줄 주석 참고)로 이모지 대신 사이드바와
+    // 같은 lucide 아이콘 재사용 - Coming Soon 자리표시자에서만 실제로 보인다(캡처본이 있으면
+    // 이미지로 완전히 대체됨).
+    icon: Gamepad2,
     futureImageSrc: '/images/features/party-recruit.png',
     // 🛡️ lang 기반 -ko/-en 파일로 분리 - 둘 다 없으면 resolveLocalizedImage가 undefined를
     // 돌려줘서 "Coming Soon"이 뜬다. 파일만 추가하면 코드 변경 없이 자동으로 노출된다.
@@ -156,7 +159,7 @@ const SCREENSHOTS = [
     titleKey: 'screenshotAiTicketTitle',
     descKey: 'screenshotAiTicketDesc',
     altKey: 'screenshotAiTicketAlt',
-    icon: '🤖',
+    icon: Ticket,
     futureImageSrc: '/images/features/ai-ticket.png',
     // 🛡️ party-recruit와 동일한 lang 기반 -ko/-en 폴백 구조로 전환 - ai-ticket-en.png가
     // 추가되면서 더 이상 언어 분기 없는 단일 파일이 아니게 됐다. 기존 ai-ticket.png는
@@ -178,7 +181,10 @@ const RANK_CARD_SHOWCASE = {
   descKey: 'screenshotRankCardDesc',
   altKey: 'screenshotRankCardAlt',
   setupAltKey: 'screenshotRankCardSetupAlt',
-  icon: '🎨',
+  // 🛡️ 사이드바엔 이 항목과 1:1 대응하는 메뉴가 없어(랭크카드 커스터마이징은 /profile 안에
+  // 있음) Gamepad2/Ticket처럼 재사용할 기존 아이콘이 없다 - 색상 커스터마이징 개념과 맞는
+  // Palette를 새로 매핑한다.
+  icon: Palette,
   futureImageSrc: '/images/features/rank-card-result.png',
   imageSrc: '/images/features/rank-card-result.png',
   imageWidth: 920,
