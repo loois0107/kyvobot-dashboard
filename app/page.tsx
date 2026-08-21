@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Gamepad2, Shield, Ticket, Sparkles, Smile, TvMinimalPlay, Palette } from 'lucide-react';
 import { auth } from '@/auth';
@@ -268,7 +269,7 @@ export default async function RootPage() {
             <>
               <a
                 href={BOT_INVITE_URL}
-                className="bg-[#27272A] hover:bg-[#3F3F46] text-white text-base font-black px-10 py-4 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.45)] hover:shadow-[0_0_45px_rgba(0,0,0,0.65)] transition-all"
+                className="bg-brand hover:bg-brand-hover text-white text-base font-black px-10 py-4 rounded-xl shadow-[var(--cta-shadow)] hover:shadow-[var(--cta-shadow-hover)] transition-all"
               >
                 🤖 {t.landingPage.addBotCta}
               </a>
@@ -282,7 +283,7 @@ export default async function RootPage() {
           ) : dashboardHref ? (
             <Link
               href={dashboardHref}
-              className="bg-[#27272A] hover:bg-[#3F3F46] text-white text-base font-black px-10 py-4 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.45)] hover:shadow-[0_0_45px_rgba(0,0,0,0.65)] transition-all"
+              className="bg-brand hover:bg-brand-hover text-white text-base font-black px-10 py-4 rounded-xl shadow-[var(--cta-shadow)] hover:shadow-[var(--cta-shadow-hover)] transition-all"
             >
               🎛️ {t.landingPage.goToDashboardCta}
             </Link>
@@ -293,12 +294,38 @@ export default async function RootPage() {
               <p className="text-sm text-text-muted">{t.landingPage.noManagedServers}</p>
               <Link
                 href="/profile"
-                className="bg-[#27272A] hover:bg-[#3F3F46] text-white text-base font-black px-10 py-4 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.45)] hover:shadow-[0_0_45px_rgba(0,0,0,0.65)] transition-all"
+                className="bg-brand hover:bg-brand-hover text-white text-base font-black px-10 py-4 rounded-xl shadow-[var(--cta-shadow)] hover:shadow-[var(--cta-shadow-hover)] transition-all"
               >
                 {t.profilePickerPage.title}
               </Link>
             </div>
           )}
+        </div>
+
+        {/* 🛡️ [히어로 미리보기 - DashboardShowcase와 같은 파일, 다른 크롭] 아래쪽 DashboardShowcase
+            섹션에서 같은 leveling-dashboard-{lang}.png를 w-full h-auto(원본 비율 그대로)로 전체
+            공개하므로, 여기서는 고정 높이 박스 + object-cover object-top으로 이미지 상단(대시보드
+            첫 화면)만 "살짝 엿보기"로 자르고 하단은 배경색으로 페이드아웃한다 - 완전히 같은
+            프레젠테이션을 두 번 반복하지 않으면서도, "히어로에서 살짝 보여주고 스크롤하면 전체
+            공개"라는 자연스러운 흐름을 만든다. 프레임(보더/글로우)은 DashboardShowcase와 동일한
+            --showcase-border/--showcase-shadow를 그대로 재사용해 톤을 맞췄다. 이미 아래에서
+            제목/설명과 함께 alt 텍스트로 제대로 노출되므로 여기서는 순수 장식으로 취급
+            (aria-hidden + alt=""), 스크린리더가 같은 이미지를 두 번 설명하지 않게 한다. above-the-fold라
+            priority로 즉시 로드(지연 로딩 시 스크롤 없이는 안 뜨는 문제가 랭크카드 캡처 검증에서
+            실제로 있었음). */}
+        <div
+          aria-hidden="true"
+          className="relative w-full max-w-3xl mx-auto h-56 sm:h-72 md:h-80 rounded-2xl overflow-hidden border-2 border-[color:var(--showcase-border)] shadow-[var(--showcase-shadow)]"
+        >
+          <Image
+            src={resolveLocalizedImage('leveling-dashboard', lang) ?? '/images/features/leveling-dashboard-en.png'}
+            alt=""
+            fill
+            priority
+            className="object-cover object-top"
+            sizes="(max-width: 768px) 100vw, 768px"
+          />
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-bg-base to-transparent" />
         </div>
       </main>
 
@@ -482,7 +509,7 @@ export default async function RootPage() {
           <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
             <a
               href={BOT_INVITE_URL}
-              className="bg-[#27272A] hover:bg-[#3F3F46] text-white text-base font-black px-10 py-4 rounded-full shadow-[0_0_30px_rgba(0,0,0,0.45)] hover:shadow-[0_0_45px_rgba(0,0,0,0.65)] transition-all"
+              className="bg-brand hover:bg-brand-hover text-white text-base font-black px-10 py-4 rounded-full shadow-[var(--cta-shadow)] hover:shadow-[var(--cta-shadow-hover)] transition-all"
             >
               🤖 {t.landingPage.addBotCta}
             </a>

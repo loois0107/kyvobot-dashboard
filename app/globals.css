@@ -77,13 +77,22 @@ html {
    블루 글로우 테두리를 예외적으로 유지했었는데, 랜딩 전체 무채색 정리 범위에 편입되면서 그
    예외를 없앴다. 다크에서는 Card와 동일하게 옅은 흰색 글로우, 라이트에서는 글로우 대신
    Card 라이트처럼 중립 드롭섀도우로 "뜬" 느낌만 준다(밝은 배경 위 글로우 테두리는 Card
-   케이스와 동일하게 거의 안 보이므로). */
+   케이스와 동일하게 거의 안 보이므로).
+
+   --cta-shadow/--cta-shadow-hover는 랜딩 주 CTA 버튼(app/page.tsx, 브랜드 블루로 복귀) 전용 -
+   box-shadow는 색이 섞인 다중값이라 --color-brand처럼 @theme 토큰 하나로 못 담아서 별도
+   변수로 뺐다. 다크는 기존 그대로(0.45/0.65 알파), 라이트는 흰 배경 위에서 큰 반경+높은
+   알파 블루 글로우가 과하게 떠 보여서(브랜드 텍스트 자체도 라이트에서만 별도로 어둡게 조정한
+   것과 같은 이유) 반경/알파를 눈에 띄게 낮췄다 - 버튼 자체 대비는 이미 색으로 충분히 확보되니
+   글로우는 "은은한 강조"로만 남긴다. */
 :root {
   --card-border: var(--color-border-default);
   --card-shadow: none; /* dark, elevated 카드 - 원래도 그림자 없었음 */
   --card-shadow-accent: 0 0 18px rgba(88, 101, 242, 0.16); /* dark, non-elevated 카드 - 기존 브랜드 글로우 그대로 */
   --showcase-border: rgba(245, 245, 245, 0.18); /* dark - 브랜드 블루 대신 옅은 중립 글로우 테두리 */
   --showcase-shadow: 0 0 60px rgba(245, 245, 245, 0.12); /* dark - 브랜드 블루 글로우 대신 중립 글로우 */
+  --cta-shadow: 0 0 30px rgba(88, 101, 242, 0.45); /* dark - 기존 그대로 */
+  --cta-shadow-hover: 0 0 45px rgba(88, 101, 242, 0.65); /* dark - 기존 그대로 */
 }
 
 /* 🛡️ [랜딩/가이드도 이제 이 토큰을 쓴다] app/layout.tsx가 kyvo_theme 쿠키를 서버에서 미리 읽어
@@ -112,8 +121,17 @@ html {
      전부 2~3:1대로 텍스트 기준에 크게 못 미쳐 원색 계열을 유지한 채 채도/명도만 낮춰 재조정
      했다 - success #1A7942(최소 4.61:1), danger #D20A0A(최소 4.70:1), warning #AA4E03
      (최소 4.68:1) 전부 통과. warning-border(#C2410C)는 원래 값 그대로도 흰 배경 위에서
-     최소 4.39:1로 이미 3:1을 넉넉히 통과해서 조정하지 않았다. brand-hover는 버튼 배경으로만
-     쓰이고(텍스트로 쓰인 곳 0건, grep으로 확인) 원래도 더 어두운 값이라 조정 불필요. */
+     최소 4.39:1로 이미 3:1을 넉넉히 통과해서 조정하지 않았다.
+   - brand-hover: 원래 "버튼 배경으로만 쓰이고 텍스트로 쓰인 곳이 없어 조정 불필요"라고
+     적어뒀었는데, 그건 이 값 자체가 라이트 오버라이드가 아예 없어서 다크 값(#4752C4)이 라이트
+     모드에서도 그대로 새고 있었다는 뜻이었다(대시보드/프로필의 브랜드 버튼 5곳 + 이번에
+     추가되는 랜딩 CTA 4곳 전부 영향) - 실제로 문제였던 미조정이라 이번에 라이트 값을 새로
+     만든다. brand(#4756F1)와 dark brand→brand-hover의 밝기 축소 비율(다크 각 채널 71/88,
+     82/101, 196/242 ≈ 평균 0.81배)을 그대로 적용해 #3946C3로 정했다 - 흰 텍스트 대비 약
+     7.3:1로 브랜드 기본값(4.60:1)보다도 넉넉히 통과.
+   - cta-shadow(-hover)는 아래 :root와 동일한 이유(브랜드 CTA 글로우, box-shadow라 --color-*
+     토큰에 못 담음)로 라이트 전용 값을 둔다 - 흰 배경 위 블루 글로우는 Card/Showcase 케이스와
+     같은 이유로 크게 티나지 않으면서도 탁해 보여서, 다크 대비 반경/알파를 낮췄다. */
 [data-theme='light'] {
   --color-bg-base: #F4F4F5;
   --color-bg-surface: #FFFFFF;
@@ -127,6 +145,7 @@ html {
   --color-border-hover: #6F6F7B;
 
   --color-brand: #4756F1;
+  --color-brand-hover: #3946C3;
 
   --color-success: #1A7942;
   --color-danger: #D20A0A;
@@ -137,6 +156,8 @@ html {
   --card-shadow-accent: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
   --showcase-border: transparent; /* light - Card 라이트와 동일하게 보더 대신 드롭섀도우로만 구분 */
   --showcase-shadow: 0 8px 30px rgba(24, 24, 27, 0.10);
+  --cta-shadow: 0 0 20px rgba(71, 86, 241, 0.25); /* light - 다크보다 반경/알파 축소 */
+  --cta-shadow-hover: 0 0 30px rgba(71, 86, 241, 0.35); /* light - 다크보다 반경/알파 축소 */
 }
 
 body {
