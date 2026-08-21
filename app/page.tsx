@@ -191,10 +191,10 @@ const RANK_CARD_SHOWCASE = {
   imageHeight: 240,
   setupLocalizedBaseName: 'rank-card-setup',
   setupFutureImageSrc: '/images/features/rank-card-setup.png',
-  // 🛡️ rank-card-setup-en.png/-ko.png 실측(1362x863, 둘이 정확히 같음) - 레이아웃 예약용 근사치일
+  // 🛡️ rank-card-setup-en.png/-ko.png 실측(1229x837, 둘이 정확히 같음) - 레이아웃 예약용 근사치일
   // 뿐이지만(w-full h-auto가 실제 로드된 크기를 그대로 따라감), 재캡처 후 실측치로 갱신해둔다.
-  setupImageWidth: 1362,
-  setupImageHeight: 863,
+  setupImageWidth: 1229,
+  setupImageHeight: 837,
 } as const;
 
 interface DiscordGuild {
