@@ -7,6 +7,8 @@ import { COOKIE_NAME, dictionaries, resolveInitialLanguage } from '@/lib/i18n';
 import { LANDING_THEME_COOKIE_NAME, resolveInitialLandingTheme } from '@/lib/theme';
 import { LandingThemeProvider } from '@/lib/theme/LandingThemeContext';
 import LandingHeader from '@/components/landing/LandingHeader';
+import LenisScroll from '@/components/landing/LenisScroll';
+import DecorShapes from '@/components/landing/DecorShapes';
 import RevealOnScroll from '@/components/landing/RevealOnScroll';
 import FeatureScreenshotRow from '@/components/landing/FeatureScreenshotRow';
 import DashboardShowcase from '@/components/landing/DashboardShowcase';
@@ -254,9 +256,11 @@ export default async function RootPage() {
       initialTheme={landingTheme}
       className="min-h-screen bg-bg-base text-text-primary flex flex-col relative overflow-hidden"
     >
+      <LenisScroll />
       <LandingHeader dashboardHref={dashboardHref} />
 
       <main className="relative min-h-screen flex flex-col items-center justify-center text-center px-4 pt-4 pb-16 gap-6">
+        <DecorShapes />
         <h1 className="text-4xl md:text-6xl font-black tracking-wide">
           <span className="bg-gradient-to-r from-text-primary to-text-secondary bg-clip-text text-transparent">
             {t.landingPage.heroTitle}
@@ -378,6 +382,7 @@ export default async function RootPage() {
       </section>
 
       <section id="features" className="relative min-h-[85vh] flex flex-col justify-center max-w-7xl mx-auto w-full px-4 pb-32">
+        <DecorShapes />
         <RevealOnScroll className="mb-10 text-center">
           <p className="text-xs font-black tracking-widest text-text-secondary uppercase mb-3">
             {t.landingPage.featuresEyebrow}
