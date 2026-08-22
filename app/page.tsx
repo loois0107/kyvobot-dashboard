@@ -8,7 +8,13 @@ import { LANDING_THEME_COOKIE_NAME, resolveInitialLandingTheme } from '@/lib/the
 import { LandingThemeProvider } from '@/lib/theme/LandingThemeContext';
 import LandingHeader from '@/components/landing/LandingHeader';
 import LenisScroll from '@/components/landing/LenisScroll';
-import DecorShapes from '@/components/landing/DecorShapes';
+import DecorShapes, {
+  HERO_SHAPES,
+  PAIN_POINTS_SHAPES,
+  FEATURES_SHAPES,
+  DASHBOARD_SHOWCASE_SHAPES,
+  FINAL_CTA_SHAPES,
+} from '@/components/landing/DecorShapes';
 import RevealOnScroll from '@/components/landing/RevealOnScroll';
 import FeatureScreenshotRow from '@/components/landing/FeatureScreenshotRow';
 import DashboardShowcase from '@/components/landing/DashboardShowcase';
@@ -260,7 +266,7 @@ export default async function RootPage() {
       <LandingHeader dashboardHref={dashboardHref} />
 
       <main className="relative min-h-screen flex flex-col items-center justify-center text-center px-4 pt-4 pb-16 gap-6">
-        <DecorShapes />
+        <DecorShapes shapes={HERO_SHAPES} />
         <h1 className="text-4xl md:text-6xl font-black tracking-wide">
           <span className="bg-gradient-to-r from-text-primary to-text-secondary bg-clip-text text-transparent">
             {t.landingPage.heroTitle}
@@ -334,6 +340,7 @@ export default async function RootPage() {
       </main>
 
       <section className="relative min-h-[85vh] flex flex-col justify-center max-w-5xl mx-auto w-full px-4 pb-32">
+        <DecorShapes shapes={PAIN_POINTS_SHAPES} />
         <RevealOnScroll className="mb-10 text-center">
           <p className="text-xs font-black tracking-widest text-text-secondary uppercase mb-3">
             {t.landingPage.painPointsEyebrow}
@@ -382,7 +389,7 @@ export default async function RootPage() {
       </section>
 
       <section id="features" className="relative min-h-[85vh] flex flex-col justify-center max-w-7xl mx-auto w-full px-4 pb-32">
-        <DecorShapes />
+        <DecorShapes shapes={FEATURES_SHAPES} />
         <RevealOnScroll className="mb-10 text-center">
           <p className="text-xs font-black tracking-widest text-text-secondary uppercase mb-3">
             {t.landingPage.featuresEyebrow}
@@ -436,6 +443,7 @@ export default async function RootPage() {
       </section>
 
       <section className="relative min-h-[85vh] flex flex-col justify-center max-w-7xl mx-auto w-full px-4 pb-32">
+        <DecorShapes shapes={DASHBOARD_SHOWCASE_SHAPES} />
         <RevealOnScroll>
           <DashboardShowcase
             eyebrow={t.landingPage.dashboardShowcaseEyebrow}
@@ -508,6 +516,7 @@ export default async function RootPage() {
       </section>
 
       <section className="relative min-h-[85vh] flex flex-col justify-center items-center w-full px-4 pb-32 text-center bg-bg-base border-t-4 border-border-default">
+        <DecorShapes shapes={FINAL_CTA_SHAPES} />
         <RevealOnScroll className="flex flex-col items-center gap-6 max-w-3xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-black text-text-primary">{t.landingPage.finalCtaTitle}</h2>
           <p className="max-w-xl text-base md:text-lg text-text-secondary leading-relaxed">{t.landingPage.finalCtaDesc}</p>

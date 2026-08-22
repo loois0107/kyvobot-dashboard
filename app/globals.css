@@ -86,10 +86,18 @@ html {
    것과 같은 이유) 반경/알파를 눈에 띄게 낮췄다 - 버튼 자체 대비는 이미 색으로 충분히 확보되니
    글로우는 "은은한 강조"로만 남긴다.
 
-   --decor-stroke는 히어로/기능카드 배경의 옅은 선 장식(components/landing/DecorShapes.tsx) 전용 -
+   --decor-stroke는 랜딩 5개 섹션 배경의 옅은 선 장식(components/landing/DecorShapes.tsx) 전용 -
    예전에 지운 브랜드색 블러 글로우(bg-[#5865F2]/25 blur-[130px] 등)와는 의도적으로 다른 방향:
    색이 아니라 형태(삼각형/다이아몬드/점선원 등 가는 선 도형)로만 만드는 장식이라 브랜드색을
-   전혀 안 쓰고 중립 톤 하나만 쓴다. */
+   전혀 안 쓰고 중립 톤 하나만 쓴다.
+
+   🛡️ [알파값 재조정 - 참고 사이트 실측 비교 후] 처음엔 다크 0.14/라이트 0.10으로 시작했는데
+   "거의 안 보인다"는 피드백을 받고 참고 사이트(leaderboard.run)를 직접 열어 비교했다 - 거기는
+   저알파가 아니라 완전 불투명(stroke-opacity:1) + 브랜드색을 옅게 우려낸 파스텔톤이었다. 저희는
+   브랜드색을 안 쓰는 전제(중립색+알파)는 유지하되, 그 존재감 차이를 좁히려고 알파를 다크
+   0.35/라이트 0.22로 올렸다 - 실제 스크린샷으로 "확실히 보이되 카드 등 실제 콘텐츠보다는
+   튀지 않는" 지점을 확인하고 정함(라이트가 더 낮은 이유는 기존 --showcase-shadow 등과 동일하게,
+   밝은 배경 위에서는 어두운 선이 더 적은 알파로도 충분히 도드라지기 때문). */
 :root {
   --card-border: var(--color-border-default);
   --card-shadow: none; /* dark, elevated 카드 - 원래도 그림자 없었음 */
@@ -98,7 +106,7 @@ html {
   --showcase-shadow: 0 0 60px rgba(245, 245, 245, 0.12); /* dark - 브랜드 블루 글로우 대신 중립 글로우 */
   --cta-shadow: 0 0 30px rgba(88, 101, 242, 0.45); /* dark - 기존 그대로 */
   --cta-shadow-hover: 0 0 45px rgba(88, 101, 242, 0.65); /* dark - 기존 그대로 */
-  --decor-stroke: rgba(245, 245, 245, 0.14); /* dark - 밝은 선 */
+  --decor-stroke: rgba(245, 245, 245, 0.35); /* dark - 밝은 선 */
 }
 
 /* 🛡️ [랜딩/가이드도 이제 이 토큰을 쓴다] app/layout.tsx가 kyvo_theme 쿠키를 서버에서 미리 읽어
@@ -164,7 +172,7 @@ html {
   --showcase-shadow: 0 8px 30px rgba(24, 24, 27, 0.10);
   --cta-shadow: 0 0 20px rgba(71, 86, 241, 0.25); /* light - 다크보다 반경/알파 축소 */
   --cta-shadow-hover: 0 0 30px rgba(71, 86, 241, 0.35); /* light - 다크보다 반경/알파 축소 */
-  --decor-stroke: rgba(24, 24, 27, 0.10); /* light - 어두운 선 */
+  --decor-stroke: rgba(24, 24, 27, 0.22); /* light - 어두운 선 */
 }
 
 body {
