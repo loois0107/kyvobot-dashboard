@@ -118,7 +118,8 @@ export async function POST(
     if ("custom_commands" in settings) {
       const validation = validateCustomCommands(settings.custom_commands as Record<string, unknown>);
       if (!validation.valid) {
-        return NextResponse.json({ error: validation.errors!.join(' ') }, { status: 400 });
+        // 🛡️ automod-settings POST와 동일한 code 기반 패턴 - 여러 위반을 한 번에 배열로 돌려준다.
+        return NextResponse.json({ errors: validation.errors }, { status: 400 });
       }
     }
 

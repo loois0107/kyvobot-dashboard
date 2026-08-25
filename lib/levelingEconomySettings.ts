@@ -17,9 +17,15 @@ export const SHOP_ITEM_PRICE_MAX = 1_000_000_000;
 export const SHOP_ITEM_NAME_MAX_LENGTH = 50;
 export const SHOP_ITEM_DESCRIPTION_MAX_LENGTH = 200;
 
+// automodSettings.ts와 동일한 code 기반 패턴 - lib/automodSettings.ts의 AutomodValidationError 참고.
+export interface LevelingValidationError {
+  code: string;
+  params?: Record<string, string | number>;
+}
+
 export interface ValidationResult {
   valid: boolean;
-  errors?: string[];
+  errors?: LevelingValidationError[];
 }
 
 /**
@@ -30,43 +36,48 @@ export interface ValidationResult {
  * 서버 검증이므로, "새로 추가된 항목만" 봐주면 안 된다.
  */
 export function validateShopItems(shopItems: any): ValidationResult {
-  const errors: string[] = [];
+  const errors: LevelingValidationError[] = [];
 
   if (shopItems === undefined) {
     return { valid: true };
   }
   if (!Array.isArray(shopItems)) {
-    return { valid: false, errors: ['Shop items must be a list.'] };
+    // 🛡️ [코드화 최소 적용] 클라이언트가 항상 배열을 보내는 UI라 사실상 도달 불가능한 경로 -
+    // 매핑 테이블에 없는 코드로 남겨서 클라이언트가 일반 에러 문구로 폴백하게 둔다.
+    return { valid: false, errors: [{ code: 'shop_items_invalid_type' }] };
   }
 
   const seenNames = new Set<string>();
   for (const item of shopItems) {
     if (!item || typeof item !== 'object') {
-      errors.push('Every shop item must be an object with a name, price, and description.');
+      errors.push({ code: 'shop_item_malformed' });
       continue;
     }
 
     const name = typeof item.name === 'string' ? item.name : '';
-    const label = name || '(unnamed item)';
 
+    // 🛡️ [코드화 최소 적용] injectShopItem()에 이미 있는 클라이언트 사전 검증(itemErr* 키)과
+    // 동일한 조건으로 매핑한다 - 아이템 이름 등 동적 값 보간까지는 이번 라운드에서 맞추지 않는다
+    // (이 벌크 저장 경로는 클라이언트 사전 검증을 우회한 요청에 대한 최후 방어선이라 실사용
+    // 빈도가 낮다).
     const price = Number(item.price);
     if (!Number.isFinite(price) || price <= 0) {
-      errors.push(`"${label}": price must be a positive number.`);
+      errors.push({ code: 'shop_item_price_invalid' });
     } else if (price > SHOP_ITEM_PRICE_MAX) {
-      errors.push(`"${label}": price cannot exceed ${SHOP_ITEM_PRICE_MAX.toLocaleString()}.`);
+      errors.push({ code: 'shop_item_price_too_high' });
     }
 
     if (name.length > SHOP_ITEM_NAME_MAX_LENGTH) {
-      errors.push(`"${label}": item name cannot exceed ${SHOP_ITEM_NAME_MAX_LENGTH} characters.`);
+      errors.push({ code: 'shop_item_bounds_overflow' });
     }
     const description = typeof item.description === 'string' ? item.description : '';
     if (description.length > SHOP_ITEM_DESCRIPTION_MAX_LENGTH) {
-      errors.push(`"${label}": description cannot exceed ${SHOP_ITEM_DESCRIPTION_MAX_LENGTH} characters.`);
+      errors.push({ code: 'shop_item_bounds_overflow' });
     }
 
     const key = name.toLowerCase();
     if (key && seenNames.has(key)) {
-      errors.push(`"${label}": duplicate item name - each item needs a distinct name (case-insensitive).`);
+      errors.push({ code: 'shop_item_duplicate' });
     }
     seenNames.add(key);
   }
@@ -83,22 +94,19 @@ export function validateShopItems(shopItems: any): ValidationResult {
  * 문제로 지목된 범위가 아니다.
  */
 export function validateLevelingEconomySettings(levelingSettings: any, economySettings: any): ValidationResult {
-  const errors: string[] = [];
+  const errors: LevelingValidationError[] = [];
 
   if (levelingSettings && levelingSettings.xp_rate !== undefined) {
     const xpRate = Number(levelingSettings.xp_rate);
     if (!Number.isFinite(xpRate) || xpRate < LEVELING_XP_RATE_MIN || xpRate > LEVELING_XP_RATE_MAX) {
-      errors.push(`Global XP Multiplier Rate must be between ${LEVELING_XP_RATE_MIN} and ${LEVELING_XP_RATE_MAX}.`);
+      errors.push({ code: 'xp_rate_out_of_range' });
     }
   }
 
   if (economySettings && economySettings.min_bet !== undefined) {
     const minBet = Number(economySettings.min_bet);
     if (!Number.isFinite(minBet) || !Number.isInteger(minBet) || minBet < ECONOMY_MIN_BET_FLOOR || minBet > ECONOMY_MIN_BET_CEILING) {
-      errors.push(
-        `Minimum Casino Bet Amount must be a whole number between ${ECONOMY_MIN_BET_FLOOR} and ${ECONOMY_MIN_BET_CEILING} ` +
-        `(Mines/Roulette's own max bet - anything higher makes those games unplayable).`
-      );
+      errors.push({ code: 'min_bet_out_of_range' });
     }
   }
 

@@ -23,10 +23,16 @@ export interface PartySettings {
   card_thumbnail_url: string;
 }
 
+// automodSettings.ts와 동일한 code 기반 패턴 - lib/automodSettings.ts의 AutomodValidationError 참고.
+export interface PartyValidationError {
+  code: string;
+  params?: Record<string, string | number>;
+}
+
 export interface ValidationResult {
   valid: boolean;
   settings?: PartySettings;
-  errors?: string[];
+  errors?: PartyValidationError[];
 }
 
 export function isValidHexColor(value: unknown): value is string {
@@ -44,11 +50,11 @@ export function normalizeHexColor(value: string): string {
  * 조용히 clamp하지 않고 명확한 에러 목록을 돌려준다. 이걸 통과한 값만 guild_settings에 쓴다.
  */
 export function validatePartySettings(input: any): ValidationResult {
-  const errors: string[] = [];
+  const errors: PartyValidationError[] = [];
 
   const cardColorRaw = input?.card_color;
   if (cardColorRaw !== undefined && cardColorRaw !== '' && !isValidHexColor(cardColorRaw)) {
-    errors.push('card_color must be a valid hex color (e.g. #5865F2).');
+    errors.push({ code: 'card_color_invalid' });
   }
 
   const cardDescription = typeof input?.card_description === 'string' ? input.card_description.trim() : '';
@@ -59,7 +65,7 @@ export function validatePartySettings(input: any): ValidationResult {
     cardLifetimeMinutes < PARTY_CARD_LIFETIME_MIN_MINUTES ||
     cardLifetimeMinutes > PARTY_CARD_LIFETIME_MAX_MINUTES
   ) {
-    errors.push(`card_lifetime_minutes must be between ${PARTY_CARD_LIFETIME_MIN_MINUTES} and ${PARTY_CARD_LIFETIME_MAX_MINUTES}.`);
+    errors.push({ code: 'card_lifetime_out_of_range' });
   }
 
   const channelLifetimeHours = Number(input?.channel_lifetime_hours);
@@ -68,14 +74,14 @@ export function validatePartySettings(input: any): ValidationResult {
     channelLifetimeHours < PARTY_CHANNEL_LIFETIME_MIN_HOURS ||
     channelLifetimeHours > PARTY_CHANNEL_LIFETIME_MAX_HOURS
   ) {
-    errors.push(`channel_lifetime_hours must be between ${PARTY_CHANNEL_LIFETIME_MIN_HOURS} and ${PARTY_CHANNEL_LIFETIME_MAX_HOURS}.`);
+    errors.push({ code: 'channel_lifetime_out_of_range' });
   }
 
   const gameName = typeof input?.game_name === 'string' ? input.game_name.trim().slice(0, 256) : '';
 
   const cardThumbnailUrlRaw = typeof input?.card_thumbnail_url === 'string' ? input.card_thumbnail_url.trim() : '';
   if (cardThumbnailUrlRaw && !/^https?:\/\//i.test(cardThumbnailUrlRaw)) {
-    errors.push('card_thumbnail_url must start with http:// or https://.');
+    errors.push({ code: 'card_thumbnail_url_invalid' });
   }
 
   if (errors.length > 0) {

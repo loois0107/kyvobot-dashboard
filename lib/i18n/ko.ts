@@ -330,6 +330,9 @@ const ko: typeof en = {
     purgeItem: '🗑️ 아이템 삭제',
     unsavedWarning: '⚠️ 저장하지 않은 변경사항이 있습니다',
     commitAll: '전체 저장',
+    errXpRateRange: '글로벌 XP 배율은 {min}~{max} 사이여야 합니다.',
+    errMinBetRange: '최소 카지노 배팅액은 {min}~{max} 사이의 정수여야 합니다 (Mines/Roulette 자체의 최대 배팅 한도라, 이보다 높으면 두 게임을 플레이할 수 없게 됩니다).',
+    errGeneric: '문제가 발생했습니다. 다시 시도해주세요.',
   },
   partyPresetsPage: {
     loadingPresets: '게임 프리셋을 불러오는 중...',
@@ -385,6 +388,11 @@ const ko: typeof en = {
     saveSuccess: '파티 설정이 저장되었습니다! 새 모집부터 적용됩니다.',
     loadNetworkError: '파티 설정을 불러오는 중 네트워크 오류가 발생했습니다.',
     saveNetworkError: '저장 중 네트워크 오류가 발생했습니다.',
+    errCardColorInvalid: '카드 강조 색상은 유효한 hex 색상이어야 합니다 (예: #5865F2).',
+    errCardLifetimeRange: '모집 카드 자동 종료는 {min}~{max}분 사이여야 합니다.',
+    errChannelLifetimeRange: '파티 채널 자동 삭제는 {min}~{max}시간 사이여야 합니다.',
+    errThumbnailUrlInvalid: '카드 썸네일 URL은 http:// 또는 https://로 시작해야 합니다.',
+    errGeneric: '문제가 발생했습니다. 다시 시도해주세요.',
   },
   partyStatsPage: {
     loadingStats: '파티 통계를 불러오는 중...',

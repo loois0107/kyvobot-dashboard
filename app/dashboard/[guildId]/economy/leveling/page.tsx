@@ -10,8 +10,35 @@ import SettingsPageContainer from '@/components/SettingsPageContainer';
 import RoleSelect from '@/components/RoleSelect';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
-import { SHOP_ITEM_PRICE_MAX, SHOP_ITEM_NAME_MAX_LENGTH, SHOP_ITEM_DESCRIPTION_MAX_LENGTH } from '@/lib/levelingEconomySettings';
+import {
+  SHOP_ITEM_PRICE_MAX,
+  SHOP_ITEM_NAME_MAX_LENGTH,
+  SHOP_ITEM_DESCRIPTION_MAX_LENGTH,
+  LEVELING_XP_RATE_MIN,
+  LEVELING_XP_RATE_MAX,
+  ECONOMY_MIN_BET_FLOOR,
+  ECONOMY_MIN_BET_CEILING,
+} from '@/lib/levelingEconomySettings';
 import { normalizeNumericFieldOnBlur, parseNumericFieldValue } from '@/lib/numericInput';
+import type { TranslationKey } from '@/lib/i18n';
+
+// automod/page.tsx의 AUTOMOD_ERROR_CODE_KEY와 동일한 패턴. shop_item_* 코드들은 injectShopItem()의
+// 기존 클라이언트 사전 검증 키(itemErr*)를 그대로 재사용한다 - 이 벌크 저장 경로는 그 사전 검증을
+// 우회한 요청에 대한 최후 방어선이라 실사용 빈도가 낮으므로, 아이템 이름 등 동적 값 보간까지는
+// 이번 라운드에서 맞추지 않는다(기존 정적 문구 그대로).
+const LEVELING_ERROR_CODE_KEY: Record<string, TranslationKey> = {
+  xp_rate_out_of_range: 'levelingPage.errXpRateRange',
+  min_bet_out_of_range: 'levelingPage.errMinBetRange',
+  shop_item_price_invalid: 'levelingPage.itemErrInvalidPrice',
+  shop_item_price_too_high: 'levelingPage.itemErrPriceTooHigh',
+  shop_item_bounds_overflow: 'levelingPage.itemErrBoundsOverflow',
+  shop_item_duplicate: 'levelingPage.itemErrDuplicate',
+};
+
+const LEVELING_ERROR_CODE_STATIC_PARAMS: Record<string, Record<string, number>> = {
+  xp_rate_out_of_range: { min: LEVELING_XP_RATE_MIN, max: LEVELING_XP_RATE_MAX },
+  min_bet_out_of_range: { min: ECONOMY_MIN_BET_FLOOR, max: ECONOMY_MIN_BET_CEILING },
+};
 
 // 🛡️ cogs/economy.py의 /shop add·/shop view·/shop buy는 전부 item['name']을 읽는다 - 예전엔
 // 여기서 'title'로 저장해서 봇이 KeyError로 죽는 실제 크래시가 있었다(대시보드로 만든 아이템은
@@ -197,7 +224,19 @@ export default function LevelingEconomySettings() {
         setIsDirty(false);
       } else {
         const errBody = await res.json().catch(() => null);
-        showToast(errBody?.error || t('common.networkError'), 'error');
+        const errors = Array.isArray(errBody?.errors) ? errBody.errors : null;
+        if (errors && errors.length > 0) {
+          const joined = errors
+            .map((e: { code: string; params?: Record<string, string | number> }) => {
+              const key = LEVELING_ERROR_CODE_KEY[e.code];
+              if (!key) return errBody?.error || t('levelingPage.errGeneric');
+              return t(key, { ...(LEVELING_ERROR_CODE_STATIC_PARAMS[e.code] || {}), ...(e.params || {}) });
+            })
+            .join('\n');
+          showToast(joined, 'error');
+        } else {
+          showToast(errBody?.error || t('common.networkError'), 'error');
+        }
       }
     } catch (err) { console.error(err); } finally { setIsSaving(false); }
   };

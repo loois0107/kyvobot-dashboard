@@ -6,9 +6,15 @@ export const MACRO_TRIGGER_MAX_LENGTH = 100;
 export const MACRO_RESPONSE_MAX_LENGTH = 2000;
 export const MACRO_MAX_COUNT = 100;
 
+// automodSettings.ts와 동일한 code 기반 패턴 - lib/automodSettings.ts의 AutomodValidationError 참고.
+export interface CustomCommandsValidationError {
+  code: string;
+  params?: Record<string, string | number>;
+}
+
 export interface ValidationResult {
   valid: boolean;
-  errors?: string[];
+  errors?: CustomCommandsValidationError[];
 }
 
 /**
@@ -32,21 +38,25 @@ function extractTextContent(value: unknown): string | null {
  * 개별 필드 상한을 조용히 자르지 않고 명확한 에러로 거부한다.
  */
 export function validateCustomCommands(newCommands: Record<string, unknown>): ValidationResult {
-  const errors: string[] = [];
+  const errors: CustomCommandsValidationError[] = [];
   const entries = Object.entries(newCommands || {});
 
+  // 🛡️ [기존 키 재사용] settings/page.tsx의 매크로 추가 모달이 이미 settingsPage.errMaxMacros/
+  // errTriggerTooLong/errResponseTooLong로 클라이언트 사전 검증을 하고 있다 - 여기서는 새 키를
+  // 만들지 않고 그 키에 그대로 매핑한다. errResponseTooLong만 {length}가 항목마다 다른 실제
+  // 서버측 동적 값이라 params로 함께 보낸다.
   if (entries.length > MACRO_MAX_COUNT) {
-    errors.push(`You can have at most ${MACRO_MAX_COUNT} custom macros (got ${entries.length}).`);
+    errors.push({ code: 'macro_count_exceeded' });
   }
 
   for (const [trigger, value] of entries) {
     if (trigger.length > MACRO_TRIGGER_MAX_LENGTH) {
-      errors.push(`Macro trigger "${trigger.slice(0, 20)}..." exceeds ${MACRO_TRIGGER_MAX_LENGTH} characters.`);
+      errors.push({ code: 'macro_trigger_too_long' });
     }
 
     const textContent = extractTextContent(value);
     if (textContent !== null && textContent.length > MACRO_RESPONSE_MAX_LENGTH) {
-      errors.push(`Macro "${trigger}"'s response is ${textContent.length} characters - Discord's message limit is ${MACRO_RESPONSE_MAX_LENGTH}.`);
+      errors.push({ code: 'macro_response_too_long', params: { length: textContent.length } });
     }
   }
 

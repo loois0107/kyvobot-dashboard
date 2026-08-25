@@ -43,6 +43,21 @@ const ROLE_MACRO_ERROR_CODE_KEY: Record<string, TranslationKey> = {
   save_failed: 'settingsPage.errSaveFailed',
 };
 
+// /api/settings/{guildId}(벌크 저장, custom_commands 전체 검증)이 내려주는 code -> 기존
+// 매크로-추가 모달의 사전 검증 키(errMaxMacros/errTriggerTooLong/errResponseTooLong) 그대로 재사용.
+// 새 i18n 키는 만들지 않는다 - automod/page.tsx의 AUTOMOD_ERROR_CODE_KEY와 동일한 패턴.
+const CUSTOM_COMMANDS_ERROR_CODE_KEY: Record<string, TranslationKey> = {
+  macro_count_exceeded: 'settingsPage.errMaxMacros',
+  macro_trigger_too_long: 'settingsPage.errTriggerTooLong',
+  macro_response_too_long: 'settingsPage.errResponseTooLong',
+};
+
+const CUSTOM_COMMANDS_ERROR_CODE_STATIC_PARAMS: Record<string, Record<string, number>> = {
+  macro_count_exceeded: { max: MACRO_MAX_COUNT },
+  macro_trigger_too_long: { max: MACRO_TRIGGER_MAX_LENGTH },
+  macro_response_too_long: { max: MACRO_RESPONSE_MAX_LENGTH },
+};
+
 // cc_add_group._resolve_cmd_name과 동일한 정규화: strip → lower → "/" 접두어 제거 → "!" 접두어
 // 제거 (Python removeprefix와 동일하게 순서대로 한 번씩만 벗긴다).
 function normalizeMacroName(raw: string): string {
@@ -127,6 +142,18 @@ export default function SettingsPage() {
         setCommands(nextCommands);
         showToast(t('common.saveSuccess'), 'success');
         return true;
+      }
+      const errors = Array.isArray(data.errors) ? data.errors : null;
+      if (errors && errors.length > 0) {
+        const joined = errors
+          .map((e: { code: string; params?: Record<string, string | number> }) => {
+            const key = CUSTOM_COMMANDS_ERROR_CODE_KEY[e.code];
+            if (!key) return data.error || data.message || t('settingsPage.errGeneric');
+            return t(key, { ...(CUSTOM_COMMANDS_ERROR_CODE_STATIC_PARAMS[e.code] || {}), ...(e.params || {}) });
+          })
+          .join('\n');
+        showToast(joined, 'error');
+        return false;
       }
       showToast(data.error || data.message || t('settingsPage.errGeneric'), 'error');
       return false;

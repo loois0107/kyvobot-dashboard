@@ -330,6 +330,9 @@ const en = {
     purgeItem: '🗑️ Delete',
     unsavedWarning: '⚠️ You have unsaved changes',
     commitAll: 'Save All',
+    errXpRateRange: 'Global XP Multiplier Rate must be between {min} and {max}.',
+    errMinBetRange: "Minimum Casino Bet Amount must be a whole number between {min} and {max} (Mines/Roulette's own max bet - anything higher makes those games unplayable).",
+    errGeneric: 'Something went wrong. Please try again.',
   },
   partyPresetsPage: {
     loadingPresets: 'Loading game presets...',
@@ -385,6 +388,11 @@ const en = {
     saveSuccess: 'Party settings saved! New recruitments will use these.',
     loadNetworkError: 'Network error while loading party settings.',
     saveNetworkError: 'Network error while saving.',
+    errCardColorInvalid: 'Card accent color must be a valid hex color (e.g. #5865F2).',
+    errCardLifetimeRange: 'Recruitment card auto-close must be between {min} and {max} minutes.',
+    errChannelLifetimeRange: 'Party channel auto-delete must be between {min} and {max} hours.',
+    errThumbnailUrlInvalid: 'Card thumbnail URL must start with http:// or https://.',
+    errGeneric: 'Something went wrong. Please try again.',
   },
   partyStatsPage: {
     loadingStats: 'Loading party stats...',

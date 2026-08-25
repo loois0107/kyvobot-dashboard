@@ -59,7 +59,8 @@ export async function POST(request: Request, ctx: { params: Promise<{ guildId: s
 
   const validation = validatePartySettings(body);
   if (!validation.valid) {
-    return NextResponse.json({ status: 'error', message: validation.errors!.join(' ') }, { status: 400 });
+    // 🛡️ automod-settings POST와 동일한 code 기반 패턴 - 여러 위반을 한 번에 배열로 돌려준다.
+    return NextResponse.json({ status: 'error', errors: validation.errors }, { status: 400 });
   }
 
   // 형식 검사는 validatePartySettings가 이미 했으니, 여기서는 실제로 살아있는 이미지인지 HEAD로 확인한다.

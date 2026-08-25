@@ -80,7 +80,11 @@ export async function POST(request: Request) {
     // 힌트만 있고 서버 검증이 없어서 범위 밖 값도 그대로 저장되던 문제였다. 저장 시점에 명확히 거부한다.
     const validation = validateLevelingEconomySettings(leveling_settings, economy_settings);
     if (!validation.valid) {
-      return NextResponse.json({ error: validation.errors!.join(' ') }, { status: 400 });
+      // 🛡️ [응답 봉투 통일] automod-settings/party-settings와 동일한 code 기반 패턴으로 맞춘다 -
+      // 이 라우트의 다른 에러 분기(welcomeValidation/Supabase 등)는 기존 {error: string} 그대로
+      // 두고, 이번에 요청받은 이 검증 분기만 바꾼다. 클라이언트는 errors 배열이 있으면 그걸
+      // 우선하고, 없으면 기존 error 문자열로 폴백한다.
+      return NextResponse.json({ status: 'error', errors: validation.errors }, { status: 400 });
     }
 
     // 🛡️ channel_id/card_color/card_bg_color 형식이 깨지면 on_member_join이 매 멤버 입장마다

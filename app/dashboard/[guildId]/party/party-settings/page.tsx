@@ -17,8 +17,22 @@ import SettingsPageContainer from '@/components/SettingsPageContainer';
 import ChannelSelect from '@/components/ChannelSelect';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
+import type { TranslationKey } from '@/lib/i18n';
 
 const COLOR_PRESETS = ['#5865F2', '#23A55A', '#FEE75C', '#EB459E', '#ED4245', '#9B59B6', '#00D2D3', '#54A0FF'];
+
+// automod/page.tsx의 AUTOMOD_ERROR_CODE_KEY와 동일한 패턴.
+const PARTY_ERROR_CODE_KEY: Record<string, TranslationKey> = {
+  card_color_invalid: 'partySettingsPage.errCardColorInvalid',
+  card_lifetime_out_of_range: 'partySettingsPage.errCardLifetimeRange',
+  channel_lifetime_out_of_range: 'partySettingsPage.errChannelLifetimeRange',
+  card_thumbnail_url_invalid: 'partySettingsPage.errThumbnailUrlInvalid',
+};
+
+const PARTY_ERROR_CODE_STATIC_PARAMS: Record<string, Record<string, number>> = {
+  card_lifetime_out_of_range: { min: PARTY_CARD_LIFETIME_MIN_MINUTES, max: PARTY_CARD_LIFETIME_MAX_MINUTES },
+  channel_lifetime_out_of_range: { min: PARTY_CHANNEL_LIFETIME_MIN_HOURS, max: PARTY_CHANNEL_LIFETIME_MAX_HOURS },
+};
 
 type LoadStatus = 'loading' | 'loaded' | 'error';
 
@@ -55,6 +69,27 @@ export default function PartySettingsPage() {
       return data.message || t('common.requestFailed', { status: res.status });
     } catch {
       return t('common.requestFailed', { status: res.status });
+    }
+  };
+
+  // party-settings 저장(POST) 검증 실패 전용 - automod/page.tsx의 extractSaveErrorMessage와 동일한
+  // 패턴(여러 위반을 줄바꿈으로 합쳐서 전부 보여준다).
+  const extractPartySaveErrorMessage = async (res: Response): Promise<string> => {
+    try {
+      const data = await res.json();
+      const errors = Array.isArray(data.errors) ? data.errors : null;
+      if (errors && errors.length > 0) {
+        return errors
+          .map((e: { code: string; params?: Record<string, string | number> }) => {
+            const key = PARTY_ERROR_CODE_KEY[e.code];
+            if (!key) return data.message || t('partySettingsPage.errGeneric');
+            return t(key, { ...(PARTY_ERROR_CODE_STATIC_PARAMS[e.code] || {}), ...(e.params || {}) });
+          })
+          .join('\n');
+      }
+      return data.message || t('partySettingsPage.errGeneric');
+    } catch {
+      return t('partySettingsPage.errGeneric');
     }
   };
 
@@ -129,8 +164,10 @@ export default function PartySettingsPage() {
       if (res.ok && reportRes.ok) {
         showToast(t('partySettingsPage.saveSuccess'), 'success');
         setIsDirty(false);
+      } else if (!res.ok) {
+        showToast(await extractPartySaveErrorMessage(res), 'error');
       } else {
-        showToast(await extractErrorMessage(res.ok ? reportRes : res), 'error');
+        showToast(await extractErrorMessage(reportRes), 'error');
       }
     } catch (err) {
       console.error(err);
