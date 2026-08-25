@@ -58,7 +58,10 @@ export async function POST(request: Request, ctx: { params: Promise<{ guildId: s
 
   const validation = validateAutomodSettings(body);
   if (!validation.valid) {
-    return NextResponse.json({ status: 'error', message: validation.errors!.join(' ') }, { status: 400 });
+    // 🛡️ [영어 고정 메시지 제거] giveaways POST와 동일한 code 기반 패턴 - 여러 위반이 동시에
+    // 있으면(예: spam_limit과 max_chars가 둘 다 범위 밖) 전부 errors 배열에 담아 한 번에
+    // 돌려준다("한 번에 다 보여주기" UX는 유지). 클라이언트가 각 code를 언어별 문구로 번역한다.
+    return NextResponse.json({ status: 'error', errors: validation.errors }, { status: 400 });
   }
 
   // 🛡️ 다른 모듈(party_settings/voice_settings 등)의 설정을 지우지 않기 위해 기존 settings를 먼저 긁어온다.

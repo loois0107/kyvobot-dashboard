@@ -24,6 +24,32 @@ import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
+import type { TranslationKey } from '@/lib/i18n';
+
+// giveaways/page.tsx의 CREATE_ERROR_CODE_KEY와 동일한 패턴 - 서버가 내려주는 검증 실패
+// code를 로컬라이즈된 i18n 키로 매핑한다.
+const AUTOMOD_ERROR_CODE_KEY: Record<string, TranslationKey> = {
+  spam_limit_out_of_range: 'automodPage.errSpamLimitRange',
+  spam_interval_out_of_range: 'automodPage.errSpamIntervalRange',
+  timeout_out_of_range: 'automodPage.errTimeoutRange',
+  max_chars_out_of_range: 'automodPage.errMaxCharsRange',
+  max_lines_out_of_range: 'automodPage.errMaxLinesRange',
+  banned_word_too_long: 'automodPage.errBannedWordTooLong',
+  banned_words_too_many: 'automodPage.errBannedWordsTooMany',
+};
+
+// min/max 같은 정적 상수는 서버가 다시 내려주지 않는다(automodSettings.ts를 여기서도
+// import해서 쓰므로 중복) - 서버는 count처럼 자기만 아는 동적 값만 params로 보낸다.
+// 여기서 그 둘을 code별로 합쳐서 t()에 넘긴다.
+const AUTOMOD_ERROR_CODE_STATIC_PARAMS: Record<string, Record<string, number>> = {
+  spam_limit_out_of_range: { min: AUTOMOD_SPAM_LIMIT_MIN, max: AUTOMOD_SPAM_LIMIT_MAX },
+  spam_interval_out_of_range: { min: AUTOMOD_SPAM_INTERVAL_MIN_SECONDS, max: AUTOMOD_SPAM_INTERVAL_MAX_SECONDS },
+  timeout_out_of_range: { min: AUTOMOD_TIMEOUT_MIN_SECONDS, max: AUTOMOD_TIMEOUT_MAX_SECONDS },
+  max_chars_out_of_range: { min: AUTOMOD_MAX_CHARS_MIN, max: AUTOMOD_MAX_CHARS_MAX },
+  max_lines_out_of_range: { min: AUTOMOD_MAX_LINES_MIN, max: AUTOMOD_MAX_LINES_MAX },
+  banned_word_too_long: { maxLen: AUTOMOD_FORBIDDEN_WORD_MAX_LENGTH },
+  banned_words_too_many: { max: AUTOMOD_FORBIDDEN_WORDS_MAX_COUNT },
+};
 
 type LoadStatus = 'loading' | 'loaded' | 'error';
 
@@ -58,6 +84,28 @@ export default function AutomodSettingsPage() {
       return data.message || t('common.requestFailed', { status: res.status });
     } catch {
       return t('common.requestFailed', { status: res.status });
+    }
+  };
+
+  // 저장(POST) 검증 실패 전용 - 서버가 { errors: {code, params?}[] } 형태로 여러 위반을 한 번에
+  // 돌려주면(giveaways의 단일 code와 달리 automod는 누적형이다), 각각을 번역+보간한 뒤
+  // 줄바꿈으로 합쳐서 하나의 토스트에 전부 보여준다("한 번에 다 보여주기" 기존 UX 유지.
+  const extractSaveErrorMessage = async (res: Response): Promise<string> => {
+    try {
+      const data = await res.json();
+      const errors = Array.isArray(data.errors) ? data.errors : null;
+      if (errors && errors.length > 0) {
+        return errors
+          .map((e: { code: string; params?: Record<string, string | number> }) => {
+            const key = AUTOMOD_ERROR_CODE_KEY[e.code];
+            if (!key) return data.message || t('automodPage.errGeneric');
+            return t(key, { ...(AUTOMOD_ERROR_CODE_STATIC_PARAMS[e.code] || {}), ...(e.params || {}) });
+          })
+          .join('\n');
+      }
+      return data.message || t('automodPage.errGeneric');
+    } catch {
+      return t('automodPage.errGeneric');
     }
   };
 
@@ -107,7 +155,7 @@ export default function AutomodSettingsPage() {
         showToast(t('automodPage.saveSuccess'), 'success');
         setIsDirty(false);
       } else {
-        showToast(await extractErrorMessage(res), 'error');
+        showToast(await extractSaveErrorMessage(res), 'error');
       }
     } catch (err) {
       console.error(err);

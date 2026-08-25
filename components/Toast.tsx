@@ -33,7 +33,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           <span className="animate-pulse text-base">
             {toast.type === 'success' ? '⚡' : toast.type === 'error' ? '🚨' : '📡'}
           </span>
-          <span className="tracking-wider uppercase">{toast.message}</span>
+          <span className="tracking-wider uppercase whitespace-pre-line">{toast.message}</span>
         </div>
       )}
     </ToastContext.Provider>

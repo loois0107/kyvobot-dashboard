@@ -42,10 +42,19 @@ export interface AutomodSettings {
   forbidden_words: string[];
 }
 
+// giveaways의 code 기반 에러 패턴과 동일한 구조 - 클라이언트가 code로 i18n 키를 찾고,
+// params(개수 등 서버에서만 계산 가능한 동적 값)를 그 키에 보간한다. 서버가 이미 아는
+// 정적 상수(min/max 등)는 여기 안 담는다 - 클라이언트가 automodSettings.ts를 그대로
+// import해서 쓰므로 중복이다.
+export interface AutomodValidationError {
+  code: string;
+  params?: Record<string, string | number>;
+}
+
 export interface ValidationResult {
   valid: boolean;
   settings?: AutomodSettings;
-  errors?: string[];
+  errors?: AutomodValidationError[];
 }
 
 /**
@@ -69,31 +78,31 @@ export function parseForbiddenWordsText(text: string): string[] {
  * 않고 명확한 에러 목록을 돌려준다. 이걸 통과한 값만 guild_settings에 쓴다.
  */
 export function validateAutomodSettings(input: any): ValidationResult {
-  const errors: string[] = [];
+  const errors: AutomodValidationError[] = [];
 
   const spamLimit = Number(input?.spam_limit);
   if (!Number.isFinite(spamLimit) || spamLimit < AUTOMOD_SPAM_LIMIT_MIN || spamLimit > AUTOMOD_SPAM_LIMIT_MAX) {
-    errors.push(`spam_limit must be between ${AUTOMOD_SPAM_LIMIT_MIN} and ${AUTOMOD_SPAM_LIMIT_MAX}.`);
+    errors.push({ code: 'spam_limit_out_of_range' });
   }
 
   const spamInterval = Number(input?.spam_interval_seconds);
   if (!Number.isFinite(spamInterval) || spamInterval < AUTOMOD_SPAM_INTERVAL_MIN_SECONDS || spamInterval > AUTOMOD_SPAM_INTERVAL_MAX_SECONDS) {
-    errors.push(`spam_interval_seconds must be between ${AUTOMOD_SPAM_INTERVAL_MIN_SECONDS} and ${AUTOMOD_SPAM_INTERVAL_MAX_SECONDS}.`);
+    errors.push({ code: 'spam_interval_out_of_range' });
   }
 
   const timeoutSeconds = Number(input?.timeout_seconds);
   if (!Number.isFinite(timeoutSeconds) || timeoutSeconds < AUTOMOD_TIMEOUT_MIN_SECONDS || timeoutSeconds > AUTOMOD_TIMEOUT_MAX_SECONDS) {
-    errors.push(`timeout_seconds must be between ${AUTOMOD_TIMEOUT_MIN_SECONDS} and ${AUTOMOD_TIMEOUT_MAX_SECONDS}.`);
+    errors.push({ code: 'timeout_out_of_range' });
   }
 
   const maxChars = Number(input?.max_chars);
   if (!Number.isFinite(maxChars) || maxChars < AUTOMOD_MAX_CHARS_MIN || maxChars > AUTOMOD_MAX_CHARS_MAX) {
-    errors.push(`max_chars must be between ${AUTOMOD_MAX_CHARS_MIN} and ${AUTOMOD_MAX_CHARS_MAX}.`);
+    errors.push({ code: 'max_chars_out_of_range' });
   }
 
   const maxLines = Number(input?.max_lines);
   if (!Number.isFinite(maxLines) || maxLines < AUTOMOD_MAX_LINES_MIN || maxLines > AUTOMOD_MAX_LINES_MAX) {
-    errors.push(`max_lines must be between ${AUTOMOD_MAX_LINES_MIN} and ${AUTOMOD_MAX_LINES_MAX}.`);
+    errors.push({ code: 'max_lines_out_of_range' });
   }
 
   const forbiddenWordsText = typeof input?.forbidden_words_text === 'string' ? input.forbidden_words_text : '';
@@ -101,10 +110,10 @@ export function validateAutomodSettings(input: any): ValidationResult {
 
   const tooLong = forbiddenWords.filter((w) => w.length > AUTOMOD_FORBIDDEN_WORD_MAX_LENGTH);
   if (tooLong.length > 0) {
-    errors.push(`Each forbidden word must be ${AUTOMOD_FORBIDDEN_WORD_MAX_LENGTH} characters or fewer (${tooLong.length} word(s) exceed this).`);
+    errors.push({ code: 'banned_word_too_long', params: { count: tooLong.length } });
   }
   if (forbiddenWords.length > AUTOMOD_FORBIDDEN_WORDS_MAX_COUNT) {
-    errors.push(`You can have at most ${AUTOMOD_FORBIDDEN_WORDS_MAX_COUNT} forbidden words (got ${forbiddenWords.length}).`);
+    errors.push({ code: 'banned_words_too_many', params: { count: forbiddenWords.length } });
   }
 
   if (errors.length > 0) {
