@@ -10,6 +10,7 @@ import {
   PARTY_CHANNEL_LIFETIME_MAX_HOURS,
   DEFAULT_PARTY_SETTINGS,
 } from '@/lib/partySettings';
+import { normalizeNumericFieldOnBlur, parseNumericFieldValue } from '@/lib/numericInput';
 import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
@@ -34,8 +35,9 @@ export default function PartySettingsPage() {
 
   const [cardColor, setCardColor] = useState(DEFAULT_PARTY_SETTINGS.card_color);
   const [cardDescription, setCardDescription] = useState(DEFAULT_PARTY_SETTINGS.card_description);
-  const [cardLifetimeMinutes, setCardLifetimeMinutes] = useState(DEFAULT_PARTY_SETTINGS.card_lifetime_minutes);
-  const [channelLifetimeHours, setChannelLifetimeHours] = useState(DEFAULT_PARTY_SETTINGS.channel_lifetime_hours);
+  // 🛡️ [leading zero 버그 수정] number가 아니라 string state - 자세한 이유는 lib/numericInput.ts 참고.
+  const [cardLifetimeMinutes, setCardLifetimeMinutes] = useState(String(DEFAULT_PARTY_SETTINGS.card_lifetime_minutes));
+  const [channelLifetimeHours, setChannelLifetimeHours] = useState(String(DEFAULT_PARTY_SETTINGS.channel_lifetime_hours));
   const [gameName, setGameName] = useState(DEFAULT_PARTY_SETTINGS.game_name);
   const [cardThumbnailUrl, setCardThumbnailUrl] = useState('https://64.media.tumblr.com/1847d62bf566d47632f841c2ac0583ee/a72c90eea4141e92-5e/s1280x1920/c3d5902f839874fc3be572aaef35c47470bce4df.png');
 
@@ -73,8 +75,8 @@ export default function PartySettingsPage() {
       const s = data.party_settings || DEFAULT_PARTY_SETTINGS;
       setCardColor(s.card_color);
       setCardDescription(s.card_description);
-      setCardLifetimeMinutes(s.card_lifetime_minutes);
-      setChannelLifetimeHours(s.channel_lifetime_hours);
+      setCardLifetimeMinutes(String(s.card_lifetime_minutes));
+      setChannelLifetimeHours(String(s.channel_lifetime_hours));
       setGameName(s.game_name || '');
       setCardThumbnailUrl(s.card_thumbnail_url || 'https://i.ibb.co/4wBTDHsz/R.jpg');
 
@@ -109,8 +111,8 @@ export default function PartySettingsPage() {
           body: JSON.stringify({
             card_color: cardColor,
             card_description: cardDescription,
-            card_lifetime_minutes: cardLifetimeMinutes,
-            channel_lifetime_hours: channelLifetimeHours,
+            card_lifetime_minutes: parseNumericFieldValue(cardLifetimeMinutes),
+            channel_lifetime_hours: parseNumericFieldValue(channelLifetimeHours),
             game_name: gameName,
             card_thumbnail_url: cardThumbnailUrl,
           }),
@@ -265,7 +267,8 @@ export default function PartySettingsPage() {
             min={PARTY_CARD_LIFETIME_MIN_MINUTES}
             max={PARTY_CARD_LIFETIME_MAX_MINUTES}
             value={cardLifetimeMinutes}
-            onChange={(e) => { setCardLifetimeMinutes(parseInt(e.target.value) || 0); setIsDirty(true); }}
+            onChange={(e) => { setCardLifetimeMinutes(e.target.value); setIsDirty(true); }}
+            onBlur={(e) => setCardLifetimeMinutes(normalizeNumericFieldOnBlur(e.target.value))}
             className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-brand"
           />
         </div>
@@ -279,7 +282,8 @@ export default function PartySettingsPage() {
             min={PARTY_CHANNEL_LIFETIME_MIN_HOURS}
             max={PARTY_CHANNEL_LIFETIME_MAX_HOURS}
             value={channelLifetimeHours}
-            onChange={(e) => { setChannelLifetimeHours(parseInt(e.target.value) || 0); setIsDirty(true); }}
+            onChange={(e) => { setChannelLifetimeHours(e.target.value); setIsDirty(true); }}
+            onBlur={(e) => setChannelLifetimeHours(normalizeNumericFieldOnBlur(e.target.value))}
             className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-brand"
           />
         </div>

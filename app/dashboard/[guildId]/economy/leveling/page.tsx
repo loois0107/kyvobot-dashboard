@@ -11,6 +11,7 @@ import RoleSelect from '@/components/RoleSelect';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import { SHOP_ITEM_PRICE_MAX, SHOP_ITEM_NAME_MAX_LENGTH, SHOP_ITEM_DESCRIPTION_MAX_LENGTH } from '@/lib/levelingEconomySettings';
+import { normalizeNumericFieldOnBlur, parseNumericFieldValue } from '@/lib/numericInput';
 
 // 🛡️ cogs/economy.py의 /shop add·/shop view·/shop buy는 전부 item['name']을 읽는다 - 예전엔
 // 여기서 'title'로 저장해서 봇이 KeyError로 죽는 실제 크래시가 있었다(대시보드로 만든 아이템은
@@ -47,12 +48,13 @@ export default function LevelingEconomySettings() {
 
   // 🪙 Economy System States
   const [currencyName, setCurrencyName] = useState('Points');
-  const [minBet, setMinBet] = useState(10);
+  // 🛡️ [leading zero 버그 수정] string state - 자세한 이유는 lib/numericInput.ts 참고.
+  const [minBet, setMinBet] = useState('10');
   const [shopItems, setShopItems] = useState<ShopItem[]>([]);
 
   // 🛒 New Merchandise Input Buffers
   const [newItemTitle, setNewItemTitle] = useState('');
-  const [newItemPrice, setNewItemPrice] = useState(100);
+  const [newItemPrice, setNewItemPrice] = useState('100');
   const [newItemDescription, setNewItemDescription] = useState('');
 
   // 🎨 Rank Card Design States
@@ -115,7 +117,7 @@ export default function LevelingEconomySettings() {
         if (data.economy_settings) {
           const e = data.economy_settings;
           setCurrencyName(e.currency_name || 'Points');
-          setMinBet(e.min_bet !== undefined ? Number(e.min_bet) : 10);
+          setMinBet(e.min_bet !== undefined ? String(e.min_bet) : '10');
           setShopItems(e.shop_items || []);
         }
         setIsDirty(false);
@@ -147,7 +149,7 @@ export default function LevelingEconomySettings() {
     if (!newItemTitle.trim()) {
       showToast(t('levelingPage.missingItemTitle'), 'error'); return;
     }
-    const price = Number(newItemPrice);
+    const price = parseNumericFieldValue(newItemPrice);
     if (!Number.isFinite(price) || price <= 0) {
       showToast(t('levelingPage.itemErrInvalidPrice'), 'error'); return;
     }
@@ -164,7 +166,7 @@ export default function LevelingEconomySettings() {
     }
     const newItem: ShopItem = { name: computedName, price, description };
     setShopItems(prev => [...prev, newItem]);
-    setNewItemTitle(''); setNewItemPrice(100); setNewItemDescription(''); setIsDirty(true);
+    setNewItemTitle(''); setNewItemPrice('100'); setNewItemDescription(''); setIsDirty(true);
   };
 
   const purgeShopItem = (indexToPurge: number) => {
@@ -187,7 +189,7 @@ export default function LevelingEconomySettings() {
           accessToken: sessionWithToken?.accessToken || null,
           welcome_settings: originalData.welcome_settings || {},
           leveling_settings: { xp_rate: Number(xpRate), role_rewards: roleRewards, card_color: cardColor, card_bg_color: cardBgColor, overlay_opacity: Number(overlayOpacity), background_url: backgroundUrl, font_preference: fontPreference },
-          economy_settings: { currency_name: String(currencyName).trim(), min_bet: Number(minBet), shop_items: shopItems }
+          economy_settings: { currency_name: String(currencyName).trim(), min_bet: parseNumericFieldValue(minBet), shop_items: shopItems }
         }),
       });
       if (res.ok) {
@@ -344,7 +346,7 @@ export default function LevelingEconomySettings() {
             </div>
             <div className="space-y-1.5 pt-2">
               <label className="text-[11px] font-black text-text-secondary tracking-wider uppercase">{t('levelingPage.minBetLabel')}</label>
-              <input type="number" min="1" max="5000" value={minBet} onChange={(e) => { setMinBet(parseInt(e.target.value) || 0); setIsDirty(true); }} className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-green-500" />
+              <input type="number" min="1" max="5000" value={minBet} onChange={(e) => { setMinBet(e.target.value); setIsDirty(true); }} onBlur={(e) => setMinBet(normalizeNumericFieldOnBlur(e.target.value))} className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-green-500" />
               <HelpText>{t('levelingPage.minBetHelp')}</HelpText>
             </div>
           </Card>
@@ -361,7 +363,7 @@ export default function LevelingEconomySettings() {
               <input type="text" placeholder="e.g. VIP_Pass" value={newItemTitle} onChange={(e) => setNewItemTitle(e.target.value)} className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-yellow-500" />
               <HelpText>{t('levelingPage.itemTitleHelp')}</HelpText>
             </div>
-            <div className="space-y-1"><label className="text-[10px] font-bold text-text-secondary">{t('levelingPage.itemPriceLabel')}</label><input type="number" min="0" value={newItemPrice} onChange={(e) => setNewItemPrice(parseInt(e.target.value) || 0)} className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-yellow-500" /></div>
+            <div className="space-y-1"><label className="text-[10px] font-bold text-text-secondary">{t('levelingPage.itemPriceLabel')}</label><input type="number" min="0" value={newItemPrice} onChange={(e) => setNewItemPrice(e.target.value)} onBlur={(e) => setNewItemPrice(normalizeNumericFieldOnBlur(e.target.value))} className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-yellow-500" /></div>
             <div className="space-y-1"><label className="text-[10px] font-bold text-text-secondary">{t('levelingPage.itemDescLabel')}</label><input type="text" placeholder={t('levelingPage.itemDescPlaceholder')} value={newItemDescription} onChange={(e) => setNewItemDescription(e.target.value)} className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-yellow-500" /></div>
           </div>
           <Button type="button" variant="secondary" onClick={injectShopItem} className="w-full !py-3 tracking-widest">{t('levelingPage.injectItem')}</Button>

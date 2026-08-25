@@ -18,6 +18,7 @@ import {
   AUTOMOD_FORBIDDEN_WORDS_MAX_COUNT,
   DEFAULT_AUTOMOD_SETTINGS,
 } from '@/lib/automodSettings';
+import { normalizeNumericFieldOnBlur, parseNumericFieldValue } from '@/lib/numericInput';
 import { useT } from '@/lib/i18n/LanguageContext';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
@@ -37,11 +38,13 @@ export default function AutomodSettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
 
-  const [spamLimit, setSpamLimit] = useState(DEFAULT_AUTOMOD_SETTINGS.spam_limit);
-  const [spamIntervalSeconds, setSpamIntervalSeconds] = useState(DEFAULT_AUTOMOD_SETTINGS.spam_interval_seconds);
-  const [timeoutSeconds, setTimeoutSeconds] = useState(DEFAULT_AUTOMOD_SETTINGS.timeout_seconds);
-  const [maxChars, setMaxChars] = useState(DEFAULT_AUTOMOD_SETTINGS.max_chars);
-  const [maxLines, setMaxLines] = useState(DEFAULT_AUTOMOD_SETTINGS.max_lines);
+  // 🛡️ [leading zero 버그 수정] number가 아니라 string state - 입력 중엔 그대로 반영해서 필드를
+  // 지우면 진짜 빈 칸으로 보인다. blur/저장 시점에만 lib/numericInput.ts 헬퍼로 숫자화한다.
+  const [spamLimit, setSpamLimit] = useState(String(DEFAULT_AUTOMOD_SETTINGS.spam_limit));
+  const [spamIntervalSeconds, setSpamIntervalSeconds] = useState(String(DEFAULT_AUTOMOD_SETTINGS.spam_interval_seconds));
+  const [timeoutSeconds, setTimeoutSeconds] = useState(String(DEFAULT_AUTOMOD_SETTINGS.timeout_seconds));
+  const [maxChars, setMaxChars] = useState(String(DEFAULT_AUTOMOD_SETTINGS.max_chars));
+  const [maxLines, setMaxLines] = useState(String(DEFAULT_AUTOMOD_SETTINGS.max_lines));
   const [forbiddenWordsText, setForbiddenWordsText] = useState('');
 
   useEffect(() => {
@@ -70,11 +73,11 @@ export default function AutomodSettingsPage() {
       }
       const data = await res.json();
       const s = data.automod_settings || DEFAULT_AUTOMOD_SETTINGS;
-      setSpamLimit(s.spam_limit);
-      setSpamIntervalSeconds(s.spam_interval_seconds);
-      setTimeoutSeconds(s.timeout_seconds);
-      setMaxChars(s.max_chars ?? DEFAULT_AUTOMOD_SETTINGS.max_chars);
-      setMaxLines(s.max_lines ?? DEFAULT_AUTOMOD_SETTINGS.max_lines);
+      setSpamLimit(String(s.spam_limit));
+      setSpamIntervalSeconds(String(s.spam_interval_seconds));
+      setTimeoutSeconds(String(s.timeout_seconds));
+      setMaxChars(String(s.max_chars ?? DEFAULT_AUTOMOD_SETTINGS.max_chars));
+      setMaxLines(String(s.max_lines ?? DEFAULT_AUTOMOD_SETTINGS.max_lines));
       setForbiddenWordsText((s.forbidden_words || []).join('\n'));
       setIsDirty(false);
       setLoadStatus('loaded');
@@ -92,11 +95,11 @@ export default function AutomodSettingsPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          spam_limit: spamLimit,
-          spam_interval_seconds: spamIntervalSeconds,
-          timeout_seconds: timeoutSeconds,
-          max_chars: maxChars,
-          max_lines: maxLines,
+          spam_limit: parseNumericFieldValue(spamLimit),
+          spam_interval_seconds: parseNumericFieldValue(spamIntervalSeconds),
+          timeout_seconds: parseNumericFieldValue(timeoutSeconds),
+          max_chars: parseNumericFieldValue(maxChars),
+          max_lines: parseNumericFieldValue(maxLines),
           forbidden_words_text: forbiddenWordsText,
         }),
       });
@@ -165,7 +168,8 @@ export default function AutomodSettingsPage() {
               min={AUTOMOD_SPAM_LIMIT_MIN}
               max={AUTOMOD_SPAM_LIMIT_MAX}
               value={spamLimit}
-              onChange={(e) => { setSpamLimit(parseInt(e.target.value) || 0); setIsDirty(true); }}
+              onChange={(e) => { setSpamLimit(e.target.value); setIsDirty(true); }}
+              onBlur={(e) => setSpamLimit(normalizeNumericFieldOnBlur(e.target.value))}
               className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-brand"
             />
             <HelpText>{t('automodPage.messageLimitHelp')}</HelpText>
@@ -180,7 +184,8 @@ export default function AutomodSettingsPage() {
               min={AUTOMOD_SPAM_INTERVAL_MIN_SECONDS}
               max={AUTOMOD_SPAM_INTERVAL_MAX_SECONDS}
               value={spamIntervalSeconds}
-              onChange={(e) => { setSpamIntervalSeconds(parseInt(e.target.value) || 0); setIsDirty(true); }}
+              onChange={(e) => { setSpamIntervalSeconds(e.target.value); setIsDirty(true); }}
+              onBlur={(e) => setSpamIntervalSeconds(normalizeNumericFieldOnBlur(e.target.value))}
               className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-brand"
             />
           </div>
@@ -194,7 +199,8 @@ export default function AutomodSettingsPage() {
               min={AUTOMOD_TIMEOUT_MIN_SECONDS}
               max={AUTOMOD_TIMEOUT_MAX_SECONDS}
               value={timeoutSeconds}
-              onChange={(e) => { setTimeoutSeconds(parseInt(e.target.value) || 0); setIsDirty(true); }}
+              onChange={(e) => { setTimeoutSeconds(e.target.value); setIsDirty(true); }}
+              onBlur={(e) => setTimeoutSeconds(normalizeNumericFieldOnBlur(e.target.value))}
               className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-brand"
             />
             <HelpText>{t('automodPage.timeoutDurationHelp')}</HelpText>
@@ -217,7 +223,8 @@ export default function AutomodSettingsPage() {
               min={AUTOMOD_MAX_CHARS_MIN}
               max={AUTOMOD_MAX_CHARS_MAX}
               value={maxChars}
-              onChange={(e) => { setMaxChars(parseInt(e.target.value) || 0); setIsDirty(true); }}
+              onChange={(e) => { setMaxChars(e.target.value); setIsDirty(true); }}
+              onBlur={(e) => setMaxChars(normalizeNumericFieldOnBlur(e.target.value))}
               className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-brand"
             />
             <HelpText>{t('automodPage.maxCharsHelp')}</HelpText>
@@ -232,7 +239,8 @@ export default function AutomodSettingsPage() {
               min={AUTOMOD_MAX_LINES_MIN}
               max={AUTOMOD_MAX_LINES_MAX}
               value={maxLines}
-              onChange={(e) => { setMaxLines(parseInt(e.target.value) || 0); setIsDirty(true); }}
+              onChange={(e) => { setMaxLines(e.target.value); setIsDirty(true); }}
+              onBlur={(e) => setMaxLines(normalizeNumericFieldOnBlur(e.target.value))}
               className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-brand"
             />
             <HelpText>{t('automodPage.maxLinesHelp')}</HelpText>
