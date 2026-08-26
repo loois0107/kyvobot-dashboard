@@ -674,6 +674,8 @@ const en = {
     enableWelcomeLabel: '1. Enable Welcome Card',
     welcomeChannelLabel: '🎯 Welcome Channel',
     welcomeChannelHelp: 'A welcome card image + embed is automatically sent to this channel every time a member joins.',
+    autoroleLabel: '🎭 Auto Role',
+    autoroleHelp: 'Automatically given to every new member when they join. Leave unselected to disable.',
     enableGoodbyeLabel: '2. Enable Goodbye System',
     goodbyeChannelLabel: '📡 Goodbye Channel',
     goodbyeChannelHelp: 'A leave notification embed is sent to this channel every time a member leaves.',

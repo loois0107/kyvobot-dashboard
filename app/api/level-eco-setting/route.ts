@@ -51,6 +51,9 @@ export async function GET(request: Request) {
       goodbye_channel_id: botSettings.goodbye_channel_id ?? null,
       goodbye_message: botSettings.goodbye_message ?? '',
       welcome_settings: botSettings.welcome_settings || {},
+      // 🛡️ autorole_id는 cogs/welcome.py에서 welcome_settings 안이 아니라 settings 최상위에서
+      // 읽으므로(nested_settings.get("autorole_id")), goodbye_channel_id와 동일한 레벨/방식으로 다룬다.
+      autorole_id: botSettings.autorole_id ?? null,
     };
 
     return NextResponse.json(payload);
@@ -71,6 +74,7 @@ export async function POST(request: Request) {
       goodbye_channel_id,
       goodbye_message,
       welcome_settings,
+      autorole_id,
     } = body;
 
     const blocked = await requireGuildAdmin(guild_id);
@@ -94,6 +98,7 @@ export async function POST(request: Request) {
       goodbye_channel_id,
       card_color: welcome_settings?.card_color,
       card_bg_color: welcome_settings?.card_bg_color,
+      autorole_id,
     });
     if (!welcomeValidation.valid) {
       return NextResponse.json({ error: welcomeValidation.errors!.join(' ') }, { status: 400 });
@@ -123,6 +128,11 @@ export async function POST(request: Request) {
       goodbye_channel_id: goodbye_channel_id !== undefined ? goodbye_channel_id : (currentSettings.goodbye_channel_id ?? null),
       goodbye_message: goodbye_message !== undefined ? String(goodbye_message) : (currentSettings.goodbye_message ?? ''),
       welcome_settings: welcome_settings || currentSettings.welcome_settings || {},
+      // 🛡️ "선택 안 함"으로 저장하면 클라이언트가 빈 문자열을 보낸다 - goodbye_channel_id와 달리
+      // 여기는 명시적으로 null로 정규화해서, DB에 빈 문자열이 아니라 null로 남게 한다(cogs/welcome.py의
+      // `if autorole_id:` truthy 체크와 의미가 정확히 일치 - null이든 ""든 어차피 falsy라 동작은
+      // 같지만, DB 값 자체는 null로 깔끔하게 남겨둔다).
+      autorole_id: autorole_id !== undefined ? (autorole_id || null) : (currentSettings.autorole_id ?? null),
     };
 
     // ✨ [구조 교정] 존재하는 유일한 컬럼인 'settings' 하나에만 병합된 데이터를 안전하게 인젝션합니다.

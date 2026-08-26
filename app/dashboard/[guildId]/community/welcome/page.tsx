@@ -9,6 +9,7 @@ import { dictionaries, type Lang } from '@/lib/i18n';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
 import ChannelSelect from '@/components/ChannelSelect';
+import RoleSelect from '@/components/RoleSelect';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -27,6 +28,11 @@ export default function WelcomeSettings() {
   // 📥 Welcome System Core States
   const [enabled, setEnabled] = useState(false);
   const [channelId, setChannelId] = useState('');
+
+  // 🎭 신규 멤버 자동 역할 - welcome_settings 객체 안이 아니라 settings 최상위 필드
+  // (goodbye_channel_id와 동일한 레벨) - cogs/welcome.py의 nested_settings.get("autorole_id")와 대응.
+  // 별도 on/off 토글 없이, RoleSelect에서 "선택 안 함"을 고르면 빈 문자열 -> 저장 시 null로 꺼진다.
+  const [autoroleId, setAutoroleId] = useState('');
 
   // 📤 👑 기능 불일치 해결: 퇴장 인사(Goodbye) 제어 상태 추가
   const [goodbyeEnabled, setGoodbyeEnabled] = useState(false);
@@ -76,6 +82,7 @@ export default function WelcomeSettings() {
           setGoodbyeEnabled(!!data.goodbye_enabled);
           setGoodbyeChannelId(data.goodbye_channel_id ? String(data.goodbye_channel_id) : '');
           setGoodbyeMessage(data.goodbye_message ? String(data.goodbye_message) : '');
+          setAutoroleId(data.autorole_id ? String(data.autorole_id) : '');
         }
 
         if (data && data.welcome_settings) {
@@ -135,6 +142,7 @@ export default function WelcomeSettings() {
           goodbye_enabled: Boolean(goodbyeEnabled),
           goodbye_channel_id: String(goodbyeChannelId).trim(),
           goodbye_message: String(goodbyeMessage).trim(),
+          autorole_id: String(autoroleId).trim(),
           welcome_settings: {
             enabled: Boolean(enabled),
             channel_id: String(channelId).trim(),
@@ -224,6 +232,19 @@ export default function WelcomeSettings() {
                   className="text-sm"
                 />
                 <HelpText className="normal-case">{t('welcomePage.welcomeChannelHelp')}</HelpText>
+              </div>
+            </div>
+
+            <div className="space-y-3 p-3.5 bg-bg-elevated rounded-xl border border-border-default">
+              <div className="space-y-1">
+                <label className="text-sm font-bold text-text-secondary uppercase block">{t('welcomePage.autoroleLabel')}</label>
+                <RoleSelect
+                  guildId={guildId}
+                  value={autoroleId}
+                  onChange={(id) => { setAutoroleId(id); setIsDirty(true); }}
+                  className="text-sm"
+                />
+                <HelpText className="normal-case">{t('welcomePage.autoroleHelp')}</HelpText>
               </div>
             </div>
 

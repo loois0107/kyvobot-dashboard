@@ -22,6 +22,7 @@ export function validateWelcomeSettings(input: {
   goodbye_channel_id?: unknown;
   card_color?: unknown;
   card_bg_color?: unknown;
+  autorole_id?: unknown;
 }): ValidationResult {
   const errors: string[] = [];
 
@@ -30,6 +31,11 @@ export function validateWelcomeSettings(input: {
   }
   if (input.goodbye_channel_id !== undefined && !isValidSnowflakeOrEmpty(input.goodbye_channel_id)) {
     errors.push('goodbye_channel_id must be a valid Discord channel ID (17-20 digits) or empty.');
+  }
+  // autorole_id도 channel_id와 동일한 디스코드 스노우플레이크 형식이라 같은 검증 함수를 재사용한다 -
+  // cogs/welcome.py의 on_member_join이 int(autorole_id)를 쓰므로 형식이 깨지면 매 멤버 입장마다 조용히 실패한다.
+  if (input.autorole_id !== undefined && !isValidSnowflakeOrEmpty(input.autorole_id)) {
+    errors.push('autorole_id must be a valid Discord role ID (17-20 digits) or empty.');
   }
   if (input.card_color !== undefined && input.card_color !== '' && !isValidHexColor(input.card_color)) {
     errors.push('welcome_settings.card_color must be a valid hex color (e.g. #5865F2).');

@@ -674,6 +674,8 @@ const ko: typeof en = {
     enableWelcomeLabel: '1. 환영 카드 활성화',
     welcomeChannelLabel: '🎯 환영 채널',
     welcomeChannelHelp: '멤버가 서버에 들어올 때마다 이 채널에 환영 카드 이미지+임베드가 자동 발송돼요.',
+    autoroleLabel: '🎭 자동 역할',
+    autoroleHelp: '새 멤버가 서버에 들어오면 자동으로 부여돼요. "선택 안 함"으로 두면 꺼집니다.',
     enableGoodbyeLabel: '2. 퇴장 알림 활성화',
     goodbyeChannelLabel: '📡 퇴장 채널',
     goodbyeChannelHelp: '멤버가 나갈 때마다 이 채널에 퇴장 알림 임베드가 발송돼요.',
