@@ -91,7 +91,7 @@ export default function MemberSelect({ guildId, value, onChange, className = '' 
     if (value) onChange(''); // typing again invalidates the previous pick until a new one is made
   }
 
-  const baseClassName = `w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2] ${className}`;
+  const baseClassName = `w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-text-primary focus:outline-none focus:border-brand ${className}`;
 
   return (
     <div ref={containerRef} className="relative">
@@ -104,25 +104,25 @@ export default function MemberSelect({ guildId, value, onChange, className = '' 
         className={baseClassName}
       />
       {open && query.trim().length > 0 && (
-        <div className="absolute z-10 mt-1 w-full max-h-56 overflow-y-auto bg-[#111214] border border-[#232428] rounded-lg shadow-lg">
+        <div className="absolute z-10 mt-1 w-full max-h-56 overflow-y-auto bg-bg-surface border border-border-default rounded-lg shadow-lg">
           {loadStatus === 'loading' && (
-            <div className="p-2.5 text-sm text-gray-400">{t('common.loadingMembers')}</div>
+            <div className="p-2.5 text-sm text-text-muted">{t('common.loadingMembers')}</div>
           )}
           {loadStatus === 'loaded' && results.length === 0 && (
-            <div className="p-2.5 text-sm text-gray-400">{t('common.noResultsFound')}</div>
+            <div className="p-2.5 text-sm text-text-muted">{t('common.noResultsFound')}</div>
           )}
           {loadStatus === 'error' && (
-            <div className="p-2.5 text-sm text-red-400">{t('common.noResultsFound')}</div>
+            <div className="p-2.5 text-sm text-danger">{t('common.noResultsFound')}</div>
           )}
           {results.map((m) => (
             <button
               key={m.id}
               type="button"
               onClick={() => handleSelect(m)}
-              className="w-full text-left p-2.5 text-sm text-white hover:bg-[#232428] cursor-pointer"
+              className="w-full text-left p-2.5 text-sm text-text-primary hover:bg-bg-elevated cursor-pointer"
             >
               {m.display_name}
-              {m.display_name !== m.username && <span className="text-gray-500"> (@{m.username})</span>}
+              {m.display_name !== m.username && <span className="text-text-muted"> (@{m.username})</span>}
             </button>
           ))}
         </div>

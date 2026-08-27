@@ -9,6 +9,9 @@ import SettingsPageContainer from '@/components/SettingsPageContainer';
 import ChannelSelect from '@/components/ChannelSelect';
 import RoleSelect from '@/components/RoleSelect';
 import MemberSelect from '@/components/MemberSelect';
+import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
+import Badge from '@/components/ui/Badge';
 import type { TranslationKey } from '@/lib/i18n';
 
 // 봇의 /internal/twitch/set 응답 status를 그대로 통과시킨 code -> 로컬라이즈된 문구 매핑.
@@ -49,11 +52,14 @@ export default function TwitchStreamersSettings() {
   const t = useT();
   const guildId = (params?.guildId as string) || '';
 
+  // 🛡️ 4단계(healthy/warning/stale/pending)는 Badge.tsx의 3버킷(success/warning/danger/neutral)에
+  // 억지로 안 맞춘다(Badge.tsx:9-15 주석에 이미 이 페이지를 콕 집어 명시된 결정) - 색상 값만
+  // 토큰 팔레트에서 그대로 가져온다.
   const HEALTH_BADGE: Record<StreamerRow['poll_health'], { emoji: string; label: string; color: string }> = {
-    healthy: { emoji: '🟢', label: t('twitchPage.healthyLabel'), color: 'text-green-400' },
-    warning: { emoji: '🟡', label: t('twitchPage.delayedLabel'), color: 'text-amber-400' },
-    stale: { emoji: '🔴', label: t('twitchPage.stalledLabel'), color: 'text-red-400' },
-    pending: { emoji: '⚪', label: t('twitchPage.pendingLabel'), color: 'text-gray-400' },
+    healthy: { emoji: '🟢', label: t('twitchPage.healthyLabel'), color: 'text-success' },
+    warning: { emoji: '🟡', label: t('twitchPage.delayedLabel'), color: 'text-warning' },
+    stale: { emoji: '🔴', label: t('twitchPage.stalledLabel'), color: 'text-danger' },
+    pending: { emoji: '⚪', label: t('twitchPage.pendingLabel'), color: 'text-text-muted' },
   };
 
   const [loadStatus, setLoadStatus] = useState<LoadStatus>('loading');
@@ -212,7 +218,7 @@ export default function TwitchStreamersSettings() {
 
   if (loadStatus === 'loading') {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center text-[#949ba4] text-base">
+      <div className="min-h-[50vh] flex items-center justify-center text-text-secondary text-base">
         {t('twitchPage.loading')}
       </div>
     );
@@ -221,23 +227,19 @@ export default function TwitchStreamersSettings() {
   if (loadStatus === 'error') {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center space-y-4">
-        <p className="text-red-400 font-bold">{t('twitchPage.loadFailed')}</p>
-        <p className="text-base text-[#949ba4]">{loadErrorMsg}</p>
-        <button
-          type="button"
-          onClick={loadData}
-          className="bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm font-black px-6 py-3 rounded-xl"
-        >
+        <p className="text-danger font-bold">{t('twitchPage.loadFailed')}</p>
+        <p className="text-base text-text-secondary">{loadErrorMsg}</p>
+        <Button type="button" variant="primary" onClick={loadData} className="!px-6 !py-3 !rounded-xl text-sm font-black">
           {t('common.retry')}
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
     <SettingsPageContainer className="pb-16">
-      <header className="border-b border-[#2b2d31] pb-6">
-        <h1 className="text-xl md:text-2xl font-black tracking-wider text-[#FFD700]">{t('twitchPage.title')}</h1>
+      <header className="border-b border-border-default pb-6">
+        <h1 className="text-xl md:text-2xl font-black tracking-wider text-brand">{t('twitchPage.title')}</h1>
         <HelpText className="mt-1">
           {t('twitchPage.subtitle')}
         </HelpText>
@@ -246,32 +248,32 @@ export default function TwitchStreamersSettings() {
         </HelpText>
       </header>
 
-      <div className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-6 space-y-4 shadow-xl">
-        <h3 className="text-sm font-black tracking-widest text-[#949ba4] uppercase border-b border-[#2b2d31] pb-2">
+      <Card className="space-y-4">
+        <h3 className="text-sm font-black tracking-widest text-text-secondary uppercase border-b border-border-default pb-2">
           {t('twitchPage.addSectionTitle')}
         </h3>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-bold text-[#b5bac1]">{t('twitchPage.streamerLoginLabel')}</label>
+          <label className="text-sm font-bold text-text-secondary">{t('twitchPage.streamerLoginLabel')}</label>
           <input
             type="text"
             value={streamerLogin}
             onChange={(e) => setStreamerLogin(e.target.value)}
             placeholder={t('twitchPage.streamerLoginPlaceholder')}
-            className="w-full bg-[#111214] border border-[#232428] rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-[#5865F2]"
+            className="w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-text-primary font-mono focus:outline-none focus:border-brand"
           />
           <HelpText>{t('twitchPage.streamerLoginHelp')}</HelpText>
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-bold text-[#b5bac1]">{t('twitchPage.announcementChannel')}</label>
+          <label className="text-sm font-bold text-text-secondary">{t('twitchPage.announcementChannel')}</label>
           <ChannelSelect guildId={guildId} value={channelId} onChange={setChannelId} />
           <HelpText>{t('twitchPage.announcementChannelHelp')}</HelpText>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <label className="text-sm font-bold text-[#b5bac1]">{t('twitchPage.linkedMember')}</label>
+            <label className="text-sm font-bold text-text-secondary">{t('twitchPage.linkedMember')}</label>
             <MemberSelect
               guildId={guildId}
               value={memberId}
@@ -280,64 +282,66 @@ export default function TwitchStreamersSettings() {
             <HelpText>{t('twitchPage.linkedMemberHelp')}</HelpText>
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-bold text-[#b5bac1]">{t('twitchPage.liveRole')}</label>
+            <label className="text-sm font-bold text-text-secondary">{t('twitchPage.liveRole')}</label>
             <RoleSelect guildId={guildId} value={roleId} onChange={setRoleId} />
             <HelpText>{t('twitchPage.liveRoleHelp')}</HelpText>
           </div>
         </div>
 
-        <button
+        <Button
           type="button"
+          variant="success"
           onClick={handleAddClick}
           disabled={!streamerLogin.trim() || !channelId || isAdding}
-          className="bg-[#23A55A] hover:bg-[#1a7f43] disabled:opacity-50 text-white text-sm font-black px-6 py-3 rounded-xl"
+          className="!px-6 !py-3 !rounded-xl text-sm font-black"
         >
           {isAdding ? t('twitchPage.adding') : t('twitchPage.addButton')}
-        </button>
-      </div>
+        </Button>
+      </Card>
 
       {confirmDialog && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#1e1f22] border border-orange-500/50 rounded-2xl p-6 max-w-md w-full space-y-4">
-            <h3 className="text-orange-400 font-black text-base">{t('twitchPage.dangerousPermTitle')}</h3>
-            <p className="text-sm text-[#b5bac1]">
+          <Card elevated className="!border-warning/50 max-w-md w-full space-y-4">
+            <h3 className="text-warning font-black text-base">{t('twitchPage.dangerousPermTitle')}</h3>
+            <p className="text-sm text-text-secondary">
               {t('twitchPage.dangerousPermBody', { perms: confirmDialog.dangerous.join(', '), member: memberLabel || memberId })}
             </p>
             <div className="flex gap-3 justify-end">
-              <button type="button" onClick={() => setConfirmDialog(null)} className="text-sm font-bold text-gray-400 hover:text-white px-4 py-2">
+              <Button type="button" variant="ghost" onClick={() => setConfirmDialog(null)} className="text-sm font-bold">
                 {t('common.cancel')}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                variant="danger"
                 onClick={() => { setConfirmDialog(null); submitAdd(true); }}
-                className="bg-red-600 hover:bg-red-500 text-white text-sm font-black px-5 py-2 rounded-lg"
+                className="!px-5 !py-2 text-sm font-black"
               >
                 {t('common.confirm')}
-              </button>
+              </Button>
             </div>
-          </div>
+          </Card>
         </div>
       )}
 
       {streamers.length === 0 ? (
-        <div className="text-center py-12 border border-dashed border-[#2b2d31] rounded-xl bg-[#1e1f22]">
-          <p className="text-base text-gray-400">
+        <Card elevated className="!py-12 border-dashed text-center">
+          <p className="text-base text-text-muted">
             {t('twitchPage.noStreamersYet')}
           </p>
-        </div>
+        </Card>
       ) : (
         <div className="space-y-3">
           {streamers.map((s) => {
             const badge = HEALTH_BADGE[s.poll_health];
             return (
-              <div key={s.broadcaster_id} className="bg-[#1e1f22] border border-[#2b2d31] rounded-2xl p-4 sm:p-5 space-y-3 shadow-xl">
+              <Card key={s.broadcaster_id} className="space-y-3">
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div className="flex items-center gap-2">
-                    <span className="text-base font-black text-white">{s.broadcaster_login}</span>
+                    <span className="text-base font-black text-text-primary">{s.broadcaster_login}</span>
                     {s.is_live ? (
-                      <span className="text-[10px] font-black text-white bg-red-600 px-2 py-0.5 rounded-full">{t('twitchPage.live')}</span>
+                      <Badge variant="success">{t('twitchPage.live')}</Badge>
                     ) : (
-                      <span className="text-[10px] font-bold text-gray-500 bg-[#111214] px-2 py-0.5 rounded-full">{t('twitchPage.offline')}</span>
+                      <Badge variant="neutral">{t('twitchPage.offline')}</Badge>
                     )}
                   </div>
                   <span className={`text-[11px] font-bold ${badge.color}`}>
@@ -345,29 +349,29 @@ export default function TwitchStreamersSettings() {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-[#b5bac1]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-text-secondary">
                   <div>
-                    <span className="text-[#a1a1aa] uppercase text-[10px] font-bold block">{t('twitchPage.announcementChannel')}</span>
+                    <span className="text-text-secondary uppercase text-[10px] font-bold block">{t('twitchPage.announcementChannel')}</span>
                     {s.announcement_channel_name ? `#${s.announcement_channel_name}` : t('twitchPage.unknownChannel', { id: s.announcement_channel_id })}
                   </div>
                   <div>
-                    <span className="text-[#a1a1aa] uppercase text-[10px] font-bold block">{t('twitchPage.lastPollCheck')}</span>
+                    <span className="text-text-secondary uppercase text-[10px] font-bold block">{t('twitchPage.lastPollCheck')}</span>
                     {s.last_checked_at
                       ? t('twitchPage.minutesAgo', { minutes: Math.round(s.minutes_since_last_check ?? 0) })
                       : t('twitchPage.neverChecked')}
                   </div>
                   <div>
-                    <span className="text-[#a1a1aa] uppercase text-[10px] font-bold block">{t('twitchPage.linkedMember')}</span>
+                    <span className="text-text-secondary uppercase text-[10px] font-bold block">{t('twitchPage.linkedMember')}</span>
                     {s.member_id ? (s.member_display_name || `Unknown member (${s.member_id})`) : t('twitchPage.notConfiguredDash')}
                   </div>
                   <div>
-                    <span className="text-[#a1a1aa] uppercase text-[10px] font-bold block">{t('twitchPage.liveRole')}</span>
+                    <span className="text-text-secondary uppercase text-[10px] font-bold block">{t('twitchPage.liveRole')}</span>
                     {s.live_role_id ? (s.live_role_name || `Unknown role (${s.live_role_id})`) : t('twitchPage.notConfiguredDash')}
                   </div>
                 </div>
 
                 {s.role_grant_status === 'incomplete' && (
-                  <p className="text-[11px] font-bold text-amber-400 bg-amber-950/20 border border-amber-500/20 rounded-lg px-3 py-2">
+                  <p className="text-[11px] font-bold text-warning bg-warning/10 border border-warning/30 rounded-lg px-3 py-2">
                     {t('twitchPage.incompleteWarning', {
                       reason: s.member_id ? t('twitchPage.incompleteReasonNoRole') : t('twitchPage.incompleteReasonNoMember'),
                     })}
@@ -375,16 +379,17 @@ export default function TwitchStreamersSettings() {
                 )}
 
                 <div className="pt-2 flex justify-end">
-                  <button
+                  <Button
                     type="button"
+                    variant="danger"
                     onClick={() => handleRemove(s)}
                     disabled={removingId === s.broadcaster_id}
-                    className="text-[11px] font-black text-red-400 hover:text-white hover:bg-red-600 border border-red-500/30 px-4 py-2 rounded-lg transition-all"
+                    className="!px-4 !py-2 text-[11px] font-black"
                   >
                     {removingId === s.broadcaster_id ? t('twitchPage.removing') : t('twitchPage.remove')}
-                  </button>
+                  </Button>
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>
