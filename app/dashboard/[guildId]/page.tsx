@@ -238,7 +238,7 @@ export default function DashboardHome() {
           [SECTION 1: STATUS OVERVIEW ROW]
          ========================================== */}
       <div className="grid grid-cols-1 gap-6">
-        <Card className="!border-brand/30 hover:!border-brand/30 flex flex-col justify-between min-h-[160px] relative overflow-hidden">
+        <Card className="!border-brand/30 hover:!border-brand/30 relative overflow-hidden">
           <div className="flex items-center justify-between pb-4 border-b border-border-default">
             <div className="flex items-center gap-2">
               <span className={`w-2.5 h-2.5 rounded-full ${isConnectionFailed ? 'bg-danger' : isDataEmpty ? 'bg-text-muted' : 'bg-success'}`}></span>
@@ -250,16 +250,15 @@ export default function DashboardHome() {
           </div>
           {/* 🛡️ [정직성 정리] 예전엔 여기 "MATRIX VER: v2.4.0-pro"/"LATENCY TICK: 20ms Stable"처럼
               실제로 어디에서도 안 나오는 값을 하드코딩해서 마치 실시간 측정치인 것처럼 보여줬다 -
-              진짜 값이 없으면 아예 안 보여주는 게 맞다(가짜 문구로 순화하지 않음). 실제 값을 가진
-              두 항목(봇 이름, 이 서버 ID)만 남긴다. */}
-          <div className="flex flex-wrap gap-8 pt-6 font-mono text-base">
-            <div className="space-y-1"><span className="text-text-secondary block text-sm">{t('dashboardHome.coreAlias')}</span><strong className="text-text-primary text-base tracking-wide">Kyvo</strong></div>
-            <div className="space-y-1">
-              <span className="text-text-secondary block text-sm">{t('dashboardHome.activeContext')}</span>
-              <strong className="text-brand text-base tracking-wide truncate max-w-[180px]">
-                {t('dashboardHome.activeContextValue', { id: guildId.slice(0, 6) })}
-              </strong>
-            </div>
+              진짜 값이 없으면 아예 안 보여주는 게 맞다(가짜 문구로 순화하지 않음). "봇: Kyvo" 필드는
+              고정 문자열이라 애초에 실시간 정보가 아니었던 걸 뒤늦게 정리 - 실제 값을 가진 이 서버
+              ID만 남긴다. min-h/flex-col justify-between도 두 필드가 나란히 있을 때의 여백 배분용이었어서
+              같이 걷어냈다(카드가 내용에 맞게 자연스럽게 줄어듦). */}
+          <div className="pt-6 font-mono text-base">
+            <span className="text-text-secondary block text-sm">{t('dashboardHome.activeContext')}</span>
+            <strong className="text-brand text-base tracking-wide truncate max-w-[180px] block">
+              {t('dashboardHome.activeContextValue', { id: guildId.slice(0, 6) })}
+            </strong>
           </div>
         </Card>
       </div>
