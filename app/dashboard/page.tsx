@@ -5,9 +5,28 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useT } from '@/lib/i18n/LanguageContext';
 import { BOT_INVITE_URL } from '@/lib/botInvite';
+import Card from '@/components/ui/Card';
+import type { ManagedGuild } from '@/components/GuildsContext';
 
-type ManagedGuild = { id: string; name: string };
 type BotStatus = 'checking' | 'present' | 'absent' | 'unknown';
+
+// 🛡️ ServerSelect.tsx의 동명 헬퍼와 동일한 아이콘/이니셜 폴백 로직(중복이지만 profile/page.tsx의
+// 형제 피커 페이지도 같은 로직을 인라인으로 따로 갖고 있어서, 이 파일 안에서만 재사용하는 작은
+// 헬퍼로 두는 게 기존 컨벤션과 맞다).
+function GuildIcon({ guild, className }: { guild: ManagedGuild; className: string }) {
+  return guild.icon ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`}
+      alt=""
+      className={`${className} rounded-full shrink-0`}
+    />
+  ) : (
+    <div className={`${className} rounded-full bg-bg-elevated flex items-center justify-center font-bold text-text-secondary shrink-0`}>
+      {guild.name.slice(0, 2).toUpperCase()}
+    </div>
+  );
+}
 
 /**
  * Admin dashboard entry point. Before this page existed, the landing page just grabbed
@@ -162,19 +181,21 @@ export default function DashboardPickerPage() {
 
               if (isPresent) {
                 return (
-                  <Link
-                    key={g.id}
-                    href={`/dashboard/${g.id}`}
-                    className="bg-bg-surface border border-border-default hover:border-brand/50 rounded-xl p-5 transition-all hover:-translate-y-0.5"
-                  >
-                    {cardBody}
+                  <Link key={g.id} href={`/dashboard/${g.id}`} className="block">
+                    <Card className="!p-5 flex items-center gap-3">
+                      <GuildIcon guild={g} className="w-10 h-10 text-sm" />
+                      <div className="min-w-0 flex-1">{cardBody}</div>
+                    </Card>
                   </Link>
                 );
               }
 
               return (
-                <div key={g.id} className="bg-bg-surface border border-border-default rounded-xl p-5 space-y-3">
-                  {cardBody}
+                <Card key={g.id} className="!p-5 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <GuildIcon guild={g} className="w-10 h-10 text-sm" />
+                    <div className="min-w-0 flex-1">{cardBody}</div>
+                  </div>
                   {!isChecking && (
                     <a
                       href={`${BOT_INVITE_URL}&guild_id=${g.id}&disable_guild_select=true`}
@@ -185,7 +206,7 @@ export default function DashboardPickerPage() {
                       {t('dashboardPickerPage.inviteCta')}
                     </a>
                   )}
-                </div>
+                </Card>
               );
             })}
           </div>
