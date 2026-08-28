@@ -14,7 +14,7 @@ const COLOR_PRESETS = ['#5865F2', '#23A55A', '#FEE75C', '#EB459E', '#ED4245', '#
 
 type LoadStatus = 'loading' | 'loaded' | 'error';
 
-const EMPTY_FORM: PartyGamePreset = { game_name: '', card_color: '#5865F2', card_description: '', card_thumbnail_url: '' };
+const EMPTY_FORM: PartyGamePreset = { game_name: '', card_color: '#5865F2', card_description: '', card_thumbnail_url: '', positions: null };
 
 export default function PartyPresetsPage() {
   const params = useParams();
@@ -26,6 +26,11 @@ export default function PartyPresetsPage() {
   const [loadErrorMsg, setLoadErrorMsg] = useState('');
   const [presets, setPresets] = useState<PartyGamePreset[]>([]);
   const [form, setForm] = useState<PartyGamePreset>(EMPTY_FORM);
+  // 🛡️ [프리셋 우선 포지션] positions는 form(PartyGamePreset)에도 있지만, 입력 UI는 쉼표로 구분된
+  // 텍스트라 배열<->문자열 변환이 필요하다 - 이 두 상태가 실제 편집 중인 값의 단일 소스이고,
+  // form.positions는 저장 시점에만 이걸로부터 다시 계산해서 채운다.
+  const [usesPositions, setUsesPositions] = useState(false);
+  const [positionsText, setPositionsText] = useState('');
   const [editingOriginalName, setEditingOriginalName] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [deletingName, setDeletingName] = useState<string | null>(null);
@@ -66,21 +71,28 @@ export default function PartyPresetsPage() {
 
   const startEdit = (preset: PartyGamePreset) => {
     setForm(preset);
+    setUsesPositions(Boolean(preset.positions && preset.positions.length > 0));
+    setPositionsText((preset.positions || []).join(', '));
     setEditingOriginalName(preset.game_name);
   };
 
   const cancelEdit = () => {
     setForm(EMPTY_FORM);
+    setUsesPositions(false);
+    setPositionsText('');
     setEditingOriginalName(null);
   };
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
+      const positions = usesPositions
+        ? positionsText.split(',').map((p) => p.trim()).filter((p) => p.length > 0)
+        : null;
       const res = await fetch(`/api/party-presets/${guildId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, positions }),
       });
       if (res.ok) {
         showToast(t('partyPresetsPage.presetSaved', { name: form.game_name }), 'success');
@@ -239,6 +251,36 @@ export default function PartyPresetsPage() {
             className="w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-text-primary font-mono focus:outline-none focus:border-brand"
           />
           <HelpText>{t('partyPresetsPage.thumbnailHelp')}</HelpText>
+        </div>
+
+        <div className="space-y-2 p-3.5 bg-bg-elevated rounded-xl border border-border-default">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-black text-text-primary cursor-pointer" htmlFor="uses-positions-toggle">
+              {t('partyPresetsPage.positionsToggleLabel')}
+            </label>
+            <input
+              id="uses-positions-toggle"
+              type="checkbox"
+              checked={usesPositions}
+              onChange={(e) => setUsesPositions(e.target.checked)}
+              className="w-4 h-4 accent-brand cursor-pointer"
+            />
+          </div>
+          {usesPositions && (
+            <div className="space-y-1 pt-1 border-t border-border-default/40">
+              <label className="text-sm font-bold text-text-secondary uppercase block">
+                {t('partyPresetsPage.positionsInputLabel')}
+              </label>
+              <input
+                type="text"
+                value={positionsText}
+                onChange={(e) => setPositionsText(e.target.value)}
+                placeholder={t('partyPresetsPage.positionsInputPlaceholder')}
+                className="w-full bg-bg-surface border border-border-default rounded-lg p-2.5 text-sm text-text-primary focus:outline-none focus:border-brand"
+              />
+              <HelpText className="normal-case">{t('partyPresetsPage.positionsInputHelp')}</HelpText>
+            </div>
+          )}
         </div>
 
         <div className="flex gap-3 pt-2">

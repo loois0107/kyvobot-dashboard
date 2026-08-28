@@ -5,11 +5,20 @@ import { isValidHexColor, normalizeHexColor } from './partySettings';
 export const PARTY_GAME_PRESET_MAX_COUNT = 25; // Discord 자동완성 응답 상한과 맞춤
 export const PARTY_GAME_PRESET_NAME_MAX_LENGTH = 100;
 
+// cogs/party.py의 party_recruitments.required_positions(text[])와 동일한 자릿수 감각 - LoL(5개)보다
+// 넉넉하게 잡아, 포지션이 더 많은 다른 게임도 등록 가능하게 한다.
+export const PARTY_PRESET_POSITION_MAX_COUNT = 10;
+export const PARTY_PRESET_POSITION_NAME_MAX_LENGTH = 20;
+
 export interface PartyGamePreset {
   game_name: string;
   card_color: string;
   card_description: string;
   card_thumbnail_url: string;
+  // 🛡️ [프리셋 우선 포지션] cogs/party.py가 /party_recruit 제출 시 이 게임의 프리셋을 조회해서
+  // positions가 채워져 있으면 그 값을 required_positions로 그대로 쓰고 Yes/No 확인창 자체를
+  // 생략한다 - 비어있거나(null/[]) 프리셋이 없으면 기존 확인창 흐름으로 폴백한다.
+  positions: string[] | null;
 }
 
 export interface ValidationResult {
@@ -40,6 +49,27 @@ export function validatePartyGamePreset(input: any): ValidationResult {
     errors.push('card_thumbnail_url must start with http:// or https://.');
   }
 
+  // 🛡️ [프리셋 우선 포지션] 값이 아예 없으면(undefined/null) "포지션 미사용"으로 null 저장 -
+  // 빈 배열과 null을 굳이 구분하지 않는다(cogs/party.py도 `if preset_row.get("positions"):`로
+  // 둘 다 동일하게 falsy 취급). 배열이 아니거나 항목이 문자열이 아니면 명확히 거부한다.
+  let positions: string[] | null = null;
+  if (input?.positions !== undefined && input?.positions !== null) {
+    if (!Array.isArray(input.positions)) {
+      errors.push('positions must be an array of strings or null.');
+    } else {
+      const cleaned = (input.positions as unknown[])
+        .map((p) => (typeof p === 'string' ? p.trim() : ''))
+        .filter((p) => p.length > 0);
+      if (cleaned.length > PARTY_PRESET_POSITION_MAX_COUNT) {
+        errors.push(`positions must have at most ${PARTY_PRESET_POSITION_MAX_COUNT} entries.`);
+      } else if (cleaned.some((p) => p.length > PARTY_PRESET_POSITION_NAME_MAX_LENGTH)) {
+        errors.push(`Each position name must be ${PARTY_PRESET_POSITION_NAME_MAX_LENGTH} characters or fewer.`);
+      } else {
+        positions = cleaned.length > 0 ? cleaned : null;
+      }
+    }
+  }
+
   if (errors.length > 0) {
     return { valid: false, errors };
   }
@@ -53,6 +83,7 @@ export function validatePartyGamePreset(input: any): ValidationResult {
       card_color: cardColor,
       card_description: cardDescription,
       card_thumbnail_url: cardThumbnailUrlRaw,
+      positions,
     },
   };
 }
