@@ -8,6 +8,12 @@ export const dynamic = 'force-dynamic';
 const VALID_TEAMS = ['red', 'blue'] as const;
 type Team = (typeof VALID_TEAMS)[number];
 
+// 🛡️ [종료된 모집 잠금] party.py의 party_recruitments.status가 이 두 값이면 이미 끝난 모집이다 -
+// 팀 편성 딥링크 버튼은 카드가 마감/만료될 때 discord.py 쪽에서 view=None으로 지워지지만, 링크
+// 버튼은 콜백이 없어 클릭해도 봇으로 인터랙션이 안 오므로 그 서버사이드 방어가 아예 안 먹힌다 -
+// 그래서 이 라우트 자체가 마지막 방어선이다.
+const ENDED_STATUSES = ['closed', 'expired'];
+
 function connectSupabase() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -109,6 +115,7 @@ export async function GET(request: Request, ctx: { params: Promise<{ recruitment
     recruitment,
     participants,
     viewer: { isLeader, isAdmin },
+    readOnly: ENDED_STATUSES.includes(recruitment.status),
   });
 }
 
@@ -138,7 +145,7 @@ export async function POST(request: Request, ctx: { params: Promise<{ recruitmen
 
   const { data: recruitment, error: recruitmentError } = await supabase
     .from('party_recruitments')
-    .select('leader_id, guild_id')
+    .select('leader_id, guild_id, status')
     .eq('id', recruitmentId)
     .maybeSingle();
   if (recruitmentError) {
@@ -152,6 +159,12 @@ export async function POST(request: Request, ctx: { params: Promise<{ recruitmen
   const allowed = await canManageRecruitment(userId, recruitment);
   if (!allowed) {
     return NextResponse.json({ status: 'error', message: 'Only this recruitment\'s leader or a server admin can manage teams.' }, { status: 403 });
+  }
+
+  // 🛡️ [종료된 모집 잠금] 수동 배정/자동 밸런스 둘 다 이 체크 하나로 막는다 - 링크 버튼이 화면에
+  // 남아있든 아니든(위 ENDED_STATUSES 주석 참고) 실제 쓰기는 여기서 최종적으로 차단된다.
+  if (ENDED_STATUSES.includes(recruitment.status)) {
+    return NextResponse.json({ status: 'error', message: 'This recruitment has already ended and can no longer be edited.' }, { status: 403 });
   }
 
   if (body?.action === 'auto_balance') {

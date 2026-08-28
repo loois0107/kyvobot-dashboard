@@ -444,6 +444,7 @@ const en = {
     autoBalancing: 'Balancing...',
     autoBalanceSuccess: 'Teams auto-balanced!',
     autoBalanceNetworkError: 'Network error while auto-balancing teams.',
+    recruitmentEndedBanner: '⚠️ This recruitment has ended - team assignments are now read-only.',
   },
   reactionRolesPage: {
     loading: 'Loading reaction roles...',

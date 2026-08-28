@@ -54,16 +54,19 @@ function ParticipantAvatar({ participant, className }: { participant: Participan
 function ParticipantRow({
   participant,
   saving,
+  readOnly,
   onAssign,
   t,
 }: {
   participant: Participant;
   saving: boolean;
+  readOnly: boolean;
   onAssign: (team: Team) => void;
   t: ReturnType<typeof useT>;
 }) {
   const isRed = participant.team === 'red';
   const isBlue = participant.team === 'blue';
+  const disabled = saving || readOnly;
 
   return (
     <Card elevated className="!p-3 flex flex-col sm:flex-row sm:items-center gap-3">
@@ -86,7 +89,7 @@ function ParticipantRow({
           type="button"
           variant="secondary"
           onClick={() => onAssign('red')}
-          disabled={saving}
+          disabled={disabled}
           className={`!px-3 !py-1.5 text-xs ${
             isRed ? '!bg-red-600 !border-red-600 !text-white' : '!border-red-500/40 !text-red-400 hover:!border-red-500'
           }`}
@@ -97,7 +100,7 @@ function ParticipantRow({
           type="button"
           variant="secondary"
           onClick={() => onAssign('blue')}
-          disabled={saving}
+          disabled={disabled}
           className={`!px-3 !py-1.5 text-xs ${
             isBlue ? '!bg-blue-600 !border-blue-600 !text-white' : '!border-blue-500/40 !text-blue-400 hover:!border-blue-500'
           }`}
@@ -105,7 +108,7 @@ function ParticipantRow({
           {t('partyTeamPage.assignToBlueButton')}
         </Button>
         {(isRed || isBlue) && (
-          <Button type="button" variant="ghost" onClick={() => onAssign(null)} disabled={saving} className="!px-2 text-xs">
+          <Button type="button" variant="ghost" onClick={() => onAssign(null)} disabled={disabled} className="!px-2 text-xs">
             {t('partyTeamPage.unassignButton')}
           </Button>
         )}
@@ -131,6 +134,7 @@ export default function PartyTeamPage() {
   const [loadErrorMsg, setLoadErrorMsg] = useState('');
   const [recruitment, setRecruitment] = useState<RecruitmentInfo | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
+  const [readOnly, setReadOnly] = useState(false);
   const [savingUserId, setSavingUserId] = useState<string | null>(null);
   const [autoBalancing, setAutoBalancing] = useState(false);
 
@@ -163,6 +167,7 @@ export default function PartyTeamPage() {
       const data = await res.json();
       setRecruitment(data.recruitment);
       setParticipants(data.participants || []);
+      setReadOnly(Boolean(data.readOnly));
       setLoadStatus('loaded');
     } catch (err: any) {
       if (err?.name === 'AbortError') return;
@@ -298,6 +303,12 @@ export default function PartyTeamPage() {
           </HelpText>
         </header>
 
+        {readOnly && (
+          <div className="rounded-xl border border-warning/40 bg-warning/10 px-4 py-3 text-sm font-bold text-warning">
+            {t('partyTeamPage.recruitmentEndedBanner')}
+          </div>
+        )}
+
         <Card className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border-default pb-2">
             <h3 className="text-sm font-black tracking-widest text-text-secondary uppercase">
@@ -307,7 +318,7 @@ export default function PartyTeamPage() {
               type="button"
               variant="secondary"
               onClick={autoBalance}
-              disabled={autoBalancing || participants.length === 0}
+              disabled={autoBalancing || participants.length === 0 || readOnly}
               className="text-xs !py-1.5 w-full sm:w-auto"
             >
               {autoBalancing ? t('partyTeamPage.autoBalancing') : t('partyTeamPage.autoBalanceButton')}
@@ -329,7 +340,7 @@ export default function PartyTeamPage() {
                   <p className="text-xs text-text-muted px-1 py-2">{t('partyTeamPage.noParticipantsYet')}</p>
                 ) : (
                   redTeam.map((p) => (
-                    <ParticipantRow key={p.user_id} participant={p} saving={savingUserId === p.user_id} onAssign={(team) => assignTeam(p.user_id, team)} t={t} />
+                    <ParticipantRow key={p.user_id} participant={p} saving={savingUserId === p.user_id} readOnly={readOnly} onAssign={(team) => assignTeam(p.user_id, team)} t={t} />
                   ))
                 )}
               </div>
@@ -345,7 +356,7 @@ export default function PartyTeamPage() {
                   <p className="text-xs text-text-muted px-1 py-2">{t('partyTeamPage.noParticipantsYet')}</p>
                 ) : (
                   blueTeam.map((p) => (
-                    <ParticipantRow key={p.user_id} participant={p} saving={savingUserId === p.user_id} onAssign={(team) => assignTeam(p.user_id, team)} t={t} />
+                    <ParticipantRow key={p.user_id} participant={p} saving={savingUserId === p.user_id} readOnly={readOnly} onAssign={(team) => assignTeam(p.user_id, team)} t={t} />
                   ))
                 )}
               </div>
@@ -357,7 +368,7 @@ export default function PartyTeamPage() {
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     {unassigned.map((p) => (
-                      <ParticipantRow key={p.user_id} participant={p} saving={savingUserId === p.user_id} onAssign={(team) => assignTeam(p.user_id, team)} t={t} />
+                      <ParticipantRow key={p.user_id} participant={p} saving={savingUserId === p.user_id} readOnly={readOnly} onAssign={(team) => assignTeam(p.user_id, team)} t={t} />
                     ))}
                   </div>
                 </div>

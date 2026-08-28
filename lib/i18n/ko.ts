@@ -444,6 +444,7 @@ const ko: typeof en = {
     autoBalancing: '밸런싱 중...',
     autoBalanceSuccess: '팀이 자동으로 밸런스 조정되었습니다!',
     autoBalanceNetworkError: '자동 밸런스 중 네트워크 오류가 발생했습니다.',
+    recruitmentEndedBanner: '⚠️ 이 모집은 종료되었습니다 - 팀 배정은 이제 읽기 전용입니다.',
   },
   reactionRolesPage: {
     loading: '반응 역할을 불러오는 중...',
