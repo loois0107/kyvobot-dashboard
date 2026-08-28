@@ -10,6 +10,7 @@ import SettingsPageContainer from '@/components/SettingsPageContainer';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
+import { scoreToTierLabel } from '@/lib/tierRoles';
 
 type Team = 'red' | 'blue' | null;
 
@@ -17,6 +18,7 @@ interface Participant {
   user_id: string;
   position: string | null;
   team: Team;
+  mmr_score: number | null;
   username: string;
   avatar_url: string | null;
   is_leader: boolean;
@@ -130,6 +132,7 @@ export default function PartyTeamPage() {
   const [recruitment, setRecruitment] = useState<RecruitmentInfo | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [savingUserId, setSavingUserId] = useState<string | null>(null);
+  const [autoBalancing, setAutoBalancing] = useState(false);
 
   const extractErrorMessage = async (res: Response): Promise<string> => {
     try {
@@ -203,6 +206,38 @@ export default function PartyTeamPage() {
     }
   };
 
+  const autoBalance = async () => {
+    if (!recruitmentId) return;
+    setAutoBalancing(true);
+    try {
+      const res = await fetch(`/api/party/${recruitmentId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'auto_balance' }),
+      });
+      if (res.ok) {
+        await loadData();
+        showToast(t('partyTeamPage.autoBalanceSuccess'), 'success');
+      } else {
+        showToast(await extractErrorMessage(res), 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast(t('partyTeamPage.autoBalanceNetworkError'), 'error');
+    } finally {
+      setAutoBalancing(false);
+    }
+  };
+
+  // 팀 평균 MMR을 "Diamond 3" 같은 라벨로 보여준다 - mmr_score가 없는 참가자(미인증/미신고)는
+  // 평균 계산에서 제외한다(0점으로 섞으면 실제로는 정보가 없을 뿐인데 최하위 티어처럼 왜곡된다).
+  const averageTierLabel = (team: Participant[]): string => {
+    const scores = team.map((p) => p.mmr_score).filter((s): s is number => typeof s === 'number');
+    if (scores.length === 0) return t('partyTeamPage.noMmrData');
+    const avg = Math.round(scores.reduce((sum, s) => sum + s, 0) / scores.length);
+    return scoreToTierLabel(avg) || t('partyTeamPage.noMmrData');
+  };
+
   if (sessionStatus === 'loading' || (sessionStatus === 'authenticated' && loadStatus === 'loading')) {
     return <div className="min-h-screen bg-bg-base" />;
   }
@@ -247,6 +282,12 @@ export default function PartyTeamPage() {
 
   if (!recruitment) return null;
 
+  // 🛡️ [2단계 고도화] 레드/블루/미배정 3구역 분리 - ParticipantRow 자체는 그대로 재사용하고,
+  // 여기서 team 값으로 그룹만 나눈다.
+  const redTeam = participants.filter((p) => p.team === 'red');
+  const blueTeam = participants.filter((p) => p.team === 'blue');
+  const unassigned = participants.filter((p) => p.team === null);
+
   return (
     <div className="min-h-screen bg-bg-base text-text-primary p-4 sm:p-8">
       <SettingsPageContainer>
@@ -258,17 +299,69 @@ export default function PartyTeamPage() {
         </header>
 
         <Card className="space-y-4">
-          <h3 className="text-sm font-black tracking-widest text-text-secondary uppercase border-b border-border-default pb-2">
-            {t('partyTeamPage.participantsTitle', { count: participants.length })}
-          </h3>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border-default pb-2">
+            <h3 className="text-sm font-black tracking-widest text-text-secondary uppercase">
+              {t('partyTeamPage.participantsTitle', { count: participants.length })}
+            </h3>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={autoBalance}
+              disabled={autoBalancing || participants.length === 0}
+              className="text-xs !py-1.5 w-full sm:w-auto"
+            >
+              {autoBalancing ? t('partyTeamPage.autoBalancing') : t('partyTeamPage.autoBalanceButton')}
+            </Button>
+          </div>
 
           {participants.length === 0 ? (
             <p className="text-base text-text-muted py-4">{t('partyTeamPage.noParticipantsYet')}</p>
           ) : (
-            <div className="space-y-2">
-              {participants.map((p) => (
-                <ParticipantRow key={p.user_id} participant={p} saving={savingUserId === p.user_id} onAssign={(team) => assignTeam(p.user_id, team)} t={t} />
-              ))}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between px-1">
+                  <h4 className="text-xs font-black tracking-widest text-red-400 uppercase">
+                    {t('partyTeamPage.redTeamLabel')} ({redTeam.length})
+                  </h4>
+                  <span className="text-xs font-bold text-text-muted">{averageTierLabel(redTeam)}</span>
+                </div>
+                {redTeam.length === 0 ? (
+                  <p className="text-xs text-text-muted px-1 py-2">{t('partyTeamPage.noParticipantsYet')}</p>
+                ) : (
+                  redTeam.map((p) => (
+                    <ParticipantRow key={p.user_id} participant={p} saving={savingUserId === p.user_id} onAssign={(team) => assignTeam(p.user_id, team)} t={t} />
+                  ))
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between px-1">
+                  <h4 className="text-xs font-black tracking-widest text-blue-400 uppercase">
+                    {t('partyTeamPage.blueTeamLabel')} ({blueTeam.length})
+                  </h4>
+                  <span className="text-xs font-bold text-text-muted">{averageTierLabel(blueTeam)}</span>
+                </div>
+                {blueTeam.length === 0 ? (
+                  <p className="text-xs text-text-muted px-1 py-2">{t('partyTeamPage.noParticipantsYet')}</p>
+                ) : (
+                  blueTeam.map((p) => (
+                    <ParticipantRow key={p.user_id} participant={p} saving={savingUserId === p.user_id} onAssign={(team) => assignTeam(p.user_id, team)} t={t} />
+                  ))
+                )}
+              </div>
+
+              {unassigned.length > 0 && (
+                <div className="md:col-span-2 space-y-2 pt-2 border-t border-border-default/60">
+                  <h4 className="text-xs font-black tracking-widest text-text-muted uppercase px-1">
+                    {t('partyTeamPage.unassignedSectionTitle')} ({unassigned.length})
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {unassigned.map((p) => (
+                      <ParticipantRow key={p.user_id} participant={p} saving={savingUserId === p.user_id} onAssign={(team) => assignTeam(p.user_id, team)} t={t} />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </Card>

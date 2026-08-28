@@ -1,6 +1,32 @@
 // party.py TIER_CHOICES와 동일한 목록 - 봇 쪽이 정본, 여긴 표시/검증용으로 복제
 export const TIER_CHOICES = ['Iron', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Emerald', 'Diamond', 'Master', 'Grandmaster', 'Challenger'];
 
+// party.py의 MMR_TIER_STEP/DIVISION_TO_SCORE와 정확히 대칭되는 역연산 - 봇 쪽이 정본, 여긴 표시용으로
+// 복제(위 TIER_CHOICES와 동일한 관례). party.py의 calculate_mmr_score()가
+// tier_index*400 + division_score(0/100/200/300) + LP로 계산하므로, 그 역으로 400 단위는 티어,
+// 남은 값의 100 단위는 디비전으로 되짚는다. LP는 정수 나눗셈 과정에서 버려지므로(표시용 근사치라
+// 원래 점수를 정확히 복원하진 못한다 - "어느 티어/디비전 구간인지"만 정확하면 충분하다.
+export const MMR_TIER_STEP = 400;
+const MMR_DIVISION_STEP = 100;
+const DIVISION_ARABIC = [4, 3, 2, 1]; // 인덱스 0(IV)->4, 1(III)->3, 2(II)->2, 3(I)->1 - "Diamond 3" 같은 표기
+
+/** MMR 점수를 "Diamond 3" 같은 사람이 읽기 편한 라벨로 변환한다. score가 없으면(미인증/미신고
+ * 참가자, 또는 팀에 아무도 없어 평균 낼 데이터가 없는 경우) null을 반환한다 - 호출부가 그 상황에
+ * 맞는 문구("데이터 없음" 등)를 직접 고르게 한다. */
+export function scoreToTierLabel(score: number | null | undefined): string | null {
+  if (score === null || score === undefined || !Number.isFinite(score)) return null;
+
+  const clamped = Math.max(0, Math.floor(score));
+  let tierIndex = Math.floor(clamped / MMR_TIER_STEP);
+  tierIndex = Math.min(tierIndex, TIER_CHOICES.length - 1);
+
+  const remainder = clamped - tierIndex * MMR_TIER_STEP;
+  let divisionIndex = Math.floor(remainder / MMR_DIVISION_STEP);
+  divisionIndex = Math.min(divisionIndex, DIVISION_ARABIC.length - 1);
+
+  return `${TIER_CHOICES[tierIndex]} ${DIVISION_ARABIC[divisionIndex]}`;
+}
+
 export const ADMINISTRATOR = BigInt(0x8);
 // party.py DANGEROUS_ROLE_PERMISSIONS와 동일한 목록/정신 - 이 라우트도 커맨드와 같은 기준을 써야 한다
 export const DANGEROUS_PERMS: Record<string, bigint> = {
