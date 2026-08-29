@@ -3,51 +3,50 @@ export const PARTY_STATS_SPARSE_THRESHOLD = 5;
 export const PARTY_STATS_CACHE_TTL_SECONDS = 3600;
 
 export interface RecruitmentRow {
-  queue_type: string | null;
-  lanes: string | null;
+  selected_game: string | null;
   created_at: string;
 }
 
-export interface QueueComboStat {
-  queue_type: string;
-  lanes: string;
+export interface GameFrequencyStat {
+  game_name: string;
   count: number;
 }
 
 export interface WeeklyStats {
   totalCount: number;
-  topCombos: QueueComboStat[];
+  topGames: GameFrequencyStat[];
 }
 
-function normalizeComboKey(queueType: string | null, lanes: string | null): string {
-  const q = (queueType || '').trim().toLowerCase();
-  const l = (lanes || '').trim().toLowerCase();
-  return `${q}|${l}`;
+function normalizeGameKey(game: string | null): string {
+  return (game || '').trim().toLowerCase();
 }
 
 /**
- * queue_type/lanes는 자유 텍스트라(디스코드 모달은 select choices를 지원 안 함) 대소문자/공백
- * 차이로 같은 조합이 서로 다른 항목으로 흩어지는 걸 막기 위해 trim+소문자로 정규화해서 묶는다.
- * 화면에 보여줄 라벨은 그 그룹에서 최초로 본 원본 표기를 그대로 쓴다.
+ * 🛡️ [queue_type 삭제 - 게임 빈도 통계로 재정의] 예전엔 queue_type+lanes(둘 다 자유 텍스트) 조합을
+ * 세서 "인기 큐/라인 조합"을 보여줬는데, queue_type 필드 자체가 없어져서 selected_game(자유 텍스트가
+ * 아니라 party_game_presets 자동완성으로 고른 값) 하나만으로 "어떤 게임이 제일 많이 모집되는지"
+ * 랭킹을 낸다. 그래도 대소문자/공백 차이로 흩어지는 걸 막기 위해 trim+소문자로 정규화해서 묶는 건
+ * 동일하다(관리자가 프리셋을 대소문자만 다르게 여러 개 만든 경우 대비).
+ *
+ * selected_game이 없는(게임 미지정 캐주얼) 모집은 "어떤 게임이 인기있는지" 랭킹 대상이 아니므로
+ * topGames 집계에서 제외한다 - 다만 totalCount(이번 주 전체 모집 건수)에는 여전히 포함된다.
  */
 export function computeWeeklyStats(rows: RecruitmentRow[], topN: number = 5): WeeklyStats {
-  const groups = new Map<string, QueueComboStat>();
+  const groups = new Map<string, GameFrequencyStat>();
   for (const row of rows) {
-    const key = normalizeComboKey(row.queue_type, row.lanes);
+    const game = (row.selected_game || '').trim();
+    if (!game) continue;
+    const key = normalizeGameKey(game);
     const existing = groups.get(key);
     if (existing) {
       existing.count += 1;
     } else {
-      groups.set(key, {
-        queue_type: (row.queue_type || '').trim(),
-        lanes: (row.lanes || '').trim(),
-        count: 1,
-      });
+      groups.set(key, { game_name: game, count: 1 });
     }
   }
 
-  const topCombos = Array.from(groups.values()).sort((a, b) => b.count - a.count).slice(0, topN);
-  return { totalCount: rows.length, topCombos };
+  const topGames = Array.from(groups.values()).sort((a, b) => b.count - a.count).slice(0, topN);
+  return { totalCount: rows.length, topGames };
 }
 
 export interface VerificationRow {

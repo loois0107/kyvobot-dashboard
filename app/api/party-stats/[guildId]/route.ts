@@ -45,7 +45,7 @@ export async function GET(request: Request, ctx: { params: Promise<{ guildId: st
   const since = new Date(Date.now() - PARTY_STATS_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString();
 
   const [recruitmentsRes, verificationsRes] = await Promise.all([
-    supabase.from('party_recruitments').select('queue_type, lanes, created_at').eq('guild_id', guildId).gte('created_at', since),
+    supabase.from('party_recruitments').select('selected_game, created_at').eq('guild_id', guildId).gte('created_at', since),
     supabase.from('riot_verifications').select('user_id, tier, verified_at').eq('guild_id', guildId),
   ]);
 
@@ -75,7 +75,7 @@ export async function GET(request: Request, ctx: { params: Promise<{ guildId: st
   const payload = {
     window_days: PARTY_STATS_WINDOW_DAYS,
     weekly_count: weekly.totalCount,
-    top_combos: weekly.topCombos,
+    top_games: weekly.topGames,
     tier_distribution: tierDistribution,
     verified_user_count: latestVerifications.length,
     is_empty: sufficiency.isEmpty,

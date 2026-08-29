@@ -8,9 +8,8 @@ import SettingsPageContainer from '@/components/SettingsPageContainer';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 
-interface QueueComboStat {
-  queue_type: string;
-  lanes: string;
+interface GameFrequencyStat {
+  game_name: string;
   count: number;
 }
 
@@ -22,7 +21,7 @@ interface TierDistributionEntry {
 interface PartyStats {
   window_days: number;
   weekly_count: number;
-  top_combos: QueueComboStat[];
+  top_games: GameFrequencyStat[];
   tier_distribution: TierDistributionEntry[];
   verified_user_count: number;
   is_empty: boolean;
@@ -137,27 +136,24 @@ export default function PartyStatsPage() {
         )}
       </Card>
 
-      {/* 인기 큐타입/라인 조합 */}
+      {/* 인기 게임 랭킹 */}
       <Card className="space-y-3">
         <h3 className="text-sm font-black tracking-widest text-text-secondary uppercase border-b border-border-default pb-2">
-          {t('partyStatsPage.popularCombosTitle')}
+          {t('partyStatsPage.popularGamesTitle')}
         </h3>
-        {stats.top_combos.length === 0 ? (
+        {stats.top_games.length === 0 ? (
           <p className="text-base text-text-secondary py-4">{t('partyStatsPage.notEnoughData')}</p>
         ) : (
           <div className="space-y-2">
-            {stats.top_combos.map((combo, i) => (
-              <Card elevated key={`${combo.queue_type}-${combo.lanes}-${i}`} className="flex items-center justify-between !px-3 !py-2">
-                <span className="text-sm text-text-primary font-medium">
-                  {combo.queue_type}
-                  {combo.lanes && <span className="text-text-secondary"> · {combo.lanes}</span>}
-                </span>
-                <span className="text-sm font-black text-brand">{combo.count}</span>
+            {stats.top_games.map((game, i) => (
+              <Card elevated key={`${game.game_name}-${i}`} className="flex items-center justify-between !px-3 !py-2">
+                <span className="text-sm text-text-primary font-medium">{game.game_name}</span>
+                <span className="text-sm font-black text-brand">{game.count}</span>
               </Card>
             ))}
           </div>
         )}
-        {stats.is_sparse && stats.top_combos.length > 0 && (
+        {stats.is_sparse && stats.top_games.length > 0 && (
           <HelpText>{t('partyStatsPage.smallSampleWarning')}</HelpText>
         )}
       </Card>
