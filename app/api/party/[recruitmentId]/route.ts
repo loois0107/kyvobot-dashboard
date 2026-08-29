@@ -167,6 +167,56 @@ export async function POST(request: Request, ctx: { params: Promise<{ recruitmen
     return NextResponse.json({ status: 'error', message: 'This recruitment has already ended and can no longer be edited.' }, { status: 403 });
   }
 
+  if (body?.action === 'kick') {
+    const targetUserId = typeof body?.user_id === 'string' ? body.user_id : null;
+    if (!targetUserId) {
+      return NextResponse.json({ status: 'error', message: 'user_id is required.' }, { status: 400 });
+    }
+    // 🛡️ 리더는 강퇴 대상에서 제외한다 - 리더가 빠지면 이 모집의 소유권(leader_id) 자체가
+    // 참가자 없는 채로 붕 뜨고, 카드/채널 정리 권한(canManageRecruitment)까지 애매해진다.
+    if (targetUserId === recruitment.leader_id) {
+      return NextResponse.json({ status: 'error', message: 'The recruitment leader cannot be kicked.' }, { status: 400 });
+    }
+
+    const { data: existingParticipant, error: participantLookupError } = await supabase
+      .from('party_participants')
+      .select('user_id')
+      .eq('recruitment_id', recruitmentId)
+      .eq('user_id', targetUserId)
+      .maybeSingle();
+    if (participantLookupError) {
+      console.error('[PARTY_TEAM][ERROR]', participantLookupError);
+      return NextResponse.json({ status: 'error', message: participantLookupError.message }, { status: 500 });
+    }
+    if (!existingParticipant) {
+      return NextResponse.json({ status: 'error', message: 'This user has not joined this recruitment.' }, { status: 404 });
+    }
+
+    const { error: deleteError } = await supabase
+      .from('party_participants')
+      .delete()
+      .eq('recruitment_id', recruitmentId)
+      .eq('user_id', targetUserId);
+    if (deleteError) {
+      console.error('[PARTY_TEAM][ERROR]', deleteError);
+      return NextResponse.json({ status: 'error', message: deleteError.message }, { status: 500 });
+    }
+
+    // 🛡️ [재참가 방지 기록] party.py의 handle_join이 참가 시도 시 이 테이블부터 확인해서
+    // 강퇴당한 적 있는 유저를 막는다(cogs/party.py 참고). 이 INSERT가 실패해도 참가자 삭제
+    // 자체는 이미 끝났으니 강퇴는 성공으로 처리한다 - 이미 지운 참가자를 되돌리는 보정까지
+    // 하는 건 과함(같은 유저를 순간적으로 두 번 강퇴하는 극히 드문 경합 정도가 유일한 실패
+    // 시나리오이고, 그때도 유니크 제약 덕에 기존 기록이 이미 있다는 뜻이라 문제 없음).
+    const { error: kickInsertError } = await supabase
+      .from('party_recruitment_kicks')
+      .insert({ recruitment_id: Number(recruitmentId), user_id: targetUserId, kicked_by: userId });
+    if (kickInsertError) {
+      console.error('[PARTY_TEAM][WARN] Failed to record kick (participant already removed):', kickInsertError);
+    }
+
+    return NextResponse.json({ status: 'success' });
+  }
+
   if (body?.action === 'auto_balance') {
     const { data: participantRows, error: participantsError } = await supabase
       .from('party_participants')

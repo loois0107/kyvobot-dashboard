@@ -56,12 +56,14 @@ function ParticipantRow({
   saving,
   readOnly,
   onAssign,
+  onKick,
   t,
 }: {
   participant: Participant;
   saving: boolean;
   readOnly: boolean;
   onAssign: (team: Team) => void;
+  onKick: () => void;
   t: ReturnType<typeof useT>;
 }) {
   const isRed = participant.team === 'red';
@@ -110,6 +112,19 @@ function ParticipantRow({
         {(isRed || isBlue) && (
           <Button type="button" variant="ghost" onClick={() => onAssign(null)} disabled={disabled} className="!px-2 text-xs">
             {t('partyTeamPage.unassignButton')}
+          </Button>
+        )}
+        {/* 🛡️ 리더는 강퇴 대상이 아니다(API도 동일하게 거부함) - 버튼 자체를 안 보여줘서
+            눌러봤자 에러만 나는 상황을 UI 레벨에서 미리 막는다. */}
+        {!participant.is_leader && (
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onKick}
+            disabled={disabled}
+            className="!px-2 text-xs !text-danger hover:!bg-danger/10"
+          >
+            {t('partyTeamPage.kickButton')}
           </Button>
         )}
       </div>
@@ -206,6 +221,32 @@ export default function PartyTeamPage() {
     } catch (err) {
       console.error(err);
       showToast(t('partyTeamPage.assignNetworkError'), 'error');
+    } finally {
+      setSavingUserId(null);
+    }
+  };
+
+  const kickParticipant = async (userId: string, username: string) => {
+    if (!recruitmentId) return;
+    // 🛡️ 되돌릴 수 없는 작업 - party-presets 페이지의 프리셋 삭제와 동일하게 window.confirm으로
+    // 한 번 더 확인한다(이 코드베이스의 기존 "돌이킬 수 없는 삭제" 확인 관례 그대로).
+    if (!window.confirm(t('partyTeamPage.confirmKick', { name: username }))) return;
+    setSavingUserId(userId);
+    try {
+      const res = await fetch(`/api/party/${recruitmentId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'kick', user_id: userId }),
+      });
+      if (res.ok) {
+        setParticipants((prev) => prev.filter((p) => p.user_id !== userId));
+        showToast(t('partyTeamPage.kickSuccess', { name: username }), 'success');
+      } else {
+        showToast(await extractErrorMessage(res), 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast(t('partyTeamPage.kickNetworkError'), 'error');
     } finally {
       setSavingUserId(null);
     }
@@ -340,7 +381,7 @@ export default function PartyTeamPage() {
                   <p className="text-xs text-text-muted px-1 py-2">{t('partyTeamPage.noParticipantsYet')}</p>
                 ) : (
                   redTeam.map((p) => (
-                    <ParticipantRow key={p.user_id} participant={p} saving={savingUserId === p.user_id} readOnly={readOnly} onAssign={(team) => assignTeam(p.user_id, team)} t={t} />
+                    <ParticipantRow key={p.user_id} participant={p} saving={savingUserId === p.user_id} readOnly={readOnly} onAssign={(team) => assignTeam(p.user_id, team)} onKick={() => kickParticipant(p.user_id, p.username)} t={t} />
                   ))
                 )}
               </div>
@@ -356,7 +397,7 @@ export default function PartyTeamPage() {
                   <p className="text-xs text-text-muted px-1 py-2">{t('partyTeamPage.noParticipantsYet')}</p>
                 ) : (
                   blueTeam.map((p) => (
-                    <ParticipantRow key={p.user_id} participant={p} saving={savingUserId === p.user_id} readOnly={readOnly} onAssign={(team) => assignTeam(p.user_id, team)} t={t} />
+                    <ParticipantRow key={p.user_id} participant={p} saving={savingUserId === p.user_id} readOnly={readOnly} onAssign={(team) => assignTeam(p.user_id, team)} onKick={() => kickParticipant(p.user_id, p.username)} t={t} />
                   ))
                 )}
               </div>
@@ -368,7 +409,7 @@ export default function PartyTeamPage() {
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     {unassigned.map((p) => (
-                      <ParticipantRow key={p.user_id} participant={p} saving={savingUserId === p.user_id} readOnly={readOnly} onAssign={(team) => assignTeam(p.user_id, team)} t={t} />
+                      <ParticipantRow key={p.user_id} participant={p} saving={savingUserId === p.user_id} readOnly={readOnly} onAssign={(team) => assignTeam(p.user_id, team)} onKick={() => kickParticipant(p.user_id, p.username)} t={t} />
                     ))}
                   </div>
                 </div>

@@ -446,6 +446,10 @@ const en = {
     autoBalanceSuccess: 'Teams auto-balanced!',
     autoBalanceNetworkError: 'Network error while auto-balancing teams.',
     recruitmentEndedBanner: '⚠️ This recruitment has ended - team assignments are now read-only.',
+    kickButton: 'Kick',
+    confirmKick: "Remove {name} from this party? This can't be undone - they won't be able to rejoin.",
+    kickSuccess: '{name} was removed from the party.',
+    kickNetworkError: 'Network error while kicking this participant.',
   },
   reactionRolesPage: {
     loading: 'Loading reaction roles...',
