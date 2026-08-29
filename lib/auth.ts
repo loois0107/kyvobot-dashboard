@@ -75,6 +75,24 @@ export async function requireLogin(): Promise<{ userId: string } | NextResponse>
 }
 
 /**
+ * 개발자 본인 전용 게이트. 다른 가드들과 달리 "이 서버의 관리자인가"가 아니라 길드와 무관하게
+ * "이 계정이 정확히 OWNER_DISCORD_ID인가"만 묻는다 - 여러 서버를 가로질러 보는 콘솔(예: 서버별
+ * 실사용 현황)처럼 다른 서버 관리자에게는 절대 노출되면 안 되는 화면 전용이다. OWNER_DISCORD_ID가
+ * 아예 설정 안 돼 있으면(로컬 개발 환경 등) 무조건 막는다(fail-closed) - 빈 값과 우연히
+ * 일치하는 식의 구멍을 원천 차단.
+ */
+export async function requireOwner(): Promise<{ userId: string } | NextResponse> {
+  const loginResult = await requireLogin();
+  if (loginResult instanceof NextResponse) return loginResult;
+
+  const ownerId = process.env.OWNER_DISCORD_ID;
+  if (!ownerId || loginResult.userId !== ownerId) {
+    return NextResponse.json({ status: "error", message: "Owner access only." }, { status: 403 });
+  }
+  return loginResult;
+}
+
+/**
  * 세션 유저가 해당 길드의 "멤버"인지만 검증한다 (관리자 권한 불필요) - verifyGuildAdmin과
  * 같은 디스코드 API를 재사용하되 권한 비트 체크를 뺀 버전. 개인 대시보드에서 URL의 guildId를
  * 임의로 바꿔서 무관한 서버에 접근/오버라이드 행을 만드는 걸 막는 용도.
