@@ -6,6 +6,8 @@ export const dynamic = 'force-dynamic';
 // GUILD_TEXT and GUILD_ANNOUNCEMENT - the only channel types the dashboard's text-input-turned-
 // dropdown fields (welcome/goodbye channel, reaction role target, etc.) ever point at.
 const TEXT_CHANNEL_TYPES = new Set([0, 5]);
+// GUILD_CATEGORY - used only by the party-settings category picker (?type=category).
+const CATEGORY_CHANNEL_TYPES = new Set([4]);
 
 interface DiscordChannel {
   id: string;
@@ -27,10 +29,14 @@ interface DiscordChannel {
  * 접근 가능한 유저가 채널 드롭다운만 못 불러오는 회귀가 생긴다. ADMINISTRATOR는 항상
  * MANAGE_GUILD를 내포하므로 reaction-roles 쪽엔 영향 없다.
  */
-export async function GET(_request: Request, ctx: { params: Promise<{ guildId: string }> }) {
+export async function GET(request: Request, ctx: { params: Promise<{ guildId: string }> }) {
   const { guildId } = await ctx.params;
   const blocked = await requireGuildAdmin(guildId);
   if (blocked) return blocked;
+
+  const { searchParams } = new URL(request.url);
+  const wantCategories = searchParams.get('type') === 'category';
+  const allowedTypes = wantCategories ? CATEGORY_CHANNEL_TYPES : TEXT_CHANNEL_TYPES;
 
   const botToken = process.env.DISCORD_BOT_TOKEN;
   if (!botToken) {
@@ -50,10 +56,10 @@ export async function GET(_request: Request, ctx: { params: Promise<{ guildId: s
   }
 
   const channels: DiscordChannel[] = await res.json();
-  const textChannels = channels
-    .filter((c) => TEXT_CHANNEL_TYPES.has(c.type))
+  const filtered = channels
+    .filter((c) => allowedTypes.has(c.type))
     .sort((a, b) => a.position - b.position)
     .map((c) => ({ id: c.id, name: c.name }));
 
-  return NextResponse.json(textChannels);
+  return NextResponse.json(filtered);
 }

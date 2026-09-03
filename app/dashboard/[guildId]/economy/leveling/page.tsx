@@ -68,6 +68,7 @@ export default function LevelingEconomySettings() {
 
   // 🏆 Leveling System States
   const [xpRate, setXpRate] = useState(1);
+  const [announceLevelUp, setAnnounceLevelUp] = useState(true);
   const [roleRewards, setRoleRewards] = useState<{ [key: string]: string }>({});
   const [roles, setRoles] = useState<RoleOption[]>([]);
   const [newLvl, setNewLvl] = useState('');
@@ -134,6 +135,7 @@ export default function LevelingEconomySettings() {
         if (data.leveling_settings) {
           const l = data.leveling_settings;
           setXpRate(l.xp_rate !== undefined ? Number(l.xp_rate) : 1);
+          setAnnounceLevelUp(l.announce_level_up !== undefined ? Boolean(l.announce_level_up) : true);
           setRoleRewards(l.role_rewards || {});
           setCardColor(l.card_color || '#5865F2');
           setCardBgColor(l.card_bg_color || '#1E1F22');
@@ -215,7 +217,7 @@ export default function LevelingEconomySettings() {
           guild_id: guildId.trim(),
           accessToken: sessionWithToken?.accessToken || null,
           welcome_settings: originalData.welcome_settings || {},
-          leveling_settings: { xp_rate: Number(xpRate), role_rewards: roleRewards, card_color: cardColor, card_bg_color: cardBgColor, overlay_opacity: Number(overlayOpacity), background_url: backgroundUrl, font_preference: fontPreference },
+          leveling_settings: { xp_rate: Number(xpRate), announce_level_up: announceLevelUp, role_rewards: roleRewards, card_color: cardColor, card_bg_color: cardBgColor, overlay_opacity: Number(overlayOpacity), background_url: backgroundUrl, font_preference: fontPreference },
           economy_settings: { currency_name: String(currencyName).trim(), min_bet: parseNumericFieldValue(minBet), shop_items: shopItems }
         }),
       });
@@ -351,6 +353,16 @@ export default function LevelingEconomySettings() {
               <label className="text-[11px] font-black text-text-secondary tracking-wider uppercase">{t('levelingPage.xpRateLabel')}</label>
               <input type="number" min="0.1" max="10" step="0.1" value={xpRate} onChange={(e) => { setXpRate(parseFloat(e.target.value)); setIsDirty(true); }} className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-brand" />
               <HelpText>{t('levelingPage.xpRateHelp')}</HelpText>
+            </div>
+            <div className="flex items-center justify-between pt-2">
+              <label className="text-sm font-black text-text-primary cursor-pointer" htmlFor="announce-levelup-toggle">{t('levelingPage.announceLevelUpLabel')}</label>
+              <input
+                id="announce-levelup-toggle"
+                type="checkbox"
+                checked={announceLevelUp}
+                onChange={(e) => { setAnnounceLevelUp(e.target.checked); setIsDirty(true); }}
+                className="w-4 h-4 accent-brand cursor-pointer"
+              />
             </div>
             <div className="space-y-3 pt-2">
               <label className="text-[11px] font-black text-text-secondary tracking-wider uppercase block">{t('levelingPage.milestoneLabel')}</label>

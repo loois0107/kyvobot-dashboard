@@ -11,13 +11,22 @@ type ChannelSelectProps = {
   value: string;
   onChange: (channelId: string) => void;
   className?: string;
+  // 'category'면 /api/guilds/{guildId}/channels?type=category로 카테고리(type 4) 목록을 받는다 -
+  // party-settings의 카테고리 선택 드롭다운 전용. 기본값 'text'는 기존 동작(텍스트/공지 채널) 그대로.
+  channelType?: 'text' | 'category';
+  // 카테고리 선택은 party_settings.category_id처럼 값이 없어도(미지정 = 최상단 생성) 유효한
+  // 설정이라, "선택 안 함"을 명시적인 옵션으로 보여줘야 한다 - 기존 채널 선택 필드들은 항상
+  // 값이 있어야 해서 이 옵션이 없었다.
+  allowNone?: boolean;
+  noneLabel?: string;
 };
 
 // Shared channel picker for the settings pages that used to take a raw channel ID as free text -
-// fetches this guild's text/announcement channels from /api/guilds/{guildId}/channels and renders
-// them as a <select>. Falls back to the old text input if the channel list can't be loaded, so a
-// bot-token/API outage doesn't block admins from still typing an ID by hand.
-export default function ChannelSelect({ guildId, value, onChange, className = '' }: ChannelSelectProps) {
+// fetches this guild's text/announcement channels (or categories, via channelType='category') from
+// /api/guilds/{guildId}/channels and renders them as a <select>. Falls back to the old text input if
+// the channel list can't be loaded, so a bot-token/API outage doesn't block admins from still typing
+// an ID by hand.
+export default function ChannelSelect({ guildId, value, onChange, className = '', channelType = 'text', allowNone = false, noneLabel }: ChannelSelectProps) {
   const t = useT();
   const [channels, setChannels] = useState<Channel[]>([]);
   const [loadStatus, setLoadStatus] = useState<LoadStatus>('loading');
@@ -26,7 +35,8 @@ export default function ChannelSelect({ guildId, value, onChange, className = ''
     if (!guildId) return;
     let cancelled = false;
     setLoadStatus('loading');
-    fetch(`/api/guilds/${guildId}/channels`)
+    const query = channelType === 'category' ? '?type=category' : '';
+    fetch(`/api/guilds/${guildId}/channels${query}`)
       .then((res) => {
         if (!res.ok) throw new Error(`channels fetch failed: ${res.status}`);
         return res.json();
@@ -45,7 +55,7 @@ export default function ChannelSelect({ guildId, value, onChange, className = ''
     return () => {
       cancelled = true;
     };
-  }, [guildId]);
+  }, [guildId, channelType]);
 
   const baseClassName = `w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-text-primary focus:outline-none focus:border-brand ${className}`;
 
@@ -66,6 +76,10 @@ export default function ChannelSelect({ guildId, value, onChange, className = ''
   // and losing the reference the moment the admin saves again.
   const selectedMissingFromList = value && loadStatus === 'loaded' && !channels.some((c) => c.id === value);
 
+  const emptyOptionLabel = loadStatus === 'loading'
+    ? t('common.loadingChannels')
+    : (allowNone ? (noneLabel ?? t('common.noneOption')) : t('common.selectChannel'));
+
   return (
     <select
       value={value}
@@ -73,11 +87,11 @@ export default function ChannelSelect({ guildId, value, onChange, className = ''
       disabled={loadStatus === 'loading'}
       className={`${baseClassName} disabled:opacity-50 cursor-pointer`}
     >
-      <option value="">{loadStatus === 'loading' ? t('common.loadingChannels') : t('common.selectChannel')}</option>
+      <option value="">{emptyOptionLabel}</option>
       {selectedMissingFromList && <option value={value}>{t('common.unknownChannel', { id: value })}</option>}
       {channels.map((c) => (
         <option key={c.id} value={c.id}>
-          #{c.name}
+          {channelType === 'category' ? c.name : `#${c.name}`}
         </option>
       ))}
     </select>

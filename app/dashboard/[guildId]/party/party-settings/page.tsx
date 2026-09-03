@@ -27,6 +27,7 @@ const PARTY_ERROR_CODE_KEY: Record<string, TranslationKey> = {
   card_lifetime_out_of_range: 'partySettingsPage.errCardLifetimeRange',
   channel_lifetime_out_of_range: 'partySettingsPage.errChannelLifetimeRange',
   card_thumbnail_url_invalid: 'partySettingsPage.errThumbnailUrlInvalid',
+  category_id_invalid: 'partySettingsPage.errCategoryIdInvalid',
 };
 
 const PARTY_ERROR_CODE_STATIC_PARAMS: Record<string, Record<string, number>> = {
@@ -54,6 +55,7 @@ export default function PartySettingsPage() {
   const [channelLifetimeHours, setChannelLifetimeHours] = useState(String(DEFAULT_PARTY_SETTINGS.channel_lifetime_hours));
   const [gameName, setGameName] = useState(DEFAULT_PARTY_SETTINGS.game_name);
   const [cardThumbnailUrl, setCardThumbnailUrl] = useState('https://64.media.tumblr.com/1847d62bf566d47632f841c2ac0583ee/a72c90eea4141e92-5e/s1280x1920/c3d5902f839874fc3be572aaef35c47470bce4df.png');
+  const [categoryId, setCategoryId] = useState('');
 
   const [weeklyReportEnabled, setWeeklyReportEnabled] = useState(false);
   const [weeklyReportChannelId, setWeeklyReportChannelId] = useState('');
@@ -114,6 +116,7 @@ export default function PartySettingsPage() {
       setChannelLifetimeHours(String(s.channel_lifetime_hours));
       setGameName(s.game_name || '');
       setCardThumbnailUrl(s.card_thumbnail_url || 'https://i.ibb.co/4wBTDHsz/R.jpg');
+      setCategoryId(s.category_id ? String(s.category_id) : '');
 
       if (reportRes.ok) {
         const reportData = await reportRes.json();
@@ -150,6 +153,7 @@ export default function PartySettingsPage() {
             channel_lifetime_hours: parseNumericFieldValue(channelLifetimeHours),
             game_name: gameName,
             card_thumbnail_url: cardThumbnailUrl,
+            category_id: categoryId,
           }),
         }),
         fetch(`/api/weekly-report-settings/${guildId}`, {
@@ -286,6 +290,19 @@ export default function PartySettingsPage() {
             className="w-full bg-bg-elevated border border-border-default rounded-lg p-2.5 text-sm text-text-primary font-mono focus:outline-none focus:border-brand"
           />
           <HelpText>{t('partySettingsPage.thumbnailHelp')}</HelpText>
+        </div>
+
+        <div className="space-y-1.5 pt-2">
+          <label className="text-sm font-bold text-text-secondary">{t('partySettingsPage.categoryLabel')}</label>
+          <ChannelSelect
+            guildId={guildId}
+            value={categoryId}
+            onChange={(id) => { setCategoryId(id); setIsDirty(true); }}
+            channelType="category"
+            allowNone
+            noneLabel={t('partySettingsPage.categoryNoneOption')}
+          />
+          <HelpText>{t('partySettingsPage.categoryHelp')}</HelpText>
         </div>
       </Card>
 

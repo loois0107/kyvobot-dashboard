@@ -1,3 +1,5 @@
+import { isValidSnowflakeOrEmpty } from './welcomeSettings';
+
 // cogs/party.py의 동명 상수와 값이 반드시 일치해야 한다 - 여기서 검증을 통과시켜놓고
 // 봇 쪽 범위와 다르면 저장은 되는데 봇이 조용히 다른 값으로 덮어써서 혼란만 커진다.
 export const PARTY_CARD_LIFETIME_MIN_MINUTES = 5;
@@ -12,6 +14,9 @@ export const DEFAULT_PARTY_SETTINGS = {
   channel_lifetime_hours: 6,
   game_name: '',
   card_thumbnail_url: '',
+  // null = 카테고리 미지정(기존 동작 그대로 최상단 생성) - cogs/party.py의 resolve_party_settings와
+  // 동일한 하위호환 기본값.
+  category_id: null as string | null,
 };
 
 export interface PartySettings {
@@ -21,6 +26,7 @@ export interface PartySettings {
   channel_lifetime_hours: number;
   game_name: string;
   card_thumbnail_url: string;
+  category_id: string | null;
 }
 
 // automodSettings.ts와 동일한 code 기반 패턴 - lib/automodSettings.ts의 AutomodValidationError 참고.
@@ -84,11 +90,22 @@ export function validatePartySettings(input: any): ValidationResult {
     errors.push({ code: 'card_thumbnail_url_invalid' });
   }
 
+  // 🛡️ 빈 문자열/null/undefined 전부 "미지정"(카테고리 없이 최상단 생성, 기존 동작)으로 취급한다 -
+  // 값이 있으면 디스코드 스노우플레이크 형식(17-20자리 숫자)이어야 한다(welcome_settings.channel_id와
+  // 동일한 검증 재사용). 실제로 그 서버에 존재하는 카테고리인지까지는 여기서 확인하지 않는다 -
+  // party.py._create_party_channel이 guild.get_channel()로 못 찾으면 그냥 카테고리 없이 만든다
+  // (관리자가 카테고리를 지운 뒤 저장을 다시 안 한 경우에도 채널 생성 자체가 막히면 안 되므로).
+  const categoryIdRaw = input?.category_id;
+  if (categoryIdRaw !== undefined && categoryIdRaw !== null && categoryIdRaw !== '' && !isValidSnowflakeOrEmpty(categoryIdRaw)) {
+    errors.push({ code: 'category_id_invalid' });
+  }
+
   if (errors.length > 0) {
     return { valid: false, errors };
   }
 
   const cardColor = cardColorRaw ? normalizeHexColor(cardColorRaw) : DEFAULT_PARTY_SETTINGS.card_color;
+  const categoryId = categoryIdRaw ? String(categoryIdRaw) : null;
 
   return {
     valid: true,
@@ -99,6 +116,7 @@ export function validatePartySettings(input: any): ValidationResult {
       channel_lifetime_hours: Math.round(channelLifetimeHours),
       game_name: gameName,
       card_thumbnail_url: cardThumbnailUrlRaw,
+      category_id: categoryId,
     },
   };
 }

@@ -45,7 +45,7 @@ export async function GET(request: Request) {
     // ✨ [데이터 안전 파싱] 주머니 안에 든 설정을 안전하게 꺼내고, 없으면 기본 디폴트값을 쥐어줍니다.
     const botSettings = data?.settings || {};
     const payload = {
-      leveling_settings: botSettings.leveling_settings || { xp_rate: 1.0, blacklisted_channels: [], role_rewards: {} },
+      leveling_settings: botSettings.leveling_settings || { xp_rate: 1.0, announce_level_up: true, blacklisted_channels: [], role_rewards: {} },
       economy_settings: botSettings.economy_settings || { currency_name: 'Points', min_bet: 10, shop_items: [] },
       goodbye_enabled: botSettings.goodbye_enabled ?? false,
       goodbye_channel_id: botSettings.goodbye_channel_id ?? null,
@@ -122,7 +122,7 @@ export async function POST(request: Request) {
     // 항상 완전한 객체 하나를 통째로 보내지, 일부 필드만 undefined로 비워 보내지 않는다).
     const updatedSettings = {
       ...currentSettings,
-      leveling_settings: leveling_settings || currentSettings.leveling_settings || { xp_rate: 1.0, blacklisted_channels: [], role_rewards: {} },
+      leveling_settings: leveling_settings || currentSettings.leveling_settings || { xp_rate: 1.0, announce_level_up: true, blacklisted_channels: [], role_rewards: {} },
       economy_settings: economy_settings || currentSettings.economy_settings || { currency_name: 'Points', min_bet: 10, shop_items: [] },
       goodbye_enabled: goodbye_enabled !== undefined ? Boolean(goodbye_enabled) : (currentSettings.goodbye_enabled ?? false),
       goodbye_channel_id: goodbye_channel_id !== undefined ? goodbye_channel_id : (currentSettings.goodbye_channel_id ?? null),
