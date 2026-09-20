@@ -67,6 +67,8 @@ export default function LevelingEconomySettings() {
   const [isDirty, setIsDirty] = useState(false);
 
   // 🏆 Leveling System States
+  // 🛡️ [긴급 추가] automod의 enable-toggle과 동일한 패턴 - leveling_settings.enabled.
+  const [levelingEnabled, setLevelingEnabled] = useState(true);
   const [xpRate, setXpRate] = useState(1);
   const [announceLevelUp, setAnnounceLevelUp] = useState(true);
   const [roleRewards, setRoleRewards] = useState<{ [key: string]: string }>({});
@@ -134,6 +136,7 @@ export default function LevelingEconomySettings() {
         const data = await res.json();
         if (data.leveling_settings) {
           const l = data.leveling_settings;
+          setLevelingEnabled(l.enabled !== undefined ? Boolean(l.enabled) : true);
           setXpRate(l.xp_rate !== undefined ? Number(l.xp_rate) : 1);
           setAnnounceLevelUp(l.announce_level_up !== undefined ? Boolean(l.announce_level_up) : true);
           setRoleRewards(l.role_rewards || {});
@@ -217,7 +220,7 @@ export default function LevelingEconomySettings() {
           guild_id: guildId.trim(),
           accessToken: sessionWithToken?.accessToken || null,
           welcome_settings: originalData.welcome_settings || {},
-          leveling_settings: { xp_rate: Number(xpRate), announce_level_up: announceLevelUp, role_rewards: roleRewards, card_color: cardColor, card_bg_color: cardBgColor, overlay_opacity: Number(overlayOpacity), background_url: backgroundUrl, font_preference: fontPreference },
+          leveling_settings: { enabled: levelingEnabled, xp_rate: Number(xpRate), announce_level_up: announceLevelUp, role_rewards: roleRewards, card_color: cardColor, card_bg_color: cardBgColor, overlay_opacity: Number(overlayOpacity), background_url: backgroundUrl, font_preference: fontPreference },
           economy_settings: { currency_name: String(currencyName).trim(), min_bet: parseNumericFieldValue(minBet), shop_items: shopItems }
         }),
       });
@@ -349,6 +352,17 @@ export default function LevelingEconomySettings() {
           {/* LEVELING PROTOCOL SETTINGS */}
           <Card className="space-y-5">
             <h2 className="text-sm font-semibold tracking-widest text-text-primary uppercase border-b border-border-default pb-2">{t('levelingPage.levelingSectionTitle')}</h2>
+            <div className="flex items-center justify-between p-3.5 bg-bg-elevated rounded-xl border border-border-default">
+              <label className="text-sm font-black text-text-primary cursor-pointer" htmlFor="leveling-enable-toggle">{t('levelingPage.enabledLabel')}</label>
+              <input
+                id="leveling-enable-toggle"
+                type="checkbox"
+                checked={levelingEnabled}
+                onChange={(e) => { setLevelingEnabled(e.target.checked); setIsDirty(true); }}
+                className="w-4 h-4 accent-brand cursor-pointer"
+              />
+            </div>
+            <HelpText>{t('levelingPage.enabledHelp')}</HelpText>
             <div className="space-y-1.5">
               <label className="text-[11px] font-black text-text-secondary tracking-wider uppercase">{t('levelingPage.xpRateLabel')}</label>
               <input type="number" min="0.1" max="10" step="0.1" value={xpRate} onChange={(e) => { setXpRate(parseFloat(e.target.value)); setIsDirty(true); }} className="w-full bg-bg-elevated border border-border-default rounded-lg p-3 text-sm text-text-primary focus:outline-none focus:border-brand" />

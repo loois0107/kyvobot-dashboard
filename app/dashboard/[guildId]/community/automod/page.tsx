@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useToast } from '@/components/Toast';
+import Badge from '@/components/ui/Badge';
 import {
+  AUTOMOD_ENABLED_DEFAULT,
   AUTOMOD_SPAM_LIMIT_MIN,
   AUTOMOD_SPAM_LIMIT_MAX,
   AUTOMOD_SPAM_INTERVAL_MIN_SECONDS,
@@ -64,6 +66,9 @@ export default function AutomodSettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
 
+  // welcomePage.tsx의 enable-toggle과 동일한 패턴.
+  const [enabled, setEnabled] = useState(AUTOMOD_ENABLED_DEFAULT);
+
   // 🛡️ [leading zero 버그 수정] number가 아니라 string state - 입력 중엔 그대로 반영해서 필드를
   // 지우면 진짜 빈 칸으로 보인다. blur/저장 시점에만 lib/numericInput.ts 헬퍼로 숫자화한다.
   const [spamLimit, setSpamLimit] = useState(String(DEFAULT_AUTOMOD_SETTINGS.spam_limit));
@@ -121,6 +126,7 @@ export default function AutomodSettingsPage() {
       }
       const data = await res.json();
       const s = data.automod_settings || DEFAULT_AUTOMOD_SETTINGS;
+      setEnabled(s.enabled !== undefined ? Boolean(s.enabled) : AUTOMOD_ENABLED_DEFAULT);
       setSpamLimit(String(s.spam_limit));
       setSpamIntervalSeconds(String(s.spam_interval_seconds));
       setTimeoutSeconds(String(s.timeout_seconds));
@@ -143,6 +149,7 @@ export default function AutomodSettingsPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          enabled,
           spam_limit: parseNumericFieldValue(spamLimit),
           spam_interval_seconds: parseNumericFieldValue(spamIntervalSeconds),
           timeout_seconds: parseNumericFieldValue(timeoutSeconds),
@@ -200,6 +207,30 @@ export default function AutomodSettingsPage() {
           {isSaving ? t('common.saving') : t('common.save')}
         </Button>
       </header>
+
+      <Card className="space-y-3">
+        <div className="flex justify-between items-center">
+          <h3 className="text-sm font-black tracking-widest text-text-secondary uppercase">
+            {t('automodPage.enabledSectionTitle')}
+          </h3>
+          <Badge variant={enabled ? 'success' : 'danger'}>
+            {enabled ? t('automodPage.enabledActive') : t('automodPage.enabledOff')}
+          </Badge>
+        </div>
+        <div className="flex items-center justify-between p-3.5 bg-bg-elevated rounded-xl border border-border-default">
+          <label className="text-sm font-black text-text-primary cursor-pointer" htmlFor="enable-toggle">
+            {t('automodPage.enabledLabel')}
+          </label>
+          <input
+            id="enable-toggle"
+            type="checkbox"
+            checked={enabled}
+            onChange={(e) => { setEnabled(e.target.checked); setIsDirty(true); }}
+            className="w-4 h-4 accent-brand cursor-pointer"
+          />
+        </div>
+        <HelpText>{t('automodPage.enabledHelp')}</HelpText>
+      </Card>
 
       <Card className="space-y-4">
         <h3 className="text-sm font-black tracking-widest text-text-secondary uppercase border-b border-border-default pb-2">

@@ -1,6 +1,9 @@
 // cogs/automod.py의 동명 상수와 값이 반드시 일치해야 한다 - party_settings 상수들과 동일한 이유:
 // 여기서 검증을 통과시켜놓고 봇 쪽 범위와 다르면 저장은 되는데 봇이 조용히 다른 값으로
 // 덮어써서 혼란만 커진다.
+// 🛡️ [긴급 추가] cogs/automod.py의 AUTOMOD_ENABLED_DEFAULT와 반드시 일치해야 한다 - automod_settings를
+// 한 번도 저장한 적 없는 길드가 전부 이 기본값을 타므로, 여기도 true여야 기존 보호가 회귀하지 않는다.
+export const AUTOMOD_ENABLED_DEFAULT = true;
 export const AUTOMOD_SPAM_LIMIT_MIN = 3;
 export const AUTOMOD_SPAM_LIMIT_MAX = 20;
 export const AUTOMOD_SPAM_LIMIT_DEFAULT = 5;
@@ -25,6 +28,7 @@ export const AUTOMOD_MAX_LINES_MAX = 50;
 export const AUTOMOD_MAX_LINES_DEFAULT = 12;
 
 export const DEFAULT_AUTOMOD_SETTINGS = {
+  enabled: AUTOMOD_ENABLED_DEFAULT,
   spam_limit: AUTOMOD_SPAM_LIMIT_DEFAULT,
   spam_interval_seconds: AUTOMOD_SPAM_INTERVAL_DEFAULT_SECONDS,
   timeout_seconds: AUTOMOD_TIMEOUT_DEFAULT_SECONDS,
@@ -34,6 +38,7 @@ export const DEFAULT_AUTOMOD_SETTINGS = {
 };
 
 export interface AutomodSettings {
+  enabled: boolean;
   spam_limit: number;
   spam_interval_seconds: number;
   timeout_seconds: number;
@@ -80,6 +85,10 @@ export function parseForbiddenWordsText(text: string): string[] {
 export function validateAutomodSettings(input: any): ValidationResult {
   const errors: AutomodValidationError[] = [];
 
+  // 🛡️ [enabled - 범위 검증 불필요] 단순 불리언이라 valid/invalid 판정이 없다 - 값이 없으면
+  // AUTOMOD_ENABLED_DEFAULT(true)로 폴백해서 명시적으로 끄지 않는 한 항상 켜진 채로 저장된다.
+  const enabled = input?.enabled === undefined ? AUTOMOD_ENABLED_DEFAULT : Boolean(input.enabled);
+
   const spamLimit = Number(input?.spam_limit);
   if (!Number.isFinite(spamLimit) || spamLimit < AUTOMOD_SPAM_LIMIT_MIN || spamLimit > AUTOMOD_SPAM_LIMIT_MAX) {
     errors.push({ code: 'spam_limit_out_of_range' });
@@ -123,6 +132,7 @@ export function validateAutomodSettings(input: any): ValidationResult {
   return {
     valid: true,
     settings: {
+      enabled,
       spam_limit: Math.round(spamLimit),
       spam_interval_seconds: Math.round(spamInterval),
       timeout_seconds: Math.round(timeoutSeconds),
