@@ -16,11 +16,16 @@ import { LandingThemeProvider } from '@/lib/theme/LandingThemeContext';
 // 주의사항)만 여전히 가이드 페이지와 같은 items 카드 그리드 패턴을 쓰므로, 이 배열은 section2
 // 전용으로 남긴다.
 // 🛡️ [4개 카드 -> 3개로 재구성] "클립당 킬 1개"+"매치 기록이 남는 게임만 가능"(코드로 실제
-// 동작 확인 - highlight_err_match_not_found 메시지가 커스텀 게임/연습 모드/AI 상대 대전
-// 입문·초급·중급을 명시적으로 막는다는 걸 locales/*.json에서 확인함)을 "이럴 때 주의하세요"
-// 한 카드로, "45초 길이 제한"+"녹화 조건"을 "녹화할 때 이렇게 해주세요" 한 카드로 묶었다.
-// descKey 내용에 "\n\n"으로 두 사실을 구분해두고, whitespace-pre-line으로 그 줄바꿈만
-// 살려서 긴 한 문단이 아니라 짧은 두 문단처럼 보이게 한다.
+// 동작 확인 - highlight_err_match_not_found 메시지가 커스텀 게임/연습 모드/AI 상대 대전을
+// 명시적으로 막는다는 걸 locales/*.json에서 확인함)을 "이럴 때 주의하세요" 한 카드로,
+// "45초 길이 제한"+"녹화 조건"을 "녹화할 때 이렇게 해주세요" 한 카드로 묶었다. descKey
+// 내용에 "\n\n"으로 두 사실을 구분해두고, whitespace-pre-line으로 그 줄바꿈만 살려서
+// 긴 한 문단이 아니라 짧은 두 문단처럼 보이게 한다.
+// 🛡️ [AI 상대 대전 난이도 명칭 제거] 원래 "(Intro/Beginner/Intermediate)"처럼 구체적인
+// 난이도 이름을 영어로 적었는데, 실제 라이엇 공식 자료를 다시 조사해보니 세 번째 난이도가
+// "Intermediate"인지 "Advanced"인지 공식 출처(라이엇 개발자 블로그 vs 공식 위키)끼리도
+// 서로 다르게 표기하고 있어 확신할 수 없었다 - 틀릴 수 있는 세부 명칭 대신 "Co-op vs. AI
+// modes"/"AI 상대 대전"처럼 카테고리만 언급하도록 양쪽 언어 모두 단순화했다.
 const WHATS_NEW_CAVEATS = {
   sectionTitleKey: 'section2Title',
   items: [
@@ -101,18 +106,6 @@ export default async function WhatsNewPage() {
           </RevealOnScroll>
         </section>
 
-        {/* 🛡️ [베타 안내 - 섹션 1과 섹션 2 사이] 기능 소개 바로 다음, 주의사항 카드 앞에 둔다 -
-            "뭘 하는 기능인지" 알고 난 직후 "아직 다듬는 중"이라는 맥락을 바로 이어 붙여서,
-            주의사항 카드(사용 제약)와는 다른 결의 안내(완성도에 대한 기대치 조정)로 구분했다. */}
-        <section className="max-w-3xl mx-auto w-full px-4 pb-24">
-          <RevealOnScroll className="bg-warning/10 border border-warning/30 rounded-2xl p-6 md:p-8 text-center space-y-3">
-            <BetaBadge label={t.whatsNewPage.betaBadgeLabel} />
-            <p className="text-sm md:text-base text-text-secondary leading-relaxed">
-              {t.whatsNewPage.whatsNewBetaNotice}
-            </p>
-          </RevealOnScroll>
-        </section>
-
         {/* 🛡️ [섹션 2 - 박스 제거 + 가로 정렬(라벨/설명 2단)] 카드(bg/border/rounded) +
             3열 그리드를 걷어낸 자리에, 처음엔 제목-위/본문-아래로 세로 쌓는 리스트를
             썼었는데 그러면 컨테이너를 넓혀도 글자는 여전히 왼쪽 절반에만 몰려 보이는
@@ -166,6 +159,19 @@ export default async function WhatsNewPage() {
               </div>
             </RevealOnScroll>
           </div>
+        </section>
+
+        {/* 🛡️ [베타 안내 - 섹션 2 뒤로 이동] 원래는 섹션 1 바로 뒤(주의사항보다 먼저)였는데,
+            "사용 전 꼭 알아두세요를 다 본 다음에 보게 해달라"는 피드백으로 섹션 2 뒤로
+            옮겼다 - 구체적인 사용 제약을 다 읽은 다음에 "아직 베타라 다듬는 중"이라는
+            기대치 조정 멘트가 와야 자연스럽다는 취지. 배지(BetaBadge)도 같이 뺐다 - 바로
+            위 히어로에 이미 베타 배지가 있어서 중복이었다는 피드백. */}
+        <section className="max-w-3xl mx-auto w-full px-4 pb-24">
+          <RevealOnScroll className="bg-warning/10 border border-warning/30 rounded-2xl p-6 md:p-8 text-center">
+            <p className="text-sm md:text-base text-text-secondary leading-relaxed">
+              {t.whatsNewPage.whatsNewBetaNotice}
+            </p>
+          </RevealOnScroll>
         </section>
 
         <section className="relative flex flex-col items-center w-full px-4 py-24 text-center bg-bg-base border-t-4 border-border-default">
