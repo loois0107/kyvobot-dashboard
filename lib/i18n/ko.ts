@@ -1040,11 +1040,14 @@ const ko: typeof en = {
 
   newFeatureBanner: {
     text: '🎬 AI가 당신의 플레이를 LCK 중계처럼 만들어드려요',
+    ctaLabel: '자세히 보기',
+    betaBadgeLabel: '베타',
     dismissLabel: '닫기',
   },
 
   whatsNewPage: {
-    heroTitle: '당신의 플레이가 LCK 중계처럼 바뀝니다',
+    betaBadgeLabel: '베타',
+    heroTitle: '여러분의 플레이를 LCK&LCS처럼 바꿔드려요!',
     heroDesc: '디스코드에 영상 하나만 올리면, 나머지는 AI가 전부 맡아요.',
     ctaTitle: '지금 사용해보기',
 
@@ -1053,6 +1056,9 @@ const ko: typeof en = {
       '디스코드에서 /highlight 명령어로 게임 녹화 클립을 올리면, AI가 매치 데이터를 자동으로 분석해서 실제 LCK·롤드컵 방송 화면 같은 오버레이를 입혀줍니다. 스코어보드, 선수 정보, 아이템·룬·스펠, 골드 격차까지 전부 그 순간 기준으로 정확하게 반영되고, 거기에 그 장면을 전문 해설처럼 설명해주는 AI 음성 내레이션까지 더해져서 완성된 하이라이트 영상이 나와요. 이런 기능을 갖춘 디스코드 봇은 아직 없을 거예요.',
     whatsNewScreenshotCaption: '실제로 이런 느낌입니다',
     whatsNewScreenshotAlt: '/highlight로 만들어진 하이라이트 영상 화면 - 방송 스타일 스코어보드와 선수 정보 오버레이가 표시된 모습',
+
+    whatsNewBetaNotice:
+      '아직 초기 베타라 다듬어야 할 부분이 많아요. 상황에 따라 음성 톤이 살짝 안 맞거나 타이밍이 어긋날 수 있고 솔직히 말해서 기술적인 한계가 있다보니 대회와 똑같이 만드는건 아직까지 힘들어요. 하지만 계속 보완해서 최대한 비슷하게 만들어갈 예정이니, 가볍게 써보시고 버그나 의견을 남겨주시면 큰 힘이 돼요. 잘 부탁드립니다! 🙏',
 
     section2Title: '사용 전 꼭 알아두세요',
     whatsNewCaveatsTitle: '⚠️ 이럴 때 주의하세요',
@@ -1064,6 +1070,8 @@ const ko: typeof en = {
     whatsNewLanguageTitle: '🌍 영어로 사용하려면',
     whatsNewLanguageDesc:
       '단순히 번역만 하는 게 아니에요. 한국어는 LCK 중계 톤으로, 영어는 LCS 중계 톤으로 각각 다르게 말해줘요. 다만 이건 서버 전체에 적용되는 설정이라 서버 관리자가 대시보드 일반 설정에서 바꿔야 하고, 지금은 메시지마다 언어를 따로 고를 수는 없어요.',
+
+    whatsNewMoreGamesTeaser: '앞으로 이 기능을 계속 다듬으면서, 다른 게임도 지원할 예정이에요. 기대해주세요!',
   },
 };
 

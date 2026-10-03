@@ -5,6 +5,7 @@ import { auth } from '@/auth';
 import { COOKIE_NAME, dictionaries, resolveInitialLanguage } from '@/lib/i18n';
 import LandingHeader from '@/components/landing/LandingHeader';
 import RevealOnScroll from '@/components/landing/RevealOnScroll';
+import Badge from '@/components/ui/Badge';
 import { BOT_INVITE_URL } from '@/lib/botInvite';
 import { LANDING_THEME_COOKIE_NAME, resolveInitialLandingTheme } from '@/lib/theme';
 import { LandingThemeProvider } from '@/lib/theme/LandingThemeContext';
@@ -56,6 +57,9 @@ export default async function WhatsNewPage() {
       <main className={`relative w-full ${lang === 'ko' ? 'break-keep' : ''}`}>
         <section className="max-w-3xl mx-auto w-full px-4 pt-20 pb-16 text-center">
           <RevealOnScroll>
+            <Badge variant="warning" className="!text-xs mb-4">
+              {t.whatsNewPage.betaBadgeLabel}
+            </Badge>
             <h1 className="text-4xl md:text-5xl font-black tracking-wide mb-6">
               <span className="bg-gradient-to-r from-text-primary to-text-secondary bg-clip-text text-transparent">
                 {t.whatsNewPage.heroTitle}
@@ -92,6 +96,20 @@ export default async function WhatsNewPage() {
               </div>
               <p className="text-sm text-text-muted text-center">{t.whatsNewPage.whatsNewScreenshotCaption}</p>
             </div>
+          </RevealOnScroll>
+        </section>
+
+        {/* 🛡️ [베타 안내 - 섹션 1과 섹션 2 사이] 기능 소개 바로 다음, 주의사항 카드 앞에 둔다 -
+            "뭘 하는 기능인지" 알고 난 직후 "아직 다듬는 중"이라는 맥락을 바로 이어 붙여서,
+            주의사항 카드(사용 제약)와는 다른 결의 안내(완성도에 대한 기대치 조정)로 구분했다. */}
+        <section className="max-w-3xl mx-auto w-full px-4 pb-24">
+          <RevealOnScroll className="bg-warning/10 border border-warning/30 rounded-2xl p-6 md:p-8 text-center space-y-2">
+            <Badge variant="warning" className="!text-xs">
+              {t.whatsNewPage.betaBadgeLabel}
+            </Badge>
+            <p className="text-sm md:text-base text-text-secondary leading-relaxed">
+              {t.whatsNewPage.whatsNewBetaNotice}
+            </p>
           </RevealOnScroll>
         </section>
 
@@ -140,6 +158,7 @@ export default async function WhatsNewPage() {
                 {t.landingPage.heroTitle}
               </Link>
             </div>
+            <p className="text-sm text-text-muted mt-4">{t.whatsNewPage.whatsNewMoreGamesTeaser}</p>
           </RevealOnScroll>
         </section>
       </main>
