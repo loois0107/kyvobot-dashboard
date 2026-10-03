@@ -1073,7 +1073,7 @@ const en = {
       "It's not just a translation - Korean uses an LCK-style broadcast tone, and English uses an LCS-style one. This is a server-wide setting though, so only a server admin can change it from the dashboard's General settings, and there's no way yet to pick a language per message.",
     whatsNewPrereqTitle: '🔑 Before You Start',
     whatsNewPrereqBody:
-      "This command can only be used once every 30 seconds. Video files can't be over 100MB.\n\nYou'll also need your server's region set up and your own account verified before your first try.",
+      "Once you use it, you'll need to wait 30 seconds before using it again. Video files can't be over 100MB.\n\nYou'll also need your server's region set up and your own account verified before your first try.",
     whatsNewPrereqLinkLabel: 'See setup steps in the guide',
 
     whatsNewMoreGamesTeaser: "We'll keep improving this feature and plan to support more games down the road. Stay tuned!",
