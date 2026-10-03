@@ -1037,6 +1037,42 @@ const en = {
     guideDashboardTitle: '🎛️ Web Dashboard',
     guideDashboardDesc: "Every setting on this page - and everything above - is configured from a real web dashboard, not memorized commands. Run /dashboard anytime for a direct link to your server's admin panel.",
   },
+
+  newFeatureBanner: {
+    text: "🎬 Check out what's new",
+    dismissLabel: 'Dismiss',
+  },
+
+  whatsNewPage: {
+    heroTitle: 'The Highlight Feature Just Got a Major Upgrade',
+    heroDesc:
+      "A from-scratch redesign of /highlight, from the on-screen overlay to the commentary voice - plus a brand-new English version.",
+    ctaTitle: 'Try It Now',
+    newBadgeLabel: 'NEW',
+
+    section1Title: "What's Changed",
+    whatsNewOverlayTitle: '🎬 Broadcast-style overlay',
+    whatsNewOverlayDesc:
+      'Redesigned to match real LCK/Worlds broadcasts - a top score bar, a bottom player info panel, champion portraits with items/runes/summoner spells/level, and a gold-gap indicator.',
+    whatsNewVoiceTitle: '🎙️ More natural AI commentary',
+    whatsNewVoiceDesc: 'The AI caster voice has been fully reworked for a more natural, high-energy broadcast tone.',
+    whatsNewEnglishTitle: '🌐 English version, for the first time',
+    whatsNewEnglishDesc:
+      "/highlight now works in English too - switch your server's language to English from the dashboard's General settings to try it.",
+
+    section2Title: 'Before You Try It',
+    whatsNewOneKillTitle: '⚠️ One kill per clip',
+    whatsNewOneKillDesc:
+      "Only one kill is processed per clip. If your clip contains multiple kills, only the earliest one is used and the rest are silently ignored - trim your clip down to a single kill for best results.",
+    whatsNewLengthTitle: '⏱️ 45-second limit',
+    whatsNewLengthDesc: 'Clips longer than 45 seconds are rejected. Keep your recording short and focused on the moment you want highlighted.',
+    whatsNewRecordingTitle: '🖥️ Recording requirements',
+    whatsNewRecordingDesc:
+      "Landscape recordings only (portrait isn't supported), with the in-game clock visible - either a normal gameplay capture (clock in the top-right) or a replay-viewer recording both work automatically.",
+    whatsNewLanguageTitle: '🌍 Switching to English',
+    whatsNewLanguageDesc:
+      "Change your server's language to English under the dashboard's General settings to get the new English commentary - Korean stays the default otherwise.",
+  },
 };
 
 export default en;

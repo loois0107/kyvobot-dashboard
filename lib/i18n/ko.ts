@@ -1037,6 +1037,41 @@ const ko: typeof en = {
     guideDashboardTitle: '🎛️ 웹 대시보드',
     guideDashboardDesc: '이 페이지의 모든 설정 — 그리고 위에서 소개한 모든 기능 — 은 명령어를 외울 필요 없이 실제 웹 대시보드에서 설정합니다. 언제든 /dashboard로 서버 관리 패널 링크를 바로 받을 수 있습니다.',
   },
+
+  newFeatureBanner: {
+    text: '🎬 신기능 확인해보기',
+    dismissLabel: '닫기',
+  },
+
+  whatsNewPage: {
+    heroTitle: '하이라이트 기능이 새로워졌어요',
+    heroDesc: '화면 오버레이부터 해설 음성까지 /highlight를 처음부터 다시 디자인했습니다 — 거기에 영어 버전까지 새로 추가됐어요.',
+    ctaTitle: '지금 사용해보기',
+    newBadgeLabel: '신규',
+
+    section1Title: '뭐가 달라졌나요',
+    whatsNewOverlayTitle: '🎬 방송 스타일 오버레이',
+    whatsNewOverlayDesc:
+      '실제 LCK/롤드컵 방송 화면을 참고해 전면 개편했습니다 — 상단 스코어바, 하단 선수 정보 패널, 아이템/룬/스펠/레벨이 표시되는 챔피언 포트레이트, 골드 격차 표시까지.',
+    whatsNewVoiceTitle: '🎙️ 더 자연스러워진 AI 해설',
+    whatsNewVoiceDesc: 'AI 캐스터 음성을 더 자연스럽고 생동감 있는 방송 톤으로 전면 재작업했습니다.',
+    whatsNewEnglishTitle: '🌐 처음 선보이는 영어 버전',
+    whatsNewEnglishDesc:
+      '이제 /highlight를 영어로도 사용할 수 있습니다 — 대시보드 일반 설정에서 서버 언어를 English로 바꾸면 바로 체험할 수 있어요.',
+
+    section2Title: '사용 전 꼭 알아두세요',
+    whatsNewOneKillTitle: '⚠️ 클립당 킬 1개만 처리',
+    whatsNewOneKillDesc:
+      '클립 하나당 킬 장면 1개만 처리됩니다. 여러 킬이 담긴 클립이면 가장 먼저 발생한 킬만 쓰이고 나머지는 조용히 무시되니, 원하는 킬 하나만 나오도록 짧게 잘라서 녹화하는 걸 추천해요.',
+    whatsNewLengthTitle: '⏱️ 45초 길이 제한',
+    whatsNewLengthDesc: '45초를 넘는 클립은 지원하지 않습니다. 원하는 순간 위주로 짧게 녹화해주세요.',
+    whatsNewRecordingTitle: '🖥️ 녹화 조건',
+    whatsNewRecordingDesc:
+      '가로 화면 녹화만 지원합니다(세로 화면 불가). 인게임 시계가 보여야 하며, 일반 플레이 화면(시계가 우측 상단) 녹화와 리플레이 뷰어 녹화 둘 다 자동으로 인식해 지원합니다.',
+    whatsNewLanguageTitle: '🌍 영어로 사용하려면',
+    whatsNewLanguageDesc:
+      '대시보드의 일반 설정에서 서버 언어를 English로 바꾸면 새로운 영어 해설을 사용할 수 있습니다 — 바꾸지 않으면 기본값인 한국어 그대로 동작해요.',
+  },
 };
 
 export default ko;
