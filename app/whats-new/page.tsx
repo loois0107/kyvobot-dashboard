@@ -11,15 +11,20 @@ import { LandingThemeProvider } from '@/lib/theme/LandingThemeContext';
 
 // 🛡️ [섹션 1은 더 이상 카드 그리드가 아님] 예전엔 "뭐가 달라졌나요"로 section1도 section2와
 // 같은 items 카드 그리드였는데, 이번에 "기능 소개"로 톤을 바꾸면서 section1은 설명 문단 +
-// 스크린샷 + 언어 지원 안내로 구성된 전용 블록(아래 JSX에 직접 하드코딩)으로 바뀌었다.
-// section2(사용 전 주의사항)만 여전히 가이드 페이지와 같은 items 카드 그리드 패턴을 쓰므로,
-// 이 배열은 section2 전용으로 남긴다.
+// 스크린샷으로 구성된 전용 블록(아래 JSX에 직접 하드코딩)으로 바뀌었다. section2(사용 전
+// 주의사항)만 여전히 가이드 페이지와 같은 items 카드 그리드 패턴을 쓰므로, 이 배열은 section2
+// 전용으로 남긴다.
+// 🛡️ [4개 카드 -> 3개로 재구성] "클립당 킬 1개"+"매치 기록이 남는 게임만 가능"(코드로 실제
+// 동작 확인 - highlight_err_match_not_found 메시지가 커스텀 게임/연습 모드/AI 상대 대전
+// 입문·초급·중급을 명시적으로 막는다는 걸 locales/*.json에서 확인함)을 "이럴 때 주의하세요"
+// 한 카드로, "45초 길이 제한"+"녹화 조건"을 "녹화할 때 이렇게 해주세요" 한 카드로 묶었다.
+// descKey 내용에 "\n\n"으로 두 사실을 구분해두고, whitespace-pre-line으로 그 줄바꿈만
+// 살려서 긴 한 문단이 아니라 짧은 두 문단처럼 보이게 한다.
 const WHATS_NEW_CAVEATS = {
   sectionTitleKey: 'section2Title',
   items: [
-    { titleKey: 'whatsNewOneKillTitle', descKey: 'whatsNewOneKillDesc' },
-    { titleKey: 'whatsNewLengthTitle', descKey: 'whatsNewLengthDesc' },
-    { titleKey: 'whatsNewRecordingTitle', descKey: 'whatsNewRecordingDesc' },
+    { titleKey: 'whatsNewCaveatsTitle', descKey: 'whatsNewCaveatsBody' },
+    { titleKey: 'whatsNewRecordingTitle', descKey: 'whatsNewRecordingBody' },
     { titleKey: 'whatsNewLanguageTitle', descKey: 'whatsNewLanguageDesc' },
   ],
 } as const;
@@ -43,7 +48,12 @@ export default async function WhatsNewPage() {
       {/* 🛡️ 문서 페이지라 실제 관리 서버 조회가 불필요 - dashboardHref=null로 헤더의 Discord API 호출을 건너뛴다. */}
       <LandingHeader dashboardHref={null} />
 
-      <main className="relative w-full">
+      {/* 🛡️ [글자 단위 줄바꿈 방지 - 한국어만] word-break: keep-all(Tailwind의 break-keep)을
+          한국어일 때만 최상위에 걸어둔다 - word-break는 상속 속성이라 여기 한 번만 걸면
+          히어로/섹션 제목/본문/카드 문구까지 전부 적용된다. 영어는 공백 단위로 이미 잘
+          끊기므로(오히려 break-keep이 영어 긴 단어에서 넘침을 유발할 수 있어) lang==='ko'일
+          때만 조건부로 붙인다. */}
+      <main className={`relative w-full ${lang === 'ko' ? 'break-keep' : ''}`}>
         <section className="max-w-3xl mx-auto w-full px-4 pt-20 pb-16 text-center">
           <RevealOnScroll>
             <h1 className="text-4xl md:text-5xl font-black tracking-wide mb-6">
@@ -82,9 +92,6 @@ export default async function WhatsNewPage() {
               </div>
               <p className="text-sm text-text-muted text-center">{t.whatsNewPage.whatsNewScreenshotCaption}</p>
             </div>
-            <p className="text-sm md:text-base text-text-secondary text-center font-medium">
-              {t.whatsNewPage.whatsNewLanguageNote}
-            </p>
           </RevealOnScroll>
         </section>
 
@@ -97,14 +104,19 @@ export default async function WhatsNewPage() {
               {t.whatsNewPage[WHATS_NEW_CAVEATS.sectionTitleKey]}
             </h2>
           </RevealOnScroll>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* 🛡️ [카드 높이 - 억지로 안 맞춤] grid 기본값인 align-items:stretch를 items-start로
+              덮어쓰고, 카드 div에서도 h-full을 뺐다 - 이제 각 카드는 내용 길이만큼만 자연스럽게
+              높이가 생긴다(전엔 가장 긴 카드에 맞춰 짧은 카드까지 억지로 늘어났었음). */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
             {WHATS_NEW_CAVEATS.items.map((item, i) => (
               <RevealOnScroll key={item.titleKey} delayMs={(i % 3) * 100}>
-                <div className="h-full bg-bg-surface border border-border-default rounded-2xl p-6 space-y-3">
+                <div className="bg-bg-surface border border-border-default rounded-2xl p-6 space-y-3">
                   <h3 className="text-base font-bold text-text-primary leading-snug">
                     {t.whatsNewPage[item.titleKey]}
                   </h3>
-                  <p className="text-sm text-text-muted leading-relaxed">{t.whatsNewPage[item.descKey]}</p>
+                  <p className="text-sm text-text-muted leading-relaxed whitespace-pre-line">
+                    {t.whatsNewPage[item.descKey]}
+                  </p>
                 </div>
               </RevealOnScroll>
             ))}
