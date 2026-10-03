@@ -1043,7 +1043,6 @@ const en = {
     text: 'AI casts your plays like a pro broadcast!',
     ctaLabel: 'Learn more',
     betaBadgeLabel: 'Beta',
-    dismissLabel: 'Dismiss',
   },
 
   whatsNewPage: {

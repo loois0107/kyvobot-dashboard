@@ -5,7 +5,6 @@ import { Gamepad2, Shield, Ticket, Sparkles, Smile, TvMinimalPlay, Palette } fro
 import { auth } from '@/auth';
 import { COOKIE_NAME, dictionaries, resolveInitialLanguage } from '@/lib/i18n';
 import { LANDING_THEME_COOKIE_NAME, resolveInitialLandingTheme } from '@/lib/theme';
-import { WHATS_NEW_BANNER_COOKIE_NAME, resolveWhatsNewBannerDismissed } from '@/lib/newFeatureBanner';
 import { LandingThemeProvider } from '@/lib/theme/LandingThemeContext';
 import LandingHeader from '@/components/landing/LandingHeader';
 import NewFeatureBanner from '@/components/landing/NewFeatureBanner';
@@ -230,12 +229,6 @@ export default async function RootPage() {
   // 별도의 kyvo_landing_theme을 읽으므로, 대시보드에서 뭘 골랐든 이 값에 영향이 없다. 기본값도
   // 반대(쿠키 없으면 light)다.
   const landingTheme = resolveInitialLandingTheme(cookieStore.get(LANDING_THEME_COOKIE_NAME)?.value);
-  // 🛡️ [신기능 배너 dismiss 상태 - SSR로 미리 계산] 테마/언어와 동일한 이유(깜빡임 방지) -
-  // 클라이언트에서 useEffect로 뒤늦게 쿠키를 읽으면 배너가 한 프레임 보였다 사라지는 깜빡임이
-  // 생긴다.
-  const whatsNewBannerDismissed = resolveWhatsNewBannerDismissed(
-    cookieStore.get(WHATS_NEW_BANNER_COOKIE_NAME)?.value
-  );
 
   // 🛡️ 로그인 여부와 상관없이 항상 이 랜딩 화면을 렌더링한다(더 이상 자동 리다이렉트하지 않음) -
   // 로그인한 유저는 헤더의 아바타 드롭다운이나 히어로의 "내 대시보드로 이동" 버튼으로 스스로
@@ -272,7 +265,7 @@ export default async function RootPage() {
     >
       <LenisScroll />
       <LandingHeader dashboardHref={dashboardHref} />
-      <NewFeatureBanner initialDismissed={whatsNewBannerDismissed} />
+      <NewFeatureBanner />
 
       <main className="relative min-h-screen flex flex-col items-center justify-center text-center px-4 pt-4 pb-16 gap-6">
         <DecorShapes shapes={HERO_SHAPES} />
