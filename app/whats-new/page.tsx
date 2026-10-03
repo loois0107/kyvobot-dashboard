@@ -78,7 +78,11 @@ export default async function WhatsNewPage() {
             <h2 className="text-2xl md:text-3xl font-black text-text-primary">{t.whatsNewPage.section1Title}</h2>
           </RevealOnScroll>
           <RevealOnScroll className="space-y-8">
-            <p className="max-w-3xl mx-auto text-base md:text-lg text-text-secondary leading-relaxed text-center">
+            {/* 🛡️ [좁은 안쪽 max-w-3xl 제거] 섹션 컨테이너(max-w-5xl)보다 훨씬 좁은 max-w-3xl로
+                한 번 더 가둬놔서, 넓은 화면에서 양옆에 큰 여백만 남고 글자는 좁은 띠에 몰려
+                보이는 문제가 있었다 - 바로 아래 스크린샷과 같은 폭(5xl 컨테이너 그대로)까지
+                채우도록 안쪽 제약을 없앴다. */}
+            <p className="text-base md:text-lg text-text-secondary leading-relaxed text-center">
               {t.whatsNewPage.whatsNewExplainerBody}
             </p>
             <div className="space-y-3">
@@ -109,49 +113,57 @@ export default async function WhatsNewPage() {
           </RevealOnScroll>
         </section>
 
-        {/* 🛡️ [섹션 2 - 박스/3단 그리드 제거, 왼쪽 정렬 리스트로] "모든 걸 박스에 가두고
-            가운데 정렬한다"는 피드백으로 카드(bg/border/rounded) + 3열 그리드를 완전히
-            걷어냈다 - 좁은 칸(1152px를 3등분, 실질 ~340px)에 문단을 욱여넣는 대신, 섹션1과
-            동일한 가로폭(max-w-4xl)으로 한 번에 한 항목씩 세로로 나열해서 각 항목이 가로
-            공간을 훨씬 넉넉하게 쓴다. 제목/본문 모두 기본 정렬(왼쪽)을 그대로 둔다 - 섹션
-            제목(h2)만 기존 페이지 전체 관례대로 가운데 정렬 유지. */}
-        <section className="max-w-4xl mx-auto w-full px-4 pb-24">
+        {/* 🛡️ [섹션 2 - 박스 제거 + 가로 정렬(라벨/설명 2단)] 카드(bg/border/rounded) +
+            3열 그리드를 걷어낸 자리에, 처음엔 제목-위/본문-아래로 세로 쌓는 리스트를
+            썼었는데 그러면 컨테이너를 넓혀도 글자는 여전히 왼쪽 절반에만 몰려 보이는
+            문제가 있었다("가로로 정렬해달라"는 피드백) - 각 항목을 제목(왼쪽 고정폭
+            라벨)+본문(오른쪽 나머지 폭) 가로 2단으로 바꿔서 넓어진 컨테이너(max-w-6xl)의
+            가로 공간을 실제로 채운다. 본문 한 줄 길이 자체는 라벨 폭만큼 줄어들어 전처럼
+            과하게 길어지지 않는다. 모바일(sm 미만)에서는 flex-col로 자동으로 다시
+            세로 쌓임. */}
+        <section className="max-w-6xl mx-auto w-full px-4 pb-24">
           <RevealOnScroll className="mb-10 text-center">
             <h2 className="text-2xl md:text-3xl font-black text-text-primary">
               {t.whatsNewPage[WHATS_NEW_CAVEATS.sectionTitleKey]}
             </h2>
           </RevealOnScroll>
-          <div className="space-y-10">
+          <div className="divide-y divide-border-default/40 [&>*+*]:pt-8 [&>*]:pb-8">
             {WHATS_NEW_CAVEATS.items.map((item, i) => (
-              <RevealOnScroll key={item.titleKey} delayMs={(i % 3) * 100}>
-                <h3 className="text-lg font-bold text-text-primary leading-snug mb-2">
+              <RevealOnScroll
+                key={item.titleKey}
+                delayMs={(i % 3) * 100}
+                className="flex flex-col sm:flex-row sm:gap-10"
+              >
+                <h3 className="sm:w-64 sm:shrink-0 text-lg font-bold text-text-primary leading-snug mb-2 sm:mb-0">
                   {t.whatsNewPage[item.titleKey]}
                 </h3>
-                <p className="text-base text-text-muted leading-relaxed whitespace-pre-line">
+                <p className="flex-1 text-base text-text-muted leading-relaxed whitespace-pre-line">
                   {t.whatsNewPage[item.descKey]}
                 </p>
               </RevealOnScroll>
             ))}
-            {/* 🛡️ [사전 조건 카드 - 가이드 링크 포함이라 배열 밖에 별도 렌더] 쿨다운/용량/사전
+            {/* 🛡️ [사전 조건 항목 - 가이드 링크 포함이라 배열 밖에 별도 렌더] 쿨다운/용량/사전
                 설정(서버 지역+본인 인증)을 묶은 네 번째 항목. 나머지 세 항목과 달리 안내
                 링크(/guide)가 섞여 있어서 순수 문자열 하나로 표현할 수 없어, 위 items 배열에
-                넣지 않고 같은 space-y-10 컨테이너 안에 직접 추가한다 - 레이아웃/간격은
-                동일하게 유지된다. /guide 페이지에 서버 지역 설정+본인 인증을 함께 설명하는
-                항목(guideTierVerifyTitle/Desc)이 실제로 존재하는 것을 확인했다 - 섹션별
-                anchor id는 없어서 페이지 전체 링크로 연결한다.*/}
-            <RevealOnScroll delayMs={300}>
-              <h3 className="text-lg font-bold text-text-primary leading-snug mb-2">
+                넣지 않고 같은 라벨/본문 2단 구조를 직접 반복한다. /guide 페이지에 서버 지역
+                설정+본인 인증을 함께 설명하는 항목(guideTierVerifyTitle/Desc)이 실제로
+                존재하는 것을 확인했다 - 섹션별 anchor id는 없어서 페이지 전체 링크로
+                연결한다.*/}
+            <RevealOnScroll delayMs={300} className="flex flex-col sm:flex-row sm:gap-10">
+              <h3 className="sm:w-64 sm:shrink-0 text-lg font-bold text-text-primary leading-snug mb-2 sm:mb-0">
                 {t.whatsNewPage.whatsNewPrereqTitle}
               </h3>
-              <p className="text-base text-text-muted leading-relaxed whitespace-pre-line">
-                {t.whatsNewPage.whatsNewPrereqBody}
-              </p>
-              <Link
-                href="/guide"
-                className="inline-block mt-2 text-sm font-bold text-text-secondary hover:text-text-primary transition-colors"
-              >
-                {t.whatsNewPage.whatsNewPrereqLinkLabel} →
-              </Link>
+              <div className="flex-1">
+                <p className="text-base text-text-muted leading-relaxed whitespace-pre-line">
+                  {t.whatsNewPage.whatsNewPrereqBody}
+                </p>
+                <Link
+                  href="/guide"
+                  className="inline-block mt-2 text-sm font-bold text-text-secondary hover:text-text-primary transition-colors"
+                >
+                  {t.whatsNewPage.whatsNewPrereqLinkLabel} →
+                </Link>
+              </div>
             </RevealOnScroll>
           </div>
         </section>

@@ -1039,7 +1039,7 @@ const ko: typeof en = {
   },
 
   newFeatureBanner: {
-    newFeatureLabel: '🎬 신기능',
+    newFeatureLabel: '🎬 (신기능)',
     text: 'AI가 당신의 플레이를 LCK 중계처럼 만들어드려요!',
     ctaLabel: '자세히 보기',
     betaBadgeLabel: '베타',
@@ -1053,7 +1053,7 @@ const ko: typeof en = {
 
     section1Title: '무엇을 하는 기능인가요',
     whatsNewExplainerBody:
-      '디스코드에서 /highlight 명령어로 게임 녹화 클립을 올리면, AI가 매치 데이터를 자동으로 분석해서 실제 LCK·롤드컵 방송 화면 같은 오버레이를 입혀줍니다. 스코어보드, 선수 정보, 아이템·룬·스펠, 골드 격차까지 전부 그 순간 기준으로 정확하게 반영되고, 거기에 그 장면을 전문 해설처럼 설명해주는 AI 음성 내레이션까지 더해져서 완성된 하이라이트 영상이 나와요. 이런 기능을 갖춘 디스코드 봇은 아직 없을 거예요.',
+      '디스코드에서 /highlight 명령어로 게임 녹화 클립을 올리면, AI가 매치 데이터를 자동으로 분석해서 실제 LCK·롤드컵 방송 화면 같은 오버레이를 입혀줍니다. 스코어보드, 선수 정보, 아이템·룬·스펠, 골드 격차까지 전부 그 순간 기준으로 정확하게 반영되고, 거기에 그 장면을 전문 해설처럼 설명해주는 AI 음성 내레이션까지 더해져서 완성된 하이라이트 영상이 나와요.',
     whatsNewScreenshotCaption: '실제로 이런 느낌입니다',
     whatsNewScreenshotAlt: '/highlight로 만들어진 하이라이트 영상 화면 - 방송 스타일 스코어보드와 선수 정보 오버레이가 표시된 모습',
 
