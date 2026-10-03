@@ -5,7 +5,7 @@ import { auth } from '@/auth';
 import { COOKIE_NAME, dictionaries, resolveInitialLanguage } from '@/lib/i18n';
 import LandingHeader from '@/components/landing/LandingHeader';
 import RevealOnScroll from '@/components/landing/RevealOnScroll';
-import Badge from '@/components/ui/Badge';
+import BetaBadge from '@/components/ui/BetaBadge';
 import { BOT_INVITE_URL } from '@/lib/botInvite';
 import { LANDING_THEME_COOKIE_NAME, resolveInitialLandingTheme } from '@/lib/theme';
 import { LandingThemeProvider } from '@/lib/theme/LandingThemeContext';
@@ -57,9 +57,7 @@ export default async function WhatsNewPage() {
       <main className={`relative w-full ${lang === 'ko' ? 'break-keep' : ''}`}>
         <section className="max-w-3xl mx-auto w-full px-4 pt-20 pb-16 text-center">
           <RevealOnScroll>
-            <Badge variant="warning" className="!text-xs mb-4">
-              {t.whatsNewPage.betaBadgeLabel}
-            </Badge>
+            <BetaBadge label={t.whatsNewPage.betaBadgeLabel} className="mb-5" />
             <h1 className="text-4xl md:text-5xl font-black tracking-wide mb-6">
               <span className="bg-gradient-to-r from-text-primary to-text-secondary bg-clip-text text-transparent">
                 {t.whatsNewPage.heroTitle}
@@ -103,39 +101,35 @@ export default async function WhatsNewPage() {
             "뭘 하는 기능인지" 알고 난 직후 "아직 다듬는 중"이라는 맥락을 바로 이어 붙여서,
             주의사항 카드(사용 제약)와는 다른 결의 안내(완성도에 대한 기대치 조정)로 구분했다. */}
         <section className="max-w-3xl mx-auto w-full px-4 pb-24">
-          <RevealOnScroll className="bg-warning/10 border border-warning/30 rounded-2xl p-6 md:p-8 text-center space-y-2">
-            <Badge variant="warning" className="!text-xs">
-              {t.whatsNewPage.betaBadgeLabel}
-            </Badge>
+          <RevealOnScroll className="bg-warning/10 border border-warning/30 rounded-2xl p-6 md:p-8 text-center space-y-3">
+            <BetaBadge label={t.whatsNewPage.betaBadgeLabel} />
             <p className="text-sm md:text-base text-text-secondary leading-relaxed">
               {t.whatsNewPage.whatsNewBetaNotice}
             </p>
           </RevealOnScroll>
         </section>
 
-        {/* 🛡️ [섹션 2 - 주의사항, 기존 카드 그리드 유지] 가이드 페이지와 동일한 items 배열 .map
-            패턴 - isNew/Badge는 섹션 1 카드 그리드가 사라지면서 같이 제거됐다(이 섹션 항목
-            중에는 애초에 isNew가 없었음). */}
-        <section className="max-w-7xl mx-auto w-full px-4 pb-24">
+        {/* 🛡️ [섹션 2 - 박스/3단 그리드 제거, 왼쪽 정렬 리스트로] "모든 걸 박스에 가두고
+            가운데 정렬한다"는 피드백으로 카드(bg/border/rounded) + 3열 그리드를 완전히
+            걷어냈다 - 좁은 칸(1152px를 3등분, 실질 ~340px)에 문단을 욱여넣는 대신, 섹션1과
+            동일한 가로폭(max-w-4xl)으로 한 번에 한 항목씩 세로로 나열해서 각 항목이 가로
+            공간을 훨씬 넉넉하게 쓴다. 제목/본문 모두 기본 정렬(왼쪽)을 그대로 둔다 - 섹션
+            제목(h2)만 기존 페이지 전체 관례대로 가운데 정렬 유지. */}
+        <section className="max-w-4xl mx-auto w-full px-4 pb-24">
           <RevealOnScroll className="mb-10 text-center">
             <h2 className="text-2xl md:text-3xl font-black text-text-primary">
               {t.whatsNewPage[WHATS_NEW_CAVEATS.sectionTitleKey]}
             </h2>
           </RevealOnScroll>
-          {/* 🛡️ [카드 높이 - 억지로 안 맞춤] grid 기본값인 align-items:stretch를 items-start로
-              덮어쓰고, 카드 div에서도 h-full을 뺐다 - 이제 각 카드는 내용 길이만큼만 자연스럽게
-              높이가 생긴다(전엔 가장 긴 카드에 맞춰 짧은 카드까지 억지로 늘어났었음). */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+          <div className="space-y-10">
             {WHATS_NEW_CAVEATS.items.map((item, i) => (
               <RevealOnScroll key={item.titleKey} delayMs={(i % 3) * 100}>
-                <div className="bg-bg-surface border border-border-default rounded-2xl p-6 space-y-3">
-                  <h3 className="text-base font-bold text-text-primary leading-snug">
-                    {t.whatsNewPage[item.titleKey]}
-                  </h3>
-                  <p className="text-sm text-text-muted leading-relaxed whitespace-pre-line">
-                    {t.whatsNewPage[item.descKey]}
-                  </p>
-                </div>
+                <h3 className="text-lg font-bold text-text-primary leading-snug mb-2">
+                  {t.whatsNewPage[item.titleKey]}
+                </h3>
+                <p className="text-base text-text-muted leading-relaxed whitespace-pre-line">
+                  {t.whatsNewPage[item.descKey]}
+                </p>
               </RevealOnScroll>
             ))}
           </div>
