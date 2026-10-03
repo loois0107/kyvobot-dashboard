@@ -132,6 +132,27 @@ export default async function WhatsNewPage() {
                 </p>
               </RevealOnScroll>
             ))}
+            {/* 🛡️ [사전 조건 카드 - 가이드 링크 포함이라 배열 밖에 별도 렌더] 쿨다운/용량/사전
+                설정(서버 지역+본인 인증)을 묶은 네 번째 항목. 나머지 세 항목과 달리 안내
+                링크(/guide)가 섞여 있어서 순수 문자열 하나로 표현할 수 없어, 위 items 배열에
+                넣지 않고 같은 space-y-10 컨테이너 안에 직접 추가한다 - 레이아웃/간격은
+                동일하게 유지된다. /guide 페이지에 서버 지역 설정+본인 인증을 함께 설명하는
+                항목(guideTierVerifyTitle/Desc)이 실제로 존재하는 것을 확인했다 - 섹션별
+                anchor id는 없어서 페이지 전체 링크로 연결한다.*/}
+            <RevealOnScroll delayMs={300}>
+              <h3 className="text-lg font-bold text-text-primary leading-snug mb-2">
+                {t.whatsNewPage.whatsNewPrereqTitle}
+              </h3>
+              <p className="text-base text-text-muted leading-relaxed whitespace-pre-line">
+                {t.whatsNewPage.whatsNewPrereqBody}
+              </p>
+              <Link
+                href="/guide"
+                className="inline-block mt-2 text-sm font-bold text-text-secondary hover:text-text-primary transition-colors"
+              >
+                {t.whatsNewPage.whatsNewPrereqLinkLabel} →
+              </Link>
+            </RevealOnScroll>
           </div>
         </section>
 
