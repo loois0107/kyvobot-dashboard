@@ -1039,25 +1039,21 @@ const ko: typeof en = {
   },
 
   newFeatureBanner: {
-    text: '🎬 신기능 확인해보기',
+    text: '🎬 AI가 당신의 플레이를 LCK 중계처럼 만들어드려요',
     dismissLabel: '닫기',
   },
 
   whatsNewPage: {
-    heroTitle: '하이라이트 기능이 새로워졌어요',
-    heroDesc: '화면 오버레이부터 해설 음성까지 /highlight를 처음부터 다시 디자인했습니다 — 거기에 영어 버전까지 새로 추가됐어요.',
+    heroTitle: '당신의 플레이가 LCK 중계처럼 바뀝니다',
+    heroDesc: '디스코드에 영상 하나만 올리면, 나머지는 AI가 전부 맡아요.',
     ctaTitle: '지금 사용해보기',
-    newBadgeLabel: '신규',
 
-    section1Title: '뭐가 달라졌나요',
-    whatsNewOverlayTitle: '🎬 방송 스타일 오버레이',
-    whatsNewOverlayDesc:
-      '실제 LCK/롤드컵 방송 화면을 참고해 전면 개편했습니다 — 상단 스코어바, 하단 선수 정보 패널, 아이템/룬/스펠/레벨이 표시되는 챔피언 포트레이트, 골드 격차 표시까지.',
-    whatsNewVoiceTitle: '🎙️ 더 자연스러워진 AI 해설',
-    whatsNewVoiceDesc: 'AI 캐스터 음성을 더 자연스럽고 생동감 있는 방송 톤으로 전면 재작업했습니다.',
-    whatsNewEnglishTitle: '🌐 처음 선보이는 영어 버전',
-    whatsNewEnglishDesc:
-      '이제 /highlight를 영어로도 사용할 수 있습니다 — 대시보드 일반 설정에서 서버 언어를 English로 바꾸면 바로 체험할 수 있어요.',
+    section1Title: '무엇을 하는 기능인가요',
+    whatsNewExplainerBody:
+      '디스코드에서 /highlight 명령어로 게임 녹화 클립을 올리면, AI가 매치 데이터를 자동으로 분석해서 실제 LCK·롤드컵 방송 화면 같은 오버레이를 입혀줍니다. 스코어보드, 선수 정보, 아이템·룬·스펠, 골드 격차까지 전부 그 순간 기준으로 정확하게 반영되고, 거기에 그 장면을 전문 해설처럼 설명해주는 AI 음성 내레이션까지 더해져서 완성된 하이라이트 영상이 나와요. 이런 기능을 갖춘 디스코드 봇은 아직 없을 거예요.',
+    whatsNewScreenshotCaption: '실제로 이런 느낌입니다',
+    whatsNewScreenshotAlt: '/highlight로 만들어진 하이라이트 영상 화면 - 방송 스타일 스코어보드와 선수 정보 오버레이가 표시된 모습',
+    whatsNewLanguageNote: '🌐 한국어와 영어를 모두 지원해요 — 영어는 이번에 처음 선보입니다.',
 
     section2Title: '사용 전 꼭 알아두세요',
     whatsNewOneKillTitle: '⚠️ 클립당 킬 1개만 처리',
@@ -1070,7 +1066,7 @@ const ko: typeof en = {
       '가로 화면 녹화만 지원합니다(세로 화면 불가). 인게임 시계가 보여야 하며, 일반 플레이 화면(시계가 우측 상단) 녹화와 리플레이 뷰어 녹화 둘 다 자동으로 인식해 지원합니다.',
     whatsNewLanguageTitle: '🌍 영어로 사용하려면',
     whatsNewLanguageDesc:
-      '대시보드의 일반 설정에서 서버 언어를 English로 바꾸면 새로운 영어 해설을 사용할 수 있습니다 — 바꾸지 않으면 기본값인 한국어 그대로 동작해요.',
+      '대시보드의 일반 설정에서 서버 언어를 English로 바꾸면 영어 해설을 사용할 수 있습니다 — 바꾸지 않으면 기본값인 한국어 그대로 동작해요.',
   },
 };
 
