@@ -10,9 +10,13 @@ type BetaBadgeProps = {
 // 남긴다. Badge.tsx의 variant 체계에 끼워 넣지 않고 독립 컴포넌트로 둔 이유는 그대로:
 // Badge는 "상태"(성공/경고/위험/중립) 의미 체계이고 이건 "라벨"(베타 태그) 의미가 달라서,
 // 억지로 끼워 맞추면 variant 이름이 의미를 잃는다.
+// 🛡️ [고정 text-xs/sm 제거] 헤드라인 끝에 인라인으로 들어가면서 "옆 글자와 같은 크기로"라는
+// 요청이 생겼다 - 고정 크기를 컴포넌트에 박아두면 className으로 덮어쓸 때 같은 유틸리티
+// 클래스끼리 CSS 적용 순서가 불확실해 크기가 안 바뀌는 문제가 생긴다. 크기는 전부 호출부가
+// className으로 직접 넘기게 하고, 컴포넌트는 색/굵기/자간/대문자/괄호만 책임진다.
 export default function BetaBadge({ label, className = '' }: BetaBadgeProps) {
   return (
-    <span className={`inline-block text-warning-border text-xs md:text-sm font-black tracking-widest uppercase ${className}`}>
+    <span className={`inline-block text-warning-border font-black tracking-widest uppercase ${className}`}>
       ({label})
     </span>
   );

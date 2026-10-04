@@ -1045,7 +1045,6 @@ const en = {
   },
 
   whatsNewPage: {
-    betaBadgeLabel: 'Beta',
     heroTitle: 'We Turn Your Plays Into LCK & LCS Broadcasts!',
     heroDesc: 'Upload a clip to Discord, and AI handles the rest.',
     ctaTitle: 'Try It Now',

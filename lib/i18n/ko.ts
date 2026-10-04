@@ -1045,7 +1045,6 @@ const ko: typeof en = {
   },
 
   whatsNewPage: {
-    betaBadgeLabel: '베타',
     heroTitle: '여러분의 플레이를 LCK&LCS처럼 바꿔드려요!',
     heroDesc: '디스코드에 영상 하나만 올리면, 나머지는 AI가 전부 맡아요.',
     ctaTitle: '지금 사용해보기',

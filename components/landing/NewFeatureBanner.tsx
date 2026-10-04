@@ -30,7 +30,8 @@ export default function NewFeatureBanner() {
         <div
           className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-wide leading-tight text-text-primary ${lang === 'ko' ? 'break-keep' : ''}`}
         >
-          {t('newFeatureBanner.text')} <BetaBadge label="BETA" className="align-middle" />
+          {t('newFeatureBanner.text')}{' '}
+          <BetaBadge label="BETA" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl align-middle" />
         </div>
         <div className="mt-4 text-sm md:text-base font-bold text-text-secondary">
           {t('newFeatureBanner.ctaLabel')} →
