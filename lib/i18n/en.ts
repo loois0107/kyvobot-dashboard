@@ -1067,7 +1067,7 @@ const en = {
       "Keep your clip under 45 seconds - just the moment you want to show off.\n\nRecord in landscape (portrait isn't supported), and make sure the in-game clock is visible on screen. Both regular gameplay footage and replay-viewer recordings work fine.",
     whatsNewLanguageTitle: '🌍 Switching to English',
     whatsNewLanguageDesc:
-      "It's not just a translation - Korean uses an LCK-style broadcast tone, and English uses an LCS-style one. This is a server-wide setting though, so only a server admin can change it from the dashboard's General settings, and there's no way yet to pick a language per message.",
+      "It's not just a translation - Korean uses an LCK-style broadcast tone, and English uses an LCS-style one. When you run /highlight, the style option lets you pick either one for just that clip - leave it out and it follows the server's default setting.",
     whatsNewPrereqTitle: '🔑 Before You Start',
     whatsNewPrereqBody:
       "Once you use it, you'll need to wait 30 seconds before using it again. You can create up to 5 a day per person, and 30 a day per server. Video files can't be over 100MB.\n\nYou'll also need your server's region set up and your own account verified before your first try.",
