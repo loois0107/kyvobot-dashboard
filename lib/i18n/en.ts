@@ -1064,7 +1064,7 @@ const en = {
       "If your clip has more than one kill in it, only the earliest one gets turned into a video. Trim your clip down to just the moment you want.\n\nIt only works for games that get saved to your match history, like normal and ranked games. Custom games, practice tool, and Co-op vs. AI modes aren't supported.\n\nIf the kill happens right at the start of your clip, it might jump straight into the action without any buildup. Try to record a few seconds before the kill too.",
     whatsNewRecordingTitle: '📹 Recording Tips',
     whatsNewRecordingBody:
-      "Keep your clip under 45 seconds - just the moment you want to show off.\n\nRecord in landscape (portrait isn't supported), and make sure the in-game clock is visible on screen. Both regular gameplay footage and replay-viewer recordings work fine.",
+      "Keep your clip under 45 seconds - just the moment you want to show off.\n\nRecord in landscape (portrait isn't supported), and make sure the in-game clock is visible on screen. Both regular gameplay footage and replay-viewer recordings work fine.\n\nIf you're using a recording tool like Medal.tv, try to upload the clip soon after recording instead of letting it sit for a while.",
     whatsNewLanguageTitle: '🌍 Switching to English',
     whatsNewLanguageDesc:
       "It's not just a translation - Korean uses an LCK-style broadcast tone, and English uses an LCS-style one. When you run /highlight, the style option lets you pick either one for just that clip - leave it out and it follows the server's default setting.",
