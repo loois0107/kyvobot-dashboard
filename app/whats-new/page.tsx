@@ -60,7 +60,7 @@ export default async function WhatsNewPage() {
           끊기므로(오히려 break-keep이 영어 긴 단어에서 넘침을 유발할 수 있어) lang==='ko'일
           때만 조건부로 붙인다. */}
       <main className={`relative w-full ${lang === 'ko' ? 'break-keep' : ''}`}>
-        <section className="max-w-3xl mx-auto w-full px-4 pt-20 pb-16 text-center">
+        <section className="max-w-3xl mx-auto w-full px-4 pt-20 pb-24 text-center">
           <RevealOnScroll>
             <BetaBadge label={t.whatsNewPage.betaBadgeLabel} className="mb-5" />
             <h1 className="text-4xl md:text-5xl font-black tracking-wide mb-6">
@@ -78,7 +78,11 @@ export default async function WhatsNewPage() {
             플레이어 닉네임은 전부 블러 처리된 상태다. FeatureScreenshotRow와 동일한 프레임
             스타일(--showcase-border/--showcase-shadow)을 재사용해 랜딩 전체의 스크린샷 취급을
             통일한다. */}
-        <section className="max-w-5xl mx-auto w-full px-4 pb-24">
+        {/* 🛡️ [섹션 간 간격 확대] "무엇을 하는 기능인가요"/"사용 전 꼭 알아두세요"처럼 각자
+            하나의 분야를 대표하는 큰 섹션들 사이가 답답해 보인다는 피드백으로, 하단
+            패딩을 pb-24(96px)에서 pb-40(160px)로 늘렸다 - 히어로/섹션1/섹션2/베타 안내
+            전부 동일하게 적용해서 섹션 전환 리듬을 일관되게 유지한다. */}
+        <section className="max-w-5xl mx-auto w-full px-4 pb-40">
           <RevealOnScroll className="mb-10 text-center">
             <h2 className="text-2xl md:text-3xl font-black text-text-primary">{t.whatsNewPage.section1Title}</h2>
           </RevealOnScroll>
@@ -114,7 +118,7 @@ export default async function WhatsNewPage() {
             가로 공간을 실제로 채운다. 본문 한 줄 길이 자체는 라벨 폭만큼 줄어들어 전처럼
             과하게 길어지지 않는다. 모바일(sm 미만)에서는 flex-col로 자동으로 다시
             세로 쌓임. */}
-        <section className="max-w-6xl mx-auto w-full px-4 pb-24">
+        <section className="max-w-6xl mx-auto w-full px-4 pb-40">
           <RevealOnScroll className="mb-10 text-center">
             <h2 className="text-2xl md:text-3xl font-black text-text-primary">
               {t.whatsNewPage[WHATS_NEW_CAVEATS.sectionTitleKey]}
@@ -166,7 +170,7 @@ export default async function WhatsNewPage() {
             옮겼다 - 구체적인 사용 제약을 다 읽은 다음에 "아직 베타라 다듬는 중"이라는
             기대치 조정 멘트가 와야 자연스럽다는 취지. 배지(BetaBadge)도 같이 뺐다 - 바로
             위 히어로에 이미 베타 배지가 있어서 중복이었다는 피드백. */}
-        <section className="max-w-3xl mx-auto w-full px-4 pb-24">
+        <section className="max-w-3xl mx-auto w-full px-4 pb-40">
           <RevealOnScroll className="bg-warning/10 border border-warning/30 rounded-2xl p-6 md:p-8 text-center">
             <p className="text-sm md:text-base text-text-secondary leading-relaxed">
               {t.whatsNewPage.whatsNewBetaNotice}

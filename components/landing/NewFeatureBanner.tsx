@@ -16,15 +16,21 @@ export default function NewFeatureBanner() {
   return (
     <div className="relative z-10 mt-6 mx-4 sm:mx-6 lg:max-w-7xl lg:mx-auto">
       <Link href="/whats-new" className="block py-6 sm:py-10 md:py-14 text-center">
-        <BetaBadge label={t('newFeatureBanner.betaBadgeLabel')} className="mb-4" />
-        {/* 🛡️ ["신기능" 강조 - 같은 헤드라인 안에서 색으로만 구분] 작은 프리픽스 줄을 따로 안
-            두고, 요청하신 예시("🎬 신기능 AI가...")처럼 한 헤드라인 안에 이어 붙이되
-            "🎬 신기능" 부분만 강조색(warning-border)으로 분리해 눈에 띄게 한다. */}
+        {/* 🛡️ ["신기능"을 검은색 별 장식 프리픽스로, "베타"는 헤드라인 끝에 영어로] 예전엔
+            위에 작은 빨간 "(베타)" 배지가 따로 있고 헤드라인 안에 "(신기능)"이 끼어있는
+            구조였는데, 역할을 맞바꿨다 - "신기능"을 별 두 개로 감싼 눈에 띄는 프리픽스로
+            올리고(검은색, 헤드라인과 거의 붙는 간격만), "베타"는 문장 끝("만들어드려요!" 옆)에
+            영어 "(BETA)"로 고정 - 언어와 무관하게 항상 영어로 쓰고 빨간색만 유지한다(요청
+            그대로, i18n 번역 대상이 아님 - BetaBadge에 리터럴 "BETA"를 직접 넘긴다). */}
         <div
-          className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-wide leading-tight ${lang === 'ko' ? 'break-keep' : ''}`}
+          className={`text-sm md:text-base font-black tracking-widest text-text-primary mb-1 ${lang === 'ko' ? 'break-keep' : ''}`}
         >
-          <span className="text-warning-border">{t('newFeatureBanner.newFeatureLabel')}</span>{' '}
-          <span className="text-text-primary">{t('newFeatureBanner.text')}</span>
+          {t('newFeatureBanner.newFeatureLabel')}
+        </div>
+        <div
+          className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-wide leading-tight text-text-primary ${lang === 'ko' ? 'break-keep' : ''}`}
+        >
+          {t('newFeatureBanner.text')} <BetaBadge label="BETA" className="align-middle" />
         </div>
         <div className="mt-4 text-sm md:text-base font-bold text-text-secondary">
           {t('newFeatureBanner.ctaLabel')} →

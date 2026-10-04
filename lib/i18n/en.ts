@@ -1039,10 +1039,9 @@ const en = {
   },
 
   newFeatureBanner: {
-    newFeatureLabel: '🎬 (New)',
+    newFeatureLabel: '⭐ New ⭐',
     text: 'AI casts your plays like a pro broadcast!',
     ctaLabel: 'Learn more',
-    betaBadgeLabel: 'Beta',
   },
 
   whatsNewPage: {

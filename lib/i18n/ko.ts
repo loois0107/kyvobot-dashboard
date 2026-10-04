@@ -1039,10 +1039,9 @@ const ko: typeof en = {
   },
 
   newFeatureBanner: {
-    newFeatureLabel: '🎬 (신기능)',
+    newFeatureLabel: '⭐ 신기능 ⭐',
     text: 'AI가 당신의 플레이를 LCK 중계처럼 만들어드려요!',
     ctaLabel: '자세히 보기',
-    betaBadgeLabel: '베타',
   },
 
   whatsNewPage: {
