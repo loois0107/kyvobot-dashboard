@@ -74,10 +74,13 @@ export default async function GuidePage() {
   // 본문까지 함께 라이트/다크로 전환된다.
   const landingTheme = resolveInitialLandingTheme(cookieStore.get(LANDING_THEME_COOKIE_NAME)?.value);
 
+  // 🛡️ [overflow-hidden 제거 - sticky 헤더 복구] app/page.tsx와 동일한 이유(overflow-x-hidden
+  // 만 남겨도 overflow-y가 CSS 스펙상 암묵적으로 auto가 돼서 sticky가 똑같이 깨짐이 실측
+  // 확인됨) - 상세 설명은 그쪽 주석 참고.
   return (
     <LandingThemeProvider
       initialTheme={landingTheme}
-      className="min-h-screen bg-bg-base text-text-primary flex flex-col relative overflow-hidden"
+      className="min-h-screen bg-bg-base text-text-primary flex flex-col relative"
     >
       {/* 🛡️ 히어로 배경 글로우 제거 - app/page.tsx와 동일(랜딩 무채색 정리 범위, 브랜드 블루/민트
           글로우 완전 삭제). */}

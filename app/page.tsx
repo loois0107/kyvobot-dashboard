@@ -258,10 +258,20 @@ export default async function RootPage() {
     }
   }
 
+  // 🛡️ [overflow-hidden 제거 - sticky 헤더 복구] LandingHeader가 이 Provider의 div 바로
+  // 밑 자식인데, overflow가 'visible'이 아닌 조상이 하나라도 있으면 position:sticky가
+  // 뷰포트가 아니라 그 조상 기준으로 묶여서(CSS 스펙상 스크롤 컨테이너 취급) 사실상 깨진다
+  // (실측: 스크롤하면 헤더가 제자리에서 그냥 같이 스크롤되어 사라짐). overflow-x-hidden만
+  // 남기는 것도 시도해봤는데, "한 축만 visible이 아니면 다른 축도 auto로 강제"되는 CSS 스펙
+  // 규칙 때문에 overflow-y가 암묵적으로 auto가 돼서 동일하게 깨짐이 실측 확인됐다(explicit
+  // overflow-y-visible을 같이 줘도 계산값이 같아서 회피 불가) - 그래서 overflow 쪽을 완전히
+  // 뺀다. DecorShapes는 섹션마다 자기 자신의 overflow-hidden(absolute inset-0)으로 이미
+  // 따로 잘려 있어 이 조상의 overflow-hidden에 의존하지 않고, scrollWidth==clientWidth로
+  // 실측해도 지금 가로 오버플로우가 실제로 발생하는 곳이 없어 안전하다.
   return (
     <LandingThemeProvider
       initialTheme={landingTheme}
-      className="min-h-screen bg-bg-base text-text-primary flex flex-col relative overflow-hidden"
+      className="min-h-screen bg-bg-base text-text-primary flex flex-col relative"
     >
       <LenisScroll />
       <LandingHeader dashboardHref={dashboardHref} />

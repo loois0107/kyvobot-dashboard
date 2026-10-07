@@ -22,7 +22,7 @@ export default function LandingHeader({ dashboardHref }: LandingHeaderProps) {
   const [navOpen, setNavOpen] = useState(false);
 
   return (
-    <header className="relative z-20 mt-6 w-full bg-bg-surface py-4 sm:py-5">
+    <header className="sticky top-0 z-20 w-full bg-bg-surface border-b border-border-default/40 py-4 sm:py-5">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 px-6 sm:px-8">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2 text-lg font-black tracking-wide">
