@@ -22,19 +22,7 @@ export default function LandingHeader({ dashboardHref }: LandingHeaderProps) {
   const [navOpen, setNavOpen] = useState(false);
 
   return (
-    // 🛡️ [헤더만 다크 고정 - data-theme="dark" 강제] "밝기 토글 아이콘에서 색을 빼면(아래
-    // LandingThemeToggle) 라이트 모드에서 흰 헤더 위에 묻혀서 구분이 안 간다"는 피드백으로,
-    // 헤더 배경 자체를 페이지 테마와 무관하게 항상 어둡게 고정한다. 새 CSS 변수를 만드는 대신
-    // 이 서브트리에만 data-theme="dark"를 얹는다 - LandingThemeContext.tsx가 이미 "속성
-    // 선택자라 어떤 요소에 얹어도 그 밑으로 캐스케이드된다"는 전제로 설계돼 있어서, header
-    // 안의 bg-bg-surface/text-text-primary 등 기존 토큰 클래스가 전부 손대지 않고도 다크
-    // 값으로 풀린다(LanguageToggle/AccountMenu 드롭다운까지 포함, 전부 토큰 기반이라 자동
-    // 적용됨). bg-surface(#141416)가 bg-base(다크 페이지 배경 #0A0A0B)보다 살짝 밝은 회색이라
-    // "화면을 다크로 바꿔도 헤더가 구분되게" 요건도 자연히 만족한다.
-    <header
-      data-theme="dark"
-      className="sticky top-0 z-20 w-full bg-bg-surface border-b border-border-default/40 py-4 sm:py-5"
-    >
+    <header className="sticky top-0 z-20 w-full bg-bg-surface border-b border-border-default/40 py-4 sm:py-5">
       <div className="max-w-7xl mx-auto relative flex items-center justify-between gap-3 px-6 sm:px-8">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2 text-xl font-black tracking-wide">
@@ -50,9 +38,10 @@ export default function LandingHeader({ dashboardHref }: LandingHeaderProps) {
               {t('landingPage.heroTitle')}
             </span>
           </Link>
-          {/* 🛡️ 모바일 전용 - AccountMenu/LanguageToggle과 동일한 패턴(토글 state + 투명 백드롭 +
-              절대위치 패널)으로 "기능"/"가이드" 2개 링크에 접근하는 길을 만든다. 데스크톱에서는
-              아래의 가운데 정렬된 <nav>가 보이고 모바일에서만 이 버튼이 보인다. */}
+          {/* 🛡️ 모바일 전용 - AccountMenu와 동일한 패턴(토글 state + 투명 백드롭 + 절대위치
+              패널)으로 "기능"/"가이드" 2개 링크에 접근하는 길을 만든다(LanguageToggle은 이제
+              드롭다운이 아니라 세그먼트 컨트롤이라 이 패턴을 안 씀). 데스크톱에서는 아래의
+              가운데 정렬된 <nav>가 보이고 모바일에서만 이 버튼이 보인다. */}
           <div className="relative md:hidden">
             <button
               type="button"

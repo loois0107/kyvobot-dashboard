@@ -1,55 +1,40 @@
 'use client';
 
-import { useState } from 'react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 const LANGUAGE_OPTIONS = [
-  { code: 'ko' as const, flag: '🇰🇷', label: '한국어' },
-  { code: 'en' as const, flag: '🇺🇸', label: 'English' },
+  { code: 'ko' as const, label: 'KO' },
+  { code: 'en' as const, label: 'EN' },
 ];
 
-// Same click-toggle + full-screen-overlay-for-outside-click pattern as AccountMenu.tsx - reused
-// verbatim so the two dropdowns (this one sits immediately left of AccountMenu in every header)
-// behave identically and never need separate outside-click wiring. Panel opens `right-0` (anchored
-// to this trigger's own right edge, expanding leftward) specifically so it never extends toward
-// AccountMenu's trigger a few pixels to the right.
+// 🛡️ [드롭다운 -> 세그먼트 컨트롤] 예전엔 AccountMenu와 동일한 "클릭하면 패널이 펼쳐지는"
+// 드롭다운이었는데, "클릭해보지 않아도 어떤 언어가 있는지 한눈에 보이면 좋겠다"는 피드백으로
+// 바뀌었다 - 옵션이 2개뿐이라 드롭다운으로 숨길 이유가 없다는 판단. KO/EN 둘 다 항상 보이는
+// 알약 안에서, 선택된 쪽만 배경을 올려 하이라이트하고(bg-bg-surface, 헤더 자체 배경인
+// bg-bg-elevated보다 밝아서 "눌린 버튼" 느낌) 클릭 한 번으로 바로 전환한다(open state/바깥
+// 클릭 감지 전부 불필요해짐). 국기 이모지는 빼고 "KO"/"EN" 두 글자만 쓴다 - 세그먼트가
+// 좁아서 국기+텍스트를 같이 넣으면 비좁고, 이미 둘 다 상시 노출이라 국기로 변별력을 더할
+// 필요도 없다.
 export default function LanguageToggle() {
   const { lang, setLang } = useLanguage();
-  const [open, setOpen] = useState(false);
-  const current = LANGUAGE_OPTIONS.find((o) => o.code === lang) ?? LANGUAGE_OPTIONS[1];
 
   return (
-    <div className="relative">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 bg-bg-elevated hover:bg-bg-elevated/70 rounded-full px-3 py-1.5 text-xs font-black tracking-wider text-text-primary transition-colors"
-      >
-        <span>{current.flag}</span>
-        <span className="hidden sm:inline">{current.label}</span>
-        <span className="text-text-muted text-[10px]">▾</span>
-      </button>
-
-      {open && (
-        <>
-          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 mt-2 w-40 bg-bg-surface border border-border-default rounded-xl shadow-2xl overflow-hidden z-20">
-            {LANGUAGE_OPTIONS.map((o) => (
-              <button
-                key={o.code}
-                type="button"
-                onClick={() => { setLang(o.code); setOpen(false); }}
-                className={`flex items-center gap-2 w-full text-left px-4 py-2.5 text-sm font-bold transition-colors ${
-                  o.code === lang ? 'bg-brand/15 text-text-primary' : 'text-text-secondary hover:bg-bg-elevated'
-                }`}
-              >
-                <span>{o.flag}</span>
-                <span>{o.label}</span>
-              </button>
-            ))}
-          </div>
-        </>
-      )}
+    <div className="flex items-center gap-0.5 bg-bg-elevated rounded-full p-1">
+      {LANGUAGE_OPTIONS.map((o) => (
+        <button
+          key={o.code}
+          type="button"
+          onClick={() => setLang(o.code)}
+          aria-pressed={o.code === lang}
+          className={`rounded-full px-3 py-1 text-xs font-black tracking-wider transition-colors ${
+            o.code === lang
+              ? 'bg-bg-surface text-text-primary shadow-sm'
+              : 'text-text-muted hover:text-text-secondary'
+          }`}
+        >
+          {o.label}
+        </button>
+      ))}
     </div>
   );
 }
