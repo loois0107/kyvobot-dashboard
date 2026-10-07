@@ -11,6 +11,11 @@ type LandingHeaderProps = {
   dashboardHref: string | null;
 };
 
+// 🛡️ [서포트 서버 초대 링크] "지원" 네비 항목용 - Discord 외부 링크라 next/link 대신 일반
+// <a target="_blank" rel="noreferrer">를 쓴다(이 저장소의 다른 외부 링크들과 동일 패턴,
+// 예: reaction-roles 페이지의 jump_url). 초대 코드가 재발급되면 이 한 줄만 바꾸면 된다.
+const SUPPORT_SERVER_URL = 'https://discord.gg/WdN6dVQHye';
+
 // 🛡️ [반응형 토큰으로 전환 - 랜딩 전용 다크/라이트] 예전엔 "랜딩은 다크 고정이라 토큰 대신
 // 리터럴 hex를 직접 쓴다"였는데, 이제 랜딩도 자체 다크/라이트 토글이 생겨서(LandingThemeToggle,
 // kyvo_landing_theme 쿠키) 반응형 토큰 클래스가 필요해졌다. 이 헤더를 감싸는
@@ -71,6 +76,15 @@ export default function LandingHeader({ dashboardHref }: LandingHeaderProps) {
                   >
                     {t('landingPage.navGuide')}
                   </Link>
+                  <a
+                    href={SUPPORT_SERVER_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => setNavOpen(false)}
+                    className="block px-4 py-2.5 text-sm font-bold text-text-secondary hover:bg-bg-elevated hover:text-text-primary transition-colors"
+                  >
+                    {t('landingPage.navSupport')}
+                  </a>
                 </div>
               </>
             )}
@@ -89,6 +103,14 @@ export default function LandingHeader({ dashboardHref }: LandingHeaderProps) {
           <Link href="/guide" className="text-sm font-bold text-text-secondary hover:text-text-primary transition-colors">
             {t('landingPage.navGuide')}
           </Link>
+          <a
+            href={SUPPORT_SERVER_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="text-sm font-bold text-text-secondary hover:text-text-primary transition-colors"
+          >
+            {t('landingPage.navSupport')}
+          </a>
         </nav>
         <div className="flex items-center gap-3">
           <LandingThemeToggle />

@@ -755,6 +755,7 @@ const en = {
   landingPage: {
     navFeatures: 'Features',
     navGuide: 'Guide',
+    navSupport: 'Support',
     guildListFailed: '⚠️ Failed to load your Discord server list. Please re-authenticate your session.',
     controlHubTitle: '🛡️ Kyvo Control Hub',
     noManagedServers: 'No Discord servers found where you have management permissions.',

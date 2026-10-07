@@ -755,6 +755,7 @@ const ko: typeof en = {
   landingPage: {
     navFeatures: '기능',
     navGuide: '가이드',
+    navSupport: '지원',
     guildListFailed: '⚠️ 디스코드 서버 목록을 불러오지 못했습니다. 다시 로그인해주세요.',
     controlHubTitle: '🛡️ Kyvo 컨트롤 허브',
     noManagedServers: '관리 권한이 있는 디스코드 서버를 찾을 수 없습니다.',
