@@ -175,6 +175,44 @@ html {
   --decor-stroke: rgba(24, 24, 27, 0.22); /* light - 어두운 선 */
 }
 
+/* 🛡️ [명시적 다크 블록 신설 - LandingHeader 등 "항상 다크" 서브트리용] 지금까지 다크는
+   [data-theme='dark'] 같은 명시적 규칙이 없이 위 @theme/:root의 기본값(다크 값 그대로)에만
+   의존했다 - [data-theme='light']가 어딘가에서 한 번 켜지면 그 밑 서브트리는 전부 라이트
+   값을 물려받고, 다시 다크로 되돌릴 "재진입 지점"이 없었다는 뜻. 랜딩 헤더를 페이지의
+   라이트/다크 토글과 무관하게 항상 어둡게 고정하기로 하면서(LandingHeader.tsx의
+   data-theme="dark") 그 재진입 지점이 필요해졌다 - @theme/:root의 다크 값을 그대로
+   복제한다(단일 소스가 아니라 복제인 이유: @theme는 Tailwind 전용 문법이라 속성 선택자
+   블록 안에서 재사용할 수 없음 - 라이트 블록도 이미 같은 이유로 전부 복제돼 있다). 값이
+   바뀌면 이 블록도 같이 갱신해야 한다. */
+[data-theme='dark'] {
+  --color-bg-base: #0A0A0B;
+  --color-bg-surface: #141416;
+  --color-bg-elevated: #1C1C1F;
+
+  --color-text-primary: #F5F5F5;
+  --color-text-secondary: #A1A1AA;
+  --color-text-muted: #85858B;
+
+  --color-border-default: #676771;
+  --color-border-hover: #797984;
+
+  --color-brand: #5865F2;
+  --color-brand-hover: #4752C4;
+
+  --color-success: #23A55A;
+  --color-danger: #F87171;
+  --color-warning: #FB923C;
+
+  --card-border: var(--color-border-default);
+  --card-shadow: none;
+  --card-shadow-accent: 0 0 18px rgba(88, 101, 242, 0.16);
+  --showcase-border: rgba(245, 245, 245, 0.18);
+  --showcase-shadow: 0 0 60px rgba(245, 245, 245, 0.12);
+  --cta-shadow: 0 0 30px rgba(88, 101, 242, 0.45);
+  --cta-shadow-hover: 0 0 45px rgba(88, 101, 242, 0.65);
+  --decor-stroke: rgba(245, 245, 245, 0.35);
+}
+
 body {
   /* 🛡️ 이 앱은 관리자 대시보드를 제외하면 다크/라이트 모드 구분이 없다(dark: 클래스 전체
      검색 0건, 기존 조사에서 확인됨) - 예전 --background/--foreground(prefers-color-scheme
