@@ -7,6 +7,7 @@ import LandingHeader from '@/components/landing/LandingHeader';
 import RevealOnScroll from '@/components/landing/RevealOnScroll';
 import BetaBadge from '@/components/ui/BetaBadge';
 import { BOT_INVITE_URL } from '@/lib/botInvite';
+import { DOR_COMPANION_DOWNLOAD_URL } from '@/lib/dorCompanion';
 import { LANDING_THEME_COOKIE_NAME, resolveInitialLandingTheme } from '@/lib/theme';
 import { LandingThemeProvider } from '@/lib/theme/LandingThemeContext';
 
@@ -148,6 +149,30 @@ export default async function WhatsNewPage() {
                 </p>
               </RevealOnScroll>
             ))}
+            {/* 🛡️ [DOR 컴패니언 다운로드 - 배열 밖에 별도 렌더] "녹화할 때 이렇게 해주세요" 바로
+                다음 항목으로 넣는다 - DOR도 결국 Medal.tv처럼 녹화 프로그램 중 하나이고, 이
+                항목만 다운로드 버튼이 섞여 있어서 title+desc만 받는 items 배열에는 못 넣는다.
+                나머지 세 항목과 똑같은 라벨/본문 2단 구조를 그대로 반복(사전 조건 항목과 동일한
+                패턴). 버튼 스타일은 이 페이지 하단 CTA의 보조 버튼과 같은 pill 모양을 더 작게. */}
+            <RevealOnScroll delayMs={300} className="flex flex-col sm:flex-row sm:gap-10">
+              <h3 className="sm:w-64 sm:shrink-0 text-lg font-bold text-text-primary leading-snug mb-2 sm:mb-0">
+                {t.whatsNewPage.whatsNewDorTitle}
+              </h3>
+              <div className="flex-1">
+                <p className="text-base text-text-muted leading-relaxed whitespace-pre-line">
+                  {t.whatsNewPage.whatsNewDorBody}
+                </p>
+                <a
+                  href={DOR_COMPANION_DOWNLOAD_URL}
+                  download
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 mt-3 border border-border-default/40 hover:border-border-hover text-text-secondary hover:text-text-primary text-sm font-bold px-6 py-2.5 rounded-full transition-all"
+                >
+                  ⬇️ {t.whatsNewPage.whatsNewDorButtonLabel}
+                </a>
+              </div>
+            </RevealOnScroll>
             {/* 🛡️ [사전 조건 항목 - 가이드 링크 포함이라 배열 밖에 별도 렌더] 쿨다운/용량/사전
                 설정(서버 지역+본인 인증)을 묶은 네 번째 항목. 나머지 세 항목과 달리 안내
                 링크(/guide)가 섞여 있어서 순수 문자열 하나로 표현할 수 없어, 위 items 배열에
@@ -155,7 +180,7 @@ export default async function WhatsNewPage() {
                 설정+본인 인증을 함께 설명하는 항목(guideTierVerifyTitle/Desc)이 실제로
                 존재하는 것을 확인했다 - 섹션별 anchor id는 없어서 페이지 전체 링크로
                 연결한다.*/}
-            <RevealOnScroll delayMs={300} className="flex flex-col sm:flex-row sm:gap-10">
+            <RevealOnScroll delayMs={400} className="flex flex-col sm:flex-row sm:gap-10">
               <h3 className="sm:w-64 sm:shrink-0 text-lg font-bold text-text-primary leading-snug mb-2 sm:mb-0">
                 {t.whatsNewPage.whatsNewPrereqTitle}
               </h3>

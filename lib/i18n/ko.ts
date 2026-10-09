@@ -1069,6 +1069,10 @@ const ko: typeof en = {
     whatsNewLanguageTitle: '🌍 영어로 사용하려면',
     whatsNewLanguageDesc:
       '단순히 번역만 하는 게 아니에요. 한국어는 LCK 중계 톤으로, 영어는 LCS 중계 톤으로 각각 다르게 말해줘요. /highlight 사용할 때 style 옵션으로 이번 영상만 원하는 스타일을 고를 수도 있고, 아무것도 안 고르면 서버 기본 설정을 따라가요.',
+    whatsNewDorTitle: '💾 DOR로 녹화하고 계신가요',
+    whatsNewDorBody:
+      'DOR을 쓰고 계시다면, 컴패니언 앱을 설치해서 킬 클립이 녹화될 때마다 자동으로 업로드되게 할 수 있어요. 영상을 직접 올릴 필요 없이, 디스코드에서 /dor_token으로 토큰을 받고 /dor_list로 바로 하이라이트를 만들면 돼요.',
+    whatsNewDorButtonLabel: '컴패니언 앱 다운로드',
     whatsNewPrereqTitle: '🔑 시작하기 전에',
     whatsNewPrereqBody:
       '한 번 쓰고 나면 30초 동안은 다시 쓸 수 없어요. 한 사람당 하루 5번, 서버당 하루 30번까지 만들 수 있어요. 영상 파일은 100MB를 넘으면 안 돼요.\n\n처음 쓰기 전에 서버 지역 설정과 본인 인증이 먼저 돼 있어야 해요.',
