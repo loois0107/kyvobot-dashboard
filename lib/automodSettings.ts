@@ -1,9 +1,13 @@
 // cogs/automod.py의 동명 상수와 값이 반드시 일치해야 한다 - party_settings 상수들과 동일한 이유:
 // 여기서 검증을 통과시켜놓고 봇 쪽 범위와 다르면 저장은 되는데 봇이 조용히 다른 값으로
 // 덮어써서 혼란만 커진다.
-// 🛡️ [긴급 추가] cogs/automod.py의 AUTOMOD_ENABLED_DEFAULT와 반드시 일치해야 한다 - automod_settings를
-// 한 번도 저장한 적 없는 길드가 전부 이 기본값을 타므로, 여기도 true여야 기존 보호가 회귀하지 않는다.
-export const AUTOMOD_ENABLED_DEFAULT = true;
+// 🛡️ [2026-10-10 마이그레이션 이후 false로 전환] cogs/automod.py와 똑같은 배경 - automod_settings.
+// enabled 키가 없던 기존 길드는 migrate_automod_enabled.py(kyvobot 레포)가 전부 enabled: true를
+// 백필해뒀다. 이제 이 기본값을 타는 건 마이그레이션 이후 새로 초대되는 길드뿐이라 false로 바꿔도
+// 기존 서버 보호가 회귀하지 않는다. 이 값을 쓰는 곳(GET의 DEFAULT_AUTOMOD_SETTINGS 병합,
+// 설정 페이지의 초기 useState)도 신규 길드에서 실제 봇 동작(꺼짐)과 다르게 "켜짐"으로 보이지
+// 않으려면 반드시 봇 쪽과 같은 값이어야 한다.
+export const AUTOMOD_ENABLED_DEFAULT = false;
 export const AUTOMOD_SPAM_LIMIT_MIN = 3;
 export const AUTOMOD_SPAM_LIMIT_MAX = 20;
 export const AUTOMOD_SPAM_LIMIT_DEFAULT = 5;
@@ -86,7 +90,8 @@ export function validateAutomodSettings(input: any): ValidationResult {
   const errors: AutomodValidationError[] = [];
 
   // 🛡️ [enabled - 범위 검증 불필요] 단순 불리언이라 valid/invalid 판정이 없다 - 값이 없으면
-  // AUTOMOD_ENABLED_DEFAULT(true)로 폴백해서 명시적으로 끄지 않는 한 항상 켜진 채로 저장된다.
+  // AUTOMOD_ENABLED_DEFAULT(false)로 폴백한다. 이 페이지는 폼이 항상 enabled를 명시적으로
+  // 보내므로(토글 UI가 있음) 실제로 undefined가 되는 경로는 거의 없다.
   const enabled = input?.enabled === undefined ? AUTOMOD_ENABLED_DEFAULT : Boolean(input.enabled);
 
   const spamLimit = Number(input?.spam_limit);
