@@ -5,6 +5,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     // clientId/clientSecret은 AUTH_DISCORD_ID / AUTH_DISCORD_SECRET 에서 자동 주입됨
     Discord({
+      // 🛡️ [iss 콜백 파라미터] Discord가 OAuth2 콜백 리다이렉트에 RFC 9207
+      // (authorization response issuer identification) 파라미터 iss=https://discord.com을
+      // 붙이기 시작했는데, @auth/core의 기본 Discord provider(0.41.3 확인 - 아직 최신에도
+      // 없음)는 issuer를 지정하지 않아서 oauth4webapi가 플레이스홀더 "https://authjs.dev"와
+      // 비교해 매번 CallbackRouteError(unexpected "iss")를 던졌다. token/userinfo URL이 이미
+      // 실제 주소로 고정돼 있어서(providers.js의 normalizeOAuth/handleOAuth) issuer를 넣어도
+      // OIDC 디스커버리를 새로 타지 않고 as.issuer 값만 바뀐다 - 안전한 범위의 수정.
+      issuer: "https://discord.com",
       // 유저의 길드 목록을 읽으려면 guilds 스코프가 반드시 필요하다
       authorization: { params: { scope: "identify guilds" } },
       // 🛡️ [다국어] next-auth 기본 profile() 매퍼가 id/name/email/image만 남기고 locale을

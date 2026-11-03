@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession, signIn } from 'next-auth/react';
 import HelpText from '@/components/HelpText';
 import SettingsPageContainer from '@/components/SettingsPageContainer';
 import Card from '@/components/ui/Card';
@@ -78,12 +78,13 @@ export default function AdminServersPage() {
       <div className="min-h-[50vh] flex items-center justify-center p-4">
         <div className="text-center space-y-4 border border-border-default bg-bg-surface p-8 rounded-2xl shadow-2xl max-w-md w-full">
           <h1 className="text-xl font-black text-warning">Login Required</h1>
-          <a
-            href="/api/auth/signin?callbackUrl=%2Fadmin%2Fservers"
+          <button
+            type="button"
+            onClick={() => signIn('discord', { callbackUrl: '/admin/servers' })}
             className="inline-block bg-brand hover:bg-brand-hover text-white text-sm font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all"
           >
             Login with Discord
-          </a>
+          </button>
         </div>
       </div>
     );

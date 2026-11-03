@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession, signIn, signOut } from 'next-auth/react';
 import { useT } from '@/lib/i18n/LanguageContext';
 
 type ExtraMenuItem = {
@@ -26,12 +26,13 @@ export default function AccountMenu({ profileHref, extraItems = [] }: AccountMen
 
   if (!session?.user) {
     return (
-      <a
-        href="/api/auth/signin"
+      <button
+        type="button"
+        onClick={() => signIn('discord')}
         className="border border-brand/40 hover:border-brand text-text-secondary hover:text-text-primary text-sm sm:text-base font-bold px-4 py-2 rounded-lg transition-all whitespace-nowrap"
       >
         {t('landingPage.loginCta')}
-      </a>
+      </button>
     );
   }
 

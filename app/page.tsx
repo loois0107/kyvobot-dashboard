@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Gamepad2, Shield, Ticket, Sparkles, Smile, TvMinimalPlay, Palette } from 'lucide-react';
-import { auth } from '@/auth';
+import { auth, signIn } from '@/auth';
 import { COOKIE_NAME, dictionaries, resolveInitialLanguage } from '@/lib/i18n';
 import { LANDING_THEME_COOKIE_NAME, resolveInitialLandingTheme } from '@/lib/theme';
 import { LandingThemeProvider } from '@/lib/theme/LandingThemeContext';
@@ -295,12 +295,19 @@ export default async function RootPage() {
               >
                 🤖 {t.landingPage.addBotCta}
               </a>
-              <a
-                href="/api/auth/signin"
-                className="border border-border-default/40 hover:border-border-hover text-text-secondary hover:text-text-primary text-base font-bold px-10 py-4 rounded-xl transition-all"
+              <form
+                action={async () => {
+                  'use server';
+                  await signIn('discord');
+                }}
               >
-                {t.landingPage.loginCta}
-              </a>
+                <button
+                  type="submit"
+                  className="border border-border-default/40 hover:border-border-hover text-text-secondary hover:text-text-primary text-base font-bold px-10 py-4 rounded-xl transition-all"
+                >
+                  {t.landingPage.loginCta}
+                </button>
+              </form>
             </>
           ) : dashboardHref ? (
             <Link
@@ -539,12 +546,19 @@ export default async function RootPage() {
             >
               🤖 {t.landingPage.addBotCta}
             </a>
-            <a
-              href="/api/auth/signin"
-              className="border border-border-default/40 hover:border-border-hover text-text-secondary hover:text-text-primary text-base font-bold px-10 py-4 rounded-full transition-all"
+            <form
+              action={async () => {
+                'use server';
+                await signIn('discord');
+              }}
             >
-              {t.landingPage.loginCta}
-            </a>
+              <button
+                type="submit"
+                className="border border-border-default/40 hover:border-border-hover text-text-secondary hover:text-text-primary text-base font-bold px-10 py-4 rounded-full transition-all"
+              >
+                {t.landingPage.loginCta}
+              </button>
+            </form>
           </div>
         </RevealOnScroll>
       </section>

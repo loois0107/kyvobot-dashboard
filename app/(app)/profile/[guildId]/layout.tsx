@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams, usePathname } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useSession, signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { useT } from '@/lib/i18n/LanguageContext';
 
@@ -27,12 +27,13 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
         <div className="text-center space-y-4 border border-border-default bg-bg-surface p-8 rounded-2xl shadow-2xl max-w-md w-full">
           <h1 className="text-xl font-black text-warning">{t('profileCardPage.loginRequiredTitle')}</h1>
           <p className="text-sm text-text-secondary">{t('profileCardPage.loginRequiredDesc')}</p>
-          <a
-            href={`/api/auth/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`}
+          <button
+            type="button"
+            onClick={() => signIn('discord', { callbackUrl })}
             className="inline-block bg-brand hover:bg-brand-hover text-white text-sm font-black px-6 py-3 rounded-xl shadow-lg tracking-widest transition-all"
           >
             {t('profileCardPage.loginButton')}
-          </a>
+          </button>
         </div>
       </div>
     );
