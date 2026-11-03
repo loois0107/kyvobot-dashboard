@@ -763,6 +763,10 @@ const ko: typeof en = {
     heroTagline: '자동 관리, 레벨링, 파티 모집, AI 티켓 지원까지 - 실제 웹 대시보드로 설정하는 올인원 디스코드 봇입니다.',
     addBotCta: '서버에 추가하기',
     loginCta: 'Discord로 로그인',
+    miniGameEyebrow: '⭐ 신규 미니게임 ⭐',
+    miniGameTitle: '친구들과 즐기는 4인 대난투!',
+    miniGameDesc: '보이스 채널에 모인 멤버들과 바로 시작하는 미니게임, MOA를 만나보세요.',
+    miniGameCta: '자세히 보기',
     painPointsEyebrow: '문제 상황',
     painPointsTitle: '이런 고민, 있으시죠?',
     painPointPartyDescription: '사람은 많은데 같이 할 사람을 찾기가 힘드셨죠. **/party_recruit** 한 번이면 모집부터 매칭까지 자동으로 끝나요.',
@@ -1075,6 +1079,36 @@ const ko: typeof en = {
     whatsNewPrereqLinkLabel: '설정 방법은 가이드 페이지에서 확인하세요',
 
     whatsNewMoreGamesTeaser: '앞으로 이 기능을 계속 다듬으면서, 다른 게임도 지원할 예정이에요. 기대해주세요!',
+  },
+
+  brawlSpikePage: {
+    heroTitle: '다 함께 뛰어드는 4인 대난투, MOA',
+    heroDesc: '보이스 채널에 모인 친구들과 바로 시작하는 즉석 난투극이에요.',
+
+    section1Title: '무엇을 하는 미니게임인가요',
+    introBody1:
+      '같은 보이스 채널에 모인 친구들과 /모아 명령어 한 번이면 곧바로 시작하는 4인 대난투 미니게임, MOA예요.',
+    introBody2: '설치나 복잡한 준비 없이, 친구들과 가볍게 몇 판씩 즐기기 딱 좋아요.',
+
+    section2Title: '인게임은 어떨까요?',
+    screenshotMainMenuAlt: '게임 선택 화면에서 MOA를 고르는 모습',
+    screenshotArenaClassicAlt: '잿불의 투기장 맵에서 플레이하는 모습',
+    screenshotArenaClassicCaption: '잿불의 투기장',
+    screenshotArenaConstellationAlt: '성좌의 아레나 맵에서 플레이하는 모습',
+    screenshotArenaConstellationCaption: '성좌의 아레나',
+
+    section3Title: '희귀 무기 각성 연출',
+    cutsceneIntro:
+      '보급상자에서 희귀 무기를 뽑는 순간, 손에 넣은 무기마다 어울리는 웅장한 전용 음악이 깔리면서 분위기가 완전히 바뀌어요. 공격 방식과 타격 사운드도 무기마다 전혀 다르게 느껴져서, 뽑을 때마다 매번 새로운 손맛을 즐길 수 있어요.',
+    cutsceneAlt1: '희귀 무기 각성 연출 예시 1',
+    cutsceneCaption1: '각성 연출 예시 1',
+    cutsceneAlt2: '희귀 무기 각성 연출 예시 2',
+    cutsceneCaption2: '각성 연출 예시 2',
+    cutsceneAlt3: '희귀 무기 각성 연출 예시 3',
+    cutsceneCaption3: '각성 연출 예시 3',
+
+    ctaTitle: '지금 보이스 채널에서 바로 시작해보세요',
+    ctaDesc: '서버에 Kyvo를 추가한 다음, 보이스 채널에 모여 /모아 명령어를 입력하면 바로 대난투가 시작돼요.',
   },
 };
 

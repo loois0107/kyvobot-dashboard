@@ -763,6 +763,10 @@ const en = {
     heroTagline: 'One Discord bot for moderation, leveling, party recruiting, and AI-powered ticket support - configured from a real web dashboard.',
     addBotCta: 'Add to Server',
     loginCta: 'Login with Discord',
+    miniGameEyebrow: '⭐ New Mini-Game ⭐',
+    miniGameTitle: 'A 4-player brawl with your friends!',
+    miniGameDesc: 'Jump into MOA, a quick mini-game with whoever is in your voice channel.',
+    miniGameCta: 'Learn more',
     painPointsEyebrow: 'The Problem',
     painPointsTitle: 'Sound Familiar?',
     painPointPartyDescription: "Plenty of members online, but finding people to actually play with is the hard part. Run **/party_recruit** once, and recruiting and matching happen automatically.",
@@ -1075,6 +1079,36 @@ const en = {
     whatsNewPrereqLinkLabel: 'See setup steps in the guide',
 
     whatsNewMoreGamesTeaser: "We'll keep improving this feature and plan to support more games down the road. Stay tuned!",
+  },
+
+  brawlSpikePage: {
+    heroTitle: 'MOA: A 4-Player Free-for-All',
+    heroDesc: 'Jump straight into a quick brawl with friends in your voice channel.',
+
+    section1Title: 'What This Mini-Game Is',
+    introBody1:
+      "MOA is a 4-player free-for-all mini-game you can jump into instantly with friends in the same voice channel - just run /moa.",
+    introBody2: "No install, no setup - perfect for a few casual rounds with friends.",
+
+    section2Title: 'What Does Gameplay Look Like?',
+    screenshotMainMenuAlt: 'Selecting MOA from the game picker screen',
+    screenshotArenaClassicAlt: 'Gameplay on the Ashen Arena map',
+    screenshotArenaClassicCaption: 'Ashen Arena',
+    screenshotArenaConstellationAlt: 'Gameplay on the Constellation Arena map',
+    screenshotArenaConstellationCaption: 'Constellation Arena',
+
+    section3Title: 'Rare Weapon Awakening Cutscenes',
+    cutsceneIntro:
+      "The moment you pull a rare weapon from a supply crate, a grand, dedicated theme kicks in to match whatever you just grabbed, completely shifting the mood of the fight. Every weapon also has its own attack style and hit sound, so each pull feels fresh all over again.",
+    cutsceneAlt1: 'Example of a rare weapon awakening cutscene 1',
+    cutsceneCaption1: 'Awakening example 1',
+    cutsceneAlt2: 'Example of a rare weapon awakening cutscene 2',
+    cutsceneCaption2: 'Awakening example 2',
+    cutsceneAlt3: 'Example of a rare weapon awakening cutscene 3',
+    cutsceneCaption3: 'Awakening example 3',
+
+    ctaTitle: 'Start a Match Right From Your Voice Channel',
+    ctaDesc: 'Add Kyvo to your server, then run /moa in a voice channel with friends to jump straight into a match.',
   },
 };
 

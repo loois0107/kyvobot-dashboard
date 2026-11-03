@@ -7,7 +7,6 @@ import { COOKIE_NAME, dictionaries, resolveInitialLanguage } from '@/lib/i18n';
 import { LANDING_THEME_COOKIE_NAME, resolveInitialLandingTheme } from '@/lib/theme';
 import { LandingThemeProvider } from '@/lib/theme/LandingThemeContext';
 import LandingHeader from '@/components/landing/LandingHeader';
-import NewFeatureBanner from '@/components/landing/NewFeatureBanner';
 import LenisScroll from '@/components/landing/LenisScroll';
 import DecorShapes, {
   HERO_SHAPES,
@@ -21,6 +20,7 @@ import FeatureScreenshotRow from '@/components/landing/FeatureScreenshotRow';
 import DashboardShowcase from '@/components/landing/DashboardShowcase';
 import { BOT_INVITE_URL } from '@/lib/botInvite';
 import { resolveLocalizedImage } from '@/lib/resolveLocalizedImage';
+import BetaBadge from '@/components/ui/BetaBadge';
 
 // 🛡️ hasDetail: true인 3개(파티/AI티켓/레벨링)는 SEE IT IN ACTION에 대응하는 스크린샷 행이
 // 있어서 카드 하단에 "자세히 보기" 링크를 붙인다(#see-it-in-action으로 스크롤). 나머지 3개는
@@ -275,7 +275,52 @@ export default async function RootPage() {
     >
       <LenisScroll />
       <LandingHeader dashboardHref={dashboardHref} />
-      <NewFeatureBanner />
+
+      {/* 🛡️ [신기능 배너 -> 2분할 카드] 기존엔 "신기능"(LCK 하이라이트) 배너 한 줄이 이 자리를
+          전부 차지했는데, 신규 미니게임(brawl-spike)도 같은 비중으로 소개하기 위해 좌/우 카드로
+          나눴다. 두 카드 모두 grid item이라 기본 align-items:stretch로 높이가 자동으로
+          맞춰지고, 내부를 flex+justify-center로 세로 중앙 정렬해서 콘텐츠 길이가 달라도
+          시각적 비중이 동등해 보이게 한다. 오른쪽 카드는 기존 NewFeatureBanner의 문구/링크
+          (/whats-new)를 그대로 재사용 - 전용 컴포넌트는 더 이상 쓰이는 곳이 없어 삭제했다. */}
+      <section className="relative z-10 mt-6 mx-4 sm:mx-6 lg:max-w-7xl lg:mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* 🛡️ 신규 미니게임 소개 카드 - "자세히 보기"는 전용 상세 페이지(app/brawl-spike/page.tsx)로 연결된다. */}
+          <Link
+            href="/brawl-spike"
+            className="group h-full flex flex-col items-center justify-center bg-bg-surface border border-border-default rounded-2xl p-8 sm:p-10 text-center transition-all duration-200 hover:-translate-y-1 hover:border-text-secondary/50"
+          >
+            <div className="text-sm md:text-base font-black tracking-widest text-text-primary mb-1">
+              {t.landingPage.miniGameEyebrow}
+            </div>
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-black tracking-wide leading-tight text-text-primary">
+              {t.landingPage.miniGameTitle}
+            </h3>
+            <p className="mt-3 text-sm md:text-base text-text-secondary leading-relaxed">
+              {t.landingPage.miniGameDesc}
+            </p>
+            <div className="mt-4 text-sm md:text-base font-bold text-text-secondary group-hover:text-text-primary transition-colors">
+              {t.landingPage.miniGameCta} →
+            </div>
+          </Link>
+
+          {/* 🛡️ 기존 LCK 하이라이트 기능 카드 - 문구/링크는 NewFeatureBanner와 동일, 카드 형태만 맞춤 */}
+          <Link
+            href="/whats-new"
+            className="group h-full flex flex-col items-center justify-center bg-bg-surface border border-border-default rounded-2xl p-8 sm:p-10 text-center transition-all duration-200 hover:-translate-y-1 hover:border-text-secondary/50"
+          >
+            <div className="text-sm md:text-base font-black tracking-widest text-text-primary mb-1">
+              {t.newFeatureBanner.newFeatureLabel}
+            </div>
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-black tracking-wide leading-tight text-text-primary">
+              {t.newFeatureBanner.text}{' '}
+              <BetaBadge label="BETA" className="text-xl sm:text-2xl md:text-3xl align-middle" />
+            </h3>
+            <div className="mt-4 text-sm md:text-base font-bold text-text-secondary group-hover:text-text-primary transition-colors">
+              {t.newFeatureBanner.ctaLabel} →
+            </div>
+          </Link>
+        </div>
+      </section>
 
       <main className="relative min-h-screen flex flex-col items-center justify-center text-center px-4 pt-4 pb-16 gap-6">
         <DecorShapes shapes={HERO_SHAPES} />
